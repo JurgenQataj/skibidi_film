@@ -1,0 +1,11 @@
+# File delle variabili d'ambiente
+server/.env
+
+# Cartelle delle dipendenze (non servono online)
+server/node_modules
+client/node_modules
+
+# File di log e di sistema
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,38 @@
+.card {
+  /* RIDOTTA LA LARGHEZZA PER FARNE ENTRARE DI PIÙ */
+  width: 130px; 
+  background-color: #1c1e21;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  margin: 5px; /* Ridotto anche il margine */
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  /* RIDOTTA L'ALTEZZA IN PROPORZIONE */
+  height: 195px; 
+  object-fit: cover;
+  display: block;
+}
+
+.title {
+  padding: 8px; /* Ridotto il padding */
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* RIDOTTA LA DIMENSIONE DEL FONT */
+  font-size: 0.9rem; 
+}
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+}

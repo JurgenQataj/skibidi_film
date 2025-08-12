@@ -1,0 +1,235 @@
+.pageContainer {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  color: white;
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary-color);
+}
+
+.profileInfo {
+  text-align: left;
+}
+
+.username {
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.bio {
+  font-size: 1.1rem;
+  color: #ccc;
+  margin-top: 10px;
+  max-width: 500px;
+}
+
+.statsContainer {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.statItem,
+.statItemClickable {
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.statItemClickable {
+  cursor: pointer;
+}
+
+.statItemClickable:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+}
+
+.reviewsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.userList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.followButton,
+.editButton {
+  margin-top: 20px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: var(--border-radius);
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.followButton:hover,
+.editButton:hover {
+  opacity: 0.9;
+}
+
+/* Stili per il pop-up di modifica profilo */
+.editLabel {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.bioTextarea {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.avatarGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.avatarOption {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.avatarOption.selected {
+  border-color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.saveButton {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  opacity: 0.9;
+}
+
+/* ... (tutti gli stili precedenti fino a .saveButton:hover) ... */
+
+.showAllContainer {
+  text-align: center;
+  margin-top: 30px;
+}
+.showAllButton {
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.showAllButton:hover {
+  background-color: var(--secondary-color);
+}
+
+/* --- SEZIONE CORRETTA CON I CONTATORI CSS --- */
+.historyList {
+  list-style: none; /* Disattiviamo la numerazione automatica */
+  padding-left: 0;
+  counter-reset: review-counter; /* 1. Azzeriamo il nostro contatore personalizzato */
+  color: #ccc;
+  font-family: sans-serif;
+}
+.historyItem {
+  counter-increment: review-counter; /* 2. Diciamo al contatore di aumentare di 1 per ogni film */
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #444;
+}
+.historyItem::before {
+  content: counter(review-counter) "."; /* 3. Mostriamo il valore del contatore prima di ogni film */
+  font-weight: bold;
+  color: var(--primary-color);
+  width: 40px; /* Spazio per il numero */
+  text-align: right;
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+.historyItem:last-child {
+  border-bottom: none;
+}
+.historyPoster {
+  width: 40px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 15px;
+}
+.historyInfo {
+  flex-grow: 1;
+}
+.historyTitle {
+  display: block;
+  font-weight: bold;
+  color: white;
+}
+.historyRating {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}

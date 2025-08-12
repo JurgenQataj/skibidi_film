@@ -1,0 +1,337 @@
+/* Stili principali della pagina */
+.pageContainer {
+  color: white;
+  padding-bottom: 50px;
+}
+.loading {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-top: 50px;
+  padding: 40px;
+}
+
+/* Stili per l'Header con sfondo */
+.header {
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+}
+.headerOverlay {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.95) 20%,
+    rgba(0, 0, 0, 0.7) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  padding: 50px 40px;
+}
+.headerContent {
+  display: flex;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: center;
+}
+.poster {
+  width: 300px;
+  height: 450px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+.details {
+  flex: 1;
+}
+.title {
+  font-size: 3rem;
+  margin-top: 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+.tagline {
+  font-style: italic;
+  font-size: 1.2rem;
+  color: #ccc;
+  margin-top: -15px;
+}
+.overview {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.director {
+  margin-top: 20px;
+  font-size: 1.1rem;
+}
+
+/* Sezione Info (Costo, Botteghino, Lingua) */
+.infoSection {
+  display: flex;
+  justify-content: space-around;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  margin: 0 40px 40px 40px;
+  border-radius: var(--border-radius);
+  max-width: 1200px;
+  box-sizing: border-box;
+  position: relative;
+  top: -20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.infoBox {
+  text-align: center;
+}
+.infoBox h4 {
+  margin: 0;
+  color: #ccc;
+  font-weight: normal;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+.infoBox p {
+  margin: 5px 0 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Sezione Cast */
+.castSection {
+  padding: 0 40px;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+.castSection h2 {
+  font-size: 2rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+}
+.castGrid {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding-bottom: 20px;
+}
+.actorCard {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  min-width: 150px;
+  text-align: center;
+}
+.actorCard img {
+  width: 100%;
+  height: 225px;
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.actorCard strong,
+.actorCard span {
+  display: block;
+  padding: 5px;
+}
+.actorCard span {
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+/* Sezione Recensioni */
+.reviewsSection {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 40px auto;
+  background-color: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius);
+}
+.reviewsTitle {
+  font-size: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+  margin-top: 0;
+}
+.reviewItem {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.reviewHeader div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.reviewAuthor {
+  font-size: 1.1rem;
+}
+.reviewRating {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.reviewComment {
+  margin: 0;
+  line-height: 1.5;
+}
+.deleteButton {
+  background-color: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  border-radius: 5px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+.deleteButton:hover {
+  background-color: #ff4d4d;
+  color: white;
+}
+.alreadyReviewedMessage {
+  background-color: rgba(60, 20, 80, 0.5);
+  border: 1px solid var(--primary-color);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+/* Sezione Azioni Recensione (Reazioni e Commenti) */
+.reviewActions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+.reactions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.reactions span {
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-width: 15px;
+}
+.reactions button {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.reactions button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.2);
+}
+.commentButton {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.commentButton:hover {
+  color: white;
+}
+
+/* Sezione Commenti */
+.commentsSection {
+  margin-top: 15px;
+  padding: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+.commentItem {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.commentItem strong {
+  color: var(--primary-color);
+}
+.authorLink {
+  text-decoration: none;
+  color: inherit;
+}
+.authorLink:hover strong {
+  text-decoration: underline;
+}
+.commentForm {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+.commentForm input {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: white;
+  padding: 8px;
+}
+.commentForm button {
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* Azioni film (Watchlist / Aggiungi a lista) */
+.actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+.actionButton {
+  padding: 10px 15px;
+  border: none;
+  border-radius: var(--border-radius);
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.actionButton:hover {
+  opacity: 0.8;
+}
+.listsDropdown {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: var(--border-radius);
+}
+.listButton {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 5px;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.listButton:hover {
+  border-color: var(--primary-color);
+}

@@ -1,0 +1,36 @@
+:root {
+  --background-color: #f0f2f5;
+  --text-color: #1c1e21;
+  --primary-color: #8a4baf;
+  --secondary-color: #e50914;
+  --card-background: #ffffff;
+  --border-radius: 12px;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #141414; /* Colore di riserva se l'immagine non carica */
+}
+
+/* Usiamo un pseudo-elemento per lo sfondo per una maggiore stabilità */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("/sfondo1.jpg"); /* Assicurati che il tuo file in /public si chiami sfondo1.jpg */
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}

@@ -1,0 +1,48 @@
+.loginContainer {
+  background-color: rgba(0, 0, 0, 0.75); /* Sfondo nero semi-trasparente */
+  backdrop-filter: blur(10px); /* Effetto sfocato dello sfondo */
+  padding: 60px;
+  border-radius: var(--border-radius);
+  color: white; /* Testo bianco per contrasto */
+  min-width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.inputField {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.submitButton {
+  padding: 12px 15px;
+  border-radius: var(--border-radius);
+  border: none;
+  background-color: var(--primary-color); /* Usiamo il viola come colore primario */
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.submitButton:hover {
+  background-color: var(--secondary-color); /* Al passaggio del mouse, diventa rosso Netflix */
+}

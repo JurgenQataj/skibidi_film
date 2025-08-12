@@ -1,0 +1,56 @@
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import styles from "./ListPage.module.css"; // Riusiamo lo stile della pagina delle liste
+import MovieCard from "../components/MovieCard";
+
+function WatchlistPage() {
+  const [watchlist, setWatchlist] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchWatchlist = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.user.id;
+
+      const response = await axios.get(
+        `http://localhost:5000/api/watchlist/user/${userId}`
+      );
+      setWatchlist(response.data);
+    } catch (error) {
+      console.error("Errore nel caricamento della watchlist:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWatchlist();
+  }, [fetchWatchlist]);
+
+  if (loading)
+    return <p className={styles.statusText}>Caricamento della watchlist...</p>;
+
+  return (
+    <div className={styles.pageContainer}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>La mia Watchlist</h1>
+        <p className={styles.description}>
+          I film che hai salvato per guardarli più tardi.
+        </p>
+      </header>
+      <div className={styles.moviesGrid}>
+        {watchlist.length > 0 ? (
+          watchlist.map((movie) => (
+            <MovieCard key={movie.tmdb_id} movie={movie} />
+          ))
+        ) : (
+          <p className={styles.statusText}>La tua watchlist è vuota.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default WatchlistPage;

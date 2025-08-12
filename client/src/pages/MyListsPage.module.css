@@ -1,0 +1,115 @@
+.pageContainer {
+  padding: 40px;
+  color: white;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.createListSection,
+.myListsSection {
+  background-color: rgba(28, 30, 33, 0.7); /* Meno trasparente e più solido */
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  margin-bottom: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.inputField,
+.textareaField {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.textareaField {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.button {
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: var(--secondary-color);
+}
+
+.listsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* MODIFICA: La card ora non è più un link diretto, ma lo sono i suoi contenuti */
+.listCard {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  position: relative;
+  transition: background-color 0.2s;
+}
+.listCard:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* NUOVO: Stile per il contenuto cliccabile */
+.listLink {
+  text-decoration: none; /* Rimuove la sottolineatura */
+  color: inherit;
+  display: block;
+}
+
+.listCard h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+}
+.listCard p {
+  color: #ccc;
+}
+
+.statusText {
+  font-style: italic;
+  color: #ccc;
+}
+
+/* MODIFICA: Stile migliorato per il pulsante Elimina */
+.deleteButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 77, 77, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+.deleteButton:hover {
+  background: #cc0000;
+}
+.watchlistCard {
+  border: 2px solid var(--primary-color);
+  background-color: rgba(138, 75, 175, 0.2);
+}
