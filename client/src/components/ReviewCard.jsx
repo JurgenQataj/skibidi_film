@@ -11,13 +11,16 @@ function ReviewCard({ review, onInteraction }) {
   const placeholderPoster =
     "https://via.placeholder.com/200x300.png?text=No+Image";
 
+  // Definiamo l'URL del nostro backend
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   if (!review) return null;
 
   const handleReaction = async (reactionType) => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:5000/api/reactions/reviews/${review.id}`,
+        `${API_URL}/api/reactions/reviews/${review.id}`, // <--- USA API_URL
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -34,7 +37,7 @@ function ReviewCard({ review, onInteraction }) {
     }
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/comments/reviews/${review.id}`
+        `${API_URL}/api/comments/reviews/${review.id}` // <--- USA API_URL
       );
       setComments({ shown: true, list: response.data || [] });
     } catch (error) {
@@ -48,7 +51,7 @@ function ReviewCard({ review, onInteraction }) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:5000/api/comments/reviews/${review.id}`,
+        `${API_URL}/api/comments/reviews/${review.id}`, // <--- USA API_URL
         { comment_text: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -92,7 +95,6 @@ function ReviewCard({ review, onInteraction }) {
           Voto: <span className={styles.ratingValue}>{review.rating}</span>
         </div>
         <p className={styles.comment}>"{review.comment_text}"</p>
-
         <div className={styles.actions}>
           <div className={styles.reactions}>
             <button onClick={() => handleReaction("love")} title="Love">
@@ -105,7 +107,6 @@ function ReviewCard({ review, onInteraction }) {
             {review.comment_count || 0})
           </button>
         </div>
-
         {comments.shown && (
           <div className={styles.commentsSection}>
             {comments.list.map((comment) => (
@@ -134,5 +135,4 @@ function ReviewCard({ review, onInteraction }) {
     </div>
   );
 }
-
 export default ReviewCard;

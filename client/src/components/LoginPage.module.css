@@ -33,7 +33,9 @@
   padding: 12px 15px;
   border-radius: var(--border-radius);
   border: none;
-  background-color: var(--primary-color); /* Usiamo il viola come colore primario */
+  background-color: var(
+    --primary-color
+  ); /* Usiamo il viola come colore primario */
   color: white;
   font-weight: bold;
   font-size: 16px;
@@ -44,5 +46,7 @@
 }
 
 .submitButton:hover {
-  background-color: var(--secondary-color); /* Al passaggio del mouse, diventa rosso Netflix */
+  background-color: var(
+    --secondary-color
+  ); /* Al passaggio del mouse, diventa rosso Netflix */
 }

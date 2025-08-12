@@ -18,9 +18,12 @@ function ProfilePage() {
     title: "",
     content: [],
   });
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+
+  // Definiamo l'URL del backend
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,9 +35,9 @@ function ProfilePage() {
         setLoggedInUserId(currentUserId);
 
         const [profileRes, statsRes, reviewsRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/users/${userId}/profile`),
-          axios.get(`http://localhost:5000/api/users/${userId}/stats`),
-          axios.get(`http://localhost:5000/api/users/${userId}/reviews`),
+          axios.get(`${API_URL}/api/users/${userId}/profile`),
+          axios.get(`${API_URL}/api/users/${userId}/stats`),
+          axios.get(`${API_URL}/api/users/${userId}/reviews`),
         ]);
 
         setProfile(profileRes.data);
@@ -43,7 +46,7 @@ function ProfilePage() {
 
         if (currentUserId && currentUserId !== Number(userId)) {
           const followStatusRes = await axios.get(
-            `http://localhost:5000/api/users/${userId}/follow-status`,
+            `${API_URL}/api/users/${userId}/follow-status`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setIsFollowing(followStatusRes.data.isFollowing);
@@ -57,9 +60,8 @@ function ProfilePage() {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [userId]);
+  }, [userId, API_URL]);
 
   const handleFollowToggle = async () => {
     const token = localStorage.getItem("token");
@@ -67,16 +69,9 @@ function ProfilePage() {
     const config = { headers: { Authorization: `Bearer ${token}` } };
     try {
       if (isFollowing) {
-        await axios.delete(
-          `http://localhost:5000/api/users/${userId}/unfollow`,
-          config
-        );
+        await axios.delete(`${API_URL}/api/users/${userId}/unfollow`, config);
       } else {
-        await axios.post(
-          `http://localhost:5000/api/users/${userId}/follow`,
-          {},
-          config
-        );
+        await axios.post(`${API_URL}/api/users/${userId}/follow`, {}, config);
       }
       setIsFollowing(!isFollowing);
       setStats((prev) => ({
@@ -93,8 +88,8 @@ function ProfilePage() {
   const showModalWith = async (type) => {
     const url =
       type === "followers"
-        ? `http://localhost:5000/api/users/${userId}/followers`
-        : `http://localhost:5000/api/users/${userId}/following`;
+        ? `${API_URL}/api/users/${userId}/followers`
+        : `${API_URL}/api/users/${userId}/following`;
     const title = type === "followers" ? "Follower" : "Seguiti";
     try {
       const token = localStorage.getItem("token");
@@ -110,22 +105,11 @@ function ProfilePage() {
 
   if (loading)
     return (
-      <p
-        style={{
-          color: "white",
-          textAlign: "center",
-          fontSize: "2rem",
-          paddingTop: "50px",
-        }}
-      >
-        Caricamento...
-      </p>
+      <p style={{ color: "white", textAlign: "center" }}>Caricamento...</p>
     );
   if (!profile || !stats)
     return (
-      <p style={{ color: "white", textAlign: "center" }}>
-        Utente non trovato o errore nel caricamento.
-      </p>
+      <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>
     );
 
   const isOwnProfile = loggedInUserId === Number(userId);
@@ -139,17 +123,13 @@ function ProfilePage() {
         title={modalData.title}
       >
         <div className={styles.userList}>
-          {modalData.content && modalData.content.length > 0 ? (
-            modalData.content.map((user) => (
-              <UserCard
-                key={user.id}
-                user={user}
-                onNavigate={() => setModalData({ isOpen: false })}
-              />
-            ))
-          ) : (
-            <p>Nessun utente da mostrare.</p>
-          )}
+          {modalData.content.map((user) => (
+            <UserCard
+              key={user.id}
+              user={user}
+              onNavigate={() => setModalData({ isOpen: false })}
+            />
+          ))}
         </div>
       </Modal>
 

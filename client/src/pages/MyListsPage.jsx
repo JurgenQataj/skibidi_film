@@ -10,6 +10,9 @@ function MyListsPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  // Definiamo l'URL del backend che useremo in tutta la pagina
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const fetchLists = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
@@ -18,16 +21,14 @@ function MyListsPage() {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.user.id;
 
-      const response = await axios.get(
-        `http://localhost:5000/api/users/${userId}/lists`
-      );
+      const response = await axios.get(`${API_URL}/api/users/${userId}/lists`);
       setLists(response.data);
     } catch (error) {
       console.error("Errore nel caricamento delle liste:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [API_URL]);
 
   useEffect(() => {
     fetchLists();
@@ -38,7 +39,7 @@ function MyListsPage() {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:5000/api/lists",
+        `${API_URL}/api/lists`,
         { title, description },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -54,7 +55,7 @@ function MyListsPage() {
     if (window.confirm("Sei sicuro di voler eliminare questa lista?")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/api/lists/${listId}`, {
+        await axios.delete(`${API_URL}/api/lists/${listId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchLists();

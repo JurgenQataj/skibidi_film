@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import styles from '../components/LoginPage.module.css'; // Riusiamo lo stile del login!
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import styles from "../components/LoginPage.module.css";
 
 function RegistrationPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     if (!username || !password || !inviteCode) {
       setError("Tutti i campi sono obbligatori.");
@@ -22,15 +22,18 @@ function RegistrationPage() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/register', {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const response = await axios.post(`${API_URL}/api/users/register`, {
         username,
         password,
-        inviteCode
+        inviteCode,
       });
       setSuccess(response.data.message + " Ora puoi fare il login.");
-      setTimeout(() => navigate('/login'), 2000); // Dopo 2 sec, torna al login
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Errore durante la registrazione.');
+      setError(
+        err.response?.data?.message || "Errore durante la registrazione."
+      );
     }
   };
 
@@ -65,11 +68,13 @@ function RegistrationPage() {
         />
       </div>
 
-      {error && <p style={{ color: '#ff8a8a' }}>{error}</p>}
-      {success && <p style={{ color: '#8aff8a' }}>{success}</p>}
-      
-      <button type="submit" className={styles.submitButton}>Registrati</button>
-      <p style={{ marginTop: '15px' }}>
+      {error && <p style={{ color: "#ff8a8a" }}>{error}</p>}
+      {success && <p style={{ color: "#8aff8a" }}>{success}</p>}
+
+      <button type="submit" className={styles.submitButton}>
+        Registrati
+      </button>
+      <p style={{ marginTop: "15px" }}>
         Hai già un account? <Link to="/login">Accedi</Link>
       </p>
     </form>

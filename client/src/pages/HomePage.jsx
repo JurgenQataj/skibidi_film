@@ -29,12 +29,16 @@ function HomePage() {
   const fetchFeed = useCallback(
     async (isRefresh = false) => {
       const targetPage = isRefresh ? 1 : page;
-      if (isRefresh) setHasMore(true); // Resetta hasMore se è un refresh
+      if (isRefresh) {
+        setHasMore(true);
+        setPage(1); // Resetta la pagina per il refresh
+      }
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
         const response = await axios.get(
-          `http://localhost:5000/api/users/feed?page=${targetPage}`,
+          `${API_URL}/api/users/feed?page=${targetPage}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

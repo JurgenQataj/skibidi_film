@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import styles from "./ListPage.module.css"; // Riusiamo lo stile della pagina delle liste
+import styles from "./ListPage.module.css";
 import MovieCard from "../components/MovieCard";
 
 function WatchlistPage() {
@@ -14,8 +14,9 @@ function WatchlistPage() {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.user.id;
 
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const response = await axios.get(
-        `http://localhost:5000/api/watchlist/user/${userId}`
+        `${API_URL}/api/watchlist/user/${userId}`
       );
       setWatchlist(response.data);
     } catch (error) {

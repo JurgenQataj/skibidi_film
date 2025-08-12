@@ -1,43 +1,42 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import styles from './AddReviewForm.module.css';
+import React, { useState } from "react";
+import axios from "axios";
+import styles from "./AddReviewForm.module.css";
 
-// onReviewAdded è una funzione che ci passerà il genitore (MovieDetailPage)
-// per dirgli di aggiornare la lista delle recensioni.
 function AddReviewForm({ tmdbId, onReviewAdded }) {
-  const [rating, setRating] = useState('');
-  const [comment, setComment] = useState('');
-  const [error, setError] = useState('');
+  const [rating, setRating] = useState("");
+  const [comment, setComment] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!rating) {
-      setError('Devi inserire un voto.');
+      setError("Devi inserire un voto.");
       return;
     }
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/reviews', 
+      const token = localStorage.getItem("token");
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+      await axios.post(
+        `${API_URL}/api/reviews`,
         {
           tmdbId: tmdbId,
           rating: parseFloat(rating),
-          comment_text: comment
+          comment_text: comment,
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
-      // Svuotiamo i campi e chiamiamo la funzione per aggiornare la lista
-      setRating('');
-      setComment('');
-      onReviewAdded();
 
+      setRating("");
+      setComment("");
+      onReviewAdded();
     } catch (err) {
-      setError(err.response?.data?.message || 'Si è verificato un errore.');
+      setError(err.response?.data?.message || "Si è verificato un errore.");
     }
   };
 
@@ -46,7 +45,7 @@ function AddReviewForm({ tmdbId, onReviewAdded }) {
       <h3>Lascia la tua Recensione</h3>
       <div className={styles.inputGroup}>
         <label>Voto (0.0 - 10.0)</label>
-        <input 
+        <input
           type="number"
           step="0.1"
           min="0"
@@ -66,7 +65,9 @@ function AddReviewForm({ tmdbId, onReviewAdded }) {
         />
       </div>
       {error && <p className={styles.error}>{error}</p>}
-      <button type="submit" className={styles.submitButton}>Invia Recensione</button>
+      <button type="submit" className={styles.submitButton}>
+        Invia Recensione
+      </button>
     </form>
   );
 }
