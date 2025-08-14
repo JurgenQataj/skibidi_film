@@ -1,16 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const connectDB = require("./config/database"); // Importa la nuova funzione di connessione
 
-// Importa tutte le rotte necessarie
-const userRoutes = require('./routes/users');
-const movieRoutes = require('./routes/movies');
-const reviewRoutes = require('./routes/reviews'); // <-- 1. QUESTA È LA RIGA CHE HAI CHIESTO
-const listRoutes = require('./routes/lists'); 
-const reactionRoutes = require('./routes/reactions');
-const watchlistRoutes = require('./routes/watchlist');
-const notificationRoutes = require('./routes/notifications');
-const commentRoutes = require('./routes/comments');
+// Esegui la connessione a MongoDB Atlas
+connectDB();
 
 const app = express();
 
@@ -18,23 +12,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Rotta di prova
-app.get('/', (req, res) => {
-    res.send('<h1>Il server di Skibidi Film è attivo! 🎉</h1>');
-});
+// Rotte
+app.use("/api/users", require("./routes/users"));
+app.use("/api/movies", require("./routes/movies"));
+app.use("/api/reviews", require("./routes/reviews"));
+app.use("/api/lists", require("./routes/lists"));
+app.use("/api/reactions", require("./routes/reactions"));
+app.use("/api/watchlist", require("./routes/watchlist"));
+app.use("/api/notifications", require("./routes/notifications"));
+app.use("/api/comments", require("./routes/comments"));
 
-// Usa le rotte per le varie sezioni dell'API
-app.use('/api/users', userRoutes);
-app.use('/api/movies', movieRoutes);
-app.use('/api/reviews', reviewRoutes); // <-- 2. E QUESTA È L'ALTRA RIGA FONDAMENTALE
-app.use('/api/lists', listRoutes); // <-- AGGIUNGI QUESTA
-app.use('/api/reactions', reactionRoutes);
-app.use('/api/watchlist', watchlistRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/comments', commentRoutes);
+// Rotta di prova
+app.get("/", (req, res) => {
+  res.send("<h1>Il server di Skibidi Film (MongoDB) è attivo! 🎉</h1>");
+});
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server in ascolto sulla porta ${PORT}`);
+  console.log(`🚀 Server in ascolto sulla porta ${PORT}`);
 });

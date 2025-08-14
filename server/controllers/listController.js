@@ -1,104 +1,107 @@
-const db = require('../config/database');
-const axios = require('axios');
+const MovieList = require("../models/MovieList");
+const Movie = require("../models/Movie");
+const axios = require("axios");
 
 // Funzione per creare una nuova lista
 exports.createList = async (req, res) => {
-    const { title, description } = req.body;
-    const userId = req.user.id;
-    if (!title) return res.status(400).json({ message: "Il titolo è obbligatorio." });
-    try {
-        await db.query('INSERT INTO movie_lists (user_id, title, description) VALUES (?, ?, ?)', [userId, title, description]);
-        res.status(201).json({ message: 'Lista creata con successo!' });
-    } catch (error) {
-        console.error("Errore durante la creazione della lista:", error);
-        res.status(500).json({ message: 'Errore del server.' });
+  const { title, description } = req.body;
+  try {
+    const newList = new MovieList({ user: req.user.id, title, description });
+    await newList.save();
+    res.status(201).json(newList);
+  } catch (error) {
+    res.status(500).json({ message: "Errore del server." });
+  }
+};
+
+// Funzione per ottenere i dettagli di una lista
+exports.getListDetails = async (req, res) => {
+  try {
+    const list = await MovieList.findById(req.params.listId)
+      .populate("user", "username") // Aggiunge il nome dell'autore
+      .populate("movies"); // Aggiunge tutti i dati dei film nella lista
+
+    if (!list) return res.status(404).json({ message: "Lista non trovata." });
+    res.json(list);
+  } catch (error) {
+    res.status(500).json({ message: "Errore del server." });
+  }
+};
+
+// Funzione per eliminare una lista
+exports.deleteList = async (req, res) => {
+  try {
+    const list = await MovieList.findById(req.params.listId);
+    if (!list) return res.status(404).json({ message: "Lista non trovata." });
+
+    // Controlla che l'utente che elimina sia il proprietario della lista
+    if (list.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Non hai i permessi." });
     }
+    await list.deleteOne();
+    res.json({ message: "Lista eliminata." });
+  } catch (error) {
+    res.status(500).json({ message: "Errore del server." });
+  }
 };
 
 // Funzione per aggiungere un film a una lista
 exports.addMovieToList = async (req, res) => {
-    const { listId } = req.params;
-    const { tmdbId } = req.body;
-    const userId = req.user.id;
-    try {
-        const [lists] = await db.query('SELECT * FROM movie_lists WHERE id = ? AND user_id = ?', [listId, userId]);
-        if (lists.length === 0) return res.status(403).json({ message: "Non hai i permessi per modificare questa lista." });
-        
-        let [movies] = await db.query('SELECT id FROM movies WHERE tmdb_id = ?', [tmdbId]);
-        let localMovieId;
-        if (movies.length === 0) {
-            const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
-            const tmdbResponse = await axios.get(tmdbUrl);
-            const movieData = tmdbResponse.data;
-            const [newMovie] = await db.query(
-                'INSERT INTO movies (tmdb_id, title, poster_path, release_year) VALUES (?, ?, ?, ?)',
-                [movieData.id, movieData.title, movieData.poster_path, new Date(movieData.release_date).getFullYear()]
-            );
-            localMovieId = newMovie.insertId;
-        } else {
-            localMovieId = movies[0].id;
-        }
-        await db.query('INSERT INTO list_items (list_id, movie_id) VALUES (?, ?)', [listId, localMovieId]);
-        res.status(200).json({ message: 'Film aggiunto alla lista con successo!' });
-    } catch (error) {
-        if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ message: 'Questo film è già in questa lista.' });
-        res.status(500).json({ message: 'Errore del server.' });
+  const { listId } = req.params;
+  const { tmdbId } = req.body;
+  try {
+    const list = await MovieList.findOne({ _id: listId, user: req.user.id });
+    if (!list)
+      return res
+        .status(404)
+        .json({ message: "Lista non trovata o non autorizzato." });
+
+    let movie = await Movie.findOne({ tmdb_id: tmdbId });
+    if (!movie) {
+      const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+      const tmdbResponse = await axios.get(tmdbUrl);
+      const movieData = tmdbResponse.data;
+      movie = new Movie({
+        tmdb_id: movieData.id,
+        title: movieData.title,
+        poster_path: movieData.poster_path,
+      });
+      await movie.save();
     }
+
+    // Aggiunge il film solo se non è già presente
+    if (list.movies.includes(movie._id)) {
+      return res
+        .status(409)
+        .json({ message: "Questo film è già in questa lista." });
+    }
+
+    list.movies.push(movie._id);
+    await list.save();
+    res.json({ message: "Film aggiunto alla lista." });
+  } catch (error) {
+    res.status(500).json({ message: "Errore del server." });
+  }
 };
 
 // Funzione per rimuovere un film da una lista
 exports.removeMovieFromList = async (req, res) => {
-    const { listId, tmdbId } = req.params;
-    const userId = req.user.id;
-    try {
-        const [lists] = await db.query('SELECT * FROM movie_lists WHERE id = ? AND user_id = ?', [listId, userId]);
-        if (lists.length === 0) return res.status(403).json({ message: "Non hai i permessi." });
+  const { listId, tmdbId } = req.params;
+  try {
+    const list = await MovieList.findOne({ _id: listId, user: req.user.id });
+    if (!list)
+      return res
+        .status(404)
+        .json({ message: "Lista non trovata o non autorizzato." });
 
-        const [movies] = await db.query('SELECT id FROM movies WHERE tmdb_id = ?', [tmdbId]);
-        if (movies.length === 0) return res.status(404).json({ message: 'Film non trovato.' });
-        
-        const localMovieId = movies[0].id;
-        await db.query('DELETE FROM list_items WHERE list_id = ? AND movie_id = ?', [listId, localMovieId]);
-        res.status(200).json({ message: 'Film rimosso dalla lista.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Errore del server.' });
-    }
-};
+    const movie = await Movie.findOne({ tmdb_id: tmdbId });
+    if (!movie) return res.status(404).json({ message: "Film non trovato." });
 
-// Funzione per eliminare un'intera lista
-exports.deleteList = async (req, res) => {
-    const { listId } = req.params;
-    const userId = req.user.id;
-    try {
-        const [lists] = await db.query('SELECT * FROM movie_lists WHERE id = ? AND user_id = ?', [listId, userId]);
-        if (lists.length === 0) return res.status(403).json({ message: "Non hai i permessi." });
-        await db.query('DELETE FROM movie_lists WHERE id = ?', [listId]);
-        res.status(200).json({ message: 'Lista eliminata.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Errore del server.' });
-    }
-};
-
-// Funzione per vedere i dettagli di una singola lista
-exports.getListDetails = async (req, res) => {
-    const { listId } = req.params;
-    try {
-        const [lists] = await db.query(
-            `SELECT ml.id, ml.title, ml.description, u.username AS author
-             FROM movie_lists AS ml JOIN users AS u ON ml.user_id = u.id
-             WHERE ml.id = ?`,
-            [listId]
-        );
-        if (lists.length === 0) return res.status(404).json({ message: "Lista non trovata." });
-        
-        const [movies] = await db.query(
-            `SELECT m.tmdb_id, m.title, m.poster_path, m.release_year
-             FROM list_items AS li JOIN movies AS m ON li.movie_id = m.id
-             WHERE li.list_id = ?`,
-            [listId]
-        );
-        res.json({ ...lists[0], movies });
-    } catch (error) {
-        res.status(500).json({ message: 'Errore del server.' });
-    }
+    // Rimuove il film dall'array
+    list.movies.pull(movie._id);
+    await list.save();
+    res.json({ message: "Film rimosso dalla lista." });
+  } catch (error) {
+    res.status(500).json({ message: "Errore del server." });
+  }
 };
