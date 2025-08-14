@@ -1,13 +1,14 @@
-const { Pool } = require("pg");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
-
-module.exports = {
-  query: (text, params) => pool.query(text, params),
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.DATABASE_URL);
+    console.log("✅ Connessione a MongoDB Atlas riuscita!");
+  } catch (err) {
+    console.error("❌ Errore di connessione a MongoDB:", err.message);
+    process.exit(1); // Esce dal processo con errore
+  }
 };
+
+module.exports = connectDB;
