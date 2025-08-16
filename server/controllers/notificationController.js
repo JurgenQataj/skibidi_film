@@ -1,21 +1,32 @@
 const Notification = require("../models/Notification");
+const Review = require("../models/Review"); // Importa il modello Review
 
 // Ottenere le notifiche dell'utente loggato
 exports.getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({ recipient: req.user.id })
-      .populate("sender", "username avatar_url _id") // Aggiunge i dati di chi ha inviato la notifica
+      .populate("sender", "username avatar_url _id")
       .populate({
         path: "targetReview",
-        select: "movie",
+        // Popola il film dentro la recensione
         populate: {
           path: "movie",
-          select: "tmdb_id",
+          model: "Movie", // Specifica il modello
+          select: "tmdb_id title poster_path",
         },
       })
       .sort({ createdAt: -1 });
-    res.json(notifications);
+
+    // **Filtro di sicurezza per rimuovere dati corrotti**
+    const validNotifications = notifications.filter((n) => {
+      if (n.type === "new_follower") return true; // I 'follow' sono sempre validi
+      // Per like e commenti, assicurati che la recensione e il film esistano
+      return n.targetReview && n.targetReview.movie;
+    });
+
+    res.json(validNotifications);
   } catch (error) {
+    console.error("Errore nel recupero delle notifiche:", error);
     res.status(500).json({ message: "Errore del server." });
   }
 };

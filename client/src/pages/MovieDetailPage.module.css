@@ -9,8 +9,6 @@
   margin-top: 50px;
   padding: 40px;
 }
-
-/* Stili per l'Header con sfondo */
 .header {
   width: 100%;
   background-size: cover;
@@ -48,22 +46,10 @@
   margin-top: 0;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
 }
-.tagline {
-  font-style: italic;
-  font-size: 1.2rem;
-  color: #ccc;
-  margin-top: -15px;
-}
 .overview {
   font-size: 1rem;
   line-height: 1.6;
 }
-.director {
-  margin-top: 20px;
-  font-size: 1.1rem;
-}
-
-/* Sezione Info (Costo, Botteghino, Lingua) */
 .infoSection {
   display: flex;
   justify-content: space-around;
@@ -93,8 +79,6 @@
   font-size: 1.5rem;
   font-weight: bold;
 }
-
-/* Sezione Cast */
 .castSection {
   padding: 0 40px;
   max-width: 1200px;
@@ -108,7 +92,7 @@
 }
 .castGrid {
   display: flex;
-  overflow-x: auto; /* Mantiene lo swipe orizzontale */
+  overflow-x: auto;
   gap: 15px;
   padding-bottom: 20px;
 }
@@ -129,14 +113,11 @@
 .actorCard span {
   display: block;
   padding: 5px;
-  font-size: 0.9rem;
 }
 .actorCard span {
   font-size: 0.8rem;
   color: #ccc;
 }
-
-/* Sezione Recensioni */
 .reviewsSection {
   padding: 40px;
   max-width: 1200px;
@@ -152,12 +133,24 @@
   padding-bottom: 15px;
   margin-top: 0;
 }
-.reviewItem {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  border-radius: var(--border-radius);
-  margin-bottom: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.reviewActions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+.reactions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.reactions button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 /* --- Media Queries per il Mobile --- */
@@ -167,45 +160,35 @@
   .reviewsSection {
     padding: 20px;
   }
-
   .headerContent {
     flex-direction: column;
     text-align: center;
     gap: 20px;
   }
-
   .poster {
-    width: 200px;
-    height: 300px;
+    width: 60%; /* Usa la percentuale per adattarsi meglio */
+    height: auto;
   }
-
   .title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
-
+  .overview {
+    font-size: 0.9rem;
+  }
   .infoSection {
     flex-direction: column;
     gap: 20px;
     margin: 20px;
     top: 0;
   }
-
   .castSection h2,
   .reviewsTitle {
     font-size: 1.5rem;
   }
-
-  /* **LA CORREZIONE PER IL CAST** */
   .actorCard {
-    min-width: 100px; /* Rimpicciolisce le card */
+    min-width: 120px;
   }
   .actorCard img {
-    height: 150px; /* Rimpicciolisce le immagini */
-  }
-  .actorCard strong {
-    font-size: 0.8rem;
-  }
-  .actorCard span {
-    font-size: 0.7rem;
+    height: 180px;
   }
 }
