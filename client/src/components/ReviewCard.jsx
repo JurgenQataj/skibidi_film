@@ -6,17 +6,22 @@ import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 
 function ReviewCard({ review, onInteraction }) {
+  // CONTROLLO DI SICUREZZA FONDAMENTALE: se la recensione o i dati del film mancano, non renderizzare nulla.
+  if (!review || !review.id || !review.movie_title || !review.tmdb_id) {
+    console.warn(
+      "ReviewCard ha ricevuto dati incompleti e non verrà renderizzata:",
+      review
+    );
+    return null;
+  }
+
   const [comments, setComments] = useState({ shown: false, list: [] });
   const [commentText, setCommentText] = useState("");
 
   const posterBaseUrl = "https://image.tmdb.org/t/p/w200";
-  // **FIX: Corretto il placeholder**
   const placeholderPoster =
     "https://via.placeholder.com/200x300.png?text=No+Image";
-
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-  if (!review) return null;
 
   const handleReaction = async (reactionType) => {
     try {
@@ -35,15 +40,15 @@ function ReviewCard({ review, onInteraction }) {
   const toggleComments = async () => {
     if (comments.shown) {
       setComments({ shown: false, list: [] });
-      return;
-    }
-    try {
-      const response = await axios.get(
-        `${API_URL}/api/comments/reviews/${review.id}`
-      );
-      setComments({ shown: true, list: response.data || [] });
-    } catch (error) {
-      console.error("Errore caricamento commenti:", error);
+    } else {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/comments/reviews/${review.id}`
+        );
+        setComments({ shown: true, list: response.data || [] });
+      } catch (error) {
+        console.error("Errore caricamento commenti:", error);
+      }
     }
   };
 
@@ -64,7 +69,6 @@ function ReviewCard({ review, onInteraction }) {
     }
   };
 
-  // Funzione per formattare la data
   const timeAgo = (date) => {
     try {
       return formatDistanceToNow(new Date(date), {
@@ -85,7 +89,7 @@ function ReviewCard({ review, onInteraction }) {
               ? `${posterBaseUrl}${review.poster_path}`
               : placeholderPoster
           }
-          alt={`Locandina di ${review.movie_title || "Film"}`}
+          alt={`Locandina di ${review.movie_title}`}
           className={styles.poster}
         />
       </Link>
@@ -102,17 +106,14 @@ function ReviewCard({ review, onInteraction }) {
             to={`/movie/${review.tmdb_id}`}
             className={styles.movieTitleLink}
           >
-            {review.movie_title || "un film"}
+            {review.movie_title}
           </Link>
         </div>
         <div className={styles.rating}>
           Voto: <span className={styles.ratingValue}>{review.rating}</span>
         </div>
         <p className={styles.comment}>"{review.comment_text}"</p>
-
-        {/* **NUOVO: Timestamp** */}
         <div className={styles.timestamp}>{timeAgo(review.created_at)}</div>
-
         <div className={styles.actions}>
           <div className={styles.reactions}>
             <button onClick={() => handleReaction("love")} title="Love">
@@ -128,12 +129,12 @@ function ReviewCard({ review, onInteraction }) {
         {comments.shown && (
           <div className={styles.commentsSection}>
             {comments.list.map((comment) => (
-              <div key={comment.id} className={styles.commentItem}>
+              <div key={comment._id} className={styles.commentItem}>
                 <Link
-                  to={`/profile/${comment.user_id}`}
+                  to={`/profile/${comment.user._id}`}
                   className={styles.authorLink}
                 >
-                  <strong>{comment.username}:</strong>
+                  <strong>{comment.user.username}:</strong>
                 </Link>
                 <span> {comment.comment_text}</span>
               </div>
@@ -153,4 +154,5 @@ function ReviewCard({ review, onInteraction }) {
     </div>
   );
 }
+
 export default ReviewCard;

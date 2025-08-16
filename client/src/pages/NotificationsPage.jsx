@@ -28,18 +28,31 @@ function NotificationsPage() {
   }, [API_URL]);
 
   const getNotificationLink = (notification) => {
+    // CONTROLLO DI SICUREZZA
+    if (!notification || !notification.sender) return "/";
+
     switch (notification.type) {
       case "new_follower":
         return `/profile/${notification.sender._id}`;
       case "new_reaction":
       case "new_comment":
-        return `/movie/${notification.targetReview?.movie.tmdb_id}`;
+        // CONTROLLO DI SICUREZZA ANCORA PIÙ SPECIFICO
+        if (
+          notification.targetReview &&
+          notification.targetReview.movie &&
+          notification.targetReview.movie.tmdb_id
+        ) {
+          return `/movie/${notification.targetReview.movie.tmdb_id}`;
+        }
+        return "/"; // Link di fallback se i dati sono corrotti
       default:
         return "/";
     }
   };
 
   const getNotificationText = (notification) => {
+    if (!notification || !notification.sender) return "Notifica non valida.";
+
     switch (notification.type) {
       case "new_follower":
         return (

@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Review = require("../models/Review");
 const MovieList = require("../models/MovieList");
+const Notification = require("../models/Notification");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -13,10 +14,8 @@ exports.registerUser = async (req, res) => {
   try {
     let user = await User.findOne({ username });
     if (user) return res.status(409).json({ message: "Username già preso." });
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
     user = new User({ username, password: hashedPassword });
     await user.save();
     res.status(201).json({ message: `Utente '${username}' registrato!` });
@@ -31,11 +30,9 @@ exports.loginUser = async (req, res) => {
     const user = await User.findOne({ username });
     if (!user)
       return res.status(401).json({ message: "Credenziali non valide." });
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(401).json({ message: "Credenziali non valide." });
-
     const payload = { user: { id: user.id, username: user.username } };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "7d",
@@ -76,16 +73,19 @@ exports.followUser = async (req, res) => {
   try {
     if (req.params.userId === req.user.id)
       return res.status(400).json({ message: "Non puoi seguire te stesso." });
-
-    // Aggiunge l'utente alla lista 'following' dell'utente corrente
     await User.findByIdAndUpdate(req.user.id, {
       $addToSet: { following: req.params.userId },
     });
-    // Aggiunge l'utente corrente alla lista 'followers' dell'altro utente
     await User.findByIdAndUpdate(req.params.userId, {
       $addToSet: { followers: req.user.id },
     });
-
+    // Crea notifica
+    const notification = new Notification({
+      recipient: req.params.userId,
+      sender: req.user.id,
+      type: "new_follower",
+    });
+    await notification.save();
     res.json({ message: "Utente seguito" });
   } catch (error) {
     res.status(500).json({ message: "Errore del server" });
@@ -120,7 +120,7 @@ exports.getFollowers = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).populate(
       "followers",
-      "id username avatar_url"
+      "_id username avatar_url"
     );
     res.json(user.followers);
   } catch (error) {
@@ -132,7 +132,7 @@ exports.getFollowing = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).populate(
       "following",
-      "id username avatar_url"
+      "_id username avatar_url"
     );
     res.json(user.following);
   } catch (error) {
@@ -145,7 +145,7 @@ exports.getUserReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.params.userId })
       .populate({ path: "movie", select: "tmdb_id title poster_path" })
-      .sort({ createdAt: "asc" });
+      .sort({ createdAt: "desc" }); // Ordine più logico
     res.json(reviews);
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
@@ -178,16 +178,17 @@ exports.getUserFeed = async (req, res) => {
     const followingIds = currentUser.following;
 
     const reviews = await Review.find({ user: { $in: followingIds } })
-      .populate("user", "username avatar_url")
-      .populate("movie", "title poster_path tmdb_id") // Popola i dati del film
+      .populate("user", "username avatar_url _id")
+      .populate("movie", "title poster_path tmdb_id")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // **LA CORREZIONE FONDAMENTALE È QUI SOTTO**
-    // Filtriamo le recensioni che per qualche motivo non hanno un film valido associato.
-    // Questo previene il crash del frontend.
-    const validReviews = reviews.filter((review) => review.movie);
+    // FILTRO DI SICUREZZA FONDAMENTALE:
+    // Scarta le recensioni "orfane" (quelle il cui film è stato cancellato o ha un riferimento rotto)
+    const validReviews = reviews.filter(
+      (review) => review.user && review.movie
+    );
 
     const formattedFeed = validReviews.map((review) => ({
       id: review._id,
@@ -196,11 +197,9 @@ exports.getUserFeed = async (req, res) => {
       created_at: review.createdAt,
       author_id: review.user._id,
       review_author: review.user.username,
-      // Dati del film
       tmdb_id: review.movie.tmdb_id,
       movie_title: review.movie.title,
       poster_path: review.movie.poster_path,
-      // Dati delle interazioni
       reactions: review.reactions.reduce((acc, reaction) => {
         acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
         return acc;
@@ -214,12 +213,14 @@ exports.getUserFeed = async (req, res) => {
     res.status(500).json({ message: "Errore del server" });
   }
 };
+
 // --- Funzioni di Scoperta ---
 exports.getMostFollowedUsers = async (req, res) => {
   try {
     const users = await User.aggregate([
       {
         $project: {
+          _id: 1,
           username: 1,
           avatar_url: 1,
           followers_count: { $size: "$followers" },
@@ -239,7 +240,7 @@ exports.getNewestUsers = async (req, res) => {
     const users = await User.find()
       .sort({ createdAt: -1 })
       .limit(20)
-      .select("id username avatar_url created_at");
+      .select("_id username avatar_url createdAt");
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Errore del server" });
@@ -252,9 +253,7 @@ exports.getUserStats = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "Utente non trovato." });
-
     const moviesReviewed = await Review.countDocuments({ user: userId });
-
     res.json({
       username: user.username,
       moviesReviewed,

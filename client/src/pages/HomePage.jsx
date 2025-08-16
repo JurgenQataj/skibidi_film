@@ -38,30 +38,21 @@ function HomePage() {
       try {
         const token = localStorage.getItem("token");
         const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-        const response = await axios.get(
+        const { data } = await axios.get(
           `${API_URL}/api/users/feed?page=${targetPage}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const validData = response.data.filter(
-          (review) =>
-            review && review.id && review.movie_title && review.tmdb_id
+        // Sicurezza aggiuntiva nel frontend
+        const validData = data.filter(
+          (review) => review && review.id && review.tmdb_id
         );
 
         if (validData.length > 0) {
-          if (isRefresh) {
-            setFeed(validData);
-          } else {
-            setFeed((prevFeed) => {
-              const allReviews = [...prevFeed, ...validData];
-              return Array.from(
-                new Map(allReviews.map((item) => [item.id, item])).values()
-              );
-            });
-          }
+          setFeed((prev) => (isRefresh ? validData : [...prev, ...data]));
         }
 
-        if (response.data.length < 10) {
+        if (data.length < 10) {
           setHasMore(false);
         }
       } catch (error) {
@@ -80,14 +71,10 @@ function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (page > 1) {
-      fetchFeed(false); // Caricamenti successivi
-    }
+    if (page > 1) fetchFeed(false);
   }, [page]);
 
-  const handleInteraction = () => {
-    fetchFeed(true); // Ricarica tutto il feed
-  };
+  const handleInteraction = () => fetchFeed(true);
 
   return (
     <div className={styles.pageContainer}>
@@ -127,4 +114,5 @@ function HomePage() {
     </div>
   );
 }
+
 export default HomePage;
