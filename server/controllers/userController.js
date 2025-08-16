@@ -179,22 +179,28 @@ exports.getUserFeed = async (req, res) => {
 
     const reviews = await Review.find({ user: { $in: followingIds } })
       .populate("user", "username avatar_url")
-      .populate("movie", "title poster_path tmdb_id")
+      .populate("movie", "title poster_path tmdb_id") // Popola i dati del film
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const formattedFeed = reviews.map((review) => ({
-      id: review._id, // <-- **LA CORREZIONE**
+    // **LA CORREZIONE FONDAMENTALE È QUI SOTTO**
+    // Filtriamo le recensioni che per qualche motivo non hanno un film valido associato.
+    // Questo previene il crash del frontend.
+    const validReviews = reviews.filter((review) => review.movie);
+
+    const formattedFeed = validReviews.map((review) => ({
+      id: review._id,
       rating: review.rating,
       comment_text: review.comment_text,
-      is_spoiler: review.is_spoiler,
       created_at: review.createdAt,
       author_id: review.user._id,
       review_author: review.user.username,
+      // Dati del film
       tmdb_id: review.movie.tmdb_id,
       movie_title: review.movie.title,
       poster_path: review.movie.poster_path,
+      // Dati delle interazioni
       reactions: review.reactions.reduce((acc, reaction) => {
         acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
         return acc;
@@ -208,7 +214,6 @@ exports.getUserFeed = async (req, res) => {
     res.status(500).json({ message: "Errore del server" });
   }
 };
-
 // --- Funzioni di Scoperta ---
 exports.getMostFollowedUsers = async (req, res) => {
   try {

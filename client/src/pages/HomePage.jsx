@@ -30,8 +30,9 @@ function HomePage() {
     async (isRefresh = false) => {
       const targetPage = isRefresh ? 1 : page;
       if (isRefresh) {
+        setFeed([]); // Pulisce il feed prima di un refresh
         setHasMore(true);
-        setPage(1); // Resetta la pagina per il refresh
+        setPage(1);
       }
       setLoading(true);
       try {
@@ -49,10 +50,11 @@ function HomePage() {
             const newFeed = isRefresh
               ? response.data
               : [...prevFeed, ...response.data];
-            const uniqueFeed = Array.from(
+            // Filtra per ID unici e si assicura che ogni recensione sia valida
+            const uniqueAndValidFeed = Array.from(
               new Map(newFeed.map((item) => [item.id, item])).values()
-            );
-            return uniqueFeed;
+            ).filter((item) => item && item.tmdb_id); // Controllo di sicurezza
+            return uniqueAndValidFeed;
           });
         }
         if (response.data.length === 0 || response.data.length < 10) {
@@ -64,20 +66,20 @@ function HomePage() {
         setLoading(false);
       }
     },
-    [page]
+    [page, hasMore]
   );
 
   useEffect(() => {
-    // Carica la prima pagina solo all'inizio
+    // Carica la prima pagina solo al montaggio iniziale
     fetchFeed(true);
-  }, []);
+  }, []); // Eseguito solo una volta
 
   useEffect(() => {
     // Carica le pagine successive per l'infinite scroll
     if (page > 1) {
       fetchFeed(false);
     }
-  }, [page]);
+  }, [page]); // Si attiva solo quando 'page' cambia
 
   return (
     <div className={styles.pageContainer}>
@@ -90,23 +92,23 @@ function HomePage() {
 
       <div className={styles.feedContainer}>
         {feed.map((review, index) => {
-          // **LA CORREZIONE**
-          const card = (
+          if (feed.length === index + 1) {
+            return (
+              <div ref={lastReviewElementRef} key={review.id}>
+                <ReviewCard
+                  review={review}
+                  onInteraction={() => fetchFeed(true)}
+                />
+              </div>
+            );
+          }
+          return (
             <ReviewCard
               key={review.id}
               review={review}
               onInteraction={() => fetchFeed(true)}
             />
           );
-          if (feed.length === index + 1) {
-            return (
-              <div ref={lastReviewElementRef} key={review.id}>
-                {card}
-              </div>
-            );
-          }
-          // **LA CORREZIONE**
-          return <div key={review.id}>{card}</div>;
         })}
         {loading && <p className={styles.feedStatus}>Caricamento...</p>}
         {!hasMore && feed.length > 0 && (
