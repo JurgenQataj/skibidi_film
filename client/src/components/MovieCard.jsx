@@ -7,36 +7,26 @@ const MovieCard = ({ movie }) => {
   const placeholderPoster =
     "https://via.placeholder.com/200x300.png?text=No+Image";
 
-  // Logica di sicurezza: se 'movie' non esiste, non mostrare nulla
   if (!movie) {
-    return null;
+    return null; // Aggiunge un controllo di sicurezza per evitare crash
   }
 
+  // Logica migliorata per trovare sempre l'ID corretto
   const movieId = movie.tmdb_id || movie.id;
-
-  if (!movieId) {
-    return (
-      <div className={styles.card}>
-        <img src={placeholderPoster} alt="Film non disponibile" />
-        <div className={styles.title}>Dati non disponibili</div>
-      </div>
-    );
-  }
+  const movieTitle = movie.title || "Titolo non disponibile";
+  const posterPath = movie.poster_path;
 
   return (
     <Link to={`/movie/${movieId}`} className={styles.cardLink}>
       <div className={styles.card}>
         <img
-          src={
-            movie.poster_path
-              ? `${posterBaseUrl}${movie.poster_path}`
-              : placeholderPoster
-          }
-          alt={`Locandina di ${movie.title}`}
+          src={posterPath ? `${posterBaseUrl}${posterPath}` : placeholderPoster}
+          alt={`Locandina di ${movieTitle}`}
         />
-        <div className={styles.title}>{movie.title}</div>
+        <div className={styles.title}>{movieTitle}</div>
       </div>
     </Link>
   );
 };
+
 export default MovieCard;

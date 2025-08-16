@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./MovieDetailPage.module.css";
@@ -7,6 +7,14 @@ import AddReviewForm from "../components/AddReviewForm";
 
 function MovieDetailPage() {
   const { tmdbId } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!tmdbId || tmdbId === "undefined") {
+      console.error("ID del film non valido, reindirizzamento alla home.");
+      navigate("/");
+    }
+  }, [tmdbId, navigate]);
 
   const [movie, setMovie] = useState(null);
   const [skibidiData, setSkibidiData] = useState({
@@ -30,8 +38,8 @@ function MovieDetailPage() {
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const fetchData = useCallback(async () => {
-    // Non rimettere il loading a true se stiamo solo aggiornando
-    // setLoading(true);
+    if (!tmdbId || tmdbId === "undefined") return;
+
     setError("");
     try {
       const token = localStorage.getItem("token");
@@ -81,15 +89,14 @@ function MovieDetailPage() {
   }, [fetchData]);
 
   const handleDeleteReview = async (reviewId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare la tua recensione?")) {
+    if (!window.confirm("Sei sicuro di voler eliminare la tua recensione?"))
       return;
-    }
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API_URL}/api/reviews/${reviewId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchData(); // Ricarica i dati
+      fetchData();
     } catch (error) {
       alert("Errore durante l'eliminazione della recensione.");
     }
@@ -104,7 +111,7 @@ function MovieDetailPage() {
       } else {
         await axios.post(`${API_URL}/api/watchlist`, { tmdbId }, config);
       }
-      setIsInWatchlist(!isInWatchlist); // Aggiorna lo stato localmente
+      setIsInWatchlist(!isInWatchlist);
     } catch (error) {
       alert("Errore nell'aggiornamento della watchlist.");
     }
@@ -135,7 +142,7 @@ function MovieDetailPage() {
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchData(); // Ricarica per aggiornare i conteggi
+      fetchData();
     } catch (error) {
       alert("Errore durante l'invio della reazione.");
     }
@@ -143,7 +150,7 @@ function MovieDetailPage() {
 
   const toggleComments = async (reviewId) => {
     if (activeComments.reviewId === reviewId) {
-      setActiveComments({ reviewId: null, comments: [] }); // Chiudi
+      setActiveComments({ reviewId: null, comments: [] });
     } else {
       try {
         const response = await axios.get(
@@ -167,12 +174,11 @@ function MovieDetailPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCommentText("");
-      // Ricarica i commenti per vedere quello nuovo
       const response = await axios.get(
         `${API_URL}/api/comments/reviews/${reviewId}`
       );
       setActiveComments({ reviewId, comments: response.data });
-      fetchData(); // Ricarica tutto per aggiornare il conteggio
+      fetchData();
     } catch (error) {
       alert("Errore nell'invio del commento.");
     }

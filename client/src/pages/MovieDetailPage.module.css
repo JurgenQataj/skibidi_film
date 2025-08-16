@@ -381,4 +381,10 @@
   .reviewsTitle {
     font-size: 1.5rem;
   }
+
+  .reviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
