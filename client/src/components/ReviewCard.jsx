@@ -2,16 +2,18 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./ReviewCard.module.css";
+import { formatDistanceToNow } from "date-fns";
+import { it } from "date-fns/locale";
 
 function ReviewCard({ review, onInteraction }) {
   const [comments, setComments] = useState({ shown: false, list: [] });
   const [commentText, setCommentText] = useState("");
 
   const posterBaseUrl = "https://image.tmdb.org/t/p/w200";
+  // **FIX: Corretto il placeholder**
   const placeholderPoster =
     "https://via.placeholder.com/200x300.png?text=No+Image";
 
-  // Definiamo l'URL del nostro backend
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   if (!review) return null;
@@ -20,7 +22,7 @@ function ReviewCard({ review, onInteraction }) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `${API_URL}/api/reactions/reviews/${review.id}`, // <--- USA API_URL
+        `${API_URL}/api/reactions/reviews/${review.id}`,
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -37,7 +39,7 @@ function ReviewCard({ review, onInteraction }) {
     }
     try {
       const response = await axios.get(
-        `${API_URL}/api/comments/reviews/${review.id}` // <--- USA API_URL
+        `${API_URL}/api/comments/reviews/${review.id}`
       );
       setComments({ shown: true, list: response.data || [] });
     } catch (error) {
@@ -51,7 +53,7 @@ function ReviewCard({ review, onInteraction }) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `${API_URL}/api/comments/reviews/${review.id}`, // <--- USA API_URL
+        `${API_URL}/api/comments/reviews/${review.id}`,
         { comment_text: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -59,6 +61,18 @@ function ReviewCard({ review, onInteraction }) {
       if (onInteraction) onInteraction();
     } catch (error) {
       alert("Errore nell'invio del commento.");
+    }
+  };
+
+  // Funzione per formattare la data
+  const timeAgo = (date) => {
+    try {
+      return formatDistanceToNow(new Date(date), {
+        addSuffix: true,
+        locale: it,
+      });
+    } catch (error) {
+      return "";
     }
   };
 
@@ -95,6 +109,10 @@ function ReviewCard({ review, onInteraction }) {
           Voto: <span className={styles.ratingValue}>{review.rating}</span>
         </div>
         <p className={styles.comment}>"{review.comment_text}"</p>
+
+        {/* **NUOVO: Timestamp** */}
+        <div className={styles.timestamp}>{timeAgo(review.created_at)}</div>
+
         <div className={styles.actions}>
           <div className={styles.reactions}>
             <button onClick={() => handleReaction("love")} title="Love">

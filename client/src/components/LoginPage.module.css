@@ -50,3 +50,12 @@
     --secondary-color
   ); /* Al passaggio del mouse, diventa rosso Netflix */
 }
+
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .loginContainer {
+    width: 90%;
+    padding: 30px;
+    min-width: unset; /* Rimuove la larghezza minima */
+  }
+}

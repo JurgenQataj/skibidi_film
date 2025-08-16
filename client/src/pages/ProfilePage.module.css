@@ -4,14 +4,12 @@
   margin: 0 auto;
   color: white;
 }
-
 .profileHeader {
   display: flex;
   align-items: center;
   gap: 30px;
   margin-bottom: 50px;
 }
-
 .avatar {
   width: 150px;
   height: 150px;
@@ -19,29 +17,24 @@
   object-fit: cover;
   border: 3px solid var(--primary-color);
 }
-
 .profileInfo {
   text-align: left;
 }
-
 .username {
   font-size: 2.5rem;
   margin: 0;
 }
-
 .bio {
   font-size: 1.1rem;
   color: #ccc;
   margin-top: 10px;
   max-width: 500px;
 }
-
 .statsContainer {
   display: flex;
   gap: 30px;
   margin-top: 20px;
 }
-
 .statItem,
 .statItemClickable {
   text-align: center;
@@ -49,44 +42,36 @@
   border-radius: 8px;
   transition: background-color 0.2s;
 }
-
 .statItemClickable {
   cursor: pointer;
 }
-
 .statItemClickable:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
-
 .statValue {
   font-size: 2rem;
   font-weight: bold;
 }
-
 .statLabel {
   font-size: 0.9rem;
   color: #ccc;
 }
-
 .sectionTitle {
   font-size: 2rem;
   border-bottom: 2px solid var(--primary-color);
   padding-bottom: 10px;
   margin-bottom: 30px;
 }
-
 .reviewsGrid {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
 .userList {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-
 .followButton,
 .editButton {
   margin-top: 20px;
@@ -99,23 +84,18 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
-
 .followButton:hover,
 .editButton:hover {
   opacity: 0.9;
 }
-
-/* Stili per il pop-up di modifica profilo */
 .editLabel {
   display: block;
   font-weight: bold;
   margin-bottom: 10px;
 }
-
 .bioTextarea {
   width: 100%;
   min-height: 100px;
-  resize: vertical;
   background-color: #333;
   color: white;
   border: 1px solid #555;
@@ -124,7 +104,6 @@
   margin-bottom: 20px;
   box-sizing: border-box;
 }
-
 .avatarGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
@@ -134,7 +113,6 @@
   padding: 10px;
   border-radius: 8px;
 }
-
 .avatarOption {
   width: 60px;
   height: 60px;
@@ -143,12 +121,10 @@
   border: 3px solid transparent;
   transition: border-color 0.2s;
 }
-
 .avatarOption.selected {
   border-color: var(--primary-color);
   transform: scale(1.1);
 }
-
 .saveButton {
   width: 100%;
   padding: 12px;
@@ -160,13 +136,6 @@
   font-size: 1rem;
   cursor: pointer;
 }
-
-.saveButton:hover {
-  opacity: 0.9;
-}
-
-/* ... (tutti gli stili precedenti fino a .saveButton:hover) ... */
-
 .showAllContainer {
   text-align: center;
   margin-top: 30px;
@@ -185,27 +154,24 @@
 .showAllButton:hover {
   background-color: var(--secondary-color);
 }
-
-/* --- SEZIONE CORRETTA CON I CONTATORI CSS --- */
 .historyList {
-  list-style: none; /* Disattiviamo la numerazione automatica */
+  list-style: none;
   padding-left: 0;
-  counter-reset: review-counter; /* 1. Azzeriamo il nostro contatore personalizzato */
+  counter-reset: review-counter;
   color: #ccc;
-  font-family: sans-serif;
 }
 .historyItem {
-  counter-increment: review-counter; /* 2. Diciamo al contatore di aumentare di 1 per ogni film */
+  counter-increment: review-counter;
   display: flex;
   align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid #444;
 }
 .historyItem::before {
-  content: counter(review-counter) "."; /* 3. Mostriamo il valore del contatore prima di ogni film */
+  content: counter(review-counter) ".";
   font-weight: bold;
   color: var(--primary-color);
-  width: 40px; /* Spazio per il numero */
+  width: 40px;
   text-align: right;
   margin-right: 10px;
   font-size: 1.1rem;
@@ -232,4 +198,34 @@
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--primary-color);
+}
+
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 20px;
+  }
+
+  .profileHeader {
+    flex-direction: column; /* Impila avatar e info */
+    text-align: center;
+    gap: 20px;
+  }
+
+  .statsContainer {
+    justify-content: center; /* Centra le statistiche */
+    gap: 15px;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+
+  .reviewsGrid {
+    justify-content: center;
+  }
 }

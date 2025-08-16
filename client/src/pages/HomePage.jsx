@@ -90,6 +90,7 @@ function HomePage() {
 
       <div className={styles.feedContainer}>
         {feed.map((review, index) => {
+          // **LA CORREZIONE**
           const card = (
             <ReviewCard
               key={review.id}
@@ -99,12 +100,13 @@ function HomePage() {
           );
           if (feed.length === index + 1) {
             return (
-              <div ref={lastReviewElementRef} key={`ref-${review.id}`}>
+              <div ref={lastReviewElementRef} key={review.id}>
                 {card}
               </div>
             );
           }
-          return card;
+          // **LA CORREZIONE**
+          return <div key={review.id}>{card}</div>;
         })}
         {loading && <p className={styles.feedStatus}>Caricamento...</p>}
         {!hasMore && feed.length > 0 && (

@@ -27,6 +27,7 @@
 
 .navLinks {
   display: flex;
+  align-items: center; /* Allinea verticalmente gli item */
   gap: 30px;
 }
 
@@ -38,8 +39,101 @@
   align-items: center;
   gap: 8px;
   transition: color 0.2s ease-in-out;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: relative; /* Per il badge */
 }
 
 .navLink:hover {
   color: var(--primary-color);
+}
+
+/* Stili per le notifiche */
+.notificationContainer {
+  position: relative;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: var(--secondary-color);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.notificationDropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 300px;
+  background-color: #282c34;
+  border-radius: var(--border-radius);
+  border: 1px solid #555;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.notificationItem {
+  padding: 8px 12px;
+  border-bottom: 1px solid #444;
+  font-size: 0.9rem;
+}
+.notificationItem:last-child {
+  border-bottom: none;
+}
+
+.showAllLink {
+  text-align: center;
+  font-weight: bold;
+  color: var(--primary-color);
+  padding-top: 10px;
+  margin-top: 5px;
+  border-top: 1px solid #555;
+  text-decoration: none;
+}
+
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 15px;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .navLinks {
+    gap: 10px; /* Riduci lo spazio tra i link */
+  }
+
+  .navLink {
+    font-size: 0.8rem; /* Riduci la dimensione del testo */
+    gap: 5px;
+  }
+
+  /* Nasconde il testo e lascia solo le icone se lo schermo è strettissimo */
+  @media (max-width: 480px) {
+    .navLink {
+      font-size: 1.2rem; /* Ingrandisce l'icona */
+    }
+    .navLink > svg {
+      margin-right: 0;
+    }
+    .navLink span {
+      /* Assumendo che il testo sia in uno span */
+      display: none;
+    }
+  }
 }

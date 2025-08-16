@@ -57,11 +57,23 @@
   color: var(--secondary-color);
 }
 
+/* ... (tutti gli stili precedenti) ... */
+
 .comment {
   font-style: italic;
   color: #eee;
-  margin: 0 0 15px 0;
+  margin: 0 0 10px 0; /* Ridotto il margine inferiore */
 }
+
+/* NUOVO STILE PER IL TIMESTAMP */
+.timestamp {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-bottom: 15px;
+}
+
+/* Azioni: Reazioni e Commenti */
+/* ... (il resto degli stili) ... */
 
 /* Azioni: Reazioni e Commenti */
 .actions {
@@ -133,4 +145,23 @@
   border-radius: 5px;
   padding: 5px 10px;
   cursor: pointer;
+}
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .card {
+    flex-direction: column; /* Impila il poster sopra il contenuto */
+    align-items: center; /* Centra il poster */
+    padding: 15px;
+  }
+
+  .content {
+    margin-left: 0;
+    margin-top: 15px; /* Aggiunge spazio tra poster e testo */
+    width: 100%;
+  }
+
+  .poster {
+    width: 150px; /* Aumenta la dimensione del poster per renderlo protagonista */
+    height: 225px;
+  }
 }

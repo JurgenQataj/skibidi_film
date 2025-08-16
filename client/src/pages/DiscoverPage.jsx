@@ -35,7 +35,7 @@ function DiscoverPage() {
           {loading ? (
             <p>Caricamento...</p>
           ) : (
-            mostFollowed.map((user) => <UserCard key={user.id} user={user} />)
+            mostFollowed.map((user) => <UserCard key={user._id} user={user} />)
           )}
         </div>
       </section>
@@ -45,7 +45,7 @@ function DiscoverPage() {
           {loading ? (
             <p>Caricamento...</p>
           ) : (
-            newestUsers.map((user) => <UserCard key={user.id} user={user} />)
+            newestUsers.map((user) => <UserCard key={user._id} user={user} />)
           )}
         </div>
       </section>

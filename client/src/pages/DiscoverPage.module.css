@@ -16,3 +16,16 @@
   gap: 20px;
   margin-bottom: 50px;
 }
+
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 20px;
+  }
+
+  .gridContainer {
+    /* Permette alle card di diventare più piccole prima di andare a capo */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+  }
+}

@@ -10,9 +10,10 @@ const UserCard = ({ user, onNavigate }) => {
 
   const handleClick = () => {
     if (onNavigate) {
-      onNavigate(); // Chiude il pop-up
+      onNavigate(); // Chiude il pop-up prima di navigare
     }
-    navigate(`/profile/${user.id}`); // E POI naviga al nuovo profilo
+    // **LA CORREZIONE: usa user._id invece di user.id**
+    navigate(`/profile/${user._id}`);
   };
 
   return (

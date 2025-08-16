@@ -28,7 +28,7 @@ body::before {
   z-index: -1;
 
   background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("/sfondo1.jpg"); /* Assicurati che il tuo file in /public si chiami sfondo1.jpg */
+    url("/sfondo8.jpg"); /* Assicurati che il tuo file in /public si chiami sfondo1.jpg */
 
   background-size: cover;
   background-position: center;

@@ -66,7 +66,7 @@ function ProfilePage() {
         setStats(statsRes.data);
         setReviews(reviewsRes.data || []);
 
-        if (currentUserId && currentUserId !== Number(userId)) {
+        if (currentUserId && currentUserId !== userId) {
           const followStatusRes = await axios.get(
             `${API_URL}/api/users/${userId}/follow-status`,
             { headers: { Authorization: `Bearer ${token}` } }
@@ -86,10 +86,44 @@ function ProfilePage() {
   }, [userId, API_URL]);
 
   const handleFollowToggle = async () => {
-    /* ... (codice invariato) ... */
+    const token = localStorage.getItem("token");
+    const endpoint = isFollowing ? "unfollow" : "follow";
+    const method = isFollowing ? "delete" : "post";
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const url = `${API_URL}/api/users/${userId}/${endpoint}`;
+
+      if (method === "post") {
+        await axios.post(url, {}, config);
+      } else {
+        await axios.delete(url, config);
+      }
+
+      setIsFollowing(!isFollowing);
+      setStats((prevStats) => ({
+        ...prevStats,
+        followersCount: isFollowing
+          ? prevStats.followersCount - 1
+          : prevStats.followersCount + 1,
+      }));
+    } catch (error) {
+      alert(`Errore durante l'operazione di ${endpoint}`);
+    }
   };
+
   const showModalWith = async (type) => {
-    /* ... (codice invariato) ... */
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/users/${userId}/${type}`
+      );
+      setModalData({
+        isOpen: true,
+        title: type === "followers" ? "Follower" : "Seguiti",
+        content: response.data,
+      });
+    } catch (error) {
+      alert(`Errore nel caricamento di ${type}`);
+    }
   };
 
   const handleOpenEditModal = () => {
@@ -102,16 +136,13 @@ function ProfilePage() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
+      const updatedProfile = await axios.put(
         `${API_URL}/api/users/profile`,
         { bio: editBio, avatar_url: editAvatar },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      setProfile(updatedProfile.data);
       setIsEditModalOpen(false);
-      const profileRes = await axios.get(
-        `${API_URL}/api/users/${userId}/profile`
-      );
-      setProfile(profileRes.data);
     } catch (error) {
       alert("Errore durante l'aggiornamento del profilo.");
     }
@@ -126,24 +157,27 @@ function ProfilePage() {
       <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>
     );
 
-  const isOwnProfile = loggedInUserId === Number(userId);
+  const isOwnProfile = loggedInUserId === profile._id;
   const recentReviews = [...reviews].reverse().slice(0, 24);
 
   return (
     <>
       <Modal
         isOpen={modalData.isOpen}
-        onClose={() => setModalData({ isOpen: false })}
+        onClose={() => setModalData({ isOpen: false, title: "", content: [] })}
         title={modalData.title}
       >
         <div className={styles.userList}>
-          {modalData.content.map((user) => (
-            <UserCard
-              key={user.id}
-              user={user}
-              onNavigate={() => setModalData({ isOpen: false })}
-            />
-          ))}
+          {modalData.content &&
+            modalData.content.map((user) => (
+              <UserCard
+                key={user._id}
+                user={user}
+                onNavigate={() =>
+                  setModalData({ isOpen: false, title: "", content: [] })
+                }
+              />
+            ))}
         </div>
       </Modal>
 
@@ -158,6 +192,7 @@ function ProfilePage() {
             value={editBio}
             onChange={(e) => setEditBio(e.target.value)}
             className={styles.bioTextarea}
+            maxLength="150"
           />
           <label className={styles.editLabel}>Scegli un Avatar</label>
           <div className={styles.avatarGrid}>
@@ -187,15 +222,17 @@ function ProfilePage() {
         title={`Cronologia Completa di ${profile.username}`}
       >
         <ol className={styles.historyList}>
-          {reviews.map((review, index) => (
-            <li key={review.tmdb_id + index} className={styles.historyItem}>
+          {reviews.map((review) => (
+            <li key={review._id} className={styles.historyItem}>
               <img
-                src={`https://image.tmdb.org/t/p/w92${review.poster_path}`}
-                alt=""
+                src={`https://image.tmdb.org/t/p/w92${review.movie.poster_path}`}
+                alt={`Poster di ${review.movie.title}`}
                 className={styles.historyPoster}
               />
               <div className={styles.historyInfo}>
-                <span className={styles.historyTitle}>{review.title}</span>
+                <span className={styles.historyTitle}>
+                  {review.movie.title}
+                </span>
               </div>
               <span className={styles.historyRating}>{review.rating}/10</span>
             </li>
@@ -262,7 +299,7 @@ function ProfilePage() {
           <div className={styles.reviewsGrid}>
             {recentReviews.length > 0 ? (
               recentReviews.map((review) => (
-                <MovieCard key={review.tmdb_id} movie={review} />
+                <MovieCard key={review._id} movie={review.movie} />
               ))
             ) : (
               <p>Questo utente non ha ancora recensito nessun film.</p>

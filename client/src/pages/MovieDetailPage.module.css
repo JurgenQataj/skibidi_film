@@ -335,3 +335,50 @@
 .listButton:hover {
   border-color: var(--primary-color);
 }
+
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .headerOverlay {
+    padding: 20px;
+  }
+
+  .headerContent {
+    flex-direction: column; /* Impila l'immagine sopra i dettagli */
+    text-align: center;
+    gap: 20px;
+  }
+
+  .poster {
+    width: 200px; /* Riduci la dimensione del poster */
+    height: 300px;
+  }
+
+  .details {
+    text-align: center;
+  }
+
+  .title {
+    font-size: 2rem; /* Riduci la dimensione del titolo */
+  }
+
+  .actions {
+    justify-content: center; /* Centra i bottoni */
+  }
+
+  .infoSection {
+    flex-direction: column; /* Impila le info verticalmente */
+    gap: 20px;
+    margin: 20px;
+    top: 0;
+  }
+
+  .castSection,
+  .reviewsSection {
+    padding: 20px;
+  }
+
+  .castSection h2,
+  .reviewsTitle {
+    font-size: 1.5rem;
+  }
+}

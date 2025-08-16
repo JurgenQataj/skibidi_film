@@ -113,3 +113,9 @@
   border: 2px solid var(--primary-color);
   background-color: rgba(138, 75, 175, 0.2);
 }
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 20px;
+  }
+}

@@ -4,7 +4,15 @@ const Notification = require("../models/Notification");
 exports.getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({ recipient: req.user.id })
-      .populate("sender", "username avatar_url") // Aggiunge i dati di chi ha inviato la notifica
+      .populate("sender", "username avatar_url _id") // Aggiunge i dati di chi ha inviato la notifica
+      .populate({
+        path: "targetReview",
+        select: "movie",
+        populate: {
+          path: "movie",
+          select: "tmdb_id",
+        },
+      })
       .sort({ createdAt: -1 });
     res.json(notifications);
   } catch (error) {

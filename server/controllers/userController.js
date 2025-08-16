@@ -169,15 +169,42 @@ exports.getUserLists = async (req, res) => {
 };
 
 exports.getUserFeed = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+
   try {
     const currentUser = await User.findById(req.user.id);
-    const reviews = await Review.find({ user: { $in: currentUser.following } })
+    const followingIds = currentUser.following;
+
+    const reviews = await Review.find({ user: { $in: followingIds } })
       .populate("user", "username avatar_url")
       .populate("movie", "title poster_path tmdb_id")
       .sort({ createdAt: -1 })
-      .limit(50); // Manteniamo un limite per il feed
-    res.json(reviews);
+      .skip(skip)
+      .limit(limit);
+
+    const formattedFeed = reviews.map((review) => ({
+      id: review._id, // <-- **LA CORREZIONE**
+      rating: review.rating,
+      comment_text: review.comment_text,
+      is_spoiler: review.is_spoiler,
+      created_at: review.createdAt,
+      author_id: review.user._id,
+      review_author: review.user.username,
+      tmdb_id: review.movie.tmdb_id,
+      movie_title: review.movie.title,
+      poster_path: review.movie.poster_path,
+      reactions: review.reactions.reduce((acc, reaction) => {
+        acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
+        return acc;
+      }, {}),
+      comment_count: review.comments.length,
+    }));
+
+    res.json(formattedFeed);
   } catch (error) {
+    console.error("Errore nel caricamento del feed:", error);
     res.status(500).json({ message: "Errore del server" });
   }
 };

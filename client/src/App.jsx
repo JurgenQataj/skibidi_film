@@ -17,7 +17,8 @@ import MyListsPage from "./pages/MyListsPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegistrationPage from "./pages/RegistrationPage";
 import SearchPage from "./pages/SearchPage";
-import WatchlistPage from "./pages/WatchlistPage"; // <-- QUESTA È LA RIGA MANCANTE
+import WatchlistPage from "./pages/WatchlistPage";
+import NotificationsPage from "./pages/NotificationsPage"; // <-- NUOVO IMPORT
 
 // Import Componenti
 import Navbar from "./components/Navbar";
@@ -42,7 +43,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Rotte pubbliche per Login e Registrazione */}
         <Route
           path="/register"
           element={token ? <Navigate to="/" /> : <RegistrationPage />}
@@ -52,7 +52,6 @@ function App() {
           element={token ? <Navigate to="/" /> : <LoginPage />}
         />
 
-        {/* Tutte le rotte qui dentro sono protette */}
         <Route
           path="/"
           element={
@@ -66,6 +65,8 @@ function App() {
           <Route path="discover" element={<DiscoverPage />} />
           <Route path="my-lists" element={<MyListsPage />} />
           <Route path="watchlist" element={<WatchlistPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />{" "}
+          {/* <-- NUOVA ROTTA */}
           <Route path="list/:listId" element={<ListPage />} />
           <Route path="profile/:userId" element={<ProfilePage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />

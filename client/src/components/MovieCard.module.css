@@ -1,6 +1,6 @@
 .card {
   /* RIDOTTA LA LARGHEZZA PER FARNE ENTRARE DI PIÙ */
-  width: 130px; 
+  width: 130px;
   background-color: #1c1e21;
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -17,7 +17,7 @@
 .card img {
   width: 100%;
   /* RIDOTTA L'ALTEZZA IN PROPORZIONE */
-  height: 195px; 
+  height: 195px;
   object-fit: cover;
   display: block;
 }
@@ -29,10 +29,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   /* RIDOTTA LA DIMENSIONE DEL FONT */
-  font-size: 0.9rem; 
+  font-size: 0.9rem;
 }
 
 .cardLink {
   text-decoration: none;
   color: inherit;
+}
+
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .card {
+    /* Aumenta leggermente la larghezza per una migliore visibilità */
+    width: 140px;
+    margin: 5px;
+  }
+
+  .card img {
+    height: 210px;
+  }
 }

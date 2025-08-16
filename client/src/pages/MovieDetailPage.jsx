@@ -30,7 +30,8 @@ function MovieDetailPage() {
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    // Non rimettere il loading a true se stiamo solo aggiornando
+    // setLoading(true);
     setError("");
     try {
       const token = localStorage.getItem("token");
@@ -39,11 +40,9 @@ function MovieDetailPage() {
       setLoggedInUserId(userId);
 
       const moviePromise = axios.get(`${API_URL}/api/movies/${tmdbId}`);
-      const reviewsPromise = axios
-        .get(`${API_URL}/api/reviews/movie/${tmdbId}`)
-        .catch(() => ({
-          data: { reviews: [], averageRating: 0, reviewCount: 0 },
-        }));
+      const reviewsPromise = axios.get(
+        `${API_URL}/api/reviews/movie/${tmdbId}`
+      );
 
       const promises = [moviePromise, reviewsPromise];
       if (userId) {
@@ -77,26 +76,106 @@ function MovieDetailPage() {
   }, [tmdbId, API_URL]);
 
   useEffect(() => {
+    setLoading(true);
     fetchData();
   }, [fetchData]);
 
   const handleDeleteReview = async (reviewId) => {
-    /* ... (codice invariato) ... */
+    if (!window.confirm("Sei sicuro di voler eliminare la tua recensione?")) {
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/api/reviews/${reviewId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchData(); // Ricarica i dati
+    } catch (error) {
+      alert("Errore durante l'eliminazione della recensione.");
+    }
   };
+
   const handleWatchlistToggle = async () => {
-    /* ... (codice invariato) ... */
+    const token = localStorage.getItem("token");
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+    try {
+      if (isInWatchlist) {
+        await axios.delete(`${API_URL}/api/watchlist/${tmdbId}`, config);
+      } else {
+        await axios.post(`${API_URL}/api/watchlist`, { tmdbId }, config);
+      }
+      setIsInWatchlist(!isInWatchlist); // Aggiorna lo stato localmente
+    } catch (error) {
+      alert("Errore nell'aggiornamento della watchlist.");
+    }
   };
+
   const handleAddToList = async (listId) => {
-    /* ... (codice invariato) ... */
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        `${API_URL}/api/lists/${listId}/movies`,
+        { tmdbId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert(`Film aggiunto alla lista!`);
+      setShowLists(false);
+    } catch (error) {
+      alert(
+        error.response?.data?.message || "Errore durante l'aggiunta alla lista."
+      );
+    }
   };
+
   const handleReaction = async (reviewId, reactionType) => {
-    /* ... (codice invariato) ... */
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        `${API_URL}/api/reactions/reviews/${reviewId}`,
+        { reaction_type: reactionType },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchData(); // Ricarica per aggiornare i conteggi
+    } catch (error) {
+      alert("Errore durante l'invio della reazione.");
+    }
   };
+
   const toggleComments = async (reviewId) => {
-    /* ... (codice invariato) ... */
+    if (activeComments.reviewId === reviewId) {
+      setActiveComments({ reviewId: null, comments: [] }); // Chiudi
+    } else {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/comments/reviews/${reviewId}`
+        );
+        setActiveComments({ reviewId, comments: response.data });
+      } catch (error) {
+        console.error("Errore caricamento commenti:", error);
+      }
+    }
   };
+
   const handleAddComment = async (e, reviewId) => {
-    /* ... (codice invariato) ... */
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        `${API_URL}/api/comments/reviews/${reviewId}`,
+        { comment_text: commentText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCommentText("");
+      // Ricarica i commenti per vedere quello nuovo
+      const response = await axios.get(
+        `${API_URL}/api/comments/reviews/${reviewId}`
+      );
+      setActiveComments({ reviewId, comments: response.data });
+      fetchData(); // Ricarica tutto per aggiornare il conteggio
+    } catch (error) {
+      alert("Errore nell'invio del commento.");
+    }
   };
 
   const customLists = userLists.filter((list) => list.id !== "watchlist");
@@ -274,22 +353,19 @@ function MovieDetailPage() {
               {activeComments.reviewId === review.id && (
                 <div className={styles.commentsSection}>
                   {activeComments.comments.map((comment) => (
-                    <div key={comment.id} className={styles.commentItem}>
+                    <div key={comment._id} className={styles.commentItem}>
                       <Link
-                        to={`/profile/${comment.user_id}`}
+                        to={`/profile/${comment.user._id}`}
                         className={styles.authorLink}
                       >
-                        <strong>{comment.username}:</strong>
+                        <strong>{comment.user.username}:</strong>
                       </Link>
                       <span> {comment.comment_text}</span>
                     </div>
                   ))}
                   <form
                     className={styles.commentForm}
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleAddComment(e, review.id);
-                    }}
+                    onSubmit={(e) => handleAddComment(e, review.id)}
                   >
                     <input
                       type="text"
