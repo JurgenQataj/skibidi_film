@@ -55,14 +55,11 @@
   justify-content: space-around;
   background-color: rgba(0, 0, 0, 0.2);
   padding: 20px;
-  margin: 0 40px 40px 40px;
+  margin: -20px auto 40px auto;
   border-radius: var(--border-radius);
   max-width: 1200px;
   box-sizing: border-box;
   position: relative;
-  top: -20px;
-  margin-left: auto;
-  margin-right: auto;
 }
 .infoBox {
   text-align: center;
@@ -83,7 +80,7 @@
   padding: 0 40px;
   max-width: 1200px;
   margin: 40px auto;
-  box-sizing: border-box; /* **Correzione per il taglio** */
+  box-sizing: border-box;
 }
 .castSection h2 {
   font-size: 2rem;
@@ -95,29 +92,30 @@
   display: flex;
   overflow-x: auto;
   gap: 15px;
-  padding-bottom: 20px;
+  padding: 10px 0;
 }
 .actorCard {
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  min-width: 150px;
+  min-width: 140px;
   text-align: center;
 }
 .actorCard img {
   width: 100%;
-  height: 225px;
+  height: 210px;
   object-fit: cover;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-radius: 8px 8px 0 0;
 }
-.actorCard strong,
-.actorCard span {
-  display: block;
+.actorCard strong {
   padding: 5px;
+  font-size: 0.9rem;
+  display: block;
 }
 .actorCard span {
+  padding: 0 5px 5px 5px;
   font-size: 0.8rem;
   color: #ccc;
+  display: block;
 }
 .reviewsSection {
   padding: 40px;
@@ -134,6 +132,77 @@
   padding-bottom: 15px;
   margin-top: 0;
 }
+.reviewItem {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.reviewHeader div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.reviewActions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+.reactions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.reactions button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 0;
+}
+.reactions button:hover {
+  transform: scale(1.2);
+}
+.commentButton {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.commentButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+.deleteButton {
+  background-color: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  border-radius: 20px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.deleteButton:hover {
+  background-color: #ff4d4d;
+  color: white;
+}
 
 /* --- Media Queries per il Mobile --- */
 @media (max-width: 768px) {
@@ -142,7 +211,7 @@
     padding: 20px;
   }
   .castSection {
-    padding: 0 20px; /* **Correzione per il taglio** */
+    padding: 0 20px;
   }
   .headerContent {
     flex-direction: column;
@@ -175,42 +244,4 @@
   .actorCard img {
     height: 165px;
   }
-}
-/* ... (alla fine del file, dopo le altre regole) ... */
-.reviewActions {
-  margin-top: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 10px;
-}
-.reactions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.reactions button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.reactions button:hover {
-  transform: scale(1.2);
-}
-.commentButton {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ccc;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 12px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.commentButton:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
 }

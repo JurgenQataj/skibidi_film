@@ -79,7 +79,6 @@ exports.followUser = async (req, res) => {
     await User.findByIdAndUpdate(req.params.userId, {
       $addToSet: { followers: req.user.id },
     });
-    // Crea notifica
     const notification = new Notification({
       recipient: req.params.userId,
       sender: req.user.id,
@@ -109,8 +108,9 @@ exports.unfollowUser = async (req, res) => {
 exports.getFollowStatus = async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
-    const isFollowing = currentUser.following.includes(req.params.userId);
-    res.json({ isFollowing });
+    res.json({
+      isFollowing: currentUser.following.includes(req.params.userId),
+    });
   } catch (error) {
     res.status(500).json({ message: "Errore del server" });
   }
@@ -145,7 +145,7 @@ exports.getUserReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.params.userId })
       .populate({ path: "movie", select: "tmdb_id title poster_path" })
-      .sort({ createdAt: "desc" }); // Ordine più logico
+      .sort({ createdAt: "desc" });
     res.json(reviews);
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
@@ -175,9 +175,7 @@ exports.getUserFeed = async (req, res) => {
 
   try {
     const currentUser = await User.findById(req.user.id);
-    const followingIds = currentUser.following;
-
-    const reviews = await Review.find({ user: { $in: followingIds } })
+    const reviews = await Review.find({ user: { $in: currentUser.following } })
       .populate("user", "username avatar_url _id")
       .populate("movie", "title poster_path tmdb_id")
       .sort({ createdAt: -1 })
@@ -185,7 +183,7 @@ exports.getUserFeed = async (req, res) => {
       .limit(limit);
 
     // FILTRO DI SICUREZZA FONDAMENTALE:
-    // Scarta le recensioni "orfane" (quelle il cui film è stato cancellato o ha un riferimento rotto)
+    // Scarta le recensioni "orfane" (quelle il cui film o utente è stato cancellato)
     const validReviews = reviews.filter(
       (review) => review.user && review.movie
     );
@@ -200,21 +198,23 @@ exports.getUserFeed = async (req, res) => {
       tmdb_id: review.movie.tmdb_id,
       movie_title: review.movie.title,
       poster_path: review.movie.poster_path,
-      reactions: review.reactions.reduce((acc, reaction) => {
-        acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
-        return acc;
-      }, {}),
+      reactions: review.reactions.reduce(
+        (acc, r) => ({
+          ...acc,
+          [r.reaction_type]: (acc[r.reaction_type] || 0) + 1,
+        }),
+        {}
+      ),
       comment_count: review.comments.length,
     }));
 
     res.json(formattedFeed);
   } catch (error) {
-    console.error("Errore nel caricamento del feed:", error);
     res.status(500).json({ message: "Errore del server" });
   }
 };
 
-// --- Funzioni di Scoperta ---
+// --- Funzioni di Scoperta e Statistiche ---
 exports.getMostFollowedUsers = async (req, res) => {
   try {
     const users = await User.aggregate([
@@ -247,7 +247,6 @@ exports.getNewestUsers = async (req, res) => {
   }
 };
 
-// --- Statistiche ---
 exports.getUserStats = async (req, res) => {
   try {
     const userId = req.params.userId;

@@ -49,7 +49,13 @@ function HomePage() {
         );
 
         if (validData.length > 0) {
-          setFeed((prev) => (isRefresh ? validData : [...prev, ...data]));
+          setFeed((prev) => {
+            const newFeed = isRefresh ? validData : [...prev, ...validData];
+            // Rimuovi duplicati basati sull'ID
+            return Array.from(
+              new Map(newFeed.map((item) => [item.id, item])).values()
+            );
+          });
         }
 
         if (data.length < 10) {
@@ -74,7 +80,12 @@ function HomePage() {
     if (page > 1) fetchFeed(false);
   }, [page]);
 
-  const handleInteraction = () => fetchFeed(true);
+  const handleInteraction = () => {
+    // Ricarica il feed dall'inizio per mostrare subito le modifiche
+    setPage(1);
+    setHasMore(true);
+    fetchFeed(true);
+  };
 
   return (
     <div className={styles.pageContainer}>
