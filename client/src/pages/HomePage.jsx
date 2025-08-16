@@ -7,14 +7,15 @@ import { useAuth } from "../context/AuthContext";
 function HomePage() {
   const { logout } = useAuth();
   const [feed, setFeed] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Inizia come true
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const isFetching = useRef(false); // Usato per prevenire chiamate multiple
 
   const observer = useRef();
   const lastReviewElementRef = useCallback(
     (node) => {
-      if (loading) return;
+      if (loading || isFetching.current) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
@@ -27,59 +28,73 @@ function HomePage() {
   );
 
   const fetchFeed = useCallback(
-    async (isRefresh = false) => {
-      const targetPage = isRefresh ? 1 : page;
-      if (isRefresh) {
-        setFeed([]); // Pulisce il feed prima di un refresh
-        setHasMore(true);
-        setPage(1);
-      }
+    async (isInitialLoad = false) => {
+      // Se stiamo già caricando, non fare nulla
+      if (isFetching.current && !isInitialLoad) return;
+
+      isFetching.current = true;
       setLoading(true);
+
       try {
         const token = localStorage.getItem("token");
         const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
         const response = await axios.get(
-          `${API_URL}/api/users/feed?page=${targetPage}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          `${API_URL}/api/users/feed?page=${isInitialLoad ? 1 : page}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        if (response.data.length > 0) {
+        // Filtra per assicurarsi che ogni recensione sia valida
+        const validData = response.data.filter(
+          (review) => review && review.id && review.movie_title
+        );
+
+        if (validData.length > 0) {
           setFeed((prevFeed) => {
-            const newFeed = isRefresh
-              ? response.data
-              : [...prevFeed, ...response.data];
-            // Filtra per ID unici e si assicura che ogni recensione sia valida
-            const uniqueAndValidFeed = Array.from(
-              new Map(newFeed.map((item) => [item.id, item])).values()
-            ).filter((item) => item && item.tmdb_id); // Controllo di sicurezza
-            return uniqueAndValidFeed;
+            // Logica per evitare duplicati
+            const allReviews = isInitialLoad
+              ? validData
+              : [...prevFeed, ...validData];
+            const uniqueReviews = Array.from(
+              new Map(allReviews.map((item) => [item.id, item])).values()
+            );
+            return uniqueReviews;
           });
         }
-        if (response.data.length === 0 || response.data.length < 10) {
+
+        if (response.data.length < 10) {
           setHasMore(false);
         }
       } catch (error) {
         console.error("Errore nel caricamento del feed:", error);
+        setHasMore(false); // Blocca ulteriori caricamenti in caso di errore
       } finally {
         setLoading(false);
+        isFetching.current = false;
       }
     },
-    [page, hasMore]
+    [page]
   );
 
+  // useEffect per il caricamento iniziale
   useEffect(() => {
-    // Carica la prima pagina solo al montaggio iniziale
+    setPage(1);
+    setHasMore(true);
     fetchFeed(true);
-  }, []); // Eseguito solo una volta
+  }, []); // Eseguito solo una volta all'inizio
 
+  // useEffect per le pagine successive (infinite scroll)
   useEffect(() => {
-    // Carica le pagine successive per l'infinite scroll
     if (page > 1) {
       fetchFeed(false);
     }
-  }, [page]); // Si attiva solo quando 'page' cambia
+  }, [page]);
+
+  const handleInteraction = () => {
+    // Ricarica il feed dall'inizio dopo un'interazione (like/commento)
+    setPage(1);
+    setHasMore(true);
+    fetchFeed(true);
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -91,25 +106,27 @@ function HomePage() {
       </header>
 
       <div className={styles.feedContainer}>
-        {feed.map((review, index) => {
-          if (feed.length === index + 1) {
+        {feed.length > 0 &&
+          feed.map((review, index) => {
+            if (feed.length === index + 1) {
+              return (
+                <div ref={lastReviewElementRef} key={review.id}>
+                  <ReviewCard
+                    review={review}
+                    onInteraction={handleInteraction}
+                  />
+                </div>
+              );
+            }
             return (
-              <div ref={lastReviewElementRef} key={review.id}>
-                <ReviewCard
-                  review={review}
-                  onInteraction={() => fetchFeed(true)}
-                />
-              </div>
+              <ReviewCard
+                key={review.id}
+                review={review}
+                onInteraction={handleInteraction}
+              />
             );
-          }
-          return (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              onInteraction={() => fetchFeed(true)}
-            />
-          );
-        })}
+          })}
+
         {loading && <p className={styles.feedStatus}>Caricamento...</p>}
         {!hasMore && feed.length > 0 && (
           <p className={styles.feedStatus}>Hai raggiunto la fine del feed!</p>
@@ -123,4 +140,5 @@ function HomePage() {
     </div>
   );
 }
+
 export default HomePage;

@@ -16,7 +16,8 @@
   font-weight: bold;
 }
 
-.ratingInput, .commentTextarea {
+.ratingInput,
+.commentTextarea {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
@@ -48,4 +49,12 @@
   color: #ff8a8a;
   margin-top: -10px;
   margin-bottom: 15px;
+}
+
+/* **LA CORREZIONE PER IL FORM** */
+@media (max-width: 768px) {
+  .formContainer {
+    padding: 20px; /* Riduci il padding su mobile */
+    margin-top: 20px;
+  }
 }
