@@ -182,8 +182,7 @@ exports.getUserFeed = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    // FILTRO DI SICUREZZA FONDAMENTALE:
-    // Scarta le recensioni "orfane" (quelle il cui film o utente è stato cancellato)
+    // FILTRO DI SICUREZZA FONDAMENTALE: Scarta le recensioni "orfane"
     const validReviews = reviews.filter(
       (review) => review.user && review.movie
     );
