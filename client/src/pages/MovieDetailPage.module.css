@@ -290,20 +290,23 @@
 }
 
 @media (max-width: 768px) {
+  /* MODIFICA: Il contenuto principale della pagina (header e main)
+     ora occupa l'80% della larghezza dello schermo, risultando più stretto. */
+  .headerContent,
+  .mainContent {
+    max-width: 80%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .headerOverlay {
-    padding: 20px 15px;
-    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
+    padding: 20px 0; /* Rimosso padding laterale per centrare il contenuto */
   }
 
-  .headerContent {
-    flex-direction: column;
-    text-align: center;
-    gap: 15px;
-    max-width: 90%;
-  }
-
+  /* MODIFICA: La larghezza del poster è stata dimezzata rispetto alla versione mobile precedente,
+     passando da 60% a 30% della larghezza del suo contenitore. */
   .poster {
-    width: 45%;
+    width: 30%;
     max-width: 150px;
     height: auto;
   }
