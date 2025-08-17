@@ -288,23 +288,25 @@
   padding: 8px 12px;
   cursor: pointer;
 }
-/* In client/src/pages/MovieDetailPage.module.css */
 
+/* Sostituisci tutto il codice @media alla fine del file con questo blocco */
+
+/* --- MEDIA QUERY PER TABLET E MOBILE --- */
 @media (max-width: 768px) {
   /*
-  Contenitore Principale
-  Crea i margini e impedisce a qualsiasi elemento di uscire dai bordi.
+  MODIFICA CHIAVE #1: CONTENITORE PRINCIPALE
+  Questa è la regola più importante. Crea i margini laterali
+  e impedisce a QUALSIASI elemento figlio di "scappare" e causare lo scroll.
   */
   .pageContainer {
     padding: 0 15px;
-    max-width: 100%;
     overflow-x: hidden;
-    box-sizing: border-box;
   }
 
   /*
-  Contenuti Interni
-  Rimuoviamo il loro padding laterale per non creare doppi margini.
+  MODIFICA CHIAVE #2: CONTENUTI INTERNI
+  Ora che il contenitore principale ha i margini, azzeriamo quelli dei figli
+  per evitare spaziature doppie e disallineamenti.
   */
   .headerOverlay,
   .mainContent {
@@ -313,38 +315,47 @@
   }
 
   /*
-  Ridimensionamento degli Elementi
+  MODIFICA CHIAVE #3: ELEMENTI PROBLEMATICI
+  La sezione recensioni e il suo titolo devono potersi restringere.
   */
+  .reviewsSection {
+    /* Questa regola permette al contenitore delle recensioni di adattarsi */
+    width: 100%;
+    box-sizing: border-box; /* Assicura che il padding non causi overflow */
+  }
+
+  .reviewsTitle {
+    font-size: 1.4rem;
+    word-wrap: break-word; /* Forza il testo ad andare a capo */
+  }
+
+  /*
+  Stili per migliorare l'aspetto nel nuovo layout più stretto
+  */
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+  }
+
   .poster {
     width: 50%;
-    max-width: 170px;
+    max-width: 180px;
   }
 
   .title {
     font-size: 1.6rem;
   }
-
-  .reviewsTitle,
-  .castSection h2,
-  .overviewSection h3 {
-    font-size: 1.4rem;
-  }
-
-  /* Manteniamo lo scroll solo per il cast */
-  .castGrid {
-    overflow-x: auto;
-  }
 }
 
-/* --- NUOVA SEZIONE: MEDIA QUERY PER MOBILE MOLTO PICCOLO --- */
+/* --- MEDIA QUERY PER MOBILE MOLTO PICCOLO --- */
 @media (max-width: 480px) {
   .pageContainer {
-    padding: 0 10px; /* Riduciamo ancora un po' il padding laterale */
+    padding: 0 10px; /* Margini ancora più piccoli */
   }
 
   .poster {
-    width: 40%;
-    max-width: 120px; /* Poster ancora più piccolo */
+    width: 45%;
+    max-width: 140px;
   }
 
   .title {
@@ -357,15 +368,8 @@
     font-size: 1.2rem;
   }
 
-  .actorCard {
-    min-width: 80px; /* Card del cast più compatte */
-  }
-  .actorCard img {
-    height: 120px;
-  }
-
   .actionButton {
-    padding: 6px 12px;
-    font-size: 0.7rem; /* Bottoni più piccoli */
+    padding: 8px 14px;
+    font-size: 0.8rem;
   }
 }
