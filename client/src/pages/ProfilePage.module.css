@@ -236,6 +236,9 @@
   margin-left: 15px;
   flex-shrink: 0;
 }
+/* client/src/pages/ProfilePage.module.css */
+
+/* ... altri stili ... */
 
 /* Media Queries per il Mobile */
 @media (max-width: 768px) {
@@ -257,10 +260,15 @@
   .sectionTitle {
     font-size: 1.5rem;
   }
+
+  /* --- MODIFICA QUI --- */
   .reviewsGrid {
-    grid-template-columns: repeat(3, 1fr);
+    /* Aumentiamo le colonne a 4 per rendere le icone più piccole */
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
   }
+  /* --- FINE MODIFICA --- */
+
   .historyTitle {
     font-size: 0.9rem;
   }
