@@ -138,11 +138,9 @@
 
   /* CARD */
   .resultsGrid :global(.card) {
-    --title-height: 14px; /* 🔑 spazio riservato al titolo, facilmente modificabile */
+    --title-height: 8px; /* 🔑 quasi zero spazio sotto l’immagine */
     width: 120px !important;
-    height: calc(
-      185px + var(--title-height)
-    ) !important; /* immagine + titolo */
+    height: calc(185px + var(--title-height)) !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -160,8 +158,41 @@
   /* TITOLO */
   .resultsGrid :global(.card .title) {
     width: 120px !important;
-    height: var(--title-height) !important; /* 🔑 altezza personalizzabile */
+    height: var(--title-height) !important;
     font-size: 0.55rem !important;
+    line-height: 1 !important;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .resultsGrid {
+    grid-template-columns: repeat(3, 100px) !important;
+    gap: 8px !important;
+  }
+
+  .resultsGrid :global(.card) {
+    --title-height: 8px; /* 🔑 idem su schermi piccoli */
+    width: 100px !important;
+    height: calc(160px + var(--title-height)) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .resultsGrid :global(.card img) {
+    width: 100px !important;
+    height: 160px !important;
+    object-fit: contain !important;
+    background-color: #1c1e21 !important;
+  }
+
+  .resultsGrid :global(.card .title) {
+    width: 100px !important;
+    height: var(--title-height) !important;
+    font-size: 0.5rem !important;
     line-height: 1 !important;
     text-align: center;
     white-space: nowrap;
