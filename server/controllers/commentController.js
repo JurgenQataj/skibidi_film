@@ -7,8 +7,7 @@ exports.addComment = async (req, res) => {
   const { comment_text } = req.body;
   const userId = req.user.id;
 
-  // --- CORREZIONE DI SICUREZZA E VALIDAZIONE ---
-  // Controlla se il testo del commento è valido prima di procedere.
+  // Validazione robusta per prevenire commenti vuoti
   if (
     !comment_text ||
     typeof comment_text !== "string" ||
@@ -24,7 +23,7 @@ exports.addComment = async (req, res) => {
     if (!review)
       return res.status(404).json({ message: "Recensione non trovata." });
 
-    review.comments.push({ user: userId, comment_text: comment_text });
+    review.comments.push({ user: userId, comment_text: comment_text.trim() });
     await review.save();
 
     // Crea una notifica per l'autore della recensione
@@ -62,6 +61,39 @@ exports.getComments = async (req, res) => {
 
     res.json(validComments);
   } catch (error) {
+    res.status(500).json({ message: "Errore del server." });
+  }
+};
+
+// Eliminare un commento
+exports.deleteComment = async (req, res) => {
+  const { reviewId, commentId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Recensione non trovata." });
+    }
+
+    const comment = review.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Commento non trovato." });
+    }
+
+    if (comment.user.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Non hai i permessi per eliminare questo commento." });
+    }
+
+    // Rimuovi il commento dall'array
+    review.comments.pull({ _id: commentId });
+    await review.save();
+
+    res.json({ message: "Commento eliminato con successo." });
+  } catch (error) {
+    console.error("Errore eliminazione commento:", error);
     res.status(500).json({ message: "Errore del server." });
   }
 };

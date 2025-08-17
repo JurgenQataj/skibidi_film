@@ -4,18 +4,18 @@ import axios from "axios";
 import styles from "./ReviewCard.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
+import { jwtDecode } from "jwt-decode"; // Importa jwtDecode
 
 function ReviewCard({ review, onInteraction }) {
+  // Controllo di sicurezza per dati incompleti
   if (!review || !review.movie || !review.user || !review.movie.tmdb_id) {
-    console.warn(
-      "ReviewCard ha ricevuto dati incompleti e non verrà renderizzata:",
-      review
-    );
     return null;
   }
 
   const [comments, setComments] = useState({ shown: false, list: [] });
   const [commentText, setCommentText] = useState("");
+  const token = localStorage.getItem("token");
+  const loggedInUserId = token ? jwtDecode(token).user.id : null;
 
   const posterBaseUrl = "https://image.tmdb.org/t/p/w200";
   const placeholderPoster =
@@ -46,7 +46,6 @@ function ReviewCard({ review, onInteraction }) {
         );
         setComments({ shown: true, list: response.data || [] });
       } catch (error) {
-        // --- CORREZIONE: Aggiunte le parentesi graffe mancanti ---
         console.error("Errore caricamento commenti:", error);
       }
     }
@@ -63,6 +62,7 @@ function ReviewCard({ review, onInteraction }) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCommentText("");
+      // Ricarica i commenti per mostrare quello nuovo
       const response = await axios.get(
         `${API_URL}/api/comments/reviews/${review._id}`
       );
@@ -70,6 +70,27 @@ function ReviewCard({ review, onInteraction }) {
       if (onInteraction) onInteraction();
     } catch (error) {
       alert("Errore nell'invio del commento.");
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (window.confirm("Sei sicuro di voler eliminare questo commento?")) {
+      try {
+        await axios.delete(
+          `${API_URL}/api/comments/${commentId}/reviews/${review._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        // Ricarica i commenti per mostrare l'eliminazione
+        const response = await axios.get(
+          `${API_URL}/api/comments/reviews/${review._id}`
+        );
+        setComments({ shown: true, list: response.data || [] });
+        if (onInteraction) onInteraction(); // Aggiorna anche il feed
+      } catch (error) {
+        alert("Errore durante l'eliminazione del commento.");
+      }
     }
   };
 
@@ -124,7 +145,7 @@ function ReviewCard({ review, onInteraction }) {
         <div className={styles.rating}>
           Voto: <span className={styles.ratingValue}>{rating}</span>
         </div>
-        <p className={styles.comment}>"{comment_text}"</p>
+        {comment_text && <p className={styles.comment}>"{comment_text}"</p>}
         <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
         <div className={styles.actions}>
           <div className={styles.reactions}>
@@ -144,13 +165,23 @@ function ReviewCard({ review, onInteraction }) {
                 .filter((c) => c.user)
                 .map((comment) => (
                   <div key={comment._id} className={styles.commentItem}>
-                    <Link
-                      to={`/profile/${comment.user._id}`}
-                      className={styles.authorLink}
-                    >
-                      <strong>{comment.user.username}:</strong>
-                    </Link>
-                    <span> {comment.comment_text}</span>
+                    <div className={styles.commentContent}>
+                      <Link
+                        to={`/profile/${comment.user._id}`}
+                        className={styles.authorLink}
+                      >
+                        <strong>{comment.user.username}:</strong>
+                      </Link>
+                      <span> {comment.comment_text}</span>
+                    </div>
+                    {loggedInUserId === comment.user._id && (
+                      <button
+                        onClick={() => handleDeleteComment(comment._id)}
+                        className={styles.deleteCommentButton}
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                 ))
             ) : (
