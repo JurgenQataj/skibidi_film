@@ -146,7 +146,11 @@ exports.getUserReviews = async (req, res) => {
     const reviews = await Review.find({ user: req.params.userId })
       .populate({ path: "movie", select: "tmdb_id title poster_path" })
       .sort({ createdAt: "desc" });
-    res.json(reviews);
+
+    // Filtra le recensioni il cui film potrebbe essere stato eliminato dal DB
+    const validReviews = reviews.filter((review) => review.movie);
+
+    res.json(validReviews);
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
   }
@@ -157,12 +161,19 @@ exports.getUserLists = async (req, res) => {
     const lists = await MovieList.find({ user: req.params.userId }).sort({
       createdAt: "desc",
     });
+    const formattedLists = lists.map((list) => ({
+      id: list._id,
+      _id: list._id,
+      title: list.title,
+      description: list.description,
+    }));
     const watchlistPseudoList = {
       id: "watchlist",
+      _id: "watchlist",
       title: "Watchlist",
       description: "Film da vedere",
     };
-    res.json([watchlistPseudoList, ...lists]);
+    res.json([watchlistPseudoList, ...formattedLists]);
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
   }
@@ -172,55 +183,28 @@ exports.getUserFeed = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const skip = (page - 1) * limit;
-
   try {
-    // 1. Trova l'utente corrente e la lista di chi segue.
     const currentUser = await User.findById(req.user.id);
+    if (!currentUser) {
+      return res.status(404).json({ message: "Utente non trovato." });
+    }
     const followingIds = currentUser.following;
-
-    // 2. Se non segue nessuno, restituisci un feed vuoto.
     if (!followingIds || followingIds.length === 0) {
       return res.json([]);
     }
-
-    // 3. Cerca le recensioni degli utenti seguiti.
     const reviews = await Review.find({ user: { $in: followingIds } })
-      .populate({
-        path: "user",
-        select: "username avatar_url _id",
-      })
-      .populate({
-        path: "movie",
-        select: "title poster_path tmdb_id",
-      })
+      .populate({ path: "user", select: "username avatar_url _id" })
+      .populate({ path: "movie", select: "title poster_path tmdb_id" })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // 4. Filtro di sicurezza finale per scartare dati corrotti (recensioni "orfane")
+    // Filtro di sicurezza robusto per dati incompleti
     const validReviews = reviews.filter(
       (review) => review.user && review.movie
     );
 
-    // 5. Invia i dati "grezzi" e completi, senza formattazioni rischiose.
-    // 5. Formatta le recensioni per garantire la coerenza con altre parti dell'API
-    // ... (codice precedente della funzione)
-
-    // 5. Formatta le recensioni per garantire la coerenza con altre parti dell'API
-    const formattedReviews = validReviews.map((review) => ({
-      ...review.toObject(),
-      id: review._id,
-    }));
-
-    // Aggiungi questi header per disabilitare la cache di Vercel per questa rotta
-    res.setHeader(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, proxy-revalidate"
-    );
-    res.setHeader("Pragma", "no-cache");
-    res.setHeader("Expires", "0");
-
-    res.json(formattedReviews);
+    res.json(validReviews);
   } catch (error) {
     console.error("Errore critico nel caricamento del feed:", error);
     res
@@ -279,20 +263,12 @@ exports.getUserStats = async (req, res) => {
   }
 };
 
-// ... (tutte le altre funzioni del controller)
-
-// --- NUOVA FUNZIONE PER ELIMINARE L'ACCOUNT ---
+// --- Eliminazione Profilo ---
 exports.deleteUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-
-    // 1. Elimina tutte le liste create dall'utente
     await MovieList.deleteMany({ user: userId });
-
-    // 2. Elimina tutte le recensioni scritte dall'utente
     await Review.deleteMany({ user: userId });
-
-    // 3. Rimuovi l'utente dalle liste "followers" e "following" di altri utenti
     await User.updateMany(
       { followers: userId },
       { $pull: { followers: userId } }
@@ -301,15 +277,10 @@ exports.deleteUserProfile = async (req, res) => {
       { following: userId },
       { $pull: { following: userId } }
     );
-
-    // 4. Elimina tutte le notifiche relative all'utente
     await Notification.deleteMany({
       $or: [{ recipient: userId }, { sender: userId }],
     });
-
-    // 5. Infine, elimina l'utente
     await User.findByIdAndDelete(userId);
-
     res.json({ message: "Account eliminato con successo." });
   } catch (error) {
     console.error("Errore durante l'eliminazione dell'account:", error);

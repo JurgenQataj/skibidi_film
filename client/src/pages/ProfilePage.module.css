@@ -63,8 +63,11 @@
   margin-bottom: 30px;
 }
 .reviewsGrid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid; /* MODIFICA: Usiamo grid per un controllo migliore */
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(130px, 1fr)
+  ); /* Layout a griglia flessibile */
   gap: 10px;
 }
 .userList {
@@ -155,7 +158,6 @@
   background-color: var(--secondary-color);
 }
 
-/* --- MODIFICA RICHIESTA: Nuovi stili per la cronologia --- */
 .historyList {
   list-style: none;
   padding: 0;
@@ -190,7 +192,7 @@
 }
 .historyInfo {
   flex-grow: 1;
-  overflow: hidden; /* Evita che il testo vada a capo male */
+  overflow: hidden;
 }
 .historyTitle {
   display: block;
@@ -256,9 +258,13 @@
   .sectionTitle {
     font-size: 1.5rem;
   }
+
+  /* --- CORREZIONE: Stile per la griglia a 3 colonne su mobile --- */
   .reviewsGrid {
-    justify-content: center;
+    grid-template-columns: repeat(3, 1fr); /* 3 colonne uguali */
+    gap: 8px; /* Spazio ridotto tra le locandine */
   }
+
   .historyTitle {
     font-size: 0.9rem;
   }
