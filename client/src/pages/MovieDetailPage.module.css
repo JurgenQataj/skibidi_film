@@ -133,6 +133,9 @@
 
 .actorCard {
   min-width: 120px;
+  max-width: 120px; /* DIMENSIONE FISSA */
+  width: 120px; /* LARGHEZZA FISSA */
+  flex-shrink: 0; /* NON SI RIMPICCIOLISCE */
 }
 
 .actorCard img {
@@ -147,6 +150,12 @@
   font-size: 0.8rem;
   padding: 5px;
   display: block;
+  /* TESTO CHE NON ESPANDE LA CARD */
+  width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap; /* UNA RIGA SOLA */
+  overflow: hidden; /* NASCONDE IL TESTO CHE ESCE */
+  text-overflow: ellipsis; /* AGGIUNGE ... */
 }
 
 .reviewsSection {
