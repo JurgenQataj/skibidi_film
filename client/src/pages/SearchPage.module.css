@@ -61,7 +61,7 @@
     align-items: center;
     margin: 30px auto;
     /* MODIFICA: Impostata una larghezza fissa massima di 280px */
-    max-width: 90px;
+    max-width: 100px;
   }
 
   .resultsGrid {
