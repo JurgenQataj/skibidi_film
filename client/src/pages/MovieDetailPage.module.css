@@ -294,7 +294,7 @@
      ora occupa l'80% della larghezza dello schermo, risultando più stretto. */
   .headerContent,
   .mainContent {
-    max-width: 80%;
+    max-width: 40%;
     padding-left: 0;
     padding-right: 0;
   }
