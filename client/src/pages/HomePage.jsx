@@ -45,8 +45,9 @@ function HomePage() {
 
         setFeed((prev) => {
           const newFeed = isRefresh ? data : [...prev, ...data];
+          // Utilizziamo `_id` per essere sicuri che la chiave sia univoca
           return Array.from(
-            new Map(newFeed.map((item) => [item.id, item])).values()
+            new Map(newFeed.map((item) => [item._id, item])).values()
           );
         });
 
@@ -86,14 +87,14 @@ function HomePage() {
         {feed.map((review, index) => {
           if (feed.length === index + 1) {
             return (
-              <div ref={lastReviewElementRef} key={review.id}>
+              <div ref={lastReviewElementRef} key={review._id}>
                 <ReviewCard review={review} onInteraction={handleInteraction} />
               </div>
             );
           }
           return (
             <ReviewCard
-              key={review.id}
+              key={review._id}
               review={review}
               onInteraction={handleInteraction}
             />

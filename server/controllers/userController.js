@@ -203,7 +203,13 @@ exports.getUserFeed = async (req, res) => {
     );
 
     // 5. Invia i dati "grezzi" e completi, senza formattazioni rischiose.
-    res.json(validReviews);
+    // 5. Formatta le recensioni per garantire la coerenza con altre parti dell'API
+    const formattedReviews = validReviews.map((review) => ({
+      ...review.toObject(),
+      id: review._id,
+    }));
+
+    res.json(formattedReviews);
   } catch (error) {
     console.error("Errore critico nel caricamento del feed:", error);
     res
