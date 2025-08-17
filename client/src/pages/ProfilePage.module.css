@@ -265,7 +265,7 @@
   .reviewsGrid {
     /* Aumentiamo le colonne a 4 per rendere le icone più piccole */
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 4px;
   }
   /* --- FINE MODIFICA --- */
 
