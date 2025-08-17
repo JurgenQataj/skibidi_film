@@ -39,12 +39,16 @@ exports.getComments = async (req, res) => {
     const review = await Review.findById(reviewId).populate(
       "comments.user",
       "username avatar_url"
-    ); // Aggiunge i dati dell'utente a ogni commento
+    );
 
     if (!review)
       return res.status(404).json({ message: "Recensione non trovata." });
 
-    res.json(review.comments);
+    // --- CORREZIONE DI SICUREZZA ---
+    // Filtra i commenti il cui utente è stato eliminato (è null)
+    const validComments = review.comments.filter((comment) => comment.user);
+
+    res.json(validComments);
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
   }

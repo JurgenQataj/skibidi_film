@@ -63,11 +63,8 @@
   margin-bottom: 30px;
 }
 .reviewsGrid {
-  display: grid; /* MODIFICA: Usiamo grid per un controllo migliore */
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(130px, 1fr)
-  ); /* Layout a griglia flessibile */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 10px;
 }
 .userList {
@@ -91,10 +88,13 @@
 .editButton:hover {
   opacity: 0.9;
 }
+
+/* Stili per il modale di modifica */
 .editLabel {
   display: block;
   font-weight: bold;
   margin-bottom: 10px;
+  text-align: left;
 }
 .bioTextarea {
   width: 100%;
@@ -139,6 +139,34 @@
   font-size: 1rem;
   cursor: pointer;
 }
+.divider {
+  border: none;
+  border-top: 1px solid #555;
+  margin: 25px 0;
+}
+.dangerZone {
+  text-align: center;
+}
+.dangerTitle {
+  color: #ff4d4d;
+  margin-top: 0;
+}
+.deleteAccountButton {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #cc0000;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.deleteAccountButton:hover {
+  background-color: #ff4d4d;
+}
+
 .showAllContainer {
   text-align: center;
   margin-top: 30px;
@@ -157,7 +185,6 @@
 .showAllButton:hover {
   background-color: var(--secondary-color);
 }
-
 .historyList {
   list-style: none;
   padding: 0;
@@ -210,35 +237,7 @@
   flex-shrink: 0;
 }
 
-.divider {
-  border: none;
-  border-top: 1px solid #555;
-  margin: 25px 0;
-}
-.dangerZone {
-  text-align: center;
-}
-.dangerTitle {
-  color: #ff4d4d;
-  margin-top: 0;
-}
-.deleteAccountButton {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background-color: #cc0000;
-  color: white;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.deleteAccountButton:hover {
-  background-color: #ff4d4d;
-}
-
-/* --- Media Queries per il Mobile --- */
+/* Media Queries per il Mobile */
 @media (max-width: 768px) {
   .pageContainer {
     padding: 20px;
@@ -258,13 +257,10 @@
   .sectionTitle {
     font-size: 1.5rem;
   }
-
-  /* --- CORREZIONE: Stile per la griglia a 3 colonne su mobile --- */
   .reviewsGrid {
-    grid-template-columns: repeat(3, 1fr); /* 3 colonne uguali */
-    gap: 8px; /* Spazio ridotto tra le locandine */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
   }
-
   .historyTitle {
     font-size: 0.9rem;
   }
