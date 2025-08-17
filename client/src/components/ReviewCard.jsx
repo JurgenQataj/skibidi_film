@@ -77,7 +77,7 @@ function ReviewCard({ review, onInteraction }) {
     if (window.confirm("Sei sicuro di voler eliminare questo commento?")) {
       try {
         await axios.delete(
-          `${API_URL}/api/comments/${commentId}/reviews/${review._id}`,
+          `${API_URL}/api/comments/reviews/${review._id}/${commentId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
