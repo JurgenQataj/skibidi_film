@@ -376,97 +376,97 @@
 /* === MOBILE - STRATEGIA PROFILEPAGE (RIPRISTINATA) === */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 20px;
+    padding: 10px; /* RIDOTTO DA 20px */
   }
 
   .headerOverlay {
-    padding: 15px;
+    padding: 10px; /* RIDOTTO DA 15px */
   }
 
   .headerContent {
-    gap: 15px;
+    gap: 10px; /* RIDOTTO DA 15px */
   }
 
   .poster {
-    width: 30%;
-    max-width: 100px;
+    width: 20%; /* RIDOTTO DA 30% */
+    max-width: 70px; /* RIDOTTO DA 100px */
   }
 
   .title {
-    font-size: 1.2rem;
-    margin: 0 0 5px 0;
+    font-size: 1rem; /* RIDOTTO DA 1.2rem */
+    margin: 0 0 3px 0;
   }
 
   .tagline {
-    font-size: 0.8rem;
-    margin-bottom: 10px;
+    font-size: 0.7rem; /* RIDOTTO DA 0.8rem */
+    margin-bottom: 8px;
   }
 
   .actions {
-    gap: 8px;
+    gap: 5px; /* RIDOTTO DA 8px */
     flex-direction: column;
   }
 
   .actionButton {
-    padding: 8px 15px;
-    font-size: 0.85rem;
+    padding: 5px 10px; /* RIDOTTO DA 8px 15px */
+    font-size: 0.7rem; /* RIDOTTO DA 0.85rem */
     width: fit-content;
   }
 
   .mainContent {
     padding: 0;
-    margin: 15px 0;
+    margin: 10px 0; /* RIDOTTO DA 15px */
   }
 
   .overviewSection h3,
   .castSection h2 {
-    font-size: 1.3rem;
-    margin-bottom: 20px;
+    font-size: 1.1rem; /* RIDOTTO DA 1.3rem */
+    margin-bottom: 15px; /* RIDOTTO DA 20px */
   }
 
   .reviewsTitle {
-    font-size: 1.3rem;
+    font-size: 1.1rem; /* RIDOTTO DA 1.3rem */
   }
 
   .overview {
-    font-size: 0.85rem;
-    line-height: 1.5;
+    font-size: 0.8rem; /* RIDOTTO DA 0.85rem */
+    line-height: 1.4; /* RIDOTTO DA 1.5 */
   }
 
   .infoSection {
-    padding: 15px;
-    margin-top: 20px;
+    padding: 10px; /* RIDOTTO DA 15px */
+    margin-top: 15px; /* RIDOTTO DA 20px */
   }
 
   .infoBox h4 {
-    font-size: 0.8rem;
+    font-size: 0.7rem; /* RIDOTTO DA 0.8rem */
   }
 
   .infoBox p {
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* RIDOTTO DA 0.9rem */
   }
 
   .castGrid {
-    gap: 8px;
-    padding: 5px 0;
+    gap: 5px; /* RIDOTTO DA 8px */
+    padding: 3px 0; /* RIDOTTO DA 5px */
   }
 
-  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE */
+  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE MOLTO PIÙ PICCOLE */
   .actorCard {
-    min-width: 70px;
-    max-width: 70px;
-    width: 70px;
+    min-width: 50px; /* RIDOTTO DA 70px */
+    max-width: 50px;
+    width: 50px;
     flex-shrink: 0;
   }
 
   .actorCard img {
-    height: 105px;
+    height: 75px; /* RIDOTTO DA 105px */
   }
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.65rem;
-    padding: 2px;
+    font-size: 0.5rem; /* RIDOTTO DA 0.65rem */
+    padding: 1px; /* RIDOTTO DA 2px */
     width: 100%;
     box-sizing: border-box;
     white-space: nowrap;
@@ -475,13 +475,13 @@
   }
 
   .reviewsSection {
-    padding: 15px;
-    margin-top: 25px;
+    padding: 10px; /* RIDOTTO DA 15px */
+    margin-top: 20px; /* RIDOTTO DA 25px */
   }
 
   .reviewItem {
-    padding: 10px;
-    margin-bottom: 12px;
+    padding: 8px; /* RIDOTTO DA 10px */
+    margin-bottom: 10px; /* RIDOTTO DA 12px */
   }
 
   .reviewHeader {
@@ -501,74 +501,74 @@
 
   .commentButton,
   .deleteButton {
-    padding: 6px 10px;
-    font-size: 0.8rem;
+    padding: 4px 8px; /* RIDOTTO DA 6px 10px */
+    font-size: 0.7rem; /* RIDOTTO DA 0.8rem */
   }
 
   .commentForm {
-    gap: 8px;
+    gap: 5px; /* RIDOTTO DA 8px */
   }
 
   .commentForm input {
-    padding: 12px;
-    font-size: 0.9rem;
+    padding: 8px; /* RIDOTTO DA 12px */
+    font-size: 0.8rem; /* RIDOTTO DA 0.9rem */
   }
 
   .commentForm button {
-    padding: 12px 15px;
-    font-size: 0.85rem;
+    padding: 8px 12px; /* RIDOTTO DA 12px 15px */
+    font-size: 0.75rem; /* RIDOTTO DA 0.85rem */
   }
 }
 
 @media (max-width: 480px) {
   .pageContainer {
-    padding: 15px;
+    padding: 8px; /* RIDOTTO DA 15px */
   }
 
   .poster {
-    width: 25%;
-    max-width: 80px;
+    width: 18%; /* RIDOTTO DA 25% */
+    max-width: 60px; /* RIDOTTO DA 80px */
   }
 
   .title {
-    font-size: 1.1rem;
+    font-size: 0.9rem; /* RIDOTTO DA 1.1rem */
   }
 
   .tagline {
-    font-size: 0.75rem;
+    font-size: 0.65rem; /* RIDOTTO DA 0.75rem */
   }
 
   .actionButton {
-    padding: 6px 12px;
-    font-size: 0.8rem;
+    padding: 4px 8px; /* RIDOTTO DA 6px 12px */
+    font-size: 0.65rem; /* RIDOTTO DA 0.8rem */
   }
 
   .overviewSection h3,
   .castSection h2,
   .reviewsTitle {
-    font-size: 1.2rem;
+    font-size: 1rem; /* RIDOTTO DA 1.2rem */
   }
 
   .overview {
-    font-size: 0.8rem;
+    font-size: 0.75rem; /* RIDOTTO DA 0.8rem */
   }
 
-  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE PICCOLO */
+  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE PICCOLO ANCORA PIÙ RIDOTTE */
   .actorCard {
-    min-width: 60px;
-    max-width: 60px;
-    width: 60px;
+    min-width: 45px; /* RIDOTTO DA 60px */
+    max-width: 45px;
+    width: 45px;
     flex-shrink: 0;
   }
 
   .actorCard img {
-    height: 90px;
+    height: 65px; /* RIDOTTO DA 90px */
   }
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.6rem;
-    padding: 1px;
+    font-size: 0.45rem; /* RIDOTTO DA 0.6rem */
+    padding: 0.5px; /* RIDOTTO DA 1px */
     width: 100%;
     box-sizing: border-box;
     white-space: nowrap;
@@ -577,10 +577,10 @@
   }
 
   .reviewsSection {
-    padding: 12px;
+    padding: 8px; /* RIDOTTO DA 12px */
   }
 
   .reviewItem {
-    padding: 8px;
+    padding: 6px; /* RIDOTTO DA 8px */
   }
 }
