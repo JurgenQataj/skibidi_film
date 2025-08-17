@@ -278,3 +278,41 @@ exports.getUserStats = async (req, res) => {
     res.status(500).json({ message: "Errore del server." });
   }
 };
+
+// ... (tutte le altre funzioni del controller)
+
+// --- NUOVA FUNZIONE PER ELIMINARE L'ACCOUNT ---
+exports.deleteUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // 1. Elimina tutte le liste create dall'utente
+    await MovieList.deleteMany({ user: userId });
+
+    // 2. Elimina tutte le recensioni scritte dall'utente
+    await Review.deleteMany({ user: userId });
+
+    // 3. Rimuovi l'utente dalle liste "followers" e "following" di altri utenti
+    await User.updateMany(
+      { followers: userId },
+      { $pull: { followers: userId } }
+    );
+    await User.updateMany(
+      { following: userId },
+      { $pull: { following: userId } }
+    );
+
+    // 4. Elimina tutte le notifiche relative all'utente
+    await Notification.deleteMany({
+      $or: [{ recipient: userId }, { sender: userId }],
+    });
+
+    // 5. Infine, elimina l'utente
+    await User.findByIdAndDelete(userId);
+
+    res.json({ message: "Account eliminato con successo." });
+  } catch (error) {
+    console.error("Errore durante l'eliminazione dell'account:", error);
+    res.status(500).json({ message: "Errore del server." });
+  }
+};

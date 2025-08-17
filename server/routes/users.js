@@ -16,6 +16,9 @@ router.get("/:userId/profile", userController.getUserProfile);
 router.put("/profile", authMiddleware, userController.updateUserProfile);
 router.get("/:userId/stats", userController.getUserStats);
 
+router.delete("/profile", authMiddleware, userController.deleteUserProfile);
+router.get("/:userId/stats", userController.getUserStats);
+
 // Social
 router.post("/:userId/follow", authMiddleware, userController.followUser);
 router.delete("/:userId/unfollow", authMiddleware, userController.unfollowUser);

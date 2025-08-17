@@ -229,3 +229,38 @@
     justify-content: center;
   }
 }
+
+/* ... (tutti gli stili precedenti) */
+
+/* --- Stili per la Danger Zone nel modale --- */
+.divider {
+  border: none;
+  border-top: 1px solid #555;
+  margin: 25px 0;
+}
+
+.dangerZone {
+  text-align: center;
+}
+
+.dangerTitle {
+  color: #ff4d4d;
+  margin-top: 0;
+}
+
+.deleteAccountButton {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #cc0000;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.deleteAccountButton:hover {
+  background-color: #ff4d4d;
+}

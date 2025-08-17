@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Aggiunto useNavigate
 import axios from "axios";
 import styles from "./ProfilePage.module.css";
 import MovieCard from "../components/MovieCard";
 import UserCard from "../components/UserCard";
 import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../context/AuthContext"; // Aggiunto useAuth
 
 const avatars = [
   "1.png",
@@ -29,6 +30,8 @@ const avatarBaseUrl =
 
 function ProfilePage() {
   const { userId } = useParams();
+  const navigate = useNavigate(); // Aggiunto per il redirect dopo l'eliminazione
+  const { logout } = useAuth(); // Aggiunto per fare il logout dopo l'eliminazione
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -148,6 +151,28 @@ function ProfilePage() {
     }
   };
 
+  // --- NUOVA FUNZIONE ---
+  const handleDeleteAccount = async () => {
+    const confirmation = window.prompt(
+      "Questa azione è irreversibile. Per confermare, scrivi il tuo username:"
+    );
+    if (confirmation === profile.username) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`${API_URL}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        alert("Account eliminato con successo.");
+        logout();
+        navigate("/login");
+      } catch (error) {
+        alert("Errore durante l'eliminazione dell'account.");
+      }
+    } else if (confirmation !== null) {
+      alert("Username non corretto. Eliminazione annullata.");
+    }
+  };
+
   if (loading)
     return (
       <p style={{ color: "white", textAlign: "center" }}>Caricamento...</p>
@@ -214,6 +239,17 @@ function ProfilePage() {
             Salva Modifiche
           </button>
         </form>
+        {/* --- SEZIONE AGGIUNTA --- */}
+        <hr className={styles.divider} />
+        <div className={styles.dangerZone}>
+          <h3 className={styles.dangerTitle}>Zona Pericolo</h3>
+          <button
+            onClick={handleDeleteAccount}
+            className={styles.deleteAccountButton}
+          >
+            Elimina Account
+          </button>
+        </div>
       </Modal>
 
       <Modal

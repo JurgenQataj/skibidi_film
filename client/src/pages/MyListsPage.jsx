@@ -10,7 +10,6 @@ function MyListsPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  // Definiamo l'URL del backend che useremo in tutta la pagina
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const fetchLists = useCallback(async () => {
@@ -51,13 +50,20 @@ function MyListsPage() {
     }
   };
 
+  // --- FUNZIONE DI ELIMINAZIONE LISTA ---
   const handleDeleteList = async (listId) => {
-    if (window.confirm("Sei sicuro di voler eliminare questa lista?")) {
+    // Chiediamo conferma prima di procedere
+    if (
+      window.confirm(
+        "Sei sicuro di voler eliminare questa lista? L'azione è irreversibile."
+      )
+    ) {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(`${API_URL}/api/lists/${listId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        // Aggiorniamo la lista di liste dopo l'eliminazione
         fetchLists();
       } catch (error) {
         alert(
@@ -114,6 +120,7 @@ function MyListsPage() {
                   <h3>{list.title}</h3>
                   <p>{list.description}</p>
                 </Link>
+                {/* Il bottone chiama la funzione handleDeleteList al click */}
                 {list.id !== "watchlist" && (
                   <button
                     onClick={() => handleDeleteList(list.id)}
