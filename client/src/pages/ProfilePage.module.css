@@ -308,6 +308,7 @@
   /* CARD */
   .reviewsGrid .card {
     width: 120px !important;
+    height: 134px !important; /* 🔑 ridotta del 20% rispetto a 168px */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -316,13 +317,13 @@
 
   .reviewsGrid .card img {
     width: 120px !important;
-    height: 160px !important; /* immagine fissa */
+    height: 126px !important; /* 🔑 ridotta del 20% rispetto a 160px */
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
 
   .reviewsGrid .card .title {
-    --title-height: 8px; /* 🔑 altezza minima per il titolo */
+    --title-height: 8px; /* altezza minima titolo */
     width: 120px !important;
     height: var(--title-height) !important;
     font-size: 0.55rem !important;
@@ -357,6 +358,7 @@
 
   .reviewsGrid .card {
     width: 100px !important;
+    height: 118px !important; /* 🔑 ridotta del 20% rispetto a 148px */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -364,7 +366,7 @@
 
   .reviewsGrid .card img {
     width: 100px !important;
-    height: 140px !important; /* immagine fissa */
+    height: 112px !important; /* 🔑 ridotta del 20% rispetto a 140px */
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
