@@ -4,14 +4,14 @@ const commentController = require("../controllers/commentController");
 const authMiddleware = require("../middleware/authMiddleware");
 
 // Aggiungere un commento
-router.post("/reviews/:reviewId", authMiddleware, commentController.addComment);
+router.post("/:reviewId", authMiddleware, commentController.addComment);
 
 // Ottenere i commenti
-router.get("/reviews/:reviewId", commentController.getComments);
+router.get("/:reviewId", commentController.getComments);
 
 // --- NUOVA ROTTA CORRETTA: Eliminare un commento ---
 router.delete(
-  "/reviews/:reviewId/:commentId",
+  "/:reviewId/:commentId",
   authMiddleware,
   commentController.deleteComment
 );

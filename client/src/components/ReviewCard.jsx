@@ -42,21 +42,16 @@ function ReviewCard({ review, onInteraction }) {
   };
 
   const toggleComments = async () => {
-    console.log("🐛 FRONTEND - toggleComments chiamata");
-
     if (comments.shown) {
-      console.log("🐛 FRONTEND - Nascondendo commenti");
       setComments({ shown: false, list: [] });
     } else {
-      console.log("🐛 FRONTEND - Caricando commenti per review:", review._id);
       try {
         const response = await axios.get(
-          `${API_URL}/api/comments/reviews/${review._id}`
+          `${API_URL}/api/reviews/${review._id}/comments`
         );
-        console.log("✅ FRONTEND - Commenti caricati:", response.data?.length);
         setComments({ shown: true, list: response.data || [] });
       } catch (error) {
-        console.error("❌ FRONTEND - Errore caricamento commenti:", error);
+        console.error("Errore caricamento commenti:", error);
       }
     }
   };
@@ -64,40 +59,22 @@ function ReviewCard({ review, onInteraction }) {
   const handleAddComment = async (e) => {
     e.preventDefault();
 
-    console.log("🐛 FRONTEND - handleAddComment chiamata");
-    console.log("🐛 FRONTEND - commentText:", `"${commentText}"`);
-    console.log("🐛 FRONTEND - commentText type:", typeof commentText);
-    console.log("🐛 FRONTEND - commentText length:", commentText?.length);
-    console.log("🐛 FRONTEND - commentText.trim():", `"${commentText.trim()}"`);
-
     if (!commentText.trim()) {
-      console.log("❌ FRONTEND - Commento vuoto dopo validazione");
       alert("Il commento non può essere vuoto.");
       return;
     }
 
     if (!token) {
-      console.log("❌ FRONTEND - Nessun token");
       alert("Devi essere loggato per commentare.");
       return;
     }
 
-    console.log("✅ FRONTEND - Validazione superata, invio richiesta...");
     setIsSubmittingComment(true);
-
     const payload = { comment_text: commentText.trim() };
-    console.log("🐛 FRONTEND - Payload da inviare:", payload);
-    console.log("🐛 FRONTEND - Payload JSON:", JSON.stringify(payload));
 
     try {
-      console.log(
-        "🐛 FRONTEND - URL target:",
-        `${API_URL}/api/comments/reviews/${review._id}`
-      );
-      console.log("🐛 FRONTEND - Review ID:", review._id);
-
       const response = await axios.post(
-        `${API_URL}/api/comments/reviews/${review._id}`,
+        `${API_URL}/api/reviews/${review._id}/comments`,
         payload,
         {
           headers: {
@@ -107,30 +84,14 @@ function ReviewCard({ review, onInteraction }) {
         }
       );
 
-      console.log("✅ FRONTEND - Risposta ricevuta:", response.status);
-      console.log("🐛 FRONTEND - Dati risposta:", response.data);
-      console.log(
-        "🐛 FRONTEND - Numero commenti ricevuti:",
-        response.data?.length
-      );
-      console.log(
-        "🐛 FRONTEND - Primi 2 commenti:",
-        response.data?.slice(0, 2)
-      );
-
       setCommentText("");
       setComments({ shown: true, list: response.data || [] });
 
       if (onInteraction) {
-        console.log("🐛 FRONTEND - Chiamando onInteraction");
         onInteraction();
       }
     } catch (error) {
-      console.error("❌ FRONTEND - Errore nella richiesta:", error);
-      console.error("❌ FRONTEND - Error response:", error.response?.data);
-      console.error("❌ FRONTEND - Error status:", error.response?.status);
-      console.error("❌ FRONTEND - Error message:", error.message);
-
+      console.error("Errore nella richiesta:", error);
       const errorMessage =
         error.response?.data?.message || "Errore nell'invio del commento.";
       alert(errorMessage);
@@ -140,10 +101,6 @@ function ReviewCard({ review, onInteraction }) {
   };
 
   const handleDeleteComment = async (commentId) => {
-    console.log("🐛 FRONTEND - handleDeleteComment chiamata");
-    console.log("🐛 FRONTEND - commentId:", commentId);
-    console.log("🐛 FRONTEND - review._id:", review._id);
-
     if (!window.confirm("Sei sicuro di voler eliminare questo commento?")) {
       return;
     }
@@ -151,47 +108,24 @@ function ReviewCard({ review, onInteraction }) {
     setIsDeletingComment(commentId);
 
     try {
-      console.log(
-        "🐛 FRONTEND - URL eliminazione:",
-        `${API_URL}/api/comments/reviews/${review._id}/${commentId}`
-      );
-
       const deleteResponse = await axios.delete(
-        `${API_URL}/api/comments/reviews/${review._id}/${commentId}`,
+        `${API_URL}/api/reviews/${review._id}/comments/${commentId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      console.log(
-        "✅ FRONTEND - Eliminazione completata:",
-        deleteResponse.status
-      );
-      console.log("🐛 FRONTEND - Risposta eliminazione:", deleteResponse.data);
-
-      // Ricarica i commenti
-      console.log("🐛 FRONTEND - Ricaricando commenti dopo eliminazione...");
       const response = await axios.get(
-        `${API_URL}/api/comments/reviews/${review._id}`
+        `${API_URL}/api/reviews/${review._id}/comments`
       );
-
-      console.log(
-        "🐛 FRONTEND - Commenti dopo eliminazione:",
-        response.data?.length
-      );
-      console.log("🐛 FRONTEND - Lista commenti aggiornata:", response.data);
 
       setComments({ shown: true, list: response.data || [] });
 
       if (onInteraction) {
-        console.log("🐛 FRONTEND - Chiamando onInteraction dopo eliminazione");
         onInteraction();
       }
     } catch (error) {
-      console.error("❌ FRONTEND - Errore eliminazione:", error);
-      console.error("❌ FRONTEND - Error response:", error.response?.data);
-      console.error("❌ FRONTEND - Error status:", error.response?.status);
-
+      console.error("Errore eliminazione:", error);
       const errorMessage =
         error.response?.data?.message ||
         "Errore durante l'eliminazione del commento.";

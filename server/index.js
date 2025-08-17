@@ -26,7 +26,7 @@ app.use("/api/movies", require("./routes/movies"));
 app.use("/api/reviews", require("./routes/reviews"));
 app.use("/api/lists", require("./routes/lists"));
 app.use("/api/watchlist", require("./routes/watchlist"));
-app.use("/api/comments", require("./routes/comments"));
+app.use("/api/reviews/:reviewId/comments", require("./routes/comments"));
 app.use("/api/reactions", require("./routes/reactions"));
 app.use("/api/notifications", require("./routes/notifications"));
 
