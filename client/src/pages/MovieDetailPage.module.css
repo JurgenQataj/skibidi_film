@@ -388,8 +388,8 @@
   }
 
   .poster {
-    width: 20%; /* RIDOTTO DA 30% */
-    max-width: 70px; /* RIDOTTO DA 100px */
+    width: 12%; /* RIDOTTO DA 20% - QUASI LA METÀ */
+    max-width: 40px; /* RIDOTTO DA 70px - QUASI LA METÀ */
   }
 
   .title {
@@ -420,17 +420,17 @@
 
   .overviewSection h3,
   .castSection h2 {
-    font-size: 1.1rem; /* RIDOTTO DA 1.3rem */
-    margin-bottom: 15px; /* RIDOTTO DA 20px */
+    font-size: 0.7rem; /* RIDOTTO 40% DA 1.1rem */
+    margin-bottom: 10px; /* RIDOTTO 40% DA 15px */
   }
 
   .reviewsTitle {
-    font-size: 1.1rem; /* RIDOTTO DA 1.3rem */
+    font-size: 0.7rem; /* RIDOTTO 40% DA 1.1rem */
   }
 
   .overview {
-    font-size: 0.8rem; /* RIDOTTO DA 0.85rem */
-    line-height: 1.4; /* RIDOTTO DA 1.5 */
+    font-size: 0.5rem; /* RIDOTTO 40% DA 0.8rem */
+    line-height: 1.2; /* RIDOTTO 40% DA 1.4 */
   }
 
   .infoSection {
@@ -451,22 +451,22 @@
     padding: 3px 0; /* RIDOTTO DA 5px */
   }
 
-  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE MOLTO PIÙ PICCOLE */
+  /* ACTOR CARD RIPRISTINATE GRANDI - HANNO LO SCORRIMENTO ORIZZONTALE */
   .actorCard {
-    min-width: 50px; /* RIDOTTO DA 70px */
-    max-width: 50px;
-    width: 50px;
+    min-width: 90px; /* RIPRISTINATO GRANDE */
+    max-width: 90px;
+    width: 90px;
     flex-shrink: 0;
   }
 
   .actorCard img {
-    height: 75px; /* RIDOTTO DA 105px */
+    height: 135px; /* RIPRISTINATO GRANDE */
   }
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.5rem; /* RIDOTTO DA 0.65rem */
-    padding: 1px; /* RIDOTTO DA 2px */
+    font-size: 0.7rem; /* RIPRISTINATO LEGGIBILE */
+    padding: 3px;
     width: 100%;
     box-sizing: border-box;
     white-space: nowrap;
@@ -475,13 +475,13 @@
   }
 
   .reviewsSection {
-    padding: 10px; /* RIDOTTO DA 15px */
-    margin-top: 20px; /* RIDOTTO DA 25px */
+    padding: 6px; /* RIDOTTO 40% DA 10px */
+    margin-top: 12px; /* RIDOTTO 40% DA 20px */
   }
 
   .reviewItem {
-    padding: 8px; /* RIDOTTO DA 10px */
-    margin-bottom: 10px; /* RIDOTTO DA 12px */
+    padding: 5px; /* RIDOTTO 40% DA 8px */
+    margin-bottom: 6px; /* RIDOTTO 40% DA 10px */
   }
 
   .reviewHeader {
@@ -510,13 +510,13 @@
   }
 
   .commentForm input {
-    padding: 8px; /* RIDOTTO DA 12px */
-    font-size: 0.8rem; /* RIDOTTO DA 0.9rem */
+    padding: 5px; /* RIDOTTO 40% DA 8px */
+    font-size: 0.5rem; /* RIDOTTO 40% DA 0.8rem */
   }
 
   .commentForm button {
-    padding: 8px 12px; /* RIDOTTO DA 12px 15px */
-    font-size: 0.75rem; /* RIDOTTO DA 0.85rem */
+    padding: 5px 7px; /* RIDOTTO 40% DA 8px 12px */
+    font-size: 0.45rem; /* RIDOTTO 40% DA 0.75rem */
   }
 }
 
@@ -526,8 +526,8 @@
   }
 
   .poster {
-    width: 18%; /* RIDOTTO DA 25% */
-    max-width: 60px; /* RIDOTTO DA 80px */
+    width: 10%; /* ANCORA PIÙ PICCOLO */
+    max-width: 35px; /* ANCORA PIÙ PICCOLO */
   }
 
   .title {
@@ -546,29 +546,29 @@
   .overviewSection h3,
   .castSection h2,
   .reviewsTitle {
-    font-size: 1rem; /* RIDOTTO DA 1.2rem */
+    font-size: 0.6rem; /* RIDOTTO 40% DA 1rem */
   }
 
   .overview {
-    font-size: 0.75rem; /* RIDOTTO DA 0.8rem */
+    font-size: 0.45rem; /* RIDOTTO 40% DA 0.75rem */
   }
 
-  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE PICCOLO ANCORA PIÙ RIDOTTE */
+  /* ACTOR CARD RIPRISTINATE GRANDI ANCHE SU MOBILE PICCOLO */
   .actorCard {
-    min-width: 45px; /* RIDOTTO DA 60px */
-    max-width: 45px;
-    width: 45px;
+    min-width: 80px; /* GRANDE */
+    max-width: 80px;
+    width: 80px;
     flex-shrink: 0;
   }
 
   .actorCard img {
-    height: 65px; /* RIDOTTO DA 90px */
+    height: 120px; /* GRANDE */
   }
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.45rem; /* RIDOTTO DA 0.6rem */
-    padding: 0.5px; /* RIDOTTO DA 1px */
+    font-size: 0.65rem; /* LEGGIBILE */
+    padding: 2px;
     width: 100%;
     box-sizing: border-box;
     white-space: nowrap;
@@ -577,10 +577,10 @@
   }
 
   .reviewsSection {
-    padding: 8px; /* RIDOTTO DA 12px */
+    padding: 5px; /* RIDOTTO 40% DA 8px */
   }
 
   .reviewItem {
-    padding: 6px; /* RIDOTTO DA 8px */
+    padding: 4px; /* RIDOTTO 40% DA 6px */
   }
 }
