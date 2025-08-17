@@ -289,7 +289,6 @@
   cursor: pointer;
 }
 
-/* --- Media Query per schermi più grandi (Tablet e Desktop) --- */
 @media (min-width: 768px) {
   .headerOverlay {
     padding: 50px 40px;

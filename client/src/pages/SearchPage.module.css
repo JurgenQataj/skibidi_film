@@ -54,16 +54,13 @@
   margin: 0 auto;
   padding: 20px 0;
 }
-
-/* --- Media Queries per il Mobile --- */
 @media (max-width: 768px) {
   .searchForm {
     flex-direction: column;
     align-items: center;
-    max-width: 90%; /* Il form è più stretto su mobile */
+    max-width: 90%; /* MODIFICA: Il form ora occupa il 90% della larghezza */
   }
 
-  /* Griglia più compatta su mobile */
   .resultsGrid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
@@ -71,7 +68,6 @@
   }
 }
 
-/* --- Aggiunto per schermi molto piccoli --- */
 @media (max-width: 480px) {
   .resultsGrid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
