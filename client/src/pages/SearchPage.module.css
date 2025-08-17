@@ -112,18 +112,28 @@
   margin: 0 auto;
   padding: 20px 0;
 }
+
 @media (max-width: 768px) {
+  /*
+  MODIFICA CHIAVE: Come in ProfilePage, restringiamo il contenitore
+  e VIETIAMO lo scorrimento orizzontale.
+  */
+  .pageContainer {
+    padding: 20px;
+    overflow-x: hidden; /* Impedisce lo scorrimento laterale */
+  }
+
   .searchForm {
     flex-direction: column;
     align-items: center;
-    margin: 30px auto;
+    width: 100%;
     max-width: 280px;
   }
 
   .resultsGrid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
-    padding: 10px;
+    padding: 10px 0;
   }
 }
 
