@@ -154,100 +154,72 @@
 .showAllButton:hover {
   background-color: var(--secondary-color);
 }
+
+/* --- MODIFICA RICHIESTA: Nuovi stili per la cronologia --- */
 .historyList {
   list-style: none;
-  padding-left: 0;
-  counter-reset: review-counter;
+  padding: 0;
+  margin: 0;
   color: #ccc;
 }
 .historyItem {
-  counter-increment: review-counter;
   display: flex;
   align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid #444;
 }
-.historyItem::before {
-  content: counter(review-counter) ".";
+.historyItem:last-child {
+  border-bottom: none;
+}
+.historyNumber {
   font-weight: bold;
   color: var(--primary-color);
   width: 40px;
-  text-align: right;
-  margin-right: 10px;
+  text-align: center;
+  flex-shrink: 0;
   font-size: 1.1rem;
-}
-.historyItem:last-child {
-  border-bottom: none;
 }
 .historyPoster {
   width: 40px;
   height: 60px;
   object-fit: cover;
   border-radius: 4px;
+  margin-left: 10px;
   margin-right: 15px;
+  flex-shrink: 0;
 }
 .historyInfo {
   flex-grow: 1;
+  overflow: hidden; /* Evita che il testo vada a capo male */
 }
 .historyTitle {
   display: block;
   font-weight: bold;
   color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .historyRating {
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--primary-color);
+  margin-left: 15px;
+  flex-shrink: 0;
 }
 
-/* --- Media Queries per il Mobile --- */
-@media (max-width: 768px) {
-  .pageContainer {
-    padding: 20px;
-  }
-
-  .profileHeader {
-    flex-direction: column; /* Impila avatar e info */
-    text-align: center;
-    gap: 20px;
-  }
-
-  .statsContainer {
-    justify-content: center; /* Centra le statistiche */
-    gap: 15px;
-  }
-
-  .statValue {
-    font-size: 1.5rem;
-  }
-
-  .sectionTitle {
-    font-size: 1.5rem;
-  }
-
-  .reviewsGrid {
-    justify-content: center;
-  }
-}
-
-/* ... (tutti gli stili precedenti) */
-
-/* --- Stili per la Danger Zone nel modale --- */
 .divider {
   border: none;
   border-top: 1px solid #555;
   margin: 25px 0;
 }
-
 .dangerZone {
   text-align: center;
 }
-
 .dangerTitle {
   color: #ff4d4d;
   margin-top: 0;
 }
-
 .deleteAccountButton {
   width: 100%;
   padding: 12px;
@@ -260,7 +232,45 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
-
 .deleteAccountButton:hover {
   background-color: #ff4d4d;
+}
+
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 20px;
+  }
+  .profileHeader {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+  .statsContainer {
+    justify-content: center;
+    gap: 15px;
+  }
+  .statValue {
+    font-size: 1.5rem;
+  }
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+  .reviewsGrid {
+    justify-content: center;
+  }
+  .historyTitle {
+    font-size: 0.9rem;
+  }
+  .historyRating {
+    font-size: 1rem;
+  }
+  .historyNumber {
+    width: 30px;
+    font-size: 1rem;
+  }
+  .historyPoster {
+    margin-left: 5px;
+    margin-right: 10px;
+  }
 }

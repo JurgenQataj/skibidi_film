@@ -39,19 +39,16 @@ function MovieDetailPage() {
 
   const fetchData = useCallback(async () => {
     if (!tmdbId || tmdbId === "undefined") return;
-
     setError("");
     try {
       const token = localStorage.getItem("token");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       let userId = token ? jwtDecode(token).user.id : null;
       setLoggedInUserId(userId);
-
       const moviePromise = axios.get(`${API_URL}/api/movies/${tmdbId}`);
       const reviewsPromise = axios.get(
         `${API_URL}/api/reviews/movie/${tmdbId}`
       );
-
       const promises = [moviePromise, reviewsPromise];
       if (userId) {
         promises.push(
@@ -64,12 +61,9 @@ function MovieDetailPage() {
           axios.get(`${API_URL}/api/users/${userId}/lists`, { headers })
         );
       }
-
       const results = await Promise.all(promises);
-
       setMovie(results[0].data);
       setSkibidiData(results[1].data);
-
       if (userId && results.length > 2) {
         setHasUserReviewed(results[2].data.hasReviewed);
         setIsInWatchlist(results[3].data.isInWatchlist);
@@ -218,8 +212,6 @@ function MovieDetailPage() {
                 {movie.title} ({new Date(movie.release_date).getFullYear()})
               </h1>
               <p className={styles.tagline}>{movie.tagline}</p>
-              <h3>Trama</h3>
-              <p className={styles.overview}>{movie.overview}</p>
               <div className={styles.director}>
                 <strong>Regista:</strong>{" "}
                 {movie.director?.name || "Non disponibile"}
@@ -245,8 +237,9 @@ function MovieDetailPage() {
                   {customLists.length > 0 ? (
                     customLists.map((list) => (
                       <button
-                        key={list.id}
-                        onClick={() => handleAddToList(list.id)}
+                        // --- CORREZIONE 1: Usa list._id per la key e per l'ID ---
+                        key={list._id}
+                        onClick={() => handleAddToList(list._id)}
                         className={styles.listButton}
                       >
                         {list.title}
@@ -262,129 +255,139 @@ function MovieDetailPage() {
         </div>
       </div>
 
-      <div className={styles.infoSection}>
-        <div className={styles.infoBox}>
-          <h4>Costo</h4>
-          <p>{formatCurrency(movie.budget)}</p>
+      <div className={styles.mainContent}>
+        <div className={styles.overviewSection}>
+          <h3>Trama</h3>
+          <p className={styles.overview}>{movie.overview}</p>
         </div>
-        <div className={styles.infoBox}>
-          <h4>Botteghino</h4>
-          <p>{formatCurrency(movie.revenue)}</p>
-        </div>
-        <div className={styles.infoBox}>
-          <h4>Lingua</h4>
-          <p>{movie.original_language.toUpperCase()}</p>
-        </div>
-      </div>
-
-      <div className={styles.castSection}>
-        <h2>Cast Principale</h2>
-        <div className={styles.castGrid}>
-          {movie.cast.map((actor) => (
-            <div key={actor.id} className={styles.actorCard}>
-              <img
-                src={
-                  actor.profile_path
-                    ? `${posterBaseUrl}w185${actor.profile_path}`
-                    : "https://via.placeholder.com/185x278.png?text=No+Image"
-                }
-                alt={actor.name}
-              />
-              <strong>{actor.name}</strong>
-              <span>{actor.character}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.reviewsSection}>
-        {loggedInUserId && !hasUserReviewed && (
-          <AddReviewForm tmdbId={tmdbId} onReviewAdded={fetchData} />
-        )}
-        {loggedInUserId && hasUserReviewed && (
-          <div className={styles.alreadyReviewedMessage}>
-            <h3>Hai già recensito questo film</h3>
+        <div className={styles.infoSection}>
+          <div className={styles.infoBox}>
+            <h4>Costo</h4>
+            <p>{formatCurrency(movie.budget)}</p>
           </div>
-        )}
-        <h2 className={styles.reviewsTitle}>
-          Recensioni della Community ({skibidiData.reviewCount || 0})
-        </h2>
-        <div className={styles.reviewsList}>
-          {skibidiData.reviews?.map((review) => (
-            <div key={review.id} className={styles.reviewItem}>
-              <div className={styles.reviewHeader}>
-                <Link
-                  to={`/profile/${review.user_id}`}
-                  className={styles.authorLink}
-                >
-                  <strong className={styles.reviewAuthor}>
-                    {review.username}
-                  </strong>
-                </Link>
-                <div>
-                  <span className={styles.reviewRating}>
-                    {review.rating}/10
-                  </span>
-                  {loggedInUserId === review.user_id && (
-                    <button
-                      onClick={() => handleDeleteReview(review.id)}
-                      className={styles.deleteButton}
-                    >
-                      Elimina
-                    </button>
-                  )}
-                </div>
+          <div className={styles.infoBox}>
+            <h4>Botteghino</h4>
+            <p>{formatCurrency(movie.revenue)}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Lingua</h4>
+            <p>{movie.original_language.toUpperCase()}</p>
+          </div>
+        </div>
+        <div className={styles.castSection}>
+          <h2>Cast Principale</h2>
+          <div className={styles.castGrid}>
+            {movie.cast.map((actor) => (
+              <div key={actor.id} className={styles.actorCard}>
+                <img
+                  src={
+                    actor.profile_path
+                      ? `${posterBaseUrl}w185${actor.profile_path}`
+                      : "https://via.placeholder.com/185x278.png?text=No+Image"
+                  }
+                  alt={actor.name}
+                />
+                <strong>{actor.name}</strong>
+                <span>{actor.character}</span>
               </div>
-              <p className={styles.reviewComment}>{review.comment_text}</p>
-              <div className={styles.reviewActions}>
-                <div className={styles.reactions}>
-                  <button
-                    onClick={() => handleReaction(review.id, "love")}
-                    title="Love"
-                  >
-                    ❤️
-                  </button>
-                  <span>{review.reactions?.love || 0}</span>
-                </div>
-                <button
-                  onClick={() => toggleComments(review.id)}
-                  className={styles.commentButton}
-                >
-                  {activeComments.reviewId === review.id
-                    ? "Chiudi"
-                    : "Commenti"}{" "}
-                  ({review.comment_count || 0})
-                </button>
-              </div>
-              {activeComments.reviewId === review.id && (
-                <div className={styles.commentsSection}>
-                  {activeComments.comments.map((comment) => (
-                    <div key={comment._id} className={styles.commentItem}>
-                      <Link
-                        to={`/profile/${comment.user._id}`}
-                        className={styles.authorLink}
-                      >
-                        <strong>{comment.user.username}:</strong>
-                      </Link>
-                      <span> {comment.comment_text}</span>
-                    </div>
-                  ))}
-                  <form
-                    className={styles.commentForm}
-                    onSubmit={(e) => handleAddComment(e, review.id)}
-                  >
-                    <input
-                      type="text"
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      placeholder="Scrivi una risposta..."
-                    />
-                    <button type="submit">Invia</button>
-                  </form>
-                </div>
-              )}
+            ))}
+          </div>
+        </div>
+        <div className={styles.reviewsSection}>
+          {loggedInUserId && !hasUserReviewed && (
+            <AddReviewForm tmdbId={tmdbId} onReviewAdded={fetchData} />
+          )}
+          {loggedInUserId && hasUserReviewed && (
+            <div className={styles.alreadyReviewedMessage}>
+              <h3>Hai già recensito questo film</h3>
             </div>
-          ))}
+          )}
+          <h2 className={styles.reviewsTitle}>
+            Recensioni della Community
+            <span className={styles.reviewStats}>
+              {skibidiData.averageRating} ★ ({skibidiData.reviewCount} voti)
+            </span>
+          </h2>
+          <div className={styles.reviewsList}>
+            {skibidiData.reviews?.map((review) => (
+              <div key={review.id} className={styles.reviewItem}>
+                <div className={styles.reviewHeader}>
+                  <Link
+                    to={`/profile/${review.user_id}`}
+                    className={styles.authorLink}
+                  >
+                    <strong className={styles.reviewAuthor}>
+                      {review.username}
+                    </strong>
+                  </Link>
+                  <div>
+                    <span className={styles.reviewRating}>
+                      {review.rating}/10
+                    </span>
+                    {loggedInUserId === review.user_id && (
+                      <button
+                        onClick={() => handleDeleteReview(review.id)}
+                        className={styles.deleteButton}
+                      >
+                        Elimina
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <p className={styles.reviewComment}>{review.comment_text}</p>
+                <div className={styles.reviewActions}>
+                  <div className={styles.reactions}>
+                    <button
+                      onClick={() => handleReaction(review.id, "love")}
+                      title="Love"
+                    >
+                      ❤️
+                    </button>
+                    <span>{review.reactions?.love || 0}</span>
+                  </div>
+                  <button
+                    onClick={() => toggleComments(review.id)}
+                    className={styles.commentButton}
+                  >
+                    {activeComments.reviewId === review.id
+                      ? "Chiudi"
+                      : "Commenti"}{" "}
+                    ({review.comment_count || 0})
+                  </button>
+                </div>
+                {activeComments.reviewId === review.id && (
+                  <div className={styles.commentsSection}>
+                    {/* --- CORREZIONE 2: Aggiunto un controllo per evitare il crash --- */}
+                    {activeComments.comments
+                      .filter((c) => c.user)
+                      .map((comment) => (
+                        <div key={comment._id} className={styles.commentItem}>
+                          <Link
+                            to={`/profile/${comment.user._id}`}
+                            className={styles.authorLink}
+                          >
+                            <strong>{comment.user.username}:</strong>
+                          </Link>
+                          <span> {comment.comment_text}</span>
+                        </div>
+                      ))}
+                    <form
+                      className={styles.commentForm}
+                      onSubmit={(e) => handleAddComment(e, review.id)}
+                    >
+                      <input
+                        type="text"
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="Scrivi una risposta..."
+                      />
+                      <button type="submit">Invia</button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

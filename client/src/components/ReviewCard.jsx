@@ -6,8 +6,6 @@ import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 
 function ReviewCard({ review, onInteraction }) {
-  // CONTROLLO DI SICUREZZA FONDAMENTALE:
-  // Se la recensione o i dati essenziali del film o dell'utente mancano, non renderizzare nulla.
   if (!review || !review.movie || !review.user || !review.movie.tmdb_id) {
     console.warn(
       "ReviewCard ha ricevuto dati incompleti e non verrà renderizzata:",
@@ -48,6 +46,7 @@ function ReviewCard({ review, onInteraction }) {
         );
         setComments({ shown: true, list: response.data || [] });
       } catch (error) {
+        // --- CORREZIONE: Aggiunte le parentesi graffe mancanti ---
         console.error("Errore caricamento commenti:", error);
       }
     }
@@ -64,7 +63,10 @@ function ReviewCard({ review, onInteraction }) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCommentText("");
-      toggleComments().then(() => toggleComments());
+      const response = await axios.get(
+        `${API_URL}/api/comments/reviews/${review._id}`
+      );
+      setComments({ shown: true, list: response.data || [] });
       if (onInteraction) onInteraction();
     } catch (error) {
       alert("Errore nell'invio del commento.");
@@ -138,17 +140,19 @@ function ReviewCard({ review, onInteraction }) {
         {comments.shown && (
           <div className={styles.commentsSection}>
             {comments.list.length > 0 ? (
-              comments.list.map((comment) => (
-                <div key={comment._id} className={styles.commentItem}>
-                  <Link
-                    to={`/profile/${comment.user._id}`}
-                    className={styles.authorLink}
-                  >
-                    <strong>{comment.user.username}:</strong>
-                  </Link>
-                  <span> {comment.comment_text}</span>
-                </div>
-              ))
+              comments.list
+                .filter((c) => c.user)
+                .map((comment) => (
+                  <div key={comment._id} className={styles.commentItem}>
+                    <Link
+                      to={`/profile/${comment.user._id}`}
+                      className={styles.authorLink}
+                    >
+                      <strong>{comment.user.username}:</strong>
+                    </Link>
+                    <span> {comment.comment_text}</span>
+                  </div>
+                ))
             ) : (
               <p>Nessun commento ancora.</p>
             )}

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Aggiunto useNavigate
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./ProfilePage.module.css";
 import MovieCard from "../components/MovieCard";
 import UserCard from "../components/UserCard";
 import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
-import { useAuth } from "../context/AuthContext"; // Aggiunto useAuth
+import { useAuth } from "../context/AuthContext";
 
 const avatars = [
   "1.png",
@@ -30,8 +30,8 @@ const avatarBaseUrl =
 
 function ProfilePage() {
   const { userId } = useParams();
-  const navigate = useNavigate(); // Aggiunto per il redirect dopo l'eliminazione
-  const { logout } = useAuth(); // Aggiunto per fare il logout dopo l'eliminazione
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -95,13 +95,11 @@ function ProfilePage() {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const url = `${API_URL}/api/users/${userId}/${endpoint}`;
-
       if (method === "post") {
         await axios.post(url, {}, config);
       } else {
         await axios.delete(url, config);
       }
-
       setIsFollowing(!isFollowing);
       setStats((prevStats) => ({
         ...prevStats,
@@ -151,7 +149,6 @@ function ProfilePage() {
     }
   };
 
-  // --- NUOVA FUNZIONE ---
   const handleDeleteAccount = async () => {
     const confirmation = window.prompt(
       "Questa azione è irreversibile. Per confermare, scrivi il tuo username:"
@@ -183,7 +180,8 @@ function ProfilePage() {
     );
 
   const isOwnProfile = loggedInUserId === profile._id;
-  const recentReviews = [...reviews].reverse().slice(0, 24);
+  // --- MODIFICA RICHIESTA: Mostra le prime 24 recensioni (che sono già le più recenti) ---
+  const recentReviews = reviews.slice(0, 24);
 
   return (
     <>
@@ -239,7 +237,6 @@ function ProfilePage() {
             Salva Modifiche
           </button>
         </form>
-        {/* --- SEZIONE AGGIUNTA --- */}
         <hr className={styles.divider} />
         <div className={styles.dangerZone}>
           <h3 className={styles.dangerTitle}>Zona Pericolo</h3>
@@ -252,14 +249,16 @@ function ProfilePage() {
         </div>
       </Modal>
 
+      {/* --- MODIFICA RICHIESTA: Nuova struttura per la cronologia completa --- */}
       <Modal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
         title={`Cronologia Completa di ${profile.username}`}
       >
         <ol className={styles.historyList}>
-          {reviews.map((review) => (
+          {reviews.map((review, index) => (
             <li key={review._id} className={styles.historyItem}>
+              <span className={styles.historyNumber}>{index + 1}</span>
               <img
                 src={`https://image.tmdb.org/t/p/w92${review.movie.poster_path}`}
                 alt={`Poster di ${review.movie.title}`}
