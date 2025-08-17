@@ -159,22 +159,81 @@ function MovieDetailPage() {
 
   const handleAddComment = async (e, reviewId) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+
+    if (!commentText.trim()) {
+      alert("Il commento non può essere vuoto.");
+      return;
+    }
+
     const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Devi essere loggato per commentare.");
+      return;
+    }
+
     try {
-      await axios.post(
+      const response = await axios.post(
         `${API_URL}/api/comments/reviews/${reviewId}`,
-        { comment_text: commentText },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { comment_text: commentText.trim() },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
+
       setCommentText("");
-      const response = await axios.get(
-        `${API_URL}/api/comments/reviews/${reviewId}`
-      );
-      setActiveComments({ reviewId, comments: response.data });
+
+      // Aggiorna i commenti con la risposta del server
+      setActiveComments({
+        reviewId,
+        comments: response.data || [],
+      });
+
+      // Ricarica anche i dati generali per aggiornare il contatore
       fetchData();
     } catch (error) {
-      alert("Errore nell'invio del commento.");
+      console.error("Errore invio commento:", error);
+      const errorMessage =
+        error.response?.data?.message || "Errore nell'invio del commento.";
+      alert(errorMessage);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Sei sicuro di voler eliminare questo commento?")) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.delete(
+        `${API_URL}/api/comments/reviews/${activeComments.reviewId}/${commentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Ricarica i commenti per mostrare l'eliminazione
+      const response = await axios.get(
+        `${API_URL}/api/comments/reviews/${activeComments.reviewId}`
+      );
+
+      setActiveComments({
+        reviewId: activeComments.reviewId,
+        comments: response.data || [],
+      });
+
+      // Ricarica anche i dati generali per aggiornare il contatore
+      fetchData();
+    } catch (error) {
+      console.error("Errore eliminazione commento:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Errore durante l'eliminazione del commento.";
+      alert(errorMessage);
     }
   };
 
@@ -367,6 +426,14 @@ function MovieDetailPage() {
                             <strong>{comment.user.username}:</strong>
                           </Link>
                           <span> {comment.comment_text}</span>
+                          {loggedInUserId === comment.user._id && (
+                            <button
+                              onClick={() => handleDeleteComment(comment._id)}
+                              className={styles.deleteCommentButton}
+                            >
+                              ×
+                            </button>
+                          )}
                         </div>
                       ))}
                     <form

@@ -4,7 +4,7 @@ import axios from "axios";
 import styles from "./ReviewCard.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
-import { jwtDecode } from "jwt-decode"; // Importa jwtDecode
+import { jwtDecode } from "jwt-decode";
 
 function ReviewCard({ review, onInteraction }) {
   // Controllo di sicurezza per dati incompleti
@@ -14,6 +14,9 @@ function ReviewCard({ review, onInteraction }) {
 
   const [comments, setComments] = useState({ shown: false, list: [] });
   const [commentText, setCommentText] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isDeletingComment, setIsDeletingComment] = useState(null);
+
   const token = localStorage.getItem("token");
   const loggedInUserId = token ? jwtDecode(token).user.id : null;
 
@@ -23,8 +26,9 @@ function ReviewCard({ review, onInteraction }) {
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const handleReaction = async (reactionType) => {
+    if (!token) return;
+
     try {
-      const token = localStorage.getItem("token");
       await axios.post(
         `${API_URL}/api/reactions/reviews/${review._id}`,
         { reaction_type: reactionType },
@@ -32,6 +36,7 @@ function ReviewCard({ review, onInteraction }) {
       );
       if (onInteraction) onInteraction();
     } catch (error) {
+      console.error("Errore reazione:", error);
       alert(error.response?.data?.message || "Errore");
     }
   };
@@ -53,44 +58,76 @@ function ReviewCard({ review, onInteraction }) {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+
+    if (!commentText.trim()) {
+      alert("Il commento non può essere vuoto.");
+      return;
+    }
+
+    if (!token) {
+      alert("Devi essere loggato per commentare.");
+      return;
+    }
+
+    setIsSubmittingComment(true);
+
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         `${API_URL}/api/comments/reviews/${review._id}`,
-        { comment_text: commentText },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { comment_text: commentText.trim() },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
+
       setCommentText("");
-      // Ricarica i commenti per mostrare quello nuovo
-      const response = await axios.get(
-        `${API_URL}/api/comments/reviews/${review._id}`
-      );
+      // Aggiorna la lista dei commenti con la risposta del server
       setComments({ shown: true, list: response.data || [] });
+
       if (onInteraction) onInteraction();
     } catch (error) {
-      alert("Errore nell'invio del commento.");
+      console.error("Errore invio commento:", error);
+      const errorMessage =
+        error.response?.data?.message || "Errore nell'invio del commento.";
+      alert(errorMessage);
+    } finally {
+      setIsSubmittingComment(false);
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (window.confirm("Sei sicuro di voler eliminare questo commento?")) {
-      try {
-        await axios.delete(
-          `${API_URL}/api/comments/reviews/${review._id}/${commentId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        // Ricarica i commenti per mostrare l'eliminazione
-        const response = await axios.get(
-          `${API_URL}/api/comments/reviews/${review._id}`
-        );
-        setComments({ shown: true, list: response.data || [] });
-        if (onInteraction) onInteraction(); // Aggiorna anche il feed
-      } catch (error) {
-        alert("Errore durante l'eliminazione del commento.");
-      }
+    if (!window.confirm("Sei sicuro di voler eliminare questo commento?")) {
+      return;
+    }
+
+    setIsDeletingComment(commentId);
+
+    try {
+      await axios.delete(
+        `${API_URL}/api/comments/reviews/${review._id}/${commentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Ricarica i commenti per mostrare l'eliminazione
+      const response = await axios.get(
+        `${API_URL}/api/comments/reviews/${review._id}`
+      );
+      setComments({ shown: true, list: response.data || [] });
+
+      if (onInteraction) onInteraction();
+    } catch (error) {
+      console.error("Errore eliminazione commento:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Errore durante l'eliminazione del commento.";
+      alert(errorMessage);
+    } finally {
+      setIsDeletingComment(null);
     }
   };
 
@@ -147,22 +184,30 @@ function ReviewCard({ review, onInteraction }) {
         </div>
         {comment_text && <p className={styles.comment}>"{comment_text}"</p>}
         <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
-        <div className={styles.actions}>
-          <div className={styles.reactions}>
-            <button onClick={() => handleReaction("love")} title="Love">
-              ❤️
+
+        {token && (
+          <div className={styles.actions}>
+            <div className={styles.reactions}>
+              <button
+                onClick={() => handleReaction("love")}
+                title="Love"
+                disabled={!loggedInUserId}
+              >
+                ❤️
+              </button>
+              <span>{reactionCount}</span>
+            </div>
+            <button onClick={toggleComments} className={styles.commentToggle}>
+              {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
             </button>
-            <span>{reactionCount}</span>
           </div>
-          <button onClick={toggleComments} className={styles.commentToggle}>
-            {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
-          </button>
-        </div>
+        )}
+
         {comments.shown && (
           <div className={styles.commentsSection}>
             {comments.list.length > 0 ? (
               comments.list
-                .filter((c) => c.user)
+                .filter((c) => c.user && c.user._id) // Filtro migliorato
                 .map((comment) => (
                   <div key={comment._id} className={styles.commentItem}>
                     <div className={styles.commentContent}>
@@ -178,8 +223,9 @@ function ReviewCard({ review, onInteraction }) {
                       <button
                         onClick={() => handleDeleteComment(comment._id)}
                         className={styles.deleteCommentButton}
+                        disabled={isDeletingComment === comment._id}
                       >
-                        ×
+                        {isDeletingComment === comment._id ? "..." : "×"}
                       </button>
                     )}
                   </div>
@@ -187,15 +233,25 @@ function ReviewCard({ review, onInteraction }) {
             ) : (
               <p>Nessun commento ancora.</p>
             )}
-            <form onSubmit={handleAddComment} className={styles.commentForm}>
-              <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Rispondi..."
-              />
-              <button type="submit">Invia</button>
-            </form>
+
+            {token && (
+              <form onSubmit={handleAddComment} className={styles.commentForm}>
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Rispondi..."
+                  disabled={isSubmittingComment}
+                  maxLength={500} // Limite di caratteri
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmittingComment || !commentText.trim()}
+                >
+                  {isSubmittingComment ? "..." : "Invia"}
+                </button>
+              </form>
+            )}
           </div>
         )}
       </div>
