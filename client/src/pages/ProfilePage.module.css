@@ -305,16 +305,9 @@
     justify-content: center !important;
   }
 
-  /*
-  MODIFICA CHIAVE: Applicata la tua logica con la variabile --title-height
-  per ridurre lo spazio del titolo e darlo all'immagine.
-  */
+  /* CARD */
   .reviewsGrid .card {
-    --title-height: 8px; /* Altezza titolo ridotta */
     width: 120px !important;
-    height: calc(
-      160px + var(--title-height)
-    ) !important; /* Altezza totale corretta */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -323,14 +316,15 @@
 
   .reviewsGrid .card img {
     width: 120px !important;
-    height: 160px !important; /* Manteniamo l'altezza originale dell'immagine */
+    height: 160px !important; /* immagine fissa */
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
 
   .reviewsGrid .card .title {
+    --title-height: 8px; /* 🔑 altezza minima per il titolo */
     width: 120px !important;
-    height: var(--title-height) !important; /* Usiamo la variabile */
+    height: var(--title-height) !important;
     font-size: 0.55rem !important;
     line-height: 1 !important;
     text-align: center;
@@ -362,11 +356,7 @@
   }
 
   .reviewsGrid .card {
-    --title-height: 8px;
     width: 100px !important;
-    height: calc(
-      140px + var(--title-height)
-    ) !important; /* Altezza totale corretta */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -374,12 +364,13 @@
 
   .reviewsGrid .card img {
     width: 100px !important;
-    height: 140px !important; /* Manteniamo l'altezza originale dell'immagine */
+    height: 140px !important; /* immagine fissa */
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
 
   .reviewsGrid .card .title {
+    --title-height: 8px;
     width: 100px !important;
     height: var(--title-height) !important;
     font-size: 0.5rem !important;
