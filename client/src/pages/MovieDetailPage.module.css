@@ -337,7 +337,7 @@
 
   .poster {
     width: 50%; /* Poster più piccolo */
-    max-width: 180px;
+    max-width: 100px;
     height: auto;
   }
 
@@ -356,9 +356,9 @@
   }
 
   .actorCard {
-    min-width: 100px;
+    min-width: 60px;
   }
   .actorCard img {
-    height: 150px;
+    height: 80px;
   }
 }
