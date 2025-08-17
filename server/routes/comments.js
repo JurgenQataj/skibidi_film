@@ -3,15 +3,25 @@ const router = express.Router();
 const commentController = require("../controllers/commentController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// Aggiungere un commento
-router.post("/:reviewId", authMiddleware, commentController.addComment);
+// Aggiungere un commento a una recensione
+// Corrisponde a: POST /api/reviews/:reviewId/comments
+// highlight-next-line
+router.post(
+  "/:reviewId/comments",
+  authMiddleware,
+  commentController.addComment
+);
 
-// Ottenere i commenti
-router.get("/:reviewId", commentController.getComments);
+// Ottenere i commenti di una recensione
+// Corrisponde a: GET /api/reviews/:reviewId/comments
+// highlight-next-line
+router.get("/:reviewId/comments", commentController.getComments);
 
-// --- NUOVA ROTTA CORRETTA: Eliminare un commento ---
+// Eliminare un commento
+// Corrisponde a: DELETE /api/reviews/:reviewId/comments/:commentId
+// highlight-next-line
 router.delete(
-  "/:reviewId/:commentId",
+  "/:reviewId/comments/:commentId",
   authMiddleware,
   commentController.deleteComment
 );

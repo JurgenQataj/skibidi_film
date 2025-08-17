@@ -46,6 +46,7 @@ function ReviewCard({ review, onInteraction }) {
       setComments({ shown: false, list: [] });
     } else {
       try {
+        // highlight-next-line
         const response = await axios.get(
           `${API_URL}/api/reviews/${review._id}/comments`
         );
@@ -74,6 +75,7 @@ function ReviewCard({ review, onInteraction }) {
 
     try {
       const response = await axios.post(
+        // highlight-next-line
         `${API_URL}/api/reviews/${review._id}/comments`,
         payload,
         {
@@ -108,7 +110,8 @@ function ReviewCard({ review, onInteraction }) {
     setIsDeletingComment(commentId);
 
     try {
-      const deleteResponse = await axios.delete(
+      await axios.delete(
+        // highlight-next-line
         `${API_URL}/api/reviews/${review._id}/comments/${commentId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -116,6 +119,7 @@ function ReviewCard({ review, onInteraction }) {
       );
 
       const response = await axios.get(
+        // highlight-next-line
         `${API_URL}/api/reviews/${review._id}/comments`
       );
 
@@ -211,7 +215,7 @@ function ReviewCard({ review, onInteraction }) {
           <div className={styles.commentsSection}>
             {comments.list.length > 0 ? (
               comments.list
-                .filter((c) => c.user && c.user._id) // Filtro migliorato
+                .filter((c) => c.user && c.user._id)
                 .map((comment) => (
                   <div key={comment._id} className={styles.commentItem}>
                     <div className={styles.commentContent}>
@@ -246,7 +250,7 @@ function ReviewCard({ review, onInteraction }) {
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Rispondi..."
                   disabled={isSubmittingComment}
-                  maxLength={500} // Limite di caratteri
+                  maxLength={500}
                 />
                 <button
                   type="submit"

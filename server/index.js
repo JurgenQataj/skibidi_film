@@ -7,7 +7,7 @@ connectDB(); // Esegue la connessione a MongoDB
 
 const app = express();
 
-const whitelist = ["http://localhost:5173", "https://skibidi-film.vercel.app"]; // Aggiungi qui l'URL del tuo Vercel
+const whitelist = ["http://localhost:5173", "https://skibidi-film.vercel.app"];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -26,7 +26,8 @@ app.use("/api/movies", require("./routes/movies"));
 app.use("/api/reviews", require("./routes/reviews"));
 app.use("/api/lists", require("./routes/lists"));
 app.use("/api/watchlist", require("./routes/watchlist"));
-app.use("/api/reviews/:reviewId/comments", require("./routes/comments"));
+// highlight-next-line
+app.use("/api/reviews", require("./routes/comments")); // Changed: This now handles nested comment routes
 app.use("/api/reactions", require("./routes/reactions"));
 app.use("/api/notifications", require("./routes/notifications"));
 
