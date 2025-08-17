@@ -290,75 +290,82 @@
 }
 /* In client/src/pages/MovieDetailPage.module.css */
 
-/* In client/src/pages/MovieDetailPage.module.css */
-
-/* Inserisci o sostituisci questo blocco in /client/src/pages/MovieDetailPage.module.css */
-
-/* --- Media Query per MOBILE --- */
 @media (max-width: 768px) {
   /*
-  MODIFICA #1: La Soluzione Principale (come in ProfilePage)
-  Applichiamo un padding (spazio interno) ai lati del contenitore principale.
-  Questo restringe l'area di visualizzazione per TUTTI gli elementi interni,
-  eliminando lo scorrimento orizzontale e risolvendo il problema del testo tagliato.
+  Contenitore Principale
+  Crea i margini e impedisce a qualsiasi elemento di uscire dai bordi.
   */
   .pageContainer {
-    padding-left: 15px;
-    padding-right: 15px;
-    overflow-x: hidden; /* Sicurezza extra per bloccare lo scroll */
+    padding: 0 15px;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
   }
 
   /*
-  MODIFICA #2: L'Header
-  Rimuoviamo il padding laterale dall'overlay perché ora è gestito dal .pageContainer.
-  Questo centra il suo contenuto nel nuovo spazio ristretto.
+  Contenuti Interni
+  Rimuoviamo il loro padding laterale per non creare doppi margini.
   */
-  .headerOverlay {
-    padding: 20px 0;
-  }
-
-  .headerContent,
+  .headerOverlay,
   .mainContent {
-    width: 100%; /* I contenuti si adattano al nuovo contenitore stretto */
-    padding: 0;
-    margin: 25px auto;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   /*
-  MODIFICA #3: Ridimensionamento Titoli e Poster
-  Riduciamo la dimensione del testo e del poster per adattarsi meglio allo spazio.
+  Ridimensionamento degli Elementi
   */
-  .overviewSection h3,
-  .castSection h2,
-  .reviewsTitle {
-    font-size: 1.5rem;
-    word-wrap: break-word; /* Va a capo se il testo è troppo lungo */
-  }
-
   .poster {
-    width: 50%; /* Poster più piccolo */
-    max-width: 100px;
-    height: auto;
+    width: 50%;
+    max-width: 170px;
   }
 
   .title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
 
-  .director {
-    display: none;
+  .reviewsTitle,
+  .castSection h2,
+  .overviewSection h3 {
+    font-size: 1.4rem;
   }
 
   /* Manteniamo lo scroll solo per il cast */
   .castGrid {
     overflow-x: auto;
-    padding-bottom: 10px; /* Spazio per la scrollbar */
+  }
+}
+
+/* --- NUOVA SEZIONE: MEDIA QUERY PER MOBILE MOLTO PICCOLO --- */
+@media (max-width: 480px) {
+  .pageContainer {
+    padding: 0 10px; /* Riduciamo ancora un po' il padding laterale */
+  }
+
+  .poster {
+    width: 40%;
+    max-width: 120px; /* Poster ancora più piccolo */
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .reviewsTitle,
+  .castSection h2,
+  .overviewSection h3 {
+    font-size: 1.2rem;
   }
 
   .actorCard {
-    min-width: 60px;
+    min-width: 80px; /* Card del cast più compatte */
   }
   .actorCard img {
-    height: 80px;
+    height: 120px;
+  }
+
+  .actionButton {
+    padding: 6px 12px;
+    font-size: 0.7rem; /* Bottoni più piccoli */
   }
 }
