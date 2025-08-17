@@ -55,19 +55,87 @@
   padding: 20px 0;
 }
 
+/* Stili di base per DESKTOP */
+.pageContainer {
+  padding: 20px;
+  color: white;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.title {
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.searchForm {
+  margin: 30px auto;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  border: 1px solid #555;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.searchButton {
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.searchButton:hover {
+  background-color: var(--secondary-color);
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+/* --- Media Query ESCLUSIVAMENTE per il MOBILE --- */
 @media (max-width: 768px) {
+  /*
+  MODIFICA CHIAVE: Applichiamo lo stesso padding laterale della ProfilePage.
+  Questo restringe il contenitore principale, eliminando lo scorrimento
+  orizzontale e creando margini puliti.
+  */
+  .pageContainer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .searchForm {
     flex-direction: column;
     align-items: center;
-    margin: 30px auto;
-    /* MODIFICA: Impostata una larghezza fissa massima di 280px */
+    width: 100%; /* Occupa il 100% del nuovo contenitore stretto */
     max-width: 280px;
   }
 
   .resultsGrid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
-    padding: 10px;
+    padding: 10px 0; /* Rimosso padding laterale inutile */
   }
 }
 
