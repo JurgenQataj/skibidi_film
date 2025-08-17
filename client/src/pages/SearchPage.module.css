@@ -143,22 +143,23 @@
   }
 
   /*
-  MODIFICA CHIAVE: Altezza immagine aumentata, altezza titolo dimezzata
+  MODIFICA CHIAVE: Altezza immagine ulteriormente aumentata, altezza titolo ridotta al minimo.
   */
   .resultsGrid :global(.card img) {
     width: 120px !important;
-    height: 180px !important; /* Aumentata da 160px */
+    height: 185px !important; /* Aumentata da 180px */
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
 
   .resultsGrid :global(.card .title) {
     width: 120px !important;
-    height: 10px !important; /* Dimezzata da 40px */
-    font-size: 0.6rem !important;
+    height: 15px !important; /* Ridotta da 20px */
+    font-size: 0.5rem !important; /* Testo più piccolo per lo spazio ridotto */
     white-space: normal;
     text-align: center;
-    padding: 1px;
+    padding: 1px; /* Padding minimo */
+    line-height: 1.2; /* Riduce l'interlinea */
   }
 }
 
@@ -174,16 +175,16 @@
   }
 
   /*
-  MODIFICA CHIAVE: Altezza immagine aumentata, altezza titolo dimezzata
+  MODIFICA CHIAVE: Altezza immagine ulteriormente aumentata, altezza titolo ridotta al minimo.
   */
   .resultsGrid :global(.card img) {
     width: 100px !important;
-    height: 155px !important; /* Aumentata da 140px */
+    height: 160px !important; /* Aumentata da 155px */
   }
 
   .resultsGrid :global(.card .title) {
     width: 100px !important;
-    height: 10px !important; /* Dimezzata da 30px */
+    height: 10px !important; /* Ridotta da 15px */
     font-size: 0.5rem !important;
   }
 }
