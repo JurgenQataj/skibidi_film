@@ -7,6 +7,18 @@ exports.addComment = async (req, res) => {
   const { comment_text } = req.body;
   const userId = req.user.id;
 
+  // --- CORREZIONE DI SICUREZZA E VALIDAZIONE ---
+  // Controlla se il testo del commento è valido prima di procedere.
+  if (
+    !comment_text ||
+    typeof comment_text !== "string" ||
+    comment_text.trim() === ""
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Il testo del commento non può essere vuoto." });
+  }
+
   try {
     const review = await Review.findById(reviewId);
     if (!review)
@@ -28,6 +40,7 @@ exports.addComment = async (req, res) => {
 
     res.status(201).json(review.comments);
   } catch (error) {
+    console.error("Errore durante l'aggiunta del commento:", error);
     res.status(500).json({ message: "Errore del server." });
   }
 };
@@ -44,8 +57,7 @@ exports.getComments = async (req, res) => {
     if (!review)
       return res.status(404).json({ message: "Recensione non trovata." });
 
-    // --- CORREZIONE DI SICUREZZA ---
-    // Filtra i commenti il cui utente è stato eliminato (è null)
+    // Filtro di sicurezza per commenti di utenti eliminati
     const validComments = review.comments.filter((comment) => comment.user);
 
     res.json(validComments);
