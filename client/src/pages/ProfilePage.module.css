@@ -303,7 +303,7 @@
     grid-template-columns: repeat(3, 120px) !important;
     gap: 10px !important;
     justify-content: center !important;
-    /* Rimuoviamo l'altezza fissa della riga per renderla dinamica */
+    grid-auto-rows: unset; /* Rimuoviamo l'altezza fissa della riga */
   }
 
   /*
@@ -311,11 +311,11 @@
   per ridurre lo spazio del titolo e darlo all'immagine.
   */
   .reviewsGrid .card {
-    --title-height: 8px; /* Impostiamo l'altezza minima per il titolo */
+    --title-height: 8px; /* Altezza titolo ridotta */
     width: 120px !important;
     height: calc(
       160px + var(--title-height)
-    ) !important; /* Altezza totale dinamica */
+    ) !important; /* Altezza totale corretta */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -339,6 +339,7 @@
     overflow: hidden;
   }
 
+  /* ... (altri stili mobile) ... */
   .historyTitle {
     font-size: 0.9rem;
   }
@@ -368,25 +369,16 @@
     height: calc(
       140px + var(--title-height)
     ) !important; /* Altezza totale corretta */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   }
 
   .reviewsGrid .card img {
     width: 100px !important;
     height: 140px !important; /* Manteniamo l'altezza originale dell'immagine */
-    object-fit: contain !important;
-    background-color: #1c1e21 !important;
   }
 
   .reviewsGrid .card .title {
     width: 100px !important;
     height: var(--title-height) !important;
     font-size: 0.5rem !important;
-    line-height: 1 !important;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
   }
 }
