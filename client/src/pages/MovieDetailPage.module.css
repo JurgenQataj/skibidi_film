@@ -290,57 +290,66 @@
 }
 /* In client/src/pages/MovieDetailPage.module.css */
 
+/* In client/src/pages/MovieDetailPage.module.css */
+
+/* --- Sostituisci la media query esistente con questa --- */
 @media (max-width: 768px) {
   .pageContainer {
-    /* Impedisce lo scorrimento orizzontale sull'intera pagina */
-    overflow-x: hidden;
+    /* MODIFICA #1: La Soluzione Principale (come in ProfilePage)
+       Applichiamo un padding (spazio interno) ai lati del contenitore principale.
+       Questo restringe l'area di visualizzazione per TUTTI gli elementi interni,
+       eliminando lo scorrimento orizzontale e creando margini puliti.
+    */
+    padding-left: 15px;
+    padding-right: 15px;
   }
 
+  /* MODIFICA #2: L'Header (il "poster gigantesco")
+     Rimuoviamo il padding laterale dall'overlay perché ora è gestito dal .pageContainer.
+     Questo centra il suo contenuto nel nuovo spazio ristretto.
+  */
   .headerOverlay {
-    /* Aggiunge spazio ai lati, come nelle altre pagine */
-    padding: 20px 15px;
+    padding: 20px 0;
   }
 
+  .headerContent,
   .mainContent {
-    /* Allinea il contenuto con l'header */
-    padding: 0 15px;
+    width: 100%; /* I contenuti si adattano al nuovo contenitore stretto */
+    padding: 0;
+    margin: 25px auto;
   }
 
-  .headerContent {
-    /* Il contenuto dell'header ora è allineato correttamente */
-    gap: 15px;
+  /* MODIFICA #3: La sezione "Recensioni della Community"
+     Riduciamo la dimensione del titolo per assicurarci che non venga tagliato
+     e vada a capo correttamente nel nuovo spazio.
+  */
+  .overviewSection h3,
+  .castSection h2,
+  .reviewsTitle {
+    font-size: 1.5rem; /* Testo più piccolo per adattarsi meglio */
+    word-wrap: break-word; /* Sicurezza extra per andare a capo */
   }
 
+  /* Stili aggiuntivi per coerenza nel layout ridotto */
   .poster {
-    /* Poster più piccolo come richiesto */
-    width: 45%;
-    max-width: 160px;
+    width: 50%;
+    max-width: 180px;
+    height: auto;
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
   }
 
-  .tagline {
-    font-size: 0.9rem;
-    margin-bottom: 15px;
+  .director {
+    display: none;
   }
 
-  .actionButton {
-    padding: 8px 15px;
-    font-size: 0.8rem;
-  }
-
-  /* La griglia del cast mantiene il suo scorrimento orizzontale */
-  .castGrid {
-    overflow-x: auto;
-    padding-bottom: 15px; /* Aggiunge spazio sotto per lo scrollbar */
-  }
-
+  /* Le tue dimensioni personalizzate per le card attori */
   .actorCard {
-    min-width: 100px;
+    min-width: 60px;
   }
   .actorCard img {
-    height: 150px;
+    height: 80px;
   }
 }

@@ -48,14 +48,11 @@
 /* In client/src/components/AddReviewForm.module.css */
 
 /* Aggiungi questo blocco alla fine del file */
+/* In client/src/components/AddReviewForm.module.css */
+
 @media (max-width: 768px) {
   .formContainer {
     padding: 20px;
     margin-top: 0;
-  }
-
-  .submitButton {
-    padding: 10px;
-    font-size: 0.9rem;
   }
 }
