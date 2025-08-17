@@ -154,7 +154,7 @@
 
   .resultsGrid :global(.card .title) {
     width: 120px !important;
-    height: 20px !important; /* Dimezzata da 40px */
+    height: 13px !important; /* Dimezzata da 40px */
     font-size: 0.6rem !important;
     white-space: normal;
     text-align: center;
@@ -183,7 +183,7 @@
 
   .resultsGrid :global(.card .title) {
     width: 100px !important;
-    height: 15px !important; /* Dimezzata da 30px */
+    height: 10px !important; /* Dimezzata da 30px */
     font-size: 0.5rem !important;
   }
 }
