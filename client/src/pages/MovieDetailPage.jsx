@@ -237,7 +237,6 @@ function MovieDetailPage() {
                   {customLists.length > 0 ? (
                     customLists.map((list) => (
                       <button
-                        // --- CORREZIONE 1: Usa list._id per la key e per l'ID ---
                         key={list._id}
                         onClick={() => handleAddToList(list._id)}
                         className={styles.listButton}
@@ -357,7 +356,6 @@ function MovieDetailPage() {
                 </div>
                 {activeComments.reviewId === review.id && (
                   <div className={styles.commentsSection}>
-                    {/* --- CORREZIONE 2: Aggiunto un controllo per evitare il crash --- */}
                     {activeComments.comments
                       .filter((c) => c.user)
                       .map((comment) => (

@@ -1,162 +1,200 @@
-/* Stili principali della pagina */
+/* Stile base Mobile-First */
 .pageContainer {
   color: white;
-  padding-bottom: 50px;
+  padding-bottom: 30px;
 }
+
 .loading {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-align: center;
   margin-top: 50px;
-  padding: 40px;
+  padding: 20px;
 }
+
 .header {
   width: 100%;
   background-size: cover;
-  background-position: center center;
+  background-position: center 20%;
 }
+
 .headerOverlay {
-  background: linear-gradient(
-    to right,
-    rgba(0, 0, 0, 0.95) 20%,
-    rgba(0, 0, 0, 0.7) 50%,
-    rgba(0, 0, 0, 0.4) 100%
-  );
-  padding: 50px 40px;
+  background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
+  padding: 20px 15px;
 }
+
 .headerContent {
   display: flex;
-  gap: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  gap: 20px;
+  max-width: 1200px; /* Aggiunto per coerenza */
+  margin: 0 auto;
 }
+
 .poster {
-  width: 300px;
-  height: 450px;
-  object-fit: cover;
+  width: 60%;
+  max-width: 200px;
+  height: auto;
   border-radius: var(--border-radius);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
+
 .details {
-  flex: 1;
+  width: 100%;
 }
+
 .title {
-  font-size: 3rem;
-  margin-top: 0;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  font-size: 1.8rem;
+  margin: 0 0 10px 0;
 }
-.mainContent {
-  padding: 0 40px;
-  max-width: 1200px;
-  margin: 40px auto;
-}
-.overview {
+
+.tagline {
   font-size: 1rem;
+  font-style: italic;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.director {
+  display: none; /* Nascosto su mobile per compattezza */
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Contenuto principale sotto l'header */
+.mainContent {
+  padding: 0 15px;
+  margin: 25px auto;
+  max-width: 1200px;
+}
+
+.overviewSection h3 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.overview {
+  font-size: 0.9rem;
   line-height: 1.6;
 }
+
 .infoSection {
-  display: flex;
-  justify-content: space-around;
+  margin-top: 30px;
   background-color: rgba(0, 0, 0, 0.2);
   padding: 20px;
-  margin-top: 30px;
   border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
+
 .infoBox {
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
 .infoBox h4 {
   margin: 0;
   color: #ccc;
   font-weight: normal;
-  text-transform: uppercase;
   font-size: 0.9rem;
 }
+
 .infoBox p {
-  margin: 5px 0 0;
-  font-size: 1.5rem;
+  margin: 0;
+  font-size: 1.1rem;
   font-weight: bold;
 }
+
 .castSection {
   margin-top: 40px;
 }
+
 .castSection h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   border-bottom: 2px solid var(--primary-color);
   padding-bottom: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
+
 .castGrid {
   display: flex;
   overflow-x: auto;
   gap: 15px;
   padding: 10px 5px;
 }
+
 .actorCard {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  min-width: 140px;
-  text-align: center;
+  min-width: 120px;
 }
+
 .actorCard img {
   width: 100%;
-  height: 210px;
+  height: 180px;
   object-fit: cover;
   border-radius: 8px 8px 0 0;
 }
-.actorCard strong {
-  padding: 5px;
-  font-size: 0.9rem;
-  display: block;
-}
+
+.actorCard strong,
 .actorCard span {
-  padding: 0 5px 5px 5px;
   font-size: 0.8rem;
-  color: #ccc;
+  padding: 5px;
   display: block;
 }
+
 .reviewsSection {
-  margin-top: 50px;
-  padding: 40px;
+  margin-top: 40px;
   background-color: rgba(10, 10, 10, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
   border-radius: var(--border-radius);
 }
+
 .reviewsTitle {
-  font-size: 2rem;
+  font-size: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 15px;
   margin-top: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
+
 .reviewStats {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: normal;
-  color: #ccc;
 }
+
 .reviewItem {
   background-color: rgba(0, 0, 0, 0.2);
-  padding: 20px;
+  padding: 15px;
   border-radius: var(--border-radius);
   margin-bottom: 15px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .reviewHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
+
 .reviewHeader div {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
+
 .reviewActions {
   margin-top: 15px;
   display: flex;
@@ -165,11 +203,13 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 10px;
 }
+
 .reactions {
   display: flex;
   gap: 8px;
   align-items: center;
 }
+
 .reactions button {
   background: none;
   border: none;
@@ -178,14 +218,8 @@
   transition: transform 0.2s;
   padding: 0;
 }
-.reactions button:hover {
-  transform: scale(1.2);
-}
-.actions {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-}
+
+/* Stili comuni per i bottoni */
 .actionButton,
 .deleteButton,
 .commentButton {
@@ -195,10 +229,12 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
+  font-size: 0.9rem;
 }
 .actionButton {
   background-color: var(--primary-color);
   color: white;
+  padding: 10px 18px;
 }
 .actionButton:hover {
   opacity: 0.8;
@@ -212,7 +248,6 @@
   background-color: #ff4d4d;
   color: white;
 }
-/* --- STILE CORRETTO --- */
 .commentButton {
   background-color: rgba(255, 255, 255, 0.1);
   color: #ccc;
@@ -221,6 +256,8 @@
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
 }
+
+/* Sezione commenti */
 .commentsSection {
   margin-top: 15px;
   padding-top: 15px;
@@ -229,7 +266,6 @@
 .commentItem {
   font-size: 0.9rem;
   margin-bottom: 5px;
-  color: #eee;
 }
 .commentForm {
   display: flex;
@@ -252,86 +288,66 @@
   padding: 8px 12px;
   cursor: pointer;
 }
-/* --- Media Queries per il Mobile --- */
-@media (max-width: 768px) {
+
+/* --- Media Query per schermi più grandi (Tablet e Desktop) --- */
+@media (min-width: 768px) {
   .headerOverlay {
-    padding: 20px 15px;
+    padding: 50px 40px;
+    background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.95) 20%,
+      rgba(0, 0, 0, 0.7) 50%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
   }
-  .mainContent {
-    padding: 0 15px;
-    margin-top: 25px;
-  }
+
   .headerContent {
     flex-direction: row;
-    gap: 15px;
-    align-items: flex-start;
+    text-align: left;
+    gap: 40px;
   }
+
   .poster {
-    width: 120px;
-    height: 180px;
+    width: 300px;
+    max-width: none;
+    height: 450px;
   }
-  .details {
-    text-align: left;
-  }
+
   .title {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+    font-size: 3rem;
   }
-  .tagline,
+
   .director {
-    display: none;
+    display: block; /* Mostra di nuovo il regista */
   }
+
   .actions {
-    flex-direction: column;
-    align-items: stretch;
+    justify-content: flex-start;
   }
-  .actionButton {
-    width: 100%;
-    text-align: center;
-    padding: 10px;
-    font-size: 0.9rem;
+
+  .mainContent {
+    padding: 0 40px;
+    margin: 40px auto;
   }
-  .overviewSection {
-    margin-top: 0;
-  }
-  .overview {
-    font-size: 0.9rem;
-    line-height: 1.5;
-  }
-  .infoSection {
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px;
-  }
-  .infoBox {
-    display: flex;
-    justify-content: space-between;
-    text-align: left;
-    align-items: center;
-  }
-  .infoBox p {
-    font-size: 1.1rem;
-    margin: 0;
-  }
+
+  .overviewSection h3,
   .castSection h2,
   .reviewsTitle {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
+
+  .infoSection {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
   .reviewsTitle {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
   }
-  .reviewStats {
-    font-size: 0.9rem;
-  }
+
   .reviewsSection {
-    padding: 20px 15px;
-  }
-  .actorCard {
-    min-width: 110px;
-  }
-  .actorCard img {
-    height: 165px;
+    padding: 40px;
   }
 }
