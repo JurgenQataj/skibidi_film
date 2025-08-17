@@ -6,8 +6,10 @@ import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 
 function ReviewCard({ review, onInteraction }) {
-  // CONTROLLO DI SICUREZZA FONDAMENTALE: se la recensione o i dati del film mancano, non renderizzare nulla.
-  if (!review || !review.id || !review.movie_title || !review.tmdb_id) {
+  // CONTROLLO DI SICUREZZA FONDAMENTALE:
+  // Se la recensione o i dati essenziali del film o dell'utente mancano, non renderizzare nulla.
+  // Questo previene il crash dell'applicazione.
+  if (!review || !review.movie || !review.user) {
     console.warn(
       "ReviewCard ha ricevuto dati incompleti e non verrà renderizzata:",
       review
@@ -27,7 +29,7 @@ function ReviewCard({ review, onInteraction }) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `${API_URL}/api/reactions/reviews/${review.id}`,
+        `${API_URL}/api/reactions/reviews/${review._id}`, // Usa _id, il vero ID dal database
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -43,7 +45,7 @@ function ReviewCard({ review, onInteraction }) {
     } else {
       try {
         const response = await axios.get(
-          `${API_URL}/api/comments/reviews/${review.id}`
+          `${API_URL}/api/comments/reviews/${review._id}`
         );
         setComments({ shown: true, list: response.data || [] });
       } catch (error) {
@@ -58,11 +60,13 @@ function ReviewCard({ review, onInteraction }) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `${API_URL}/api/comments/reviews/${review.id}`,
+        `${API_URL}/api/comments/reviews/${review._id}`,
         { comment_text: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCommentText("");
+      // Ricarica i commenti per vedere subito quello nuovo
+      toggleComments().then(() => toggleComments());
       if (onInteraction) onInteraction();
     } catch (error) {
       alert("Errore nell'invio del commento.");
@@ -80,65 +84,77 @@ function ReviewCard({ review, onInteraction }) {
     }
   };
 
+  // Estrai i dati in modo sicuro leggendo la struttura corretta
+  const { movie, user, rating, comment_text, createdAt } = review;
+  const reactionCount =
+    review.reactions?.reduce(
+      (acc, r) => ({
+        ...acc,
+        [r.reaction_type]: (acc[r.reaction_type] || 0) + 1,
+      }),
+      {}
+    ).love || 0;
+  const commentCount = review.comments?.length || 0;
+
   return (
     <div className={styles.card}>
-      <Link to={`/movie/${review.tmdb_id}`}>
+      <Link to={`/movie/${movie.tmdb_id}`}>
         <img
           src={
-            review.poster_path
-              ? `${posterBaseUrl}${review.poster_path}`
+            movie.poster_path
+              ? `${posterBaseUrl}${movie.poster_path}`
               : placeholderPoster
           }
-          alt={`Locandina di ${review.movie_title}`}
+          alt={`Locandina di ${movie.title}`}
           className={styles.poster}
         />
       </Link>
       <div className={styles.content}>
         <div className={styles.header}>
-          <Link
-            to={`/profile/${review.author_id}`}
-            className={styles.authorLink}
-          >
-            {review.review_author || "Utente"}
+          <Link to={`/profile/${user._id}`} className={styles.authorLink}>
+            {user.username || "Utente"}
           </Link>
           <span> ha recensito </span>
           <Link
-            to={`/movie/${review.tmdb_id}`}
+            to={`/movie/${movie.tmdb_id}`}
             className={styles.movieTitleLink}
           >
-            {review.movie_title}
+            {movie.title}
           </Link>
         </div>
         <div className={styles.rating}>
-          Voto: <span className={styles.ratingValue}>{review.rating}</span>
+          Voto: <span className={styles.ratingValue}>{rating}</span>
         </div>
-        <p className={styles.comment}>"{review.comment_text}"</p>
-        <div className={styles.timestamp}>{timeAgo(review.created_at)}</div>
+        <p className={styles.comment}>"{comment_text}"</p>
+        <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
         <div className={styles.actions}>
           <div className={styles.reactions}>
             <button onClick={() => handleReaction("love")} title="Love">
               ❤️
             </button>
-            <span>{review.reactions?.love || 0}</span>
+            <span>{reactionCount}</span>
           </div>
           <button onClick={toggleComments} className={styles.commentToggle}>
-            {comments.shown ? "Chiudi" : "Commenti"} (
-            {review.comment_count || 0})
+            {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
           </button>
         </div>
         {comments.shown && (
           <div className={styles.commentsSection}>
-            {comments.list.map((comment) => (
-              <div key={comment._id} className={styles.commentItem}>
-                <Link
-                  to={`/profile/${comment.user._id}`}
-                  className={styles.authorLink}
-                >
-                  <strong>{comment.user.username}:</strong>
-                </Link>
-                <span> {comment.comment_text}</span>
-              </div>
-            ))}
+            {comments.list.length > 0 ? (
+              comments.list.map((comment) => (
+                <div key={comment._id} className={styles.commentItem}>
+                  <Link
+                    to={`/profile/${comment.user._id}`}
+                    className={styles.authorLink}
+                  >
+                    <strong>{comment.user.username}:</strong>
+                  </Link>
+                  <span> {comment.comment_text}</span>
+                </div>
+              ))
+            ) : (
+              <p>Nessun commento ancora.</p>
+            )}
             <form onSubmit={handleAddComment} className={styles.commentForm}>
               <input
                 type="text"

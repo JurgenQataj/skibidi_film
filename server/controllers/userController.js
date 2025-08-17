@@ -174,14 +174,16 @@ exports.getUserFeed = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
+    // 1. Trova l'utente corrente e la lista di chi segue.
     const currentUser = await User.findById(req.user.id);
     const followingIds = currentUser.following;
 
-    // Se l'utente non segue nessuno, restituisci un array vuoto.
+    // 2. Se non segue nessuno, restituisci un feed vuoto.
     if (!followingIds || followingIds.length === 0) {
       return res.json([]);
     }
 
+    // 3. Cerca le recensioni degli utenti seguiti.
     const reviews = await Review.find({ user: { $in: followingIds } })
       .populate("user", "username avatar_url _id")
       .populate("movie", "title poster_path tmdb_id")
@@ -189,32 +191,13 @@ exports.getUserFeed = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    // Filtro di sicurezza per scartare dati corrotti
+    // 4. Filtro di sicurezza finale per scartare dati corrotti (recensioni "orfane")
     const validReviews = reviews.filter(
       (review) => review.user && review.movie
     );
 
-    const formattedFeed = validReviews.map((review) => ({
-      id: review._id,
-      rating: review.rating,
-      comment_text: review.comment_text,
-      created_at: review.createdAt,
-      author_id: review.user._id,
-      review_author: review.user.username,
-      tmdb_id: review.movie.tmdb_id,
-      movie_title: review.movie.title,
-      poster_path: review.movie.poster_path,
-      reactions: review.reactions.reduce(
-        (acc, r) => ({
-          ...acc,
-          [r.reaction_type]: (acc[r.reaction_type] || 0) + 1,
-        }),
-        {}
-      ),
-      comment_count: review.comments.length,
-    }));
-
-    res.json(formattedFeed);
+    // 5. Invia i dati "grezzi" e completi, senza formattazioni rischiose.
+    res.json(validReviews);
   } catch (error) {
     console.error("Errore critico nel caricamento del feed:", error);
     res
