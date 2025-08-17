@@ -175,14 +175,21 @@ exports.getUserFeed = async (req, res) => {
 
   try {
     const currentUser = await User.findById(req.user.id);
-    const reviews = await Review.find({ user: { $in: currentUser.following } })
+    const followingIds = currentUser.following;
+
+    // Se l'utente non segue nessuno, restituisci un array vuoto.
+    if (!followingIds || followingIds.length === 0) {
+      return res.json([]);
+    }
+
+    const reviews = await Review.find({ user: { $in: followingIds } })
       .populate("user", "username avatar_url _id")
       .populate("movie", "title poster_path tmdb_id")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // FILTRO DI SICUREZZA FONDAMENTALE: Scarta le recensioni "orfane"
+    // Filtro di sicurezza per scartare dati corrotti
     const validReviews = reviews.filter(
       (review) => review.user && review.movie
     );
@@ -209,7 +216,10 @@ exports.getUserFeed = async (req, res) => {
 
     res.json(formattedFeed);
   } catch (error) {
-    res.status(500).json({ message: "Errore del server" });
+    console.error("Errore critico nel caricamento del feed:", error);
+    res
+      .status(500)
+      .json({ message: "Errore del server durante il caricamento del feed." });
   }
 };
 

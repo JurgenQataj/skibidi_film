@@ -43,20 +43,12 @@ function HomePage() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Sicurezza aggiuntiva nel frontend
-        const validData = data.filter(
-          (review) => review && review.id && review.tmdb_id
-        );
-
-        if (validData.length > 0) {
-          setFeed((prev) => {
-            const newFeed = isRefresh ? validData : [...prev, ...validData];
-            // Rimuovi duplicati basati sull'ID
-            return Array.from(
-              new Map(newFeed.map((item) => [item.id, item])).values()
-            );
-          });
-        }
+        setFeed((prev) => {
+          const newFeed = isRefresh ? data : [...prev, ...data];
+          return Array.from(
+            new Map(newFeed.map((item) => [item.id, item])).values()
+          );
+        });
 
         if (data.length < 10) {
           setHasMore(false);
@@ -73,19 +65,14 @@ function HomePage() {
   );
 
   useEffect(() => {
-    fetchFeed(true); // Caricamento iniziale
+    fetchFeed(true);
   }, []);
 
   useEffect(() => {
     if (page > 1) fetchFeed(false);
   }, [page]);
 
-  const handleInteraction = () => {
-    // Ricarica il feed dall'inizio per mostrare subito le modifiche
-    setPage(1);
-    setHasMore(true);
-    fetchFeed(true);
-  };
+  const handleInteraction = () => fetchFeed(true);
 
   return (
     <div className={styles.pageContainer}>
@@ -118,7 +105,8 @@ function HomePage() {
         )}
         {feed.length === 0 && !loading && (
           <p className={styles.feedStatus}>
-            Il tuo feed è vuoto. Segui i tuoi amici!
+            Il tuo feed è vuoto. Segui i tuoi amici per vedere le loro
+            recensioni!
           </p>
         )}
       </div>
