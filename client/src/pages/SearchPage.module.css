@@ -132,16 +132,24 @@
   .resultsGrid {
     grid-template-columns: repeat(3, 120px) !important;
     gap: 10px !important;
-    grid-auto-rows: 200px !important;
     justify-content: center !important;
     padding: 10px 0;
   }
 
+  /* CARD */
   .resultsGrid :global(.card) {
+    --title-height: 14px; /* 🔑 spazio riservato al titolo, facilmente modificabile */
     width: 120px !important;
-    height: 200px !important;
+    height: calc(
+      185px + var(--title-height)
+    ) !important; /* immagine + titolo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1c1e21 !important;
   }
 
+  /* IMMAGINE */
   .resultsGrid :global(.card img) {
     width: 120px !important;
     height: 185px !important;
@@ -149,13 +157,14 @@
     background-color: #1c1e21 !important;
   }
 
+  /* TITOLO */
   .resultsGrid :global(.card .title) {
     width: 120px !important;
+    height: var(--title-height) !important; /* 🔑 altezza personalizzabile */
     font-size: 0.55rem !important;
     line-height: 1 !important;
     text-align: center;
-    padding: 1px;
-    white-space: nowrap; /* forza su una riga */
-    overflow: hidden; /* taglia ciò che non entra */
+    white-space: nowrap;
+    overflow: hidden;
   }
 }
