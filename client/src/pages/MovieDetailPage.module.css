@@ -133,6 +133,9 @@
 
 .actorCard {
   min-width: 120px;
+  max-width: 120px; /* DIMENSIONE FISSA */
+  width: 120px; /* LARGHEZZA FISSA */
+  flex-shrink: 0; /* NON SI RIMPICCIOLISCE */
 }
 
 .actorCard img {
@@ -147,6 +150,12 @@
   font-size: 0.8rem;
   padding: 5px;
   display: block;
+  /* TESTO CHE NON ESPANDE LA CARD */
+  width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap; /* UNA RIGA SOLA */
+  overflow: hidden; /* NASCONDE IL TESTO CHE ESCE */
+  text-overflow: ellipsis; /* AGGIUNGE ... */
 }
 
 .reviewsSection {
@@ -453,6 +462,9 @@
 
   .actorCard {
     min-width: 70px; /* Molto più piccole */
+    max-width: 70px; /* DIMENSIONE FISSA MOBILE */
+    width: 70px; /* LARGHEZZA FISSA MOBILE */
+    flex-shrink: 0; /* NON SI RIMPICCIOLISCE */
   }
 
   .actorCard img {
@@ -463,6 +475,12 @@
   .actorCard span {
     font-size: 0.65rem; /* Font piccolissimo */
     padding: 2px;
+    /* TESTO FISSO ANCHE SU MOBILE */
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* REVIEWS SECTION - Come le card del ProfilePage */
@@ -550,6 +568,9 @@
 
   .actorCard {
     min-width: 60px;
+    max-width: 60px; /* DIMENSIONE FISSA MOBILE PICCOLO */
+    width: 60px; /* LARGHEZZA FISSA MOBILE PICCOLO */
+    flex-shrink: 0;
   }
 
   .actorCard img {
@@ -560,6 +581,12 @@
   .actorCard span {
     font-size: 0.6rem;
     padding: 1px;
+    /* MANTIENI TESTO FISSO */
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .reviewsSection {
