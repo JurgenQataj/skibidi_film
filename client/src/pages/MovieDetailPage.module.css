@@ -292,78 +292,64 @@
 /* --- Media Query ESCLUSIVAMENTE per il MOBILE --- */
 @media (max-width: 768px) {
   /*
-  MODIFICA CHIAVE #1: Forziamo la pagina a non superare mai la larghezza dello schermo.
-  'width: 100vw' imposta la larghezza esattamente a quella del viewport (lo schermo).
-  'overflow-x: hidden' VIETA lo scorrimento orizzontale. Questo è il fix principale.
+  MODIFICA #1: La Soluzione Principale (come in ProfilePage)
+  Applichiamo un padding (spazio interno) ai lati del contenitore principale.
+  Questo restringe l'area di visualizzazione per TUTTI gli elementi interni,
+  eliminando lo scorrimento orizzontale e creando margini puliti.
   */
   .pageContainer {
-    width: 100vw;
-    overflow-x: hidden;
-    padding: 0; /* Rimuoviamo il padding vecchio per un controllo migliore */
+    padding-left: 15px;
+    padding-right: 15px;
   }
 
   /*
-  MODIFICA CHIAVE #2: Riduciamo la larghezza del contenuto del 40%.
-  Impostando 'width: 90%' e centrando con 'margin: auto', il contenuto
-  sarà notevolmente più stretto, risolvendo il problema del titolo tagliato.
+  MODIFICA #2: L'Header (il "poster gigantesco")
+  Rimuoviamo il padding laterale dall'overlay perché ora è gestito dal .pageContainer.
+  Questo centra il suo contenuto nel nuovo spazio ristretto.
   */
-  .headerContent,
-  .mainContent {
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* Adattamenti degli elementi interni al nuovo layout stretto */
   .headerOverlay {
     padding: 20px 0;
   }
 
-  .title {
-    font-size: 1.8rem;
+  .headerContent,
+  .mainContent {
+    width: 100%; /* I contenuti si adattano al nuovo contenitore stretto */
+    padding: 0;
+    margin: 25px auto;
   }
 
+  /*
+  MODIFICA #3: La sezione "Recensioni della Community"
+  Riduciamo la dimensione del titolo per assicurarci che non venga tagliato
+  e vada a capo correttamente nel nuovo spazio.
+  */
+  .overviewSection h3,
+  .castSection h2,
+  .reviewsTitle {
+    font-size: 1.5rem; /* Testo più piccolo per adattarsi meglio */
+    word-wrap: break-word; /* Sicurezza extra per andare a capo */
+  }
+
+  /* Stili aggiuntivi per coerenza nel layout ridotto */
   .poster {
     width: 50%;
     max-width: 180px;
     height: auto;
   }
 
+  .title {
+    font-size: 1.8rem;
+  }
+
   .director {
     display: none;
   }
 
+  /* Le tue dimensioni personalizzate per le card attori */
   .actorCard {
     min-width: 60px;
   }
   .actorCard img {
     height: 80px;
-  }
-
-  .actorCard strong,
-  .actorCard span {
-    font-size: 0.7rem;
-  }
-
-  .overviewSection h3,
-  .castSection h2,
-  .reviewsTitle {
-    font-size: 1.3rem;
-  }
-
-  .infoSection {
-    flex-direction: column;
-    padding: 15px;
-  }
-
-  .reviewsSection {
-    padding: 15px;
-  }
-
-  .reviewsTitle {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
