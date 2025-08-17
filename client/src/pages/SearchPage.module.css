@@ -114,7 +114,7 @@
   margin: 0 auto;
   padding: 20px 0;
 }
-/* --- Media Query ESCLUSIVAMENTE per il MOBILE --- */
+
 @media (max-width: 768px) {
   .pageContainer {
     padding: 10px;
@@ -129,7 +129,6 @@
     max-width: 280px;
   }
 
-  /* Griglia fissa come nella ProfilePage */
   .resultsGrid {
     grid-template-columns: repeat(3, 120px) !important;
     gap: 10px !important;
@@ -138,34 +137,32 @@
     padding: 10px 0;
   }
 
-  /*
-  MODIFICA CHIAVE: Forziamo le card e le immagini a comportarsi
-  ESATTAMENTE come quelle della ProfilePage.
-  */
   .resultsGrid :global(.card) {
     width: 120px !important;
     height: 200px !important;
   }
 
+  /*
+  MODIFICA CHIAVE: Altezza immagine aumentata, altezza titolo dimezzata
+  */
   .resultsGrid :global(.card img) {
     width: 120px !important;
-    height: 160px !important;
-    object-fit: contain !important; /* Mostra l'intera immagine senza tagli */
-    background-color: #1c1e21 !important; /* Aggiunge uno sfondo per riempire gli spazi vuoti */
+    height: 180px !important; /* Aumentata da 160px */
+    object-fit: contain !important;
+    background-color: #1c1e21 !important;
   }
 
   .resultsGrid :global(.card .title) {
     width: 120px !important;
-    height: 40px !important;
+    height: 20px !important; /* Dimezzata da 40px */
     font-size: 0.6rem !important;
-    white-space: normal; /* Permette al testo di andare a capo */
-    text-align: center; /* Centra il titolo */
-    padding: 2px; /* Riduce lo spazio interno */
+    white-space: normal;
+    text-align: center;
+    padding: 2px;
   }
 }
 
 @media (max-width: 480px) {
-  /* Adattamenti per schermi molto piccoli, come in ProfilePage */
   .resultsGrid {
     grid-template-columns: repeat(3, 100px) !important;
     grid-auto-rows: 170px !important;
@@ -176,14 +173,17 @@
     height: 170px !important;
   }
 
+  /*
+  MODIFICA CHIAVE: Altezza immagine aumentata, altezza titolo dimezzata
+  */
   .resultsGrid :global(.card img) {
     width: 100px !important;
-    height: 140px !important;
+    height: 155px !important; /* Aumentata da 140px */
   }
 
   .resultsGrid :global(.card .title) {
     width: 100px !important;
-    height: 30px !important;
+    height: 15px !important; /* Dimezzata da 30px */
     font-size: 0.5rem !important;
   }
 }
