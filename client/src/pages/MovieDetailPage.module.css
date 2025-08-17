@@ -131,11 +131,12 @@
   padding: 10px 5px;
 }
 
+/* ACTOR CARD CON DIMENSIONI FISSE - DESKTOP */
 .actorCard {
   min-width: 120px;
-  max-width: 120px; /* DIMENSIONE FISSA */
-  width: 120px; /* LARGHEZZA FISSA */
-  flex-shrink: 0; /* NON SI RIMPICCIOLISCE */
+  max-width: 120px;
+  width: 120px;
+  flex-shrink: 0;
 }
 
 .actorCard img {
@@ -150,12 +151,11 @@
   font-size: 0.8rem;
   padding: 5px;
   display: block;
-  /* TESTO CHE NON ESPANDE LA CARD */
   width: 100%;
   box-sizing: border-box;
-  white-space: nowrap; /* UNA RIGA SOLA */
-  overflow: hidden; /* NASCONDE IL TESTO CHE ESCE */
-  text-overflow: ellipsis; /* AGGIUNGE ... */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .reviewsSection {
@@ -373,66 +373,59 @@
   color: #eee;
 }
 
-/* === MOBILE - STRATEGIA PROFILEPAGE === */
+/* === MOBILE - STRATEGIA PROFILEPAGE (RIPRISTINATA) === */
 @media (max-width: 768px) {
-  /* CONTAINER PRINCIPALE - Come ProfilePage */
   .pageContainer {
-    padding: 20px; /* Stesso del ProfilePage */
+    padding: 20px;
   }
 
-  /* HEADER - Molto più compatto */
   .headerOverlay {
-    padding: 15px; /* Ridotto */
+    padding: 15px;
   }
 
   .headerContent {
-    gap: 15px; /* Spazio ridotto */
+    gap: 15px;
   }
 
-  /* POSTER - Molto più piccolo come gli avatar del ProfilePage */
   .poster {
-    width: 30%; /* Molto più piccolo */
-    max-width: 100px; /* Come gli avatar piccoli */
+    width: 30%;
+    max-width: 100px;
   }
 
-  /* TITOLO - Più compatto */
   .title {
-    font-size: 1.2rem; /* Ridotto drasticamente */
+    font-size: 1.2rem;
     margin: 0 0 5px 0;
   }
 
   .tagline {
-    font-size: 0.8rem; /* Molto piccolo */
+    font-size: 0.8rem;
     margin-bottom: 10px;
   }
 
-  /* AZIONI - Come i bottoni del ProfilePage */
   .actions {
     gap: 8px;
     flex-direction: column;
   }
 
   .actionButton {
-    padding: 8px 15px; /* Come editButton del ProfilePage */
+    padding: 8px 15px;
     font-size: 0.85rem;
     width: fit-content;
   }
 
-  /* CONTENUTO PRINCIPALE - Come ProfilePage */
   .mainContent {
-    padding: 0; /* ProfilePage ha padding: 0 per il contenuto interno */
-    margin: 15px 0; /* Margin ridotto */
+    padding: 0;
+    margin: 15px 0;
   }
 
-  /* SEZIONI - Titoli più piccoli come ProfilePage */
   .overviewSection h3,
   .castSection h2 {
-    font-size: 1.3rem; /* Come sectionTitle del ProfilePage */
+    font-size: 1.3rem;
     margin-bottom: 20px;
   }
 
   .reviewsTitle {
-    font-size: 1.3rem; /* Uguale alle altre sezioni */
+    font-size: 1.3rem;
   }
 
   .overview {
@@ -440,7 +433,6 @@
     line-height: 1.5;
   }
 
-  /* INFO SECTION - Più compatta */
   .infoSection {
     padding: 15px;
     margin-top: 20px;
@@ -454,28 +446,27 @@
     font-size: 0.9rem;
   }
 
-  /* CAST - Molto più piccole come le MovieCard del ProfilePage */
   .castGrid {
-    gap: 8px; /* Gap ridotto come ProfilePage grid */
+    gap: 8px;
     padding: 5px 0;
   }
 
+  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE */
   .actorCard {
-    min-width: 70px; /* Molto più piccole */
-    max-width: 70px; /* DIMENSIONE FISSA MOBILE */
-    width: 70px; /* LARGHEZZA FISSA MOBILE */
-    flex-shrink: 0; /* NON SI RIMPICCIOLISCE */
+    min-width: 70px;
+    max-width: 70px;
+    width: 70px;
+    flex-shrink: 0;
   }
 
   .actorCard img {
-    height: 105px; /* Altezza ridotta drasticamente */
+    height: 105px;
   }
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.65rem; /* Font piccolissimo */
+    font-size: 0.65rem;
     padding: 2px;
-    /* TESTO FISSO ANCHE SU MOBILE */
     width: 100%;
     box-sizing: border-box;
     white-space: nowrap;
@@ -483,14 +474,13 @@
     text-overflow: ellipsis;
   }
 
-  /* REVIEWS SECTION - Come le card del ProfilePage */
   .reviewsSection {
     padding: 15px;
     margin-top: 25px;
   }
 
   .reviewItem {
-    padding: 10px; /* Padding ridotto */
+    padding: 10px;
     margin-bottom: 12px;
   }
 
@@ -501,46 +491,43 @@
   }
 
   .reviewActions {
-    flex-direction: row; /* Mantieni orizzontale ma compatto */
+    flex-direction: row;
     justify-content: space-between;
   }
 
   .reactions button {
-    font-size: 1.2rem; /* Emoji più piccole */
+    font-size: 1.2rem;
   }
 
-  /* BOTTONI COMMENTI - Come i bottoni del ProfilePage */
   .commentButton,
   .deleteButton {
-    padding: 6px 10px; /* Padding ridotto */
+    padding: 6px 10px;
     font-size: 0.8rem;
   }
 
-  /* FORM COMMENTI - Ottimizzato per mobile */
   .commentForm {
     gap: 8px;
   }
 
   .commentForm input {
-    padding: 12px; /* Padding maggiore per touch */
+    padding: 12px;
     font-size: 0.9rem;
   }
 
   .commentForm button {
-    padding: 12px 15px; /* Touch-friendly */
+    padding: 12px 15px;
     font-size: 0.85rem;
   }
 }
 
-/* MOBILE PICCOLO - Ancora più compatto */
 @media (max-width: 480px) {
   .pageContainer {
-    padding: 15px; /* Ancora più ridotto */
+    padding: 15px;
   }
 
   .poster {
     width: 25%;
-    max-width: 80px; /* Piccolissimo */
+    max-width: 80px;
   }
 
   .title {
@@ -566,10 +553,11 @@
     font-size: 0.8rem;
   }
 
+  /* ACTOR CARD CON DIMENSIONI FISSE - MOBILE PICCOLO */
   .actorCard {
     min-width: 60px;
-    max-width: 60px; /* DIMENSIONE FISSA MOBILE PICCOLO */
-    width: 60px; /* LARGHEZZA FISSA MOBILE PICCOLO */
+    max-width: 60px;
+    width: 60px;
     flex-shrink: 0;
   }
 
@@ -581,7 +569,6 @@
   .actorCard span {
     font-size: 0.6rem;
     padding: 1px;
-    /* MANTIENI TESTO FISSO */
     width: 100%;
     box-sizing: border-box;
     white-space: nowrap;
