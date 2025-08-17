@@ -154,11 +154,11 @@
 
   .resultsGrid :global(.card .title) {
     width: 120px !important;
-    height: 13px !important; /* Dimezzata da 40px */
+    height: 10px !important; /* Dimezzata da 40px */
     font-size: 0.6rem !important;
     white-space: normal;
     text-align: center;
-    padding: 2px;
+    padding: 1px;
   }
 }
 
