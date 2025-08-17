@@ -204,10 +204,21 @@ exports.getUserFeed = async (req, res) => {
 
     // 5. Invia i dati "grezzi" e completi, senza formattazioni rischiose.
     // 5. Formatta le recensioni per garantire la coerenza con altre parti dell'API
+    // ... (codice precedente della funzione)
+
+    // 5. Formatta le recensioni per garantire la coerenza con altre parti dell'API
     const formattedReviews = validReviews.map((review) => ({
       ...review.toObject(),
       id: review._id,
     }));
+
+    // Aggiungi questi header per disabilitare la cache di Vercel per questa rotta
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
 
     res.json(formattedReviews);
   } catch (error) {
