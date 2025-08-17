@@ -379,37 +379,39 @@
     padding: 10px; /* RIDOTTO DA 20px */
   }
 
+  /* HEADER CON SFONDO - RIDOTTO DRASTICAMENTE */
   .headerOverlay {
-    padding: 10px; /* RIDOTTO DA 15px */
+    padding: 5px; /* MOLTO RIDOTTO */
   }
 
   .headerContent {
-    gap: 10px; /* RIDOTTO DA 15px */
+    gap: 5px; /* SPAZIO MINIMO */
   }
 
+  /* LOCANDINA DEL FILM - TORNA NORMALE */
   .poster {
-    width: 12%; /* RIDOTTO DA 20% - QUASI LA METÀ */
-    max-width: 40px; /* RIDOTTO DA 70px - QUASI LA METÀ */
+    width: 25%; /* TORNA NORMALE */
+    max-width: 80px; /* TORNA NORMALE */
   }
 
   .title {
-    font-size: 1rem; /* RIDOTTO DA 1.2rem */
-    margin: 0 0 3px 0;
+    font-size: 0.9rem; /* PIÙ PICCOLO PER RIDURRE ALTEZZA HEADER */
+    margin: 0; /* NO MARGIN */
   }
 
   .tagline {
-    font-size: 0.7rem; /* RIDOTTO DA 0.8rem */
-    margin-bottom: 8px;
+    font-size: 0.6rem; /* PIÙ PICCOLO */
+    margin-bottom: 5px; /* RIDOTTO */
   }
 
   .actions {
-    gap: 5px; /* RIDOTTO DA 8px */
-    flex-direction: column;
+    gap: 3px; /* SPAZIO MINIMO */
+    flex-direction: row; /* ORIZZONTALE PER RISPARMIARE SPAZIO */
   }
 
   .actionButton {
-    padding: 5px 10px; /* RIDOTTO DA 8px 15px */
-    font-size: 0.7rem; /* RIDOTTO DA 0.85rem */
+    padding: 3px 6px; /* PIÙ PICCOLO */
+    font-size: 0.6rem; /* PIÙ PICCOLO */
     width: fit-content;
   }
 
@@ -525,9 +527,10 @@
     padding: 8px; /* RIDOTTO DA 15px */
   }
 
+  /* LOCANDINA TORNA NORMALE ANCHE SU MOBILE PICCOLO */
   .poster {
-    width: 10%; /* ANCORA PIÙ PICCOLO */
-    max-width: 35px; /* ANCORA PIÙ PICCOLO */
+    width: 20%; /* NORMALE */
+    max-width: 70px; /* NORMALE */
   }
 
   .title {
