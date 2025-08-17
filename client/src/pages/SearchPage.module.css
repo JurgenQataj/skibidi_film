@@ -2,8 +2,10 @@
   padding: 20px;
   color: white;
   text-align: center;
-  width: 100%; /* Assicura che il contenitore usi tutta la larghezza */
-  box-sizing: border-box; /* Include padding nel calcolo della larghezza */
+  width: 100%;
+  max-width: 100%; /* evita che esca oltre lo schermo */
+  overflow-x: hidden; /* blocca eventuale scroll orizzontale */
+  box-sizing: border-box;
 }
 
 .title {
@@ -114,13 +116,10 @@
 }
 
 @media (max-width: 768px) {
-  /*
-  MODIFICA CHIAVE: Questa è la stessa regola della ProfilePage.
-  Restringe il padding laterale del contenitore principale, eliminando
-  lo scorrimento orizzontale.
-  */
   .pageContainer {
-    padding: 20px;
+    padding: 10px; /* riduco un po' il padding laterale */
+    max-width: 100%; /* evita scroll orizzontale */
+    overflow-x: hidden;
   }
 
   .searchForm {
@@ -131,9 +130,13 @@
   }
 
   .resultsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(130px, 1fr)
+    ); /* più stretto */
+    gap: 12px;
     padding: 10px 0;
+    max-width: 100%; /* elimina il vincolo dei 1200px */
   }
 }
 
@@ -141,5 +144,6 @@
   .resultsGrid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 8px;
+    max-width: 100%;
   }
 }
