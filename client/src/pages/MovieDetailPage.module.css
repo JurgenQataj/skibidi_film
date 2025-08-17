@@ -292,21 +292,26 @@
 
 /* In client/src/pages/MovieDetailPage.module.css */
 
-/* --- Sostituisci la media query esistente con questa --- */
+/* Inserisci o sostituisci questo blocco in /client/src/pages/MovieDetailPage.module.css */
+
+/* --- Media Query per MOBILE --- */
 @media (max-width: 768px) {
+  /*
+  MODIFICA #1: La Soluzione Principale (come in ProfilePage)
+  Applichiamo un padding (spazio interno) ai lati del contenitore principale.
+  Questo restringe l'area di visualizzazione per TUTTI gli elementi interni,
+  eliminando lo scorrimento orizzontale e risolvendo il problema del testo tagliato.
+  */
   .pageContainer {
-    /* MODIFICA #1: La Soluzione Principale (come in ProfilePage)
-       Applichiamo un padding (spazio interno) ai lati del contenitore principale.
-       Questo restringe l'area di visualizzazione per TUTTI gli elementi interni,
-       eliminando lo scorrimento orizzontale e creando margini puliti.
-    */
     padding-left: 15px;
     padding-right: 15px;
+    overflow-x: hidden; /* Sicurezza extra per bloccare lo scroll */
   }
 
-  /* MODIFICA #2: L'Header (il "poster gigantesco")
-     Rimuoviamo il padding laterale dall'overlay perché ora è gestito dal .pageContainer.
-     Questo centra il suo contenuto nel nuovo spazio ristretto.
+  /*
+  MODIFICA #2: L'Header
+  Rimuoviamo il padding laterale dall'overlay perché ora è gestito dal .pageContainer.
+  Questo centra il suo contenuto nel nuovo spazio ristretto.
   */
   .headerOverlay {
     padding: 20px 0;
@@ -319,20 +324,19 @@
     margin: 25px auto;
   }
 
-  /* MODIFICA #3: La sezione "Recensioni della Community"
-     Riduciamo la dimensione del titolo per assicurarci che non venga tagliato
-     e vada a capo correttamente nel nuovo spazio.
+  /*
+  MODIFICA #3: Ridimensionamento Titoli e Poster
+  Riduciamo la dimensione del testo e del poster per adattarsi meglio allo spazio.
   */
   .overviewSection h3,
   .castSection h2,
   .reviewsTitle {
-    font-size: 1.5rem; /* Testo più piccolo per adattarsi meglio */
-    word-wrap: break-word; /* Sicurezza extra per andare a capo */
+    font-size: 1.5rem;
+    word-wrap: break-word; /* Va a capo se il testo è troppo lungo */
   }
 
-  /* Stili aggiuntivi per coerenza nel layout ridotto */
   .poster {
-    width: 50%;
+    width: 50%; /* Poster più piccolo */
     max-width: 180px;
     height: auto;
   }
@@ -345,11 +349,16 @@
     display: none;
   }
 
-  /* Le tue dimensioni personalizzate per le card attori */
+  /* Manteniamo lo scroll solo per il cast */
+  .castGrid {
+    overflow-x: auto;
+    padding-bottom: 10px; /* Spazio per la scrollbar */
+  }
+
   .actorCard {
-    min-width: 60px;
+    min-width: 100px;
   }
   .actorCard img {
-    height: 80px;
+    height: 150px;
   }
 }
