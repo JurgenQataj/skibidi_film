@@ -373,10 +373,13 @@
   color: #eee;
 }
 
-/* === MOBILE - STRATEGIA PROFILEPAGE (RIDUZIONE 60% BACKGROUND) === */
+/* === MOBILE - ADATTATO ALLE DIMENSIONI RIDOTTE === */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 10px; /* RIDOTTO DA 20px */
+    padding: 5px; /* RIDOTTO ULTERIORMENTE */
+    max-width: 100vw; /* LARGHEZZA MASSIMA SCHERMO */
+    overflow-x: hidden; /* PREVIENE SCROLL ORIZZONTALE */
+    box-sizing: border-box;
   }
 
   /* HEADER CON SFONDO - RIDOTTO DRASTICAMENTE (40% dell'originale = 60% in meno) */
@@ -388,201 +391,123 @@
   }
 
   .headerOverlay {
-    padding: 5px; /* MOLTO RIDOTTO */
+    padding: 3px; /* ULTERIORMENTE RIDOTTO */
   }
 
   .headerContent {
-    gap: 5px; /* SPAZIO MINIMO */
+    gap: 3px; /* SPAZIO MINIMO */
+    max-width: 100%;
+    padding: 0 5px;
   }
 
-  /* LOCANDINA DEL FILM - TORNA NORMALE */
+  /* LOCANDINA DEL FILM - PROPORZIONATA AL BACKGROUND RIDOTTO */
   .poster {
-    width: 25%; /* TORNA NORMALE */
-    max-width: 80px; /* TORNA NORMALE */
+    width: 20%; /* RIDOTTO PER ADATTARSI AL BACKGROUND */
+    max-width: 60px; /* RIDOTTO */
   }
 
   .title {
-    font-size: 0.9rem; /* PIÙ PICCOLO PER RIDURRE ALTEZZA HEADER */
-    margin: 0; /* NO MARGIN */
+    font-size: 0.8rem; /* PIÙ PICCOLO */
+    margin: 0;
+    word-wrap: break-word; /* TESTO VA A CAPO */
+    hyphens: auto; /* SILLABAZIONE AUTOMATICA */
   }
 
   .tagline {
-    font-size: 0.6rem; /* PIÙ PICCOLO */
-    margin-bottom: 5px; /* RIDOTTO */
+    font-size: 0.55rem; /* PIÙ PICCOLO */
+    margin-bottom: 3px;
+    word-wrap: break-word;
+    hyphens: auto;
   }
 
   .actions {
-    gap: 3px; /* SPAZIO MINIMO */
-    flex-direction: row; /* ORIZZONTALE PER RISPARMIARE SPAZIO */
+    gap: 2px; /* SPAZIO MINIMO */
+    flex-direction: row;
+    flex-wrap: wrap; /* PERMETTE AI BOTTONI DI ANDARE A CAPO */
+    justify-content: center;
   }
 
   .actionButton {
-    padding: 3px 6px; /* PIÙ PICCOLO */
-    font-size: 0.6rem; /* PIÙ PICCOLO */
+    padding: 2px 4px; /* PIÙ PICCOLO */
+    font-size: 0.55rem; /* PIÙ PICCOLO */
     width: fit-content;
+    max-width: 45%; /* MASSIMA LARGHEZZA PER ANDARE A CAPO */
   }
 
   .mainContent {
-    padding: 0;
-    margin: 10px 0; /* RIDOTTO DA 15px */
+    padding: 0 3px; /* PADDING LATERALE MINIMO */
+    margin: 5px 0; /* RIDOTTO */
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .overviewSection h3,
   .castSection h2 {
-    font-size: 0.7rem; /* RIDOTTO 40% DA 1.1rem */
-    margin-bottom: 10px; /* RIDOTTO 40% DA 15px */
+    font-size: 0.65rem; /* RIDOTTO ULTERIORMENTE */
+    margin-bottom: 5px; /* RIDOTTO */
+    word-wrap: break-word;
+    hyphens: auto;
   }
 
   .reviewsTitle {
-    font-size: 0.7rem; /* RIDOTTO 40% DA 1.1rem */
+    font-size: 0.65rem; /* RIDOTTO ULTERIORMENTE */
+    word-wrap: break-word;
   }
 
   .overview {
-    font-size: 0.5rem; /* RIDOTTO 40% DA 0.8rem */
-    line-height: 1.2; /* RIDOTTO 40% DA 1.4 */
+    font-size: 0.45rem; /* RIDOTTO ULTERIORMENTE */
+    line-height: 1.1; /* RIDOTTO */
+    word-wrap: break-word;
+    hyphens: auto;
+    text-align: justify; /* GIUSTIFICA IL TESTO PER SFRUTTARE MEGLIO LO SPAZIO */
   }
 
   .infoSection {
-    padding: 10px; /* RIDOTTO DA 15px */
-    margin-top: 15px; /* RIDOTTO DA 20px */
+    padding: 5px; /* RIDOTTO ULTERIORMENTE */
+    margin-top: 8px; /* RIDOTTO */
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .infoBox {
+    flex-direction: column; /* STACK VERTICALMENTE PER SFRUTTARE MEGLIO LO SPAZIO */
+    align-items: flex-start;
+    gap: 2px;
   }
 
   .infoBox h4 {
-    font-size: 0.7rem; /* RIDOTTO DA 0.8rem */
+    font-size: 0.6rem; /* RIDOTTO */
+    word-wrap: break-word;
   }
 
   .infoBox p {
-    font-size: 0.8rem; /* RIDOTTO DA 0.9rem */
+    font-size: 0.7rem; /* RIDOTTO */
+    word-wrap: break-word;
   }
 
   .castGrid {
-    gap: 5px; /* RIDOTTO DA 8px */
-    padding: 3px 0; /* RIDOTTO DA 5px */
+    gap: 3px; /* RIDOTTO */
+    padding: 2px 0; /* RIDOTTO */
+    /* MANTIENE SCROLL ORIZZONTALE COME RICHIESTO */
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
-  /* ACTOR CARD RIPRISTINATE GRANDI - HANNO LO SCORRIMENTO ORIZZONTALE */
+  /* ACTOR CARD RIDOTTE PER ADATTARSI ALLE NUOVE DIMENSIONI */
   .actorCard {
-    min-width: 90px; /* RIPRISTINATO GRANDE */
-    max-width: 90px;
-    width: 90px;
+    min-width: 70px; /* RIDOTTO DA 90px */
+    max-width: 70px;
+    width: 70px;
     flex-shrink: 0;
   }
 
   .actorCard img {
-    height: 135px; /* RIPRISTINATO GRANDE */
+    height: 105px; /* RIDOTTO PROPORZIONALMENTE */
   }
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.7rem; /* RIPRISTINATO LEGGIBILE */
-    padding: 3px;
-    width: 100%;
-    box-sizing: border-box;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .reviewsSection {
-    padding: 6px; /* RIDOTTO 40% DA 10px */
-    margin-top: 12px; /* RIDOTTO 40% DA 20px */
-  }
-
-  .reviewItem {
-    padding: 5px; /* RIDOTTO 40% DA 8px */
-    margin-bottom: 6px; /* RIDOTTO 40% DA 10px */
-  }
-
-  .reviewHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-
-  .reviewActions {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .reactions button {
-    font-size: 1.2rem;
-  }
-
-  .commentButton,
-  .deleteButton {
-    padding: 4px 8px; /* RIDOTTO DA 6px 10px */
-    font-size: 0.7rem; /* RIDOTTO DA 0.8rem */
-  }
-
-  .commentForm {
-    gap: 5px; /* RIDOTTO DA 8px */
-  }
-
-  .commentForm input {
-    padding: 5px; /* RIDOTTO 40% DA 8px */
-    font-size: 0.5rem; /* RIDOTTO 40% DA 0.8rem */
-  }
-
-  .commentForm button {
-    padding: 5px 7px; /* RIDOTTO 40% DA 8px 12px */
-    font-size: 0.45rem; /* RIDOTTO 40% DA 0.75rem */
-  }
-}
-
-@media (max-width: 480px) {
-  .pageContainer {
-    padding: 8px; /* RIDOTTO DA 15px */
-  }
-
-  /* BACKGROUND ANCORA PIÙ RIDOTTO PER MOBILE MOLTO PICCOLO (30% dell'originale = 70% in meno) */
-  .header {
-    background-size: 30% auto; /* ANCORA PIÙ RIDOTTO PER MOBILE PICCOLO */
-  }
-
-  /* LOCANDINA TORNA NORMALE ANCHE SU MOBILE PICCOLO */
-  .poster {
-    width: 20%; /* NORMALE */
-    max-width: 70px; /* NORMALE */
-  }
-
-  .title {
-    font-size: 0.9rem; /* RIDOTTO DA 1.1rem */
-  }
-
-  .tagline {
-    font-size: 0.65rem; /* RIDOTTO DA 0.75rem */
-  }
-
-  .actionButton {
-    padding: 4px 8px; /* RIDOTTO DA 6px 12px */
-    font-size: 0.65rem; /* RIDOTTO DA 0.8rem */
-  }
-
-  .overviewSection h3,
-  .castSection h2,
-  .reviewsTitle {
-    font-size: 0.6rem; /* RIDOTTO 40% DA 1rem */
-  }
-
-  .overview {
-    font-size: 0.45rem; /* RIDOTTO 40% DA 0.75rem */
-  }
-
-  /* ACTOR CARD RIPRISTINATE GRANDI ANCHE SU MOBILE PICCOLO */
-  .actorCard {
-    min-width: 80px; /* GRANDE */
-    max-width: 80px;
-    width: 80px;
-    flex-shrink: 0;
-  }
-
-  .actorCard img {
-    height: 120px; /* GRANDE */
-  }
-
-  .actorCard strong,
-  .actorCard span {
-    font-size: 0.65rem; /* LEGGIBILE */
+    font-size: 0.6rem; /* RIDOTTO */
     padding: 2px;
     width: 100%;
     box-sizing: border-box;
@@ -592,10 +517,199 @@
   }
 
   .reviewsSection {
-    padding: 5px; /* RIDOTTO 40% DA 8px */
+    padding: 3px; /* RIDOTTO ULTERIORMENTE */
+    margin-top: 8px; /* RIDOTTO */
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .reviewItem {
-    padding: 4px; /* RIDOTTO 40% DA 6px */
+    padding: 3px; /* RIDOTTO ULTERIORMENTE */
+    margin-bottom: 4px; /* RIDOTTO */
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .reviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+
+  .reviewActions {
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap; /* PERMETTE AI BOTTONI DI ANDARE A CAPO */
+    gap: 2px;
+  }
+
+  .reactions button {
+    font-size: 1rem; /* RIDOTTO */
+  }
+
+  .commentButton,
+  .deleteButton {
+    padding: 2px 4px; /* RIDOTTO ULTERIORMENTE */
+    font-size: 0.6rem; /* RIDOTTO */
+    word-wrap: break-word;
+  }
+
+  .commentForm {
+    gap: 3px; /* RIDOTTO */
+    flex-wrap: wrap; /* PERMETTE AI CAMPI DI ANDARE A CAPO SE NECESSARIO */
+  }
+
+  .commentForm input {
+    padding: 3px; /* RIDOTTO ULTERIORMENTE */
+    font-size: 0.45rem; /* RIDOTTO ULTERIORMENTE */
+    min-width: 0; /* PERMETTE AL CAMPO DI RIDURSI */
+    flex: 1;
+  }
+
+  .commentForm button {
+    padding: 3px 5px; /* RIDOTTO ULTERIORMENTE */
+    font-size: 0.4rem; /* RIDOTTO ULTERIORMENTE */
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageContainer {
+    padding: 3px; /* RIDOTTO ULTERIORMENTE */
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  /* BACKGROUND ANCORA PIÙ RIDOTTO PER MOBILE MOLTO PICCOLO (30% dell'originale = 70% in meno) */
+  .header {
+    background-size: 30% auto; /* ANCORA PIÙ RIDOTTO PER MOBILE PICCOLO */
+  }
+
+  .headerOverlay {
+    padding: 2px;
+  }
+
+  .headerContent {
+    gap: 2px;
+    padding: 0 3px;
+  }
+
+  /* LOCANDINA ANCORA PIÙ PICCOLA */
+  .poster {
+    width: 18%; /* RIDOTTO ULTERIORMENTE */
+    max-width: 50px; /* RIDOTTO ULTERIORMENTE */
+  }
+
+  .title {
+    font-size: 0.7rem; /* RIDOTTO */
+    margin: 0;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .tagline {
+    font-size: 0.5rem; /* RIDOTTO */
+    margin-bottom: 2px;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .actionButton {
+    padding: 2px 3px; /* RIDOTTO */
+    font-size: 0.5rem; /* RIDOTTO */
+    max-width: 45%;
+  }
+
+  .mainContent {
+    padding: 0 2px; /* PADDING LATERALE MINIMO */
+    margin: 3px 0;
+  }
+
+  .overviewSection h3,
+  .castSection h2,
+  .reviewsTitle {
+    font-size: 0.55rem; /* RIDOTTO ULTERIORMENTE */
+    margin-bottom: 3px;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .overview {
+    font-size: 0.4rem; /* RIDOTTO ULTERIORMENTE */
+    line-height: 1.05;
+    word-wrap: break-word;
+    hyphens: auto;
+    text-align: justify;
+  }
+
+  .infoSection {
+    padding: 3px;
+    margin-top: 5px;
+  }
+
+  .infoBox h4 {
+    font-size: 0.55rem;
+    word-wrap: break-word;
+  }
+
+  .infoBox p {
+    font-size: 0.6rem;
+    word-wrap: break-word;
+  }
+
+  /* ACTOR CARD ANCORA PIÙ PICCOLE */
+  .actorCard {
+    min-width: 60px; /* RIDOTTO ULTERIORMENTE */
+    max-width: 60px;
+    width: 60px;
+    flex-shrink: 0;
+  }
+
+  .actorCard img {
+    height: 90px; /* RIDOTTO PROPORZIONALMENTE */
+  }
+
+  .actorCard strong,
+  .actorCard span {
+    font-size: 0.55rem; /* RIDOTTO */
+    padding: 1px;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .reviewsSection {
+    padding: 2px;
+    margin-top: 5px;
+  }
+
+  .reviewItem {
+    padding: 2px;
+    margin-bottom: 3px;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .commentButton,
+  .deleteButton {
+    padding: 1px 3px;
+    font-size: 0.55rem;
+  }
+
+  .commentForm input {
+    padding: 2px;
+    font-size: 0.4rem;
+  }
+
+  .commentForm button {
+    padding: 2px 4px;
+    font-size: 0.35rem;
+  }
+
+  .reactions button {
+    font-size: 0.9rem;
   }
 }
