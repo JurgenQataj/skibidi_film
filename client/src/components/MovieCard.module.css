@@ -1,41 +1,82 @@
 /* client/src/components/MovieCard.module.css */
 
 .card {
-  /* ✅ LA SOLUZIONE: rendiamo la larghezza flessibile al 100% del suo contenitore (la cella della griglia) */
-  width: 100%;
   background-color: #1c1e21;
   border-radius: var(--border-radius);
   overflow: hidden;
   color: white;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
-  /* Rimuoviamo il margine per un controllo più preciso dal gap della griglia */
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
 .card:hover {
   transform: scale(1.05);
 }
 
+/* IMMAGINI CON DIMENSIONI IDENTICHE E FISSE - 20% PIÙ GRANDI */
 .card img {
-  width: 100%;
-  display: block;
-  /* Mantiene le proporzioni corrette (altezza = 1.5 * larghezza) */
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  background-color: #333; /* Colore di sfondo mentre carica l'immagine */
+  width: 100% !important;
+  height: 240px !important; /* ERA 200px, ORA 240px (+20%) */
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  background-color: #333;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+  border-radius: 0 !important;
+  box-sizing: border-box !important;
 }
 
+/* TITOLO CON ALTEZZA FISSA */
 .title {
   padding: 8px;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.8rem; /* Riduciamo un po' il font per schermi piccoli */
+  font-size: 0.8rem;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .cardLink {
   text-decoration: none;
   color: inherit;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* MEDIA QUERIES PER RESPONSIVE */
+@media (max-width: 768px) {
+  .card img {
+    height: 150px !important; /* RESTA UGUALE SU MOBILE */
+  }
+
+  .title {
+    font-size: 0.7rem;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card img {
+    height: 120px !important; /* RESTA UGUALE SU MOBILE PICCOLO */
+  }
+
+  .title {
+    font-size: 0.6rem;
+    height: 35px;
+  }
 }

@@ -64,11 +64,51 @@
   margin-bottom: 30px;
 }
 
+/* GRIGLIA PERFETTA CON CELLE IDENTICHE */
 .reviewsGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 15px; /* Spazio più ampio per il desktop */
+  grid-template-columns: repeat(
+    6,
+    160px
+  ); /* LARGHEZZA FISSA 160px PER OGNI CELLA */
+  gap: 15px;
+  justify-content: center; /* CENTRA LA GRIGLIA */
+  grid-auto-rows: 280px; /* ALTEZZA FISSA 280px PER OGNI RIGA */
 }
+
+/* FORZA DIMENSIONI IDENTICHE ASSOLUTE */
+.reviewsGrid .card {
+  width: 160px !important; /* LARGHEZZA FISSA */
+  height: 280px !important; /* ALTEZZA FISSA */
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 160px !important;
+  min-width: 160px !important;
+  overflow: hidden !important;
+}
+
+.reviewsGrid .card img {
+  width: 160px !important; /* LARGHEZZA FISSA IDENTICA */
+  height: 240px !important; /* ALTEZZA FISSA IDENTICA */
+  object-fit: contain !important; /* MOSTRA TUTTA L'IMMAGINE */
+  object-position: center !important;
+  background-color: #1c1e21 !important; /* SFONDO PER EVENTUALI SPAZI */
+  flex-shrink: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.reviewsGrid .card .title {
+  width: 160px !important;
+  height: 40px !important; /* SPAZIO FISSO PER IL TITOLO */
+  padding: 5px !important;
+  font-size: 0.7rem !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
 .userList {
   display: flex;
   flex-direction: column;
@@ -238,11 +278,8 @@
   margin-left: 15px;
   flex-shrink: 0;
 }
-/* client/src/pages/ProfilePage.module.css */
 
-/* ... altri stili ... */
-
-/* Media Queries per il Mobile */
+/* MEDIA QUERIES PER MOBILE */
 @media (max-width: 768px) {
   .pageContainer {
     padding: 20px;
@@ -263,13 +300,32 @@
     font-size: 1.5rem;
   }
 
-  /* --- MODIFICA QUI --- */
+  /* 3 COLONNE SU MOBILE CON DIMENSIONI FISSE IDENTICHE */
   .reviewsGrid {
-    /* Aumentiamo le colonne a 4 per rendere le icone più piccole */
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, 120px) !important; /* 3 CELLE DA 120px */
+    gap: 10px !important;
+    grid-auto-rows: 200px !important; /* ALTEZZA FISSA 200px */
+    justify-content: center !important;
   }
-  /* --- FINE MODIFICA --- */
+
+  /* DIMENSIONI FISSE SU MOBILE */
+  .reviewsGrid .card {
+    width: 120px !important;
+    height: 200px !important;
+  }
+
+  .reviewsGrid .card img {
+    width: 120px !important;
+    height: 160px !important;
+    object-fit: contain !important;
+    background-color: #1c1e21 !important;
+  }
+
+  .reviewsGrid .card .title {
+    width: 120px !important;
+    height: 40px !important;
+    font-size: 0.6rem !important;
+  }
 
   .historyTitle {
     font-size: 0.9rem;
@@ -284,5 +340,31 @@
   .historyPoster {
     margin-left: 5px;
     margin-right: 10px;
+  }
+}
+
+/* MOBILE MOLTO PICCOLO */
+@media (max-width: 480px) {
+  .reviewsGrid {
+    grid-template-columns: repeat(3, 100px) !important; /* ANCORA PIÙ PICCOLE */
+    grid-auto-rows: 170px !important;
+  }
+
+  .reviewsGrid .card {
+    width: 100px !important;
+    height: 170px !important;
+  }
+
+  .reviewsGrid .card img {
+    width: 100px !important;
+    height: 140px !important;
+    object-fit: contain !important;
+    background-color: #1c1e21 !important;
+  }
+
+  .reviewsGrid .card .title {
+    width: 100px !important;
+    height: 30px !important;
+    font-size: 0.5rem !important;
   }
 }

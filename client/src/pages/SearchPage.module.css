@@ -40,16 +40,21 @@
   background-color: var(--secondary-color);
 }
 
+/* GRIGLIA CORRETTA PER LA RICERCA */
 .resultsGrid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
   justify-content: center;
-  gap: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 0;
 }
-/* --- Media Queries per il Mobile --- */
+
+/* MEDIA QUERIES PER MOBILE */
 @media (max-width: 768px) {
   .searchForm {
-    flex-direction: column; /* Impila input e bottone */
+    flex-direction: column;
     align-items: center;
     width: 90%;
     margin: 30px auto;
@@ -61,5 +66,12 @@
 
   .searchButton {
     width: 100%;
+  }
+
+  /* GRIGLIA PIÙ COMPATTA SU MOBILE */
+  .resultsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    padding: 15px;
   }
 }
