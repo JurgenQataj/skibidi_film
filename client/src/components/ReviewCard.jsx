@@ -8,8 +8,7 @@ import { it } from "date-fns/locale";
 function ReviewCard({ review, onInteraction }) {
   // CONTROLLO DI SICUREZZA FONDAMENTALE:
   // Se la recensione o i dati essenziali del film o dell'utente mancano, non renderizzare nulla.
-  // Questo previene il crash dell'applicazione.
-  if (!review || !review.movie || !review.user) {
+  if (!review || !review.movie || !review.user || !review.movie.tmdb_id) {
     console.warn(
       "ReviewCard ha ricevuto dati incompleti e non verrà renderizzata:",
       review
@@ -29,7 +28,7 @@ function ReviewCard({ review, onInteraction }) {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `${API_URL}/api/reactions/reviews/${review._id}`, // Usa _id, il vero ID dal database
+        `${API_URL}/api/reactions/reviews/${review._id}`,
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -65,7 +64,6 @@ function ReviewCard({ review, onInteraction }) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCommentText("");
-      // Ricarica i commenti per vedere subito quello nuovo
       toggleComments().then(() => toggleComments());
       if (onInteraction) onInteraction();
     } catch (error) {
@@ -84,7 +82,6 @@ function ReviewCard({ review, onInteraction }) {
     }
   };
 
-  // Estrai i dati in modo sicuro leggendo la struttura corretta
   const { movie, user, rating, comment_text, createdAt } = review;
   const reactionCount =
     review.reactions?.reduce(

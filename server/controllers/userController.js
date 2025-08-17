@@ -185,8 +185,14 @@ exports.getUserFeed = async (req, res) => {
 
     // 3. Cerca le recensioni degli utenti seguiti.
     const reviews = await Review.find({ user: { $in: followingIds } })
-      .populate("user", "username avatar_url _id")
-      .populate("movie", "title poster_path tmdb_id")
+      .populate({
+        path: "user",
+        select: "username avatar_url _id",
+      })
+      .populate({
+        path: "movie",
+        select: "title poster_path tmdb_id",
+      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
