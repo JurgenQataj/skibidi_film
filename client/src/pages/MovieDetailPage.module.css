@@ -373,13 +373,20 @@
   color: #eee;
 }
 
-/* === MOBILE - STRATEGIA PROFILEPAGE (RIPRISTINATA) === */
+/* === MOBILE - STRATEGIA PROFILEPAGE (RIDUZIONE 60% BACKGROUND) === */
 @media (max-width: 768px) {
   .pageContainer {
     padding: 10px; /* RIDOTTO DA 20px */
   }
 
-  /* HEADER CON SFONDO - RIDOTTO DRASTICAMENTE */
+  /* HEADER CON SFONDO - RIDOTTO DRASTICAMENTE (40% dell'originale = 60% in meno) */
+  .header {
+    width: 100%;
+    background-size: 40% auto; /* RIDOTTO DA cover A 40% per essere il 60% in meno */
+    background-position: center 20%;
+    background-repeat: no-repeat;
+  }
+
   .headerOverlay {
     padding: 5px; /* MOLTO RIDOTTO */
   }
@@ -525,6 +532,11 @@
 @media (max-width: 480px) {
   .pageContainer {
     padding: 8px; /* RIDOTTO DA 15px */
+  }
+
+  /* BACKGROUND ANCORA PIÙ RIDOTTO PER MOBILE MOLTO PICCOLO (30% dell'originale = 70% in meno) */
+  .header {
+    background-size: 30% auto; /* ANCORA PIÙ RIDOTTO PER MOBILE PICCOLO */
   }
 
   /* LOCANDINA TORNA NORMALE ANCHE SU MOBILE PICCOLO */
