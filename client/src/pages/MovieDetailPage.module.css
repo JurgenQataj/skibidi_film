@@ -289,24 +289,24 @@
   cursor: pointer;
 }
 
-/* Sostituisci tutto il codice @media alla fine del file con questo blocco */
+/* Inserisci o sostituisci questo blocco alla fine di /client/src/pages/MovieDetailPage.module.css */
 
-/* --- MEDIA QUERY PER TABLET E MOBILE --- */
+/* --- MEDIA QUERY PER TABLET E MOBILE (max-width: 768px) --- */
 @media (max-width: 768px) {
   /*
   MODIFICA CHIAVE #1: CONTENITORE PRINCIPALE
-  Questa è la regola più importante. Crea i margini laterali
-  e impedisce a QUALSIASI elemento figlio di "scappare" e causare lo scroll.
+  Questa è la regola fondamentale che risolve lo scorrimento.
+  Crea margini laterali e blocca qualsiasi overflow orizzontale.
   */
   .pageContainer {
-    padding: 0 15px;
-    overflow-x: hidden;
+    padding: 0 15px; /* Aggiunge margini laterali */
+    overflow-x: hidden; /* Blocca lo scorrimento orizzontale */
+    box-sizing: border-box;
   }
 
   /*
   MODIFICA CHIAVE #2: CONTENUTI INTERNI
-  Ora che il contenitore principale ha i margini, azzeriamo quelli dei figli
-  per evitare spaziature doppie e disallineamenti.
+  Azzeriamo il padding dei figli per evitare doppi margini.
   */
   .headerOverlay,
   .mainContent {
@@ -315,47 +315,40 @@
   }
 
   /*
-  MODIFICA CHIAVE #3: ELEMENTI PROBLEMATICI
-  La sezione recensioni e il suo titolo devono potersi restringere.
+  MODIFICA CHIAVE #3: RIDIMENSIONAMENTO
+  Riduciamo le dimensioni del poster, dei titoli e dei bottoni.
   */
-  .reviewsSection {
-    /* Questa regola permette al contenitore delle recensioni di adattarsi */
-    width: 100%;
-    box-sizing: border-box; /* Assicura che il padding non causi overflow */
-  }
-
-  .reviewsTitle {
-    font-size: 1.4rem;
-    word-wrap: break-word; /* Forza il testo ad andare a capo */
-  }
-
-  /*
-  Stili per migliorare l'aspetto nel nuovo layout più stretto
-  */
-  .headerContent {
-    flex-direction: column;
-    text-align: center;
-  }
-
   .poster {
     width: 50%;
-    max-width: 180px;
+    max-width: 180px; /* Poster più piccolo */
   }
 
   .title {
     font-size: 1.6rem;
   }
+
+  .reviewsTitle,
+  .castSection h2,
+  .overviewSection h3 {
+    font-size: 1.4rem;
+    word-wrap: break-word; /* Forza il testo ad andare a capo */
+  }
+
+  .actionButton {
+    padding: 8px 15px; /* Pulsanti più piccoli */
+    font-size: 0.8rem;
+  }
 }
 
-/* --- MEDIA QUERY PER MOBILE MOLTO PICCOLO --- */
+/* --- MEDIA QUERY PER MOBILE MOLTO PICCOLO (max-width: 480px) --- */
 @media (max-width: 480px) {
   .pageContainer {
-    padding: 0 10px; /* Margini ancora più piccoli */
+    padding: 0 10px; /* Margini ancora più stretti */
   }
 
   .poster {
     width: 45%;
-    max-width: 140px;
+    max-width: 140px; /* Poster ancora più piccolo */
   }
 
   .title {
@@ -369,7 +362,15 @@
   }
 
   .actionButton {
-    padding: 8px 14px;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+
+  .actorCard {
+    min-width: 90px;
+  }
+
+  .actorCard img {
+    height: 135px;
   }
 }
