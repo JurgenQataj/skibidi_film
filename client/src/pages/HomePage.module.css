@@ -1,7 +1,7 @@
 .pageContainer {
   width: 100%;
   max-width: 800px; /* Diamo una larghezza massima al contenuto */
-  margin: 0 auto;   /* Centriamo il contenitore */
+  margin: 0 auto; /* Centriamo il contenitore */
   padding: 20px;
   box-sizing: border-box;
 }
@@ -49,4 +49,19 @@
   color: white;
   font-size: 1.2rem;
   text-shadow: 1px 1px 4px black;
+}
+/* --- Media Queries per il Mobile --- */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 15px; /* Riduci il padding generale */
+  }
+
+  .title {
+    font-size: 1.8rem; /* Riduci la dimensione del titolo */
+  }
+
+  .logoutButton {
+    padding: 8px 15px; /* Rendi il bottone leggermente più piccolo */
+    font-size: 0.9rem;
+  }
 }
