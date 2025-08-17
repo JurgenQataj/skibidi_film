@@ -355,11 +355,11 @@
   }
 
   .actorCard {
-    min-width: 80px;
+    min-width: 60px;
   }
 
   .actorCard img {
-    height: 120px;
+    height: 90px;
   }
 
   .actorCard strong,
