@@ -2,17 +2,29 @@
   background-color: rgba(0, 0, 0, 0.3);
   padding: 30px;
   border-radius: var(--border-radius);
-  margin-bottom: 40px; /* **Aggiunto spazio sotto** */
+  margin-bottom: 40px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
+
 .inputGroup {
   margin-bottom: 20px;
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .inputGroup label {
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
 }
+
 .ratingInput,
 .commentTextarea {
   width: 100%;
@@ -23,7 +35,15 @@
   color: white;
   font-size: 1rem;
   box-sizing: border-box;
+  /* PREVENZIONE OVERFLOW */
+  max-width: 100%;
+  resize: vertical; /* Solo resize verticale per textarea */
 }
+
+.commentTextarea {
+  min-height: 80px; /* Altezza minima per textarea */
+}
+
 .submitButton {
   width: 100%;
   padding: 12px;
@@ -35,27 +55,137 @@
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  /* PREVENZIONE OVERFLOW */
+  box-sizing: border-box;
+  max-width: 100%;
 }
+
 .submitButton:hover {
   background-color: var(--secondary-color);
 }
+
 .error {
   color: #ff8a8a;
   margin-top: -10px;
   margin-bottom: 15px;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-/* In client/src/components/AddReviewForm.module.css */
-/* Inserisci questo blocco alla fine di /client/src/components/AddReviewForm.module.css */
-
+/* MEDIA QUERY PER TABLET E MOBILE */
 @media (max-width: 768px) {
   .formContainer {
-    padding: 20px;
+    padding: 20px; /* Padding ridotto */
     margin-top: 0;
+    margin-bottom: 30px;
+    /* ASSICURA CHE NON ESCA DALLO SCHERMO */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .inputGroup {
+    margin-bottom: 15px; /* Spazio ridotto tra i campi */
+  }
+
+  .inputGroup label {
+    font-size: 0.9rem; /* Label più piccole */
+    margin-bottom: 6px;
+  }
+
+  .ratingInput,
+  .commentTextarea {
+    padding: 12px; /* Padding maggiore per touch */
+    font-size: 1rem; /* Dimensione leggibile su mobile */
+    border-radius: 6px; /* Bordi meno arrotondati */
+  }
+
+  .ratingInput {
+    /* Specifico per il campo voto */
+    max-width: 120px; /* Non occupa tutta la larghezza */
+  }
+
+  .commentTextarea {
+    min-height: 100px; /* Textarea più grande per facilità di scrittura */
+    line-height: 1.4;
   }
 
   .submitButton {
-    padding: 12px; /* Rende il pulsante più piccolo */
+    padding: 14px; /* Pulsante più grande per touch */
+    font-size: 1rem;
+    border-radius: 6px;
+    /* IMPORTANTE: mantieni la larghezza piena */
+    width: 100%;
+  }
+
+  .error {
     font-size: 0.9rem;
+    margin-top: -8px;
+    margin-bottom: 12px;
+  }
+}
+
+/* MEDIA QUERY PER MOBILE MOLTO PICCOLO */
+@media (max-width: 480px) {
+  .formContainer {
+    padding: 15px; /* Padding ancora più ridotto */
+    margin-bottom: 20px;
+  }
+
+  .inputGroup {
+    margin-bottom: 12px;
+  }
+
+  .inputGroup label {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+  }
+
+  .ratingInput,
+  .commentTextarea {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+
+  .ratingInput {
+    max-width: 100px; /* Ancora più piccolo su schermi molto piccoli */
+  }
+
+  .commentTextarea {
+    min-height: 90px;
+  }
+
+  .submitButton {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  .error {
+    font-size: 0.85rem;
+  }
+}
+
+/* ACCESSIBILITÀ E TOUCH */
+@media (max-width: 768px) {
+  /* Miglior contrasto per i campi di input su mobile */
+  .ratingInput:focus,
+  .commentTextarea:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+    border-color: var(--primary-color);
+  }
+
+  /* Effetto hover migliorato per touch */
+  .submitButton:active {
+    transform: translateY(1px);
+    background-color: var(--secondary-color);
+  }
+
+  /* Assicura che i placeholder siano leggibili */
+  .ratingInput::placeholder,
+  .commentTextarea::placeholder {
+    color: #aaa;
+    opacity: 1;
   }
 }

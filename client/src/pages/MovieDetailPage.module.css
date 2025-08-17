@@ -2,6 +2,11 @@
 .pageContainer {
   color: white;
   padding-bottom: 30px;
+  /* AGGIUNTE CHIAVE PER EVITARE SCROLL ORIZZONTALE */
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .loading {
@@ -20,6 +25,9 @@
 .headerOverlay {
   background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
   padding: 20px 15px;
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .headerContent {
@@ -28,8 +36,11 @@
   align-items: center;
   text-align: center;
   gap: 20px;
-  max-width: 1200px; /* Aggiunto per coerenza */
+  max-width: 1200px;
   margin: 0 auto;
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .poster {
@@ -42,11 +53,17 @@
 
 .details {
   width: 100%;
+  /* PREVENZIONE OVERFLOW */
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 1.8rem;
   margin: 0 0 10px 0;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .tagline {
@@ -54,6 +71,9 @@
   font-style: italic;
   color: #ccc;
   margin-bottom: 20px;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .director {
@@ -64,6 +84,8 @@
   display: flex;
   gap: 10px;
   justify-content: center;
+  /* PREVENZIONE OVERFLOW BOTTONI */
+  flex-wrap: wrap;
 }
 
 /* Contenuto principale sotto l'header */
@@ -71,6 +93,10 @@
   padding: 0 15px;
   margin: 25px auto;
   max-width: 1200px;
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .overviewSection h3 {
@@ -78,11 +104,16 @@
   border-bottom: 2px solid var(--primary-color);
   padding-bottom: 10px;
   margin-bottom: 15px;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
 }
 
 .overview {
   font-size: 0.9rem;
   line-height: 1.6;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .infoSection {
@@ -93,12 +124,17 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .infoBox {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* PREVENZIONE OVERFLOW */
+  min-width: 0;
 }
 
 .infoBox h4 {
@@ -106,16 +142,25 @@
   color: #ccc;
   font-weight: normal;
   font-size: 0.9rem;
+  /* PREVENZIONE TESTO LUNGO */
+  flex-shrink: 0;
 }
 
 .infoBox p {
   margin: 0;
   font-size: 1.1rem;
   font-weight: bold;
+  /* PREVENZIONE TESTO LUNGO */
+  text-align: right;
+  word-wrap: break-word;
+  min-width: 0;
 }
 
 .castSection {
   margin-top: 40px;
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .castSection h2 {
@@ -123,6 +168,8 @@
   border-bottom: 2px solid var(--primary-color);
   padding-bottom: 10px;
   margin-bottom: 15px;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
 }
 
 .castGrid {
@@ -130,10 +177,14 @@
   overflow-x: auto;
   gap: 15px;
   padding: 10px 5px;
+  /* SCROLL ORIZZONTALE SOLO PER IL CAST */
+  -webkit-overflow-scrolling: touch;
 }
 
 .actorCard {
   min-width: 120px;
+  /* PREVENZIONE SHRINK */
+  flex-shrink: 0;
 }
 
 .actorCard img {
@@ -148,6 +199,9 @@
   font-size: 0.8rem;
   padding: 5px;
   display: block;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .reviewsSection {
@@ -155,6 +209,10 @@
   background-color: rgba(10, 10, 10, 0.7);
   padding: 20px;
   border-radius: var(--border-radius);
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .reviewsTitle {
@@ -167,6 +225,8 @@
   padding-bottom: 15px;
   margin-top: 0;
   margin-bottom: 20px;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
 }
 
 .reviewStats {
@@ -180,6 +240,10 @@
   border-radius: var(--border-radius);
   margin-bottom: 15px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .reviewHeader {
@@ -187,12 +251,16 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  /* PREVENZIONE OVERFLOW */
+  min-width: 0;
 }
 
 .reviewHeader div {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* PREVENZIONE OVERFLOW */
+  min-width: 0;
 }
 
 .reviewActions {
@@ -202,6 +270,9 @@
   align-items: center;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 10px;
+  /* PREVENZIONE OVERFLOW */
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .reactions {
@@ -230,6 +301,9 @@
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.9rem;
+  /* PREVENZIONE OVERFLOW */
+  word-wrap: break-word;
+  white-space: nowrap;
 }
 .actionButton {
   background-color: var(--primary-color);
@@ -257,20 +331,65 @@
   color: white;
 }
 
+/* Dropdown liste */
+.listsDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #282c34;
+  border-radius: var(--border-radius);
+  border: 1px solid #555;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  z-index: 1000;
+  /* PREVENZIONE OVERFLOW */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.listButton {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 5px;
+  background: none;
+  border: 1px solid #555;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  text-align: left;
+}
+.listButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Sezione commenti */
 .commentsSection {
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
 }
 .commentItem {
   font-size: 0.9rem;
   margin-bottom: 5px;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .commentForm {
   display: flex;
   gap: 10px;
   margin-top: 15px;
+  /* PREVENZIONE OVERFLOW */
+  width: 100%;
+  box-sizing: border-box;
 }
 .commentForm input {
   flex: 1;
@@ -279,6 +398,9 @@
   border-radius: 5px;
   padding: 8px;
   color: white;
+  /* PREVENZIONE OVERFLOW */
+  min-width: 0;
+  box-sizing: border-box;
 }
 .commentForm button {
   background-color: var(--primary-color);
@@ -287,90 +409,256 @@
   border-radius: 5px;
   padding: 8px 12px;
   cursor: pointer;
+  /* PREVENZIONE SHRINK */
+  flex-shrink: 0;
 }
 
-/* Inserisci o sostituisci questo blocco alla fine di /client/src/pages/MovieDetailPage.module.css */
+.deleteCommentButton {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  transition: color 0.2s;
+  /* PREVENZIONE SHRINK */
+  flex-shrink: 0;
+}
+
+.deleteCommentButton:hover {
+  color: #ff4d4d;
+}
+
+.alreadyReviewedMessage {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.authorLink {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+}
+.authorLink:hover {
+  text-decoration: underline;
+}
+
+.reviewAuthor {
+  color: var(--primary-color);
+}
+
+.reviewRating {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--secondary-color);
+}
+
+.reviewComment {
+  margin: 10px 0;
+  font-style: italic;
+  color: #eee;
+  /* PREVENZIONE TESTO LUNGO */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 
 /* --- MEDIA QUERY PER TABLET E MOBILE (max-width: 768px) --- */
 @media (max-width: 768px) {
-  /*
-  MODIFICA CHIAVE #1: CONTENITORE PRINCIPALE
-  Questa è la regola fondamentale che risolve lo scorrimento.
-  Crea margini laterali e blocca qualsiasi overflow orizzontale.
-  */
   .pageContainer {
-    padding: 0 15px; /* Aggiunge margini laterali */
-    overflow-x: hidden; /* Blocca lo scorrimento orizzontale */
-    box-sizing: border-box;
+    padding: 0 10px; /* Riduco il padding laterale */
+    max-width: 100%;
+    overflow-x: hidden; /* FONDAMENTALE */
   }
 
-  /*
-  MODIFICA CHIAVE #2: CONTENUTI INTERNI
-  Azzeriamo il padding dei figli per evitare doppi margini.
-  */
-  .headerOverlay,
+  .headerOverlay {
+    padding: 15px 10px; /* Riduco il padding */
+  }
+
   .mainContent {
-    padding-left: 0;
-    padding-right: 0;
+    padding: 0 5px; /* Riduco ancora di più il padding */
+    margin: 20px auto;
   }
 
-  /*
-  MODIFICA CHIAVE #3: RIDIMENSIONAMENTO
-  Riduciamo le dimensioni del poster, dei titoli e dei bottoni.
-  */
   .poster {
-    width: 50%;
-    max-width: 180px; /* Poster più piccolo */
+    width: 45%; /* Poster più piccolo */
+    max-width: 150px; /* Limite più basso */
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: 1.4rem; /* Titolo più piccolo */
   }
 
-  .reviewsTitle,
-  .castSection h2,
-  .overviewSection h3 {
-    font-size: 1.4rem;
-    word-wrap: break-word; /* Forza il testo ad andare a capo */
+  .tagline {
+    font-size: 0.9rem;
+  }
+
+  .director {
+    display: block; /* Mostra il regista su mobile */
+    font-size: 0.8rem;
+    margin-bottom: 15px;
+  }
+
+  .actions {
+    gap: 8px; /* Spazio ridotto tra bottoni */
   }
 
   .actionButton {
-    padding: 8px 15px; /* Pulsanti più piccoli */
+    padding: 6px 12px; /* Bottoni più piccoli */
     font-size: 0.8rem;
+  }
+
+  .overviewSection h3,
+  .castSection h2,
+  .reviewsTitle {
+    font-size: 1.3rem; /* Titoli sezioni più piccoli */
+  }
+
+  .overview {
+    font-size: 0.85rem;
+  }
+
+  .infoSection {
+    padding: 15px; /* Padding ridotto */
+  }
+
+  .infoBox h4 {
+    font-size: 0.8rem;
+  }
+
+  .infoBox p {
+    font-size: 1rem;
+  }
+
+  .actorCard {
+    min-width: 100px; /* Card attori più piccole */
+  }
+
+  .actorCard img {
+    height: 150px; /* Immagini attori più piccole */
+  }
+
+  .actorCard strong,
+  .actorCard span {
+    font-size: 0.7rem;
+    padding: 3px;
+  }
+
+  .reviewsSection {
+    padding: 15px; /* Padding ridotto */
+  }
+
+  .reviewItem {
+    padding: 12px; /* Padding ridotto */
+  }
+
+  .reviewHeader {
+    flex-direction: column; /* Stack verticale */
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .reviewActions {
+    flex-direction: column; /* Stack verticale */
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .commentButton,
+  .deleteButton {
+    padding: 6px 10px; /* Bottoni più piccoli */
+    font-size: 0.8rem;
+  }
+
+  .commentForm {
+    flex-direction: column; /* Stack verticale */
+    gap: 8px;
+  }
+
+  .commentForm input {
+    padding: 10px; /* Input più grande per touch */
+  }
+
+  .commentForm button {
+    padding: 10px 15px; /* Bottone più grande per touch */
+    align-self: flex-start;
   }
 }
 
 /* --- MEDIA QUERY PER MOBILE MOLTO PICCOLO (max-width: 480px) --- */
 @media (max-width: 480px) {
   .pageContainer {
-    padding: 0 10px; /* Margini ancora più stretti */
+    padding: 0 8px; /* Padding ancora più ridotto */
+  }
+
+  .headerOverlay {
+    padding: 12px 8px;
+  }
+
+  .mainContent {
+    padding: 0 3px;
+    margin: 15px auto;
   }
 
   .poster {
-    width: 45%;
-    max-width: 140px; /* Poster ancora più piccolo */
+    width: 40%; /* Poster ancora più piccolo */
+    max-width: 120px;
   }
 
   .title {
-    font-size: 1.4rem;
+    font-size: 1.2rem; /* Titolo ancora più piccolo */
   }
 
-  .reviewsTitle,
-  .castSection h2,
-  .overviewSection h3 {
-    font-size: 1.2rem;
+  .tagline {
+    font-size: 0.8rem;
   }
 
   .actionButton {
-    padding: 6px 12px;
+    padding: 5px 10px; /* Bottoni ancora più piccoli */
     font-size: 0.7rem;
   }
 
+  .overviewSection h3,
+  .castSection h2,
+  .reviewsTitle {
+    font-size: 1.1rem;
+  }
+
+  .overview {
+    font-size: 0.8rem;
+  }
+
+  .infoSection {
+    padding: 12px;
+  }
+
   .actorCard {
-    min-width: 90px;
+    min-width: 80px;
   }
 
   .actorCard img {
-    height: 135px;
+    height: 120px;
+  }
+
+  .actorCard strong,
+  .actorCard span {
+    font-size: 0.65rem;
+    padding: 2px;
+  }
+
+  .reviewsSection {
+    padding: 12px;
+  }
+
+  .reviewItem {
+    padding: 10px;
+  }
+
+  .reactions button {
+    font-size: 1.2rem; /* Emoji più piccole */
   }
 }
