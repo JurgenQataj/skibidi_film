@@ -115,28 +115,33 @@
 
 @media (max-width: 768px) {
   /*
-  MODIFICA CHIAVE: Applichiamo un padding del 25% su ogni lato.
-  Questo forza il contenuto a occupare solo il 50% centrale dello schermo,
-  dimezzando la larghezza come richiesto e bloccando lo scorrimento.
+  === LA MODIFICA CHIAVE È QUI ===
+  Ho aggiunto un padding (spazio interno) ai lati del contenitore principale.
+  Questo restringe l'area visibile e impedisce a qualsiasi elemento di
+  "sbordare", eliminando lo scorrimento orizzontale.
   */
   .pageContainer {
-    padding-left: 25%;
-    padding-right: 25%;
-    overflow-x: hidden; /* Blocca definitivamente lo scorrimento orizzontale */
+    padding-left: 20px; /* <-- PUOI REGOLARE QUESTO VALORE */
+    padding-right: 20px; /* <-- PUOI REGOLARE QUESTO VALORE */
   }
 
-  /* La barra di ricerca si adatterà automaticamente al nuovo contenitore super stretto */
   .searchForm {
     flex-direction: column;
     align-items: center;
-    width: 100%; /* Occuperà il 100% dello spazio centrale del 50% */
-    max-width: none; /* Rimuoviamo il limite di 280px che non serve più */
+    width: 100%; /* Occupa il 100% del nuovo contenitore stretto */
+    max-width: 280px;
   }
 
-  /* Adattiamo anche la griglia dei risultati */
   .resultsGrid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
     padding: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .resultsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
   }
 }
