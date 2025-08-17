@@ -290,48 +290,46 @@
 }
 
 @media (max-width: 768px) {
-  /* MODIFICA: Il contenuto principale della pagina (header e main)
-     ora occupa l'80% della larghezza dello schermo, risultando più stretto. */
-  .headerContent,
-  .mainContent {
-    max-width: 40%;
-    padding-left: 0;
-    padding-right: 0;
+  .pageContainer {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .headerOverlay {
-    padding: 20px 0; /* Rimosso padding laterale per centrare il contenuto */
+    padding: 20px 0;
   }
 
-  /* MODIFICA: La larghezza del poster è stata dimezzata rispetto alla versione mobile precedente,
-     passando da 60% a 30% della larghezza del suo contenitore. */
-  .poster {
-    width: 30%;
-    max-width: 150px;
-    height: auto;
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+    width: 100%;
+  }
+
+  .mainContent {
+    padding: 0;
+    margin: 25px auto;
   }
 
   .title {
-    font-size: 1.5rem;
-  }
-
-  .tagline {
-    font-size: 0.9rem;
+    font-size: 1.8rem;
   }
 
   .director {
     display: none;
   }
 
-  .actions {
-    flex-wrap: wrap;
-    gap: 8px;
+  .actorCard {
+    min-width: 60px;
+  }
+  .actorCard img {
+    height: 80px;
   }
 
-  .mainContent {
-    padding: 0 15px;
-    margin: 25px auto;
-    max-width: 90%;
+  /* REINTEGRATE TUTTE LE REGOLE MANCANTI DA QUI IN POI */
+  .actorCard strong,
+  .actorCard span {
+    font-size: 0.7rem;
   }
 
   .overviewSection h3,
@@ -343,31 +341,6 @@
   .infoSection {
     flex-direction: column;
     padding: 15px;
-  }
-
-  .infoBox h4 {
-    font-size: 0.8rem;
-  }
-
-  .infoBox p {
-    font-size: 1rem;
-  }
-
-  .castGrid {
-    gap: 10px;
-  }
-
-  .actorCard {
-    min-width: 60px;
-  }
-
-  .actorCard img {
-    height: 90px;
-  }
-
-  .actorCard strong,
-  .actorCard span {
-    font-size: 0.7rem;
   }
 
   .reviewsSection {
