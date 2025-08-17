@@ -46,7 +46,6 @@ function ReviewCard({ review, onInteraction }) {
       setComments({ shown: false, list: [] });
     } else {
       try {
-        // highlight-next-line
         const response = await axios.get(
           `${API_URL}/api/reviews/${review._id}/comments`
         );
@@ -59,23 +58,18 @@ function ReviewCard({ review, onInteraction }) {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-
     if (!commentText.trim()) {
       alert("Il commento non può essere vuoto.");
       return;
     }
-
     if (!token) {
       alert("Devi essere loggato per commentare.");
       return;
     }
-
     setIsSubmittingComment(true);
     const payload = { comment_text: commentText.trim() };
-
     try {
       const response = await axios.post(
-        // highlight-next-line
         `${API_URL}/api/reviews/${review._id}/comments`,
         payload,
         {
@@ -85,10 +79,8 @@ function ReviewCard({ review, onInteraction }) {
           },
         }
       );
-
       setCommentText("");
       setComments({ shown: true, list: response.data || [] });
-
       if (onInteraction) {
         onInteraction();
       }
@@ -106,25 +98,19 @@ function ReviewCard({ review, onInteraction }) {
     if (!window.confirm("Sei sicuro di voler eliminare questo commento?")) {
       return;
     }
-
     setIsDeletingComment(commentId);
-
     try {
       await axios.delete(
-        // highlight-next-line
         `${API_URL}/api/reviews/${review._id}/comments/${commentId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+      // Ricarica i commenti dopo l'eliminazione
       const response = await axios.get(
-        // highlight-next-line
         `${API_URL}/api/reviews/${review._id}/comments`
       );
-
       setComments({ shown: true, list: response.data || [] });
-
       if (onInteraction) {
         onInteraction();
       }

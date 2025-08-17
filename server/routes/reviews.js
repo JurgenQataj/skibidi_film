@@ -1,18 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const reviewController = require('../controllers/reviewController');
-const authMiddleware = require('../middleware/authMiddleware');
+const reviewController = require("../controllers/reviewController");
+const authMiddleware = require("../middleware/authMiddleware");
+const commentsRouter = require("./comments"); // Importiamo il router dei commenti
 
-// Rotta per aggiungere una recensione
-router.post('/', authMiddleware, reviewController.addReview);
+// Quando una richiesta arriva a /:reviewId/comments, usa il router dei commenti
+router.use("/:reviewId/comments", commentsRouter);
 
-// Rotta per ottenere le recensioni di un film
-router.get('/movie/:tmdbId', reviewController.getReviewsForMovie);
-
-// NUOVA rotta per controllare se l'utente ha già recensito
-router.get('/status/:tmdbId', authMiddleware, reviewController.checkUserReviewStatus);
-
-// Rotta per eliminare una recensione
-router.delete('/:reviewId', authMiddleware, reviewController.deleteReview);
+// Rotte esistenti per le recensioni
+router.post("/", authMiddleware, reviewController.addReview);
+router.get("/movie/:tmdbId", reviewController.getReviewsForMovie);
+router.get(
+  "/status/:tmdbId",
+  authMiddleware,
+  reviewController.checkUserReviewStatus
+);
+router.delete("/:reviewId", authMiddleware, reviewController.deleteReview);
 
 module.exports = router;
