@@ -138,9 +138,10 @@
 
   /* CARD */
   .resultsGrid :global(.card) {
-    --title-height: 8px; /* 🔑 quasi zero spazio sotto l’immagine */
+    --title-height: 8px;
     width: 120px !important;
-    height: calc(185px + var(--title-height)) !important;
+    /* MODIFICA: Aggiornato il calcolo con la nuova altezza dell'immagine */
+    height: calc(204px + var(--title-height)) !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -150,7 +151,8 @@
   /* IMMAGINE */
   .resultsGrid :global(.card img) {
     width: 120px !important;
-    height: 185px !important;
+    /* MODIFICA: Aumentata l'altezza da 185px a 204px (circa +10%) */
+    height: 204px !important;
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
@@ -174,9 +176,10 @@
   }
 
   .resultsGrid :global(.card) {
-    --title-height: 8px; /* 🔑 idem su schermi piccoli */
+    --title-height: 8px;
     width: 100px !important;
-    height: calc(160px + var(--title-height)) !important;
+    /* MODIFICA: Aggiornato il calcolo con la nuova altezza dell'immagine */
+    height: calc(176px + var(--title-height)) !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -184,7 +187,8 @@
 
   .resultsGrid :global(.card img) {
     width: 100px !important;
-    height: 160px !important;
+    /* MODIFICA: Aumentata l'altezza da 160px a 176px (+10%) */
+    height: 176px !important;
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
