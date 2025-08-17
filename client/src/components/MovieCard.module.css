@@ -1,13 +1,16 @@
+/* client/src/components/MovieCard.module.css */
+
 .card {
-  /* RIDOTTA LA LARGHEZZA PER FARNE ENTRARE DI PIÙ */
-  width: 130px;
+  /* ✅ LA SOLUZIONE: rendiamo la larghezza flessibile al 100% del suo contenitore (la cella della griglia) */
+  width: 100%;
   background-color: #1c1e21;
   border-radius: var(--border-radius);
   overflow: hidden;
-  margin: 5px; /* Ridotto anche il margine */
   color: white;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
+  /* Rimuoviamo il margine per un controllo più preciso dal gap della griglia */
+  margin: 0;
 }
 
 .card:hover {
@@ -16,36 +19,23 @@
 
 .card img {
   width: 100%;
-  /* RIDOTTA L'ALTEZZA IN PROPORZIONE */
-  height: 195px;
-  object-fit: cover;
   display: block;
+  /* Mantiene le proporzioni corrette (altezza = 1.5 * larghezza) */
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background-color: #333; /* Colore di sfondo mentre carica l'immagine */
 }
 
 .title {
-  padding: 8px; /* Ridotto il padding */
+  padding: 8px;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* RIDOTTA LA DIMENSIONE DEL FONT */
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Riduciamo un po' il font per schermi piccoli */
 }
 
 .cardLink {
   text-decoration: none;
   color: inherit;
-}
-
-/* --- Media Queries per il Mobile --- */
-@media (max-width: 768px) {
-  .card {
-    /* Aumenta leggermente la larghezza per una migliore visibilità */
-    width: 140px;
-    margin: 5px;
-  }
-
-  .card img {
-    height: 210px;
-  }
 }
