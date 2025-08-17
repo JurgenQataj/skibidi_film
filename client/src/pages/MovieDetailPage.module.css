@@ -289,30 +289,46 @@
   cursor: pointer;
 }
 
+/* --- Media Query ESCLUSIVAMENTE per il MOBILE --- */
 @media (max-width: 768px) {
+  /*
+  MODIFICA CHIAVE #1: Forziamo la pagina a non superare mai la larghezza dello schermo.
+  'width: 100vw' imposta la larghezza esattamente a quella del viewport (lo schermo).
+  'overflow-x: hidden' VIETA lo scorrimento orizzontale. Questo è il fix principale.
+  */
   .pageContainer {
-    padding-left: 20px;
-    padding-right: 20px;
+    width: 100vw;
+    overflow-x: hidden;
+    padding: 0; /* Rimuoviamo il padding vecchio per un controllo migliore */
   }
 
+  /*
+  MODIFICA CHIAVE #2: Riduciamo la larghezza del contenuto del 40%.
+  Impostando 'width: 90%' e centrando con 'margin: auto', il contenuto
+  sarà notevolmente più stretto, risolvendo il problema del titolo tagliato.
+  */
+  .headerContent,
+  .mainContent {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Adattamenti degli elementi interni al nuovo layout stretto */
   .headerOverlay {
     padding: 20px 0;
   }
 
-  .headerContent {
-    flex-direction: column;
-    text-align: center;
-    gap: 15px;
-    width: 100%;
-  }
-
-  .mainContent {
-    padding: 0;
-    margin: 25px auto;
-  }
-
   .title {
     font-size: 1.8rem;
+  }
+
+  .poster {
+    width: 50%;
+    max-width: 180px;
+    height: auto;
   }
 
   .director {
@@ -326,7 +342,6 @@
     height: 80px;
   }
 
-  /* REINTEGRATE TUTTE LE REGOLE MANCANTI DA QUI IN POI */
   .actorCard strong,
   .actorCard span {
     font-size: 0.7rem;
@@ -350,20 +365,5 @@
   .reviewsTitle {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .reviewStats {
-    font-size: 0.8rem;
-  }
-
-  .reactions button {
-    font-size: 1.2rem;
-  }
-
-  .actionButton,
-  .deleteButton,
-  .commentButton {
-    padding: 6px 12px;
-    font-size: 0.8rem;
   }
 }
