@@ -289,64 +289,105 @@
   cursor: pointer;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
   .headerOverlay {
-    padding: 50px 40px;
-    background: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.95) 20%,
-      rgba(0, 0, 0, 0.7) 50%,
-      rgba(0, 0, 0, 0.4) 100%
-    );
+    padding: 20px 15px;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
   }
 
   .headerContent {
-    flex-direction: row;
-    text-align: left;
-    gap: 40px;
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+    max-width: 90%;
   }
 
   .poster {
-    width: 300px;
-    max-width: none;
-    height: 450px;
+    width: 45%;
+    max-width: 150px;
+    height: auto;
   }
 
   .title {
-    font-size: 3rem;
+    font-size: 1.5rem;
+  }
+
+  .tagline {
+    font-size: 0.9rem;
   }
 
   .director {
-    display: block; /* Mostra di nuovo il regista */
+    display: none;
   }
 
   .actions {
-    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .mainContent {
-    padding: 0 40px;
-    margin: 40px auto;
+    padding: 0 15px;
+    margin: 25px auto;
+    max-width: 90%;
   }
 
   .overviewSection h3,
   .castSection h2,
   .reviewsTitle {
-    font-size: 2rem;
+    font-size: 1.3rem;
   }
 
   .infoSection {
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
+    padding: 15px;
   }
 
-  .reviewsTitle {
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
+  .infoBox h4 {
+    font-size: 0.8rem;
+  }
+
+  .infoBox p {
+    font-size: 1rem;
+  }
+
+  .castGrid {
+    gap: 10px;
+  }
+
+  .actorCard {
+    min-width: 80px;
+  }
+
+  .actorCard img {
+    height: 120px;
+  }
+
+  .actorCard strong,
+  .actorCard span {
+    font-size: 0.7rem;
   }
 
   .reviewsSection {
-    padding: 40px;
+    padding: 15px;
+  }
+
+  .reviewsTitle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reviewStats {
+    font-size: 0.8rem;
+  }
+
+  .reactions button {
+    font-size: 1.2rem;
+  }
+
+  .actionButton,
+  .deleteButton,
+  .commentButton {
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 }
