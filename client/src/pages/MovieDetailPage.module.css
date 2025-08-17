@@ -1,4 +1,4 @@
-/* Stile base Mobile-First */
+/* Stile base Desktop - INVARIATO */
 .pageContainer {
   color: white;
   padding-bottom: 30px;
@@ -57,7 +57,7 @@
 }
 
 .director {
-  display: none; /* Nascosto su mobile per compattezza */
+  display: none;
 }
 
 .actions {
@@ -66,7 +66,6 @@
   justify-content: center;
 }
 
-/* Contenuto principale sotto l'header */
 .mainContent {
   padding: 0 15px;
   margin: 25px auto;
@@ -219,7 +218,6 @@
   padding: 0;
 }
 
-/* Stili comuni per i bottoni */
 .actionButton,
 .deleteButton,
 .commentButton {
@@ -257,7 +255,6 @@
   color: white;
 }
 
-/* Dropdown liste */
 .listsDropdown {
   position: absolute;
   top: 100%;
@@ -287,7 +284,6 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Sezione commenti */
 .commentsSection {
   margin-top: 15px;
   padding-top: 15px;
@@ -368,248 +364,209 @@
   color: #eee;
 }
 
-/* === MEDIA QUERY MOBILE COMPLETA === */
+/* === MOBILE - STRATEGIA PROFILEPAGE === */
 @media (max-width: 768px) {
-  /* CONTAINER PRINCIPALE - SOLUZIONE AL PROBLEMA */
+  /* CONTAINER PRINCIPALE - Come ProfilePage */
   .pageContainer {
-    /* RIMUOVI TUTTI I PADDING/MARGIN CHE CAUSANO OVERFLOW */
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100vw !important; /* Forza larghezza viewport */
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-    box-sizing: border-box !important;
+    padding: 20px; /* Stesso del ProfilePage */
   }
 
-  /* HEADER */
+  /* HEADER - Molto più compatto */
   .headerOverlay {
-    padding: 15px !important; /* Padding uniforme */
-    width: 100% !important;
-    box-sizing: border-box !important;
+    padding: 15px; /* Ridotto */
   }
 
   .headerContent {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    gap: 15px; /* Spazio ridotto */
   }
 
+  /* POSTER - Molto più piccolo come gli avatar del ProfilePage */
   .poster {
-    width: 40% !important; /* Poster più piccolo */
-    max-width: 140px !important;
+    width: 30%; /* Molto più piccolo */
+    max-width: 100px; /* Come gli avatar piccoli */
   }
 
+  /* TITOLO - Più compatto */
   .title {
-    font-size: 1.3rem !important;
-    text-align: center !important;
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
+    font-size: 1.2rem; /* Ridotto drasticamente */
+    margin: 0 0 5px 0;
   }
 
   .tagline {
-    font-size: 0.85rem !important;
-    text-align: center !important;
+    font-size: 0.8rem; /* Molto piccolo */
+    margin-bottom: 10px;
   }
 
+  /* AZIONI - Come i bottoni del ProfilePage */
   .actions {
-    flex-direction: column !important;
-    gap: 8px !important;
+    gap: 8px;
+    flex-direction: column;
   }
 
   .actionButton {
-    padding: 8px 16px !important;
-    font-size: 0.8rem !important;
-    width: fit-content !important;
-    align-self: center !important;
+    padding: 8px 15px; /* Come editButton del ProfilePage */
+    font-size: 0.85rem;
+    width: fit-content;
   }
 
-  /* CONTENUTO PRINCIPALE */
+  /* CONTENUTO PRINCIPALE - Come ProfilePage */
   .mainContent {
-    /* QUI STA IL PROBLEMA PRINCIPALE */
-    padding: 0 15px !important; /* Padding consistente */
-    margin: 20px 0 !important; /* Solo margin verticale */
-    width: 100% !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
+    padding: 0; /* ProfilePage ha padding: 0 per il contenuto interno */
+    margin: 15px 0; /* Margin ridotto */
   }
 
-  /* SEZIONI */
+  /* SEZIONI - Titoli più piccoli come ProfilePage */
   .overviewSection h3,
-  .castSection h2,
+  .castSection h2 {
+    font-size: 1.3rem; /* Come sectionTitle del ProfilePage */
+    margin-bottom: 20px;
+  }
+
   .reviewsTitle {
-    font-size: 1.2rem !important;
-    margin-left: 0 !important;
-    word-wrap: break-word !important;
+    font-size: 1.3rem; /* Uguale alle altre sezioni */
   }
 
   .overview {
-    font-size: 0.85rem !important;
-    line-height: 1.5 !important;
+    font-size: 0.85rem;
+    line-height: 1.5;
   }
 
-  /* INFO SECTION */
+  /* INFO SECTION - Più compatta */
   .infoSection {
-    padding: 15px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .infoBox {
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
+    padding: 15px;
+    margin-top: 20px;
   }
 
   .infoBox h4 {
-    font-size: 0.8rem !important;
+    font-size: 0.8rem;
   }
 
   .infoBox p {
-    font-size: 0.9rem !important;
-    text-align: right !important;
+    font-size: 0.9rem;
   }
 
-  /* CAST SECTION */
-  .castSection {
-    width: 100% !important;
-    overflow: visible !important; /* Rimuovi overflow hidden che potrebbe tagliare */
-  }
-
+  /* CAST - Molto più piccole come le MovieCard del ProfilePage */
   .castGrid {
-    overflow-x: auto !important;
-    padding: 10px 0 !important; /* Riduci padding laterale */
-    gap: 10px !important;
-    -webkit-overflow-scrolling: touch !important;
+    gap: 8px; /* Gap ridotto come ProfilePage grid */
+    padding: 5px 0;
   }
 
   .actorCard {
-    min-width: 90px !important;
-    flex-shrink: 0 !important;
+    min-width: 70px; /* Molto più piccole */
   }
 
   .actorCard img {
-    height: 135px !important;
+    height: 105px; /* Altezza ridotta drasticamente */
   }
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.7rem !important;
-    padding: 3px !important;
+    font-size: 0.65rem; /* Font piccolissimo */
+    padding: 2px;
   }
 
-  /* REVIEWS SECTION */
+  /* REVIEWS SECTION - Come le card del ProfilePage */
   .reviewsSection {
-    padding: 15px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    margin-top: 30px !important;
+    padding: 15px;
+    margin-top: 25px;
   }
 
   .reviewItem {
-    padding: 12px !important;
-    margin-bottom: 15px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    padding: 10px; /* Padding ridotto */
+    margin-bottom: 12px;
   }
 
   .reviewHeader {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 8px !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
   }
 
   .reviewActions {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 10px !important;
+    flex-direction: row; /* Mantieni orizzontale ma compatto */
+    justify-content: space-between;
   }
 
-  .reactions {
-    align-self: flex-start !important;
+  .reactions button {
+    font-size: 1.2rem; /* Emoji più piccole */
   }
 
+  /* BOTTONI COMMENTI - Come i bottoni del ProfilePage */
   .commentButton,
   .deleteButton {
-    padding: 6px 12px !important;
-    font-size: 0.8rem !important;
+    padding: 6px 10px; /* Padding ridotto */
+    font-size: 0.8rem;
   }
 
-  /* COMMENT FORM */
+  /* FORM COMMENTI - Ottimizzato per mobile */
   .commentForm {
-    flex-direction: column !important;
-    gap: 8px !important;
-    width: 100% !important;
+    gap: 8px;
   }
 
   .commentForm input {
-    padding: 10px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    padding: 12px; /* Padding maggiore per touch */
+    font-size: 0.9rem;
   }
 
   .commentForm button {
-    padding: 10px 15px !important;
-    width: fit-content !important;
-    align-self: flex-start !important;
+    padding: 12px 15px; /* Touch-friendly */
+    font-size: 0.85rem;
   }
 }
 
-/* MOBILE MOLTO PICCOLO */
+/* MOBILE PICCOLO - Ancora più compatto */
 @media (max-width: 480px) {
   .pageContainer {
-    padding: 0 !important;
-  }
-
-  .headerOverlay {
-    padding: 10px !important;
-  }
-
-  .mainContent {
-    padding: 0 10px !important;
+    padding: 15px; /* Ancora più ridotto */
   }
 
   .poster {
-    width: 35% !important;
-    max-width: 120px !important;
+    width: 25%;
+    max-width: 80px; /* Piccolissimo */
   }
 
   .title {
-    font-size: 1.1rem !important;
+    font-size: 1.1rem;
   }
 
   .tagline {
-    font-size: 0.8rem !important;
+    font-size: 0.75rem;
   }
 
   .actionButton {
-    padding: 6px 12px !important;
-    font-size: 0.75rem !important;
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 
   .overviewSection h3,
   .castSection h2,
   .reviewsTitle {
-    font-size: 1.1rem !important;
+    font-size: 1.2rem;
   }
 
   .overview {
-    font-size: 0.8rem !important;
-  }
-
-  .infoSection {
-    padding: 12px !important;
-  }
-
-  .reviewsSection {
-    padding: 12px !important;
+    font-size: 0.8rem;
   }
 
   .actorCard {
-    min-width: 75px !important;
+    min-width: 60px;
   }
 
   .actorCard img {
-    height: 115px !important;
+    height: 90px;
+  }
+
+  .actorCard strong,
+  .actorCard span {
+    font-size: 0.6rem;
+    padding: 1px;
+  }
+
+  .reviewsSection {
+    padding: 12px;
+  }
+
+  .reviewItem {
+    padding: 8px;
   }
 }
