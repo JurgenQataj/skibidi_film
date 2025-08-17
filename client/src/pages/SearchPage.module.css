@@ -57,7 +57,7 @@
 
 @media (max-width: 768px) {
   .pageContainer {
-    min-width: 320px;
+    min-width: 290px;
   }
   .searchForm {
     flex-direction: column;
