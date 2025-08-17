@@ -40,7 +40,6 @@
   background-color: var(--secondary-color);
 }
 
-/* GRIGLIA CORRETTA PER LA RICERCA */
 .resultsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -51,7 +50,7 @@
   padding: 20px 0;
 }
 
-/* MEDIA QUERIES PER MOBILE */
+/* --- Media Queries per il Mobile --- */
 @media (max-width: 768px) {
   .searchForm {
     flex-direction: column;
@@ -68,10 +67,24 @@
     width: 100%;
   }
 
-  /* GRIGLIA PIÙ COMPATTA SU MOBILE */
+  /* Griglia più compatta su mobile */
   .resultsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
-    padding: 15px;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(120px, 1fr)
+    ); /* MODIFICA: card più piccole */
+    gap: 10px; /* MODIFICA: meno spazio tra le card */
+    padding: 10px;
+  }
+}
+
+/* --- Aggiunto per schermi molto piccoli --- */
+@media (max-width: 480px) {
+  .resultsGrid {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(100px, 1fr)
+    ); /* MODIFICA: card ancora più piccole */
+    gap: 8px;
   }
 }
