@@ -121,8 +121,8 @@
   "sbordare", eliminando lo scorrimento orizzontale.
   */
   .pageContainer {
-    padding-left: 60px; /* <-- PUOI REGOLARE QUESTO VALORE */
-    padding-right: 60px; /* <-- PUOI REGOLARE QUESTO VALORE */
+    padding-left: 700px; /* <-- PUOI REGOLARE QUESTO VALORE */
+    padding-right: 700px; /* <-- PUOI REGOLARE QUESTO VALORE */
   }
 
   .searchForm {
