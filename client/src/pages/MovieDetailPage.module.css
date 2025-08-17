@@ -288,62 +288,55 @@
   padding: 8px 12px;
   cursor: pointer;
 }
+/* In client/src/pages/MovieDetailPage.module.css */
 
-/* --- Media Query ESCLUSIVAMENTE per il MOBILE --- */
 @media (max-width: 768px) {
-  /*
-  MODIFICA CHIAVE: Applichiamo un padding laterale al contenitore principale.
-  Questo restringe l'area di visualizzazione per TUTTI gli elementi interni,
-  creando margini puliti e impedendo lo scorrimento orizzontale.
-  */
   .pageContainer {
-    padding-left: 15px;
-    padding-right: 15px;
+    /* Impedisce lo scorrimento orizzontale sull'intera pagina */
+    overflow-x: hidden;
   }
 
-  /*
-  Rimuoviamo il padding dall'overlay dell'header perché ora è gestito
-  dal .pageContainer, centrando il suo contenuto.
-  */
   .headerOverlay {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    /* Aggiunge spazio ai lati, come nelle altre pagine */
+    padding: 20px 15px;
   }
 
-  /*
-  Assicuriamoci che i contenuti interni si adattino al nuovo
-  contenitore più stretto.
-  */
-  .headerContent,
   .mainContent {
-    width: 100%;
-    padding: 0; /* Rimuoviamo il padding interno se presente */
-    margin-top: 25px;
-    margin-bottom: 25px;
+    /* Allinea il contenuto con l'header */
+    padding: 0 15px;
   }
 
-  /* Ridimensioniamo i titoli per evitare che vengano tagliati */
-  .overviewSection h3,
-  .castSection h2,
-  .reviewsTitle {
-    font-size: 1.5rem;
-  }
-
-  .title {
-    font-size: 1.8rem;
+  .headerContent {
+    /* Il contenuto dell'header ora è allineato correttamente */
+    gap: 15px;
   }
 
   .poster {
-    width: 50%;
-    max-width: 180px;
-    height: auto;
+    /* Poster più piccolo come richiesto */
+    width: 45%;
+    max-width: 160px;
   }
 
-  .director {
-    display: none;
+  .title {
+    font-size: 1.6rem;
   }
 
-  /* Adattiamo le card del cast alla nuova larghezza */
+  .tagline {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .actionButton {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+  }
+
+  /* La griglia del cast mantiene il suo scorrimento orizzontale */
+  .castGrid {
+    overflow-x: auto;
+    padding-bottom: 15px; /* Aggiunge spazio sotto per lo scrollbar */
+  }
+
   .actorCard {
     min-width: 100px;
   }

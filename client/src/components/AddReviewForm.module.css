@@ -45,10 +45,17 @@
   margin-bottom: 15px;
 }
 
-/* **Stile Responsive** */
+/* In client/src/components/AddReviewForm.module.css */
+
+/* Aggiungi questo blocco alla fine del file */
 @media (max-width: 768px) {
   .formContainer {
     padding: 20px;
     margin-top: 0;
+  }
+
+  .submitButton {
+    padding: 10px;
+    font-size: 0.9rem;
   }
 }
