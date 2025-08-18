@@ -64,22 +64,4 @@
     padding: 8px 15px; /* Rendi il bottone leggermente più piccolo */
     font-size: 0.9rem;
   }
-
-  .card {
-    width: 90%; /* <--- ECCO LA MODIFICA! */
-    flex-direction: column; /* Impila il poster sopra il contenuto */
-    align-items: center; /* Centra il poster */
-    padding: 15px;
-  }
-
-  .content {
-    margin-left: 0;
-    margin-top: 15px; /* Aggiunge spazio tra poster e testo */
-    width: 100%;
-  }
-
-  .poster {
-    width: 150px; /* Aumenta la dimensione del poster per renderlo protagonista */
-    height: 225px;
-  }
 }
