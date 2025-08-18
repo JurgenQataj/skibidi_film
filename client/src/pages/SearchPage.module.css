@@ -117,7 +117,7 @@
 
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 10px;
+    padding: 30px;
     max-width: 100%;
     overflow-x: hidden;
   }

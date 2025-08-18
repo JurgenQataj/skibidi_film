@@ -46,14 +46,14 @@
 }
 
 .feedStatus {
-  color: white;
+  color: rgb(255, 255, 255);
   font-size: 1.2rem;
   text-shadow: 1px 1px 4px black;
 }
 /* --- Media Queries per il Mobile --- */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 15px; /* Riduci il padding generale */
+    padding: 33px; /* Riduci il padding generale */
   }
 
   .title {

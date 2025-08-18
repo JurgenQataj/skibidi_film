@@ -37,7 +37,7 @@ function HomePage() {
 
       try {
         const token = localStorage.getItem("token");
-        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        const API_URL = import.meta.env.VITE_API_URL || "";
         const { data } = await axios.get(
           `${API_URL}/api/users/feed?page=${targetPage}`,
           { headers: { Authorization: `Bearer ${token}` } }

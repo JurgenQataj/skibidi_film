@@ -14,7 +14,7 @@ function SearchPage() {
 
     setLoading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const API_URL = import.meta.env.VITE_API_URL || "";
       const response = await axios.get(
         `${API_URL}/api/movies/search?query=${query}`
       );

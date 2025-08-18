@@ -7,7 +7,11 @@ connectDB();
 
 const app = express();
 
-const whitelist = ["http://localhost:5173", "https://skibidi-film.vercel.app"];
+const whitelist = [
+  "http://localhost:5173",
+  "https://skibidi-film.vercel.app",
+  "http://192.168.1.6:5173",
+];
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {

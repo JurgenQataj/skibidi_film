@@ -22,7 +22,7 @@ function ReviewCard({ review, onInteraction }) {
   const posterBaseUrl = "https://image.tmdb.org/t/p/w200";
   const placeholderPoster =
     "https://via.placeholder.com/200x300.png?text=No+Image";
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "";
 
   const handleReaction = async (reactionType) => {
     if (!token) return;

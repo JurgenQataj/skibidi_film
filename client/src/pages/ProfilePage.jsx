@@ -48,7 +48,7 @@ function ProfilePage() {
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "";
 
   useEffect(() => {
     const fetchData = async () => {

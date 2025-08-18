@@ -8,7 +8,7 @@ import { it } from "date-fns/locale";
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "";
 
   useEffect(() => {
     const fetchNotifications = async () => {

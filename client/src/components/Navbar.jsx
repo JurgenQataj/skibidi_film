@@ -33,7 +33,7 @@ function Navbar() {
     const fetchNotifications = async () => {
       if (!token) return;
       try {
-        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        const API_URL = import.meta.env.VITE_API_URL || "";
         const response = await axios.get(`${API_URL}/api/notifications`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -52,7 +52,7 @@ function Navbar() {
     setShowNotifications(!showNotifications);
     if (!showNotifications && unreadCount > 0) {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        const API_URL = import.meta.env.VITE_API_URL || "";
         await axios.put(
           `${API_URL}/api/notifications/read`,
           {},

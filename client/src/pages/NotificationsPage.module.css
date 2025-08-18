@@ -2,7 +2,7 @@
   padding: 40px;
   max-width: 800px;
   margin: 0 auto;
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 .title {
@@ -39,7 +39,7 @@
 
 .notificationItem.unread {
   border-left-color: var(--primary-color);
-  background-color: rgba(138, 75, 175, 0.1);
+  background-color: rgba(59, 29, 77, 0.1);
 }
 
 .avatar {
@@ -61,12 +61,12 @@
 
 .timestamp {
   font-size: 0.8rem;
-  color: #aaa;
+  color: #ffffff;
   margin-top: 5px;
 }
 
 .statusText {
-  color: #ccc;
+  color: #070000;
   text-align: center;
   font-size: 1.2rem;
 }

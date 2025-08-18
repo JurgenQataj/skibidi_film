@@ -14,7 +14,7 @@ function WatchlistPage() {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.user.id;
 
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const API_URL = import.meta.env.VITE_API_URL || "";
       const response = await axios.get(
         `${API_URL}/api/watchlist/user/${userId}`
       );

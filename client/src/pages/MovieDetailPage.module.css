@@ -295,7 +295,7 @@
 .commentsSection {
   margin-top: 15px;
   padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 .commentItem {
   font-size: 0.9rem;
@@ -369,7 +369,7 @@
 .reviewComment {
   margin: 10px 0;
   font-style: italic;
-  color: #eee;
+  color: #ffffff;
 }
 
 /* === MOBILE (fino a 768px) - Stili migliorati === */
@@ -428,20 +428,20 @@
 
   /* === MODIFICA CHIAVE: TRAMA E INFO PIÙ GRANDI === */
   .overview {
-    font-size: 0.9rem; /* Testo della trama più grande */
+    font-size: 1rem; /* Testo della trama più grande */
     line-height: 1.7; /* Maggiore interlinea per leggibilità */
     text-align: left; /* Allineamento a sinistra per leggibilità */
   }
 
   .infoSection {
     padding: 15px;
-    margin-top: 20px;
+    margin-top: 15px;
   }
 
   .infoBox {
     flex-direction: column; /* Sempre in colonna per più spazio verticale */
     align-items: flex-start;
-    gap: 5px; /* Aumenta lo spazio tra titolo e valore */
+    gap: 4px; /* Aumenta lo spazio tra titolo e valore */
   }
 
   .infoBox h4 {
@@ -468,7 +468,7 @@
 
   .actorCard strong,
   .actorCard span {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 
   .reviewsSection {
@@ -481,7 +481,7 @@
   }
 
   .commentForm input {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
   }
 }
 

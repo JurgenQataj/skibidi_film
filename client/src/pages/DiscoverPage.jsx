@@ -11,7 +11,7 @@ function DiscoverPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        const API_URL = import.meta.env.VITE_API_URL || "";
         const [followedRes, newestRes] = await Promise.all([
           axios.get(`${API_URL}/api/users/most-followed`),
           axios.get(`${API_URL}/api/users/newest`),
