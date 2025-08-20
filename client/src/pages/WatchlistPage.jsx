@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import styles from "./ListPage.module.css";
+// *** CORREZIONE: Importa il nuovo file di stile ***
+import styles from "./WatchlistPage.module.css";
 import MovieCard from "../components/MovieCard";
 
 function WatchlistPage() {
@@ -41,7 +42,8 @@ function WatchlistPage() {
           I film che hai salvato per guardarli più tardi.
         </p>
       </header>
-      <div className={styles.moviesGrid}>
+      {/* *** CORREZIONE: Usa la classe "reviewsGrid" per attivare la griglia corretta *** */}
+      <div className={styles.reviewsGrid}>
         {watchlist.length > 0 ? (
           watchlist.map((movie) => (
             <MovieCard key={movie.tmdb_id} movie={movie} />

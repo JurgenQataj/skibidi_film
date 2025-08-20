@@ -1,0 +1,125 @@
+/* Stile per il contenitore della griglia */
+.reviewsGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 160px); /* 6 colonne su PC */
+  gap: 15px;
+  justify-content: center;
+  grid-auto-rows: 280px;
+}
+
+/* Stili per le card dei film per forzare dimensioni identiche */
+.reviewsGrid .card {
+  width: 160px !important;
+  height: 280px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 160px !important;
+  min-width: 160px !important;
+  overflow: hidden !important;
+}
+
+.reviewsGrid .card img {
+  width: 160px !important;
+  height: 240px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background-color: #1c1e21 !important;
+  flex-shrink: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.reviewsGrid .card .title {
+  width: 160px !important;
+  height: 40px !important;
+  padding: 5px !important;
+  font-size: 0.7rem !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Media query per mobile (3 colonne) */
+@media (max-width: 768px) {
+  .reviewsGrid {
+    grid-template-columns: repeat(3, 120px) !important;
+    gap: 10px !important;
+    grid-auto-rows: unset;
+  }
+
+  .reviewsGrid .card {
+    --title-height: 8px;
+    width: 120px !important;
+    height: calc(160px + var(--title-height)) !important;
+  }
+
+  .reviewsGrid .card img {
+    width: 120px !important;
+    height: 160px !important;
+  }
+
+  .reviewsGrid .card .title {
+    width: 120px !important;
+    height: var(--title-height) !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+  }
+}
+
+/* *** CORREZIONE: Aggiunta la sezione mancante per schermi molto piccoli *** */
+@media (max-width: 480px) {
+  .reviewsGrid {
+    grid-template-columns: repeat(3, 100px) !important;
+    gap: 8px !important;
+  }
+
+  .reviewsGrid .card {
+    --title-height: 8px;
+    width: 100px !important;
+    height: calc(140px + var(--title-height)) !important;
+  }
+
+  .reviewsGrid .card img {
+    width: 100px !important;
+    height: 140px !important;
+  }
+
+  .reviewsGrid .card .title {
+    width: 100px !important;
+    height: var(--title-height) !important;
+    font-size: 0.5rem !important;
+  }
+}
+
+/* Stili aggiuntivi per la pagina */
+.pageContainer {
+  padding: 4px;
+  color: white;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.description {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: #ccc;
+  margin-top: 10px;
+}
+
+.statusText {
+  color: white;
+  font-size: 1.5rem;
+  text-align: center;
+}
