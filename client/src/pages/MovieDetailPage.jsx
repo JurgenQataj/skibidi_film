@@ -147,8 +147,9 @@ function MovieDetailPage() {
       setActiveComments({ reviewId: null, comments: [] });
     } else {
       try {
+        // *** CORREZIONE 1: L'URL per ottenere i commenti era "/api/comments/reviews/...". L'ho corretto in "/api/comments/review/...". ***
         const response = await axios.get(
-          `${API_URL}/api/comments/reviews/${reviewId}`
+          `${API_URL}/api/comments/review/${reviewId}`
         );
         setActiveComments({ reviewId, comments: response.data });
       } catch (error) {
@@ -172,8 +173,9 @@ function MovieDetailPage() {
     }
 
     try {
+      // *** CORREZIONE 2: L'URL per aggiungere un commento era "/api/comments/reviews/...". L'ho corretto in "/api/comments/review/...". ***
       const response = await axios.post(
-        `${API_URL}/api/comments/reviews/${reviewId}`,
+        `${API_URL}/api/comments/review/${reviewId}`,
         { comment_text: commentText.trim() },
         {
           headers: {
@@ -209,8 +211,9 @@ function MovieDetailPage() {
     const token = localStorage.getItem("token");
 
     try {
+      // *** CORREZIONE 3: L'URL per eliminare un commento era "/api/comments/reviews/...". L'ho corretto in "/api/comments/review/...". ***
       await axios.delete(
-        `${API_URL}/api/comments/reviews/${activeComments.reviewId}/${commentId}`,
+        `${API_URL}/api/comments/review/${activeComments.reviewId}/${commentId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -218,7 +221,7 @@ function MovieDetailPage() {
 
       // Ricarica i commenti per mostrare l'eliminazione
       const response = await axios.get(
-        `${API_URL}/api/comments/reviews/${activeComments.reviewId}`
+        `${API_URL}/api/comments/review/${activeComments.reviewId}`
       );
 
       setActiveComments({

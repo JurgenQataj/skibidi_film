@@ -104,6 +104,8 @@
   text-decoration: none;
 }
 
+/* client/src/components/Navbar.module.css */
+
 /* --- Media Queries per il Mobile --- */
 @media (max-width: 768px) {
   .navbar {
@@ -115,24 +117,30 @@
   }
 
   .navLinks {
-    gap: 10px;
+    gap: 10px; /* Riduci lo spazio tra i link */
   }
 
   .navLink {
-    font-size: 0.8rem;
+    font-size: 0.8rem; /* Riduci la dimensione del testo */
     gap: 5px;
   }
 
   /* Nasconde il testo e lascia solo le icone se lo schermo è strettissimo */
   @media (max-width: 480px) {
     .navLink {
-      font-size: 1.2rem; /* Ingrandisce l'icona */
+      font-size: 1.4rem; /* Ingrandisce l'icona */
     }
     .navLink > svg {
       margin-right: 0;
     }
-    .navLink > span {
+    .navLink span {
+      /* Questa regola nasconde tutti gli span (testo E badge) */
       display: none;
+    }
+
+    /* LA CORREZIONE: Questa regola dice al badge di mostrarsi comunque! */
+    .navLink .notificationBadge {
+      display: flex;
     }
   }
 }
