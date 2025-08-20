@@ -53,15 +53,16 @@ function Navbar() {
     if (!showNotifications && unreadCount > 0) {
       try {
         const API_URL = import.meta.env.VITE_API_URL || "";
-        await axios.put(
+        // *** MODIFICA: Salva la risposta del server ***
+        const response = await axios.put(
           `${API_URL}/api/notifications/read`,
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        // Aggiorna lo stato locale
-        setNotifications(notifications.map((n) => ({ ...n, read: true })));
+        // *** MODIFICA: Aggiorna lo stato con i dati dalla risposta ***
+        setNotifications(response.data);
       } catch (error) {
         console.error("Errore nel segnare le notifiche come lette:", error);
       }
