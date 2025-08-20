@@ -147,7 +147,6 @@ function MovieDetailPage() {
       setActiveComments({ reviewId: null, comments: [] });
     } else {
       try {
-        // *** CORREZIONE 1: L'URL per ottenere i commenti era "/api/comments/reviews/...". L'ho corretto in "/api/comments/review/...". ***
         const response = await axios.get(
           `${API_URL}/api/comments/review/${reviewId}`
         );
@@ -173,7 +172,6 @@ function MovieDetailPage() {
     }
 
     try {
-      // *** CORREZIONE 2: L'URL per aggiungere un commento era "/api/comments/reviews/...". L'ho corretto in "/api/comments/review/...". ***
       const response = await axios.post(
         `${API_URL}/api/comments/review/${reviewId}`,
         { comment_text: commentText.trim() },
@@ -187,13 +185,11 @@ function MovieDetailPage() {
 
       setCommentText("");
 
-      // Aggiorna i commenti con la risposta del server
       setActiveComments({
         reviewId,
         comments: response.data || [],
       });
 
-      // Ricarica anche i dati generali per aggiornare il contatore
       fetchData();
     } catch (error) {
       console.error("Errore invio commento:", error);
@@ -211,15 +207,14 @@ function MovieDetailPage() {
     const token = localStorage.getItem("token");
 
     try {
-      // *** CORREZIONE 3: L'URL per eliminare un commento era "/api/comments/reviews/...". L'ho corretto in "/api/comments/review/...". ***
+      // *** CORREZIONE: L'URL per eliminare un commento era errato. Deve contenere "/comment/" tra i due ID. ***
       await axios.delete(
-        `${API_URL}/api/comments/review/${activeComments.reviewId}/${commentId}`,
+        `${API_URL}/api/comments/review/${activeComments.reviewId}/comment/${commentId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Ricarica i commenti per mostrare l'eliminazione
       const response = await axios.get(
         `${API_URL}/api/comments/review/${activeComments.reviewId}`
       );
@@ -229,7 +224,6 @@ function MovieDetailPage() {
         comments: response.data || [],
       });
 
-      // Ricarica anche i dati generali per aggiornare il contatore
       fetchData();
     } catch (error) {
       console.error("Errore eliminazione commento:", error);
