@@ -1,6 +1,5 @@
-/* client/src/components/MovieCard.module.css */
-
 .card {
+  position: relative; /* <<< LA CORREZIONE È QUI */
   background-color: #1c1e21;
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -13,7 +12,6 @@
   width: 100%;
   height: 100%;
 }
-
 .card:hover {
   transform: scale(1.05);
 }
@@ -56,6 +54,34 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
+}
+
+/* ... Aggiungi questo codice alla fine del file ... */
+
+/* Stile per il pulsante di eliminazione sulla card */
+.deleteButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(229, 9, 20, 0.8); /* Rosso semi-trasparente */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  z-index: 10; /* Assicura che sia sopra l'immagine */
+}
+
+.deleteButton:hover {
+  background-color: #e50914; /* Rosso pieno al passaggio del mouse */
+  transform: scale(1.1);
 }
 
 /* MEDIA QUERIES PER RESPONSIVE */

@@ -207,7 +207,7 @@ function MovieDetailPage() {
     const token = localStorage.getItem("token");
 
     try {
-      // *** CORREZIONE: L'URL per eliminare un commento era errato. Deve contenere "/comment/" tra i due ID. ***
+      // *** CORREZIONE 1: L'URL per eliminare un commento è stato corretto per corrispondere alla rotta del backend. ***
       await axios.delete(
         `${API_URL}/api/comments/review/${activeComments.reviewId}/comment/${commentId}`,
         {
@@ -263,6 +263,7 @@ function MovieDetailPage() {
               alt={`Locandina di ${movie.title}`}
               className={styles.poster}
             />
+            {/* *** CORREZIONE 2: L'intera sezione 'details' è stata aggiornata per posizionare correttamente il dropdown. *** */}
             <div className={styles.details}>
               <h1 className={styles.title}>
                 {movie.title} ({new Date(movie.release_date).getFullYear()})
@@ -286,22 +287,24 @@ function MovieDetailPage() {
                   >
                     Aggiungi a Lista
                   </button>
-                </div>
-              )}
-              {showLists && (
-                <div className={styles.listsDropdown}>
-                  {customLists.length > 0 ? (
-                    customLists.map((list) => (
-                      <button
-                        key={list._id}
-                        onClick={() => handleAddToList(list._id)}
-                        className={styles.listButton}
-                      >
-                        {list.title}
-                      </button>
-                    ))
-                  ) : (
-                    <p>Non hai ancora creato liste.</p>
+
+                  {/* Il menu a tendina ora è figlio del contenitore .actions */}
+                  {showLists && (
+                    <div className={styles.listsDropdown}>
+                      {customLists.length > 0 ? (
+                        customLists.map((list) => (
+                          <button
+                            key={list._id}
+                            onClick={() => handleAddToList(list._id)}
+                            className={styles.listButton}
+                          >
+                            {list.title}
+                          </button>
+                        ))
+                      ) : (
+                        <p>Non hai ancora creato liste.</p>
+                      )}
+                    </div>
                   )}
                 </div>
               )}

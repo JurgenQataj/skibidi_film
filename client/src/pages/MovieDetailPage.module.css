@@ -64,6 +64,7 @@
   display: flex;
   gap: 10px;
   justify-content: center;
+  position: relative;
 }
 
 .mainContent {
@@ -263,17 +264,27 @@
   color: white;
 }
 
+/* Sostituisci la vecchia classe .actions con questa */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  position: relative; /* FONDAMENTALE: Rende questo il contenitore di riferimento */
+}
+
+/* Sostituisci la vecchia classe .listsDropdown con questa */
 .listsDropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  position: absolute; /* Si posiziona in modo assoluto rispetto a .actions */
+  top: 100%; /* Si posiziona subito sotto i pulsanti */
+  right: 0; /* Si allinea al lato destro del pulsante "Aggiungi a Lista" */
+  width: 220px; /* Larghezza ridotta come richiesto */
   background-color: #282c34;
   border-radius: var(--border-radius);
   border: 1px solid #555;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 10px;
   z-index: 1000;
+  margin-top: 8px; /* Aggiunge un piccolo spazio verticale */
 }
 
 .listButton {
