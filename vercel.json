@@ -9,28 +9,18 @@
       "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "installCommand": "npm install",
-        "buildCommand": "npm run build",
-        "outputDirectory": "dist"
+        "distDir": "dist"
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server/index.js"
+      "source": "/api/(.*)",
+      "destination": "/server/index.js"
     },
     {
-      "src": "/assets/(.*)",
-      "headers": {
-        "cache-control": "s-maxage=31536000, immutable"
-      },
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "headers": { "Cache-Control": "no-cache" },
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

@@ -10,6 +10,7 @@ export default defineConfig(({ command }) => {
     },
   };
 
+  // Applica il proxy solo quando esegui `npm run dev`
   if (command === "serve") {
     config.server.proxy = {
       "/api": {
