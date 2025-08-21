@@ -30,9 +30,6 @@ exports.searchMovies = async (req, res) => {
   }
 };
 
-// -------------------------
-// DETTAGLI FILM + CONSIGLIATI
-// -------------------------
 exports.getMovieDetails = async (req, res) => {
   const { tmdbId } = req.params;
 
@@ -51,6 +48,7 @@ exports.getMovieDetails = async (req, res) => {
     const director = credits?.crew?.find((member) => member.job === "Director");
     const cast = credits?.cast?.slice(0, 10) || [];
 
+    //  LA MODIFICA È QUI
     res.json({
       id: data.id,
       title: data.title,
@@ -64,7 +62,7 @@ exports.getMovieDetails = async (req, res) => {
       original_language: data.original_language,
       director: director || null,
       cast: cast,
-      recommendations: data.recommendations?.results || [],
+      recommendations: data.recommendations?.results || [], // Aggiungiamo recommendations qui
     });
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -77,9 +75,6 @@ exports.getMovieDetails = async (req, res) => {
   }
 };
 
-// -------------------------
-// ALTRE FUNZIONI (invariate)
-// -------------------------
 exports.getTrendingMovies = async (req, res) => {
   try {
     const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT`;

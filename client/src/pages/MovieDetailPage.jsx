@@ -68,8 +68,11 @@ function MovieDetailPage() {
 
       setMovie(movieData);
 
+      //  LA MODIFICA È QUI
       if (movieData && Array.isArray(movieData.recommendations)) {
         setRecommendations(movieData.recommendations);
+      } else {
+        setRecommendations([]); // Assicurati che sia sempre un array
       }
 
       setSkibidiData(results[1].data);
