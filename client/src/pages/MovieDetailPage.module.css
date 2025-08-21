@@ -146,6 +146,10 @@
   border-radius: 8px 8px 0 0;
 }
 
+/* ... tutti gli stili precedenti ... */
+
+/* ... stili precedenti ... */
+
 .actorCard strong,
 .actorCard span {
   font-size: 0.8rem;
@@ -158,12 +162,28 @@
   text-overflow: ellipsis;
 }
 
+/* --- NUOVI STILI PER I FILM CONSIGLIATI --- */
+.recommendationsGrid {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px 5px;
+}
+
+.movieCardWrapper {
+  width: 150px;
+  flex-shrink: 0;
+}
+/* --- FINE NUOVI STILI --- */
+
 .reviewsSection {
   margin-top: 40px;
   background-color: rgba(10, 10, 10, 0.7);
   padding: 20px;
   border-radius: var(--border-radius);
 }
+
+/* ... il resto degli stili ... */
 
 .reviewsTitle {
   font-size: 1.5rem;

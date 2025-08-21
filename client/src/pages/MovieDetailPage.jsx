@@ -4,6 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./MovieDetailPage.module.css";
 import AddReviewForm from "../components/AddReviewForm";
+import MovieCard from "../components/MovieCard"; // Importa MovieCard
 
 function MovieDetailPage() {
   const { tmdbId } = useParams();
@@ -207,7 +208,6 @@ function MovieDetailPage() {
     const token = localStorage.getItem("token");
 
     try {
-      // *** CORREZIONE 1: L'URL per eliminare un commento è stato corretto per corrispondere alla rotta del backend. ***
       await axios.delete(
         `${API_URL}/api/comments/review/${activeComments.reviewId}/comment/${commentId}`,
         {
@@ -263,7 +263,6 @@ function MovieDetailPage() {
               alt={`Locandina di ${movie.title}`}
               className={styles.poster}
             />
-            {/* *** CORREZIONE 2: L'intera sezione 'details' è stata aggiornata per posizionare correttamente il dropdown. *** */}
             <div className={styles.details}>
               <h1 className={styles.title}>
                 {movie.title} ({new Date(movie.release_date).getFullYear()})
@@ -287,8 +286,6 @@ function MovieDetailPage() {
                   >
                     Aggiungi a Lista
                   </button>
-
-                  {/* Il menu a tendina ora è figlio del contenitore .actions */}
                   {showLists && (
                     <div className={styles.listsDropdown}>
                       {customLists.length > 0 ? (
@@ -312,7 +309,6 @@ function MovieDetailPage() {
           </div>
         </div>
       </div>
-
       <div className={styles.mainContent}>
         <div className={styles.overviewSection}>
           <h3>Trama</h3>
@@ -351,6 +347,21 @@ function MovieDetailPage() {
             ))}
           </div>
         </div>
+
+        {/* --- SEZIONE FILM CONSIGLIATI (MODIFICATA) --- */}
+        {movie.recommendations && movie.recommendations.length > 0 && (
+          <div className={styles.castSection}>
+            <h2>Film Consigliati</h2>
+            <div className={styles.recommendationsGrid}>
+              {movie.recommendations.map((rec) => (
+                <div key={rec.id} className={styles.movieCardWrapper}>
+                  <MovieCard movie={rec} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className={styles.reviewsSection}>
           {loggedInUserId && !hasUserReviewed && (
             <AddReviewForm tmdbId={tmdbId} onReviewAdded={fetchData} />

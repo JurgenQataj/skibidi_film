@@ -15,26 +15,28 @@ exports.searchMovies = async (req, res) => {
     const response = await axios.get(url);
     res.json(response.data);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Errore durante la comunicazione con il servizio esterno.",
-      });
+    res.status(500).json({
+      message: "Errore durante la comunicazione con il servizio esterno.",
+    });
   }
 };
 
-// Funzione per ottenere tutti i dettagli di un film (invariata)
+// Funzione per ottenere tutti i dettagli di un film (MODIFICATA)
 exports.getMovieDetails = async (req, res) => {
   const { tmdbId } = req.params;
-  const movieDetailsUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
-  const creditsUrl = `https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+  // Aggiungiamo "recommendations" a "append_to_response"
+  const movieUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,recommendations`;
+
   try {
-    const [detailsResponse, creditsResponse] = await Promise.all([
-      axios.get(movieDetailsUrl),
-      axios.get(creditsUrl),
-    ]);
-    const movieDetails = detailsResponse.data;
-    const credits = creditsResponse.data;
+    const response = await axios.get(movieUrl);
+    const movieDetails = response.data;
+    const credits = movieDetails.credits;
+    const recommendations = movieDetails.recommendations; // Recuperiamo i consigliati
+
+    if (!credits) {
+      throw new Error("Dati sui credits non disponibili.");
+    }
+
     const director = credits.crew.find((member) => member.job === "Director");
     const cast = credits.cast.slice(0, 10);
 
@@ -51,17 +53,17 @@ exports.getMovieDetails = async (req, res) => {
       original_language: movieDetails.original_language,
       director: director || null,
       cast: cast,
+      recommendations: recommendations ? recommendations.results : [], // Aggiungiamo i consigliati
     };
     res.json(responseData);
   } catch (error) {
     if (error.response && error.response.status === 404) {
       return res.status(404).json({ message: "Film non trovato." });
     }
-    res
-      .status(500)
-      .json({
-        message: "Errore durante la comunicazione con il servizio esterno.",
-      });
+    console.error("Errore nel recupero dettagli film:", error.message);
+    res.status(500).json({
+      message: "Errore durante la comunicazione con il servizio esterno.",
+    });
   }
 };
 
