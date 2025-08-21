@@ -11,7 +11,7 @@ function MovieDetailPage() {
   const navigate = useNavigate();
 
   const [movie, setMovie] = useState(null);
-  const [recommendations, setRecommendations] = useState([]); // Stato separato per i consigliati
+  const [recommendations, setRecommendations] = useState([]);
   const [skibidiData, setSkibidiData] = useState({
     reviews: [],
     averageRating: 0,
@@ -66,22 +66,10 @@ function MovieDetailPage() {
       const results = await Promise.all(promises);
       const movieData = results[0].data;
 
-      // ✅ DEBUG: Controlliamo l'oggetto completo ricevuto dal backend
-      console.log("[DEBUG Frontend] Dati ricevuti dal backend:", movieData);
-
       setMovie(movieData);
 
       if (movieData && Array.isArray(movieData.recommendations)) {
-        // ✅ DEBUG: Controlliamo quanti consigliati stiamo per salvare nello stato
-        console.log(
-          `[DEBUG Frontend] Impostando ${movieData.recommendations.length} film consigliati nello stato.`
-        );
         setRecommendations(movieData.recommendations);
-      } else {
-        console.warn(
-          "[DEBUG Frontend] 'recommendations' non è un array o è mancante.",
-          movieData
-        );
       }
 
       setSkibidiData(results[1].data);
@@ -104,7 +92,6 @@ function MovieDetailPage() {
   }, [fetchData]);
 
   // ... (Tutte le altre funzioni di handle... rimangono ESATTAMENTE le stesse)
-
   const handleDeleteReview = async (reviewId) => {
     if (!window.confirm("Sei sicuro di voler eliminare la tua recensione?"))
       return;
@@ -259,10 +246,12 @@ function MovieDetailPage() {
                   : ""}
               </h1>
               <p className={styles.tagline}>{movie.tagline}</p>
+
               <div className={styles.director}>
-                <strong>Regista:</strong>{" "}
-                {movie.director?.name || "Non disponibile"}
+                <strong>Regia:</strong>{" "}
+                <span>{movie.director?.name || "Non disponibile"}</span>
               </div>
+
               {loggedInUserId && (
                 <div className={styles.actions}>
                   <button
@@ -342,7 +331,6 @@ function MovieDetailPage() {
           </div>
         </div>
 
-        {/* Renderizza usando lo stato separato 'recommendations' */}
         {recommendations.length > 0 && (
           <div className={styles.castSection}>
             <h2>Film Consigliati</h2>

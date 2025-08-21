@@ -23,6 +23,7 @@ exports.searchMovies = async (req, res) => {
     const response = await axios.get(url);
     res.json(response.data);
   } catch (error) {
+    console.error("Errore ricerca film:", error.message);
     res.status(500).json({
       message: "Errore durante la comunicazione con il servizio esterno.",
     });
@@ -79,13 +80,13 @@ exports.getMovieDetails = async (req, res) => {
 // -------------------------
 // ALTRE FUNZIONI (invariate)
 // -------------------------
-
 exports.getTrendingMovies = async (req, res) => {
   try {
     const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT`;
     const response = await axios.get(url);
     res.json(response.data.results);
   } catch (error) {
+    console.error("Errore film di tendenza:", error.message);
     res.status(500).json({ message: "Errore del servizio esterno." });
   }
 };
@@ -117,6 +118,7 @@ exports.getTopRatedMovies = async (req, res) => {
     ]);
     res.json(topMovies);
   } catch (error) {
+    console.error("Errore recupero top rated:", error.message);
     res.status(500).json({ message: "Errore del server." });
   }
 };
