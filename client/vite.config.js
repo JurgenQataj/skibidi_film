@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig(({ command }) => {
   const config = {
     plugins: [react()],
@@ -10,7 +9,7 @@ export default defineConfig(({ command }) => {
     },
   };
 
-  // Applica il proxy solo quando esegui `npm run dev`
+  // Applica il proxy solo quando esegui `npm run dev` in locale
   if (command === "serve") {
     config.server.proxy = {
       "/api": {
