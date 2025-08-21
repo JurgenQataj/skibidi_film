@@ -68,11 +68,10 @@ function MovieDetailPage() {
 
       setMovie(movieData);
 
-      //  LA MODIFICA È QUI
       if (movieData && Array.isArray(movieData.recommendations)) {
         setRecommendations(movieData.recommendations);
       } else {
-        setRecommendations([]); // Assicurati che sia sempre un array
+        setRecommendations([]);
       }
 
       setSkibidiData(results[1].data);
@@ -94,7 +93,6 @@ function MovieDetailPage() {
     fetchData();
   }, [fetchData]);
 
-  // ... (Tutte le altre funzioni di handle... rimangono ESATTAMENTE le stesse)
   const handleDeleteReview = async (reviewId) => {
     if (!window.confirm("Sei sicuro di voler eliminare la tua recensione?"))
       return;
@@ -300,6 +298,11 @@ function MovieDetailPage() {
         </div>
 
         <div className={styles.infoSection}>
+          {/* NUOVO BLOCCO PER LA REGIA */}
+          <div className={styles.infoBox}>
+            <h4>Regia</h4>
+            <p>{movie.director?.name || "Non disponibile"}</p>
+          </div>
           <div className={styles.infoBox}>
             <h4>Costo</h4>
             <p>{formatCurrency(movie.budget)}</p>

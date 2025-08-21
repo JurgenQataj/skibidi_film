@@ -85,14 +85,15 @@
   line-height: 1.6;
 }
 
+/* Stile aggiornato per la sezione Info */
 .infoSection {
   margin-top: 30px;
   background-color: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: var(--border-radius);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  display: grid; /* MODIFICA: Usiamo una griglia */
+  grid-template-columns: 1fr 1fr; /* MODIFICA: Due colonne di larghezza uguale */
+  gap: 20px; /* MODIFICA: Spazio tra gli elementi */
 }
 
 .infoBox {
@@ -445,6 +446,7 @@
   .infoSection {
     padding: 15px;
     margin-top: 15px;
+    grid-template-columns: 1fr; /* Una colonna su mobile */
   }
   .infoBox {
     flex-direction: column;
