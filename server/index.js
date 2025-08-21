@@ -42,7 +42,9 @@ app.use("/api/notifications", require("./routes/notifications"));
 
 app.get("/", (req, res) => res.send("Skibidi Film API Running"));
 
-// --- MODIFICA CHIAVE: ESPORTA L'APP PER VERCEL ---
-// Rimuoviamo completamente la parte con app.listen()
-// e la sostituiamo con questa riga.
-module.exports = app;
+// --- MODIFICA PER RENDER: Avvia il server e ascolta su una porta ---
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server in ascolto sulla porta ${PORT}`);
+});
