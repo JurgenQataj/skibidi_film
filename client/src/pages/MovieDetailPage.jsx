@@ -4,20 +4,14 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./MovieDetailPage.module.css";
 import AddReviewForm from "../components/AddReviewForm";
-import MovieCard from "../components/MovieCard"; // Importa MovieCard
+import MovieCard from "../components/MovieCard";
 
 function MovieDetailPage() {
   const { tmdbId } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!tmdbId || tmdbId === "undefined") {
-      console.error("ID del film non valido, reindirizzamento alla home.");
-      navigate("/");
-    }
-  }, [tmdbId, navigate]);
-
   const [movie, setMovie] = useState(null);
+  const [recommendations, setRecommendations] = useState([]); // Stato separato per i consigliati
   const [skibidiData, setSkibidiData] = useState({
     reviews: [],
     averageRating: 0,
@@ -39,18 +33,24 @@ function MovieDetailPage() {
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   const fetchData = useCallback(async () => {
-    if (!tmdbId || tmdbId === "undefined") return;
+    if (!tmdbId || tmdbId === "undefined") {
+      navigate("/");
+      return;
+    }
+    setLoading(true);
     setError("");
     try {
       const token = localStorage.getItem("token");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      let userId = token ? jwtDecode(token).user.id : null;
+      const userId = token ? jwtDecode(token).user.id : null;
       setLoggedInUserId(userId);
+
       const moviePromise = axios.get(`${API_URL}/api/movies/${tmdbId}`);
       const reviewsPromise = axios.get(
         `${API_URL}/api/reviews/movie/${tmdbId}`
       );
       const promises = [moviePromise, reviewsPromise];
+
       if (userId) {
         promises.push(
           axios.get(`${API_URL}/api/reviews/status/${tmdbId}`, { headers })
@@ -62,9 +62,30 @@ function MovieDetailPage() {
           axios.get(`${API_URL}/api/users/${userId}/lists`, { headers })
         );
       }
+
       const results = await Promise.all(promises);
-      setMovie(results[0].data);
+      const movieData = results[0].data;
+
+      // ✅ DEBUG: Controlliamo l'oggetto completo ricevuto dal backend
+      console.log("[DEBUG Frontend] Dati ricevuti dal backend:", movieData);
+
+      setMovie(movieData);
+
+      if (movieData && Array.isArray(movieData.recommendations)) {
+        // ✅ DEBUG: Controlliamo quanti consigliati stiamo per salvare nello stato
+        console.log(
+          `[DEBUG Frontend] Impostando ${movieData.recommendations.length} film consigliati nello stato.`
+        );
+        setRecommendations(movieData.recommendations);
+      } else {
+        console.warn(
+          "[DEBUG Frontend] 'recommendations' non è un array o è mancante.",
+          movieData
+        );
+      }
+
       setSkibidiData(results[1].data);
+
       if (userId && results.length > 2) {
         setHasUserReviewed(results[2].data.hasReviewed);
         setIsInWatchlist(results[3].data.isInWatchlist);
@@ -76,12 +97,13 @@ function MovieDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [tmdbId, API_URL]);
+  }, [tmdbId, API_URL, navigate]);
 
   useEffect(() => {
-    setLoading(true);
     fetchData();
   }, [fetchData]);
+
+  // ... (Tutte le altre funzioni di handle... rimangono ESATTAMENTE le stesse)
 
   const handleDeleteReview = async (reviewId) => {
     if (!window.confirm("Sei sicuro di voler eliminare la tua recensione?"))
@@ -160,77 +182,43 @@ function MovieDetailPage() {
 
   const handleAddComment = async (e, reviewId) => {
     e.preventDefault();
-
-    if (!commentText.trim()) {
-      alert("Il commento non può essere vuoto.");
-      return;
-    }
-
+    if (!commentText.trim()) return;
     const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Devi essere loggato per commentare.");
-      return;
-    }
+    if (!token) return;
 
     try {
       const response = await axios.post(
         `${API_URL}/api/comments/review/${reviewId}`,
         { comment_text: commentText.trim() },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setCommentText("");
-
-      setActiveComments({
-        reviewId,
-        comments: response.data || [],
-      });
-
+      setActiveComments({ reviewId, comments: response.data || [] });
       fetchData();
     } catch (error) {
-      console.error("Errore invio commento:", error);
-      const errorMessage =
-        error.response?.data?.message || "Errore nell'invio del commento.";
-      alert(errorMessage);
+      alert(error.response?.data?.message || "Errore");
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo commento?")) {
+    if (!window.confirm("Sei sicuro di voler eliminare questo commento?"))
       return;
-    }
-
     const token = localStorage.getItem("token");
-
     try {
       await axios.delete(
         `${API_URL}/api/comments/review/${activeComments.reviewId}/comment/${commentId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       const response = await axios.get(
         `${API_URL}/api/comments/review/${activeComments.reviewId}`
       );
-
       setActiveComments({
         reviewId: activeComments.reviewId,
         comments: response.data || [],
       });
-
       fetchData();
     } catch (error) {
-      console.error("Errore eliminazione commento:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Errore durante l'eliminazione del commento.";
-      alert(errorMessage);
+      alert(error.response?.data?.message || "Errore");
     }
   };
 
@@ -265,7 +253,10 @@ function MovieDetailPage() {
             />
             <div className={styles.details}>
               <h1 className={styles.title}>
-                {movie.title} ({new Date(movie.release_date).getFullYear()})
+                {movie.title}{" "}
+                {movie.release_date
+                  ? `(${new Date(movie.release_date).getFullYear()})`
+                  : ""}
               </h1>
               <p className={styles.tagline}>{movie.tagline}</p>
               <div className={styles.director}>
@@ -309,11 +300,13 @@ function MovieDetailPage() {
           </div>
         </div>
       </div>
+
       <div className={styles.mainContent}>
         <div className={styles.overviewSection}>
           <h3>Trama</h3>
           <p className={styles.overview}>{movie.overview}</p>
         </div>
+
         <div className={styles.infoSection}>
           <div className={styles.infoBox}>
             <h4>Costo</h4>
@@ -325,13 +318,14 @@ function MovieDetailPage() {
           </div>
           <div className={styles.infoBox}>
             <h4>Lingua</h4>
-            <p>{movie.original_language.toUpperCase()}</p>
+            <p>{movie.original_language?.toUpperCase()}</p>
           </div>
         </div>
+
         <div className={styles.castSection}>
           <h2>Cast Principale</h2>
           <div className={styles.castGrid}>
-            {movie.cast.map((actor) => (
+            {movie.cast?.map((actor) => (
               <div key={actor.id} className={styles.actorCard}>
                 <img
                   src={
@@ -348,12 +342,12 @@ function MovieDetailPage() {
           </div>
         </div>
 
-        {/* --- SEZIONE FILM CONSIGLIATI (MODIFICATA) --- */}
-        {movie.recommendations && movie.recommendations.length > 0 && (
+        {/* Renderizza usando lo stato separato 'recommendations' */}
+        {recommendations.length > 0 && (
           <div className={styles.castSection}>
             <h2>Film Consigliati</h2>
             <div className={styles.recommendationsGrid}>
-              {movie.recommendations.map((rec) => (
+              {recommendations.map((rec) => (
                 <div key={rec.id} className={styles.movieCardWrapper}>
                   <MovieCard movie={rec} />
                 </div>

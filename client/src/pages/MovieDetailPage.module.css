@@ -146,10 +146,6 @@
   border-radius: 8px 8px 0 0;
 }
 
-/* ... tutti gli stili precedenti ... */
-
-/* ... stili precedenti ... */
-
 .actorCard strong,
 .actorCard span {
   font-size: 0.8rem;
@@ -182,8 +178,6 @@
   padding: 20px;
   border-radius: var(--border-radius);
 }
-
-/* ... il resto degli stili ... */
 
 .reviewsTitle {
   font-size: 1.5rem;
@@ -284,27 +278,25 @@
   color: white;
 }
 
-/* Sostituisci la vecchia classe .actions con questa */
 .actions {
   display: flex;
   gap: 10px;
   justify-content: center;
-  position: relative; /* FONDAMENTALE: Rende questo il contenitore di riferimento */
+  position: relative;
 }
 
-/* Sostituisci la vecchia classe .listsDropdown con questa */
 .listsDropdown {
-  position: absolute; /* Si posiziona in modo assoluto rispetto a .actions */
-  top: 100%; /* Si posiziona subito sotto i pulsanti */
-  right: 0; /* Si allinea al lato destro del pulsante "Aggiungi a Lista" */
-  width: 220px; /* Larghezza ridotta come richiesto */
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 220px;
   background-color: #282c34;
   border-radius: var(--border-radius);
   border: 1px solid #555;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 10px;
   z-index: 1000;
-  margin-top: 8px; /* Aggiunge un piccolo spazio verticale */
+  margin-top: 8px;
 }
 
 .listButton {
@@ -411,106 +403,81 @@
     overflow-x: hidden;
     box-sizing: border-box;
   }
-
-  /* Header più bilanciato */
   .header {
     background-size: cover;
   }
-
   .headerOverlay {
     padding: 20px;
   }
-
   .headerContent {
     gap: 15px;
     padding: 0;
   }
-
-  /* Locandina leggermente più grande */
   .poster {
     width: 40%;
     max-width: 150px;
   }
-
   .title {
     font-size: 1.5rem;
   }
-
   .tagline {
     font-size: 0.9rem;
     margin-bottom: 15px;
   }
-
   .actionButton {
     padding: 8px 12px;
     font-size: 0.8rem;
   }
-
   .mainContent {
     padding: 0;
     margin: 20px 0;
   }
-
   .overviewSection h3,
   .castSection h2,
   .reviewsTitle {
-    font-size: 1.3rem; /* Titoli più visibili */
+    font-size: 1.3rem;
   }
-
-  /* === MODIFICA CHIAVE: TRAMA E INFO PIÙ GRANDI === */
   .overview {
-    font-size: 1rem; /* Testo della trama più grande */
-    line-height: 1.7; /* Maggiore interlinea per leggibilità */
-    text-align: left; /* Allineamento a sinistra per leggibilità */
+    font-size: 1rem;
+    line-height: 1.7;
+    text-align: left;
   }
-
   .infoSection {
     padding: 15px;
     margin-top: 15px;
   }
-
   .infoBox {
-    flex-direction: column; /* Sempre in colonna per più spazio verticale */
+    flex-direction: column;
     align-items: flex-start;
-    gap: 4px; /* Aumenta lo spazio tra titolo e valore */
+    gap: 4px;
   }
-
   .infoBox h4 {
-    font-size: 0.9rem; /* Etichetta più leggibile */
+    font-size: 0.9rem;
   }
-
   .infoBox p {
-    font-size: 1.1rem; /* Valore più visibile */
+    font-size: 1.1rem;
   }
-  /* === FINE MODIFICA CHIAVE === */
-
   .castGrid {
     gap: 10px;
   }
-
   .actorCard {
     min-width: 100px;
     max-width: 100px;
   }
-
   .actorCard img {
     height: 150px;
   }
-
   .actorCard strong,
   .actorCard span {
     font-size: 0.6rem;
   }
-
   .reviewsSection {
     padding: 15px;
     margin-top: 30px;
   }
-
   .reviewItem {
     padding: 12px;
   }
-
   .commentForm input {
     font-size: 0.7rem;
   }
@@ -521,47 +488,58 @@
   .headerOverlay {
     padding: 15px;
   }
-
   .headerContent {
     gap: 10px;
   }
-
   .poster {
     width: 45%;
     max-width: 120px;
   }
-
   .title {
     font-size: 1.2rem;
   }
-
   .tagline {
     font-size: 0.8rem;
   }
-
   .actions {
     flex-direction: column;
     align-items: center;
     gap: 8px;
   }
-
   .actionButton {
     width: 80%;
     text-align: center;
   }
-
-  /* === MODIFICA CHIAVE: TRAMA E INFO PIÙ GRANDI === */
   .overview {
     font-size: 0.85rem;
     line-height: 1.6;
   }
-
   .infoBox h4 {
     font-size: 0.8rem;
   }
-
   .infoBox p {
     font-size: 1rem;
   }
-  /* === FINE MODIFICA CHIAVE === */
+
+  /* ✅ MODIFICA: Stili per le card dei film consigliati, come nella watchlist */
+  .movieCardWrapper {
+    width: 100px; /* Imposta la larghezza del contenitore della card */
+  }
+
+  /* Usa :global() per applicare stili specifici ai figli del MovieCard 
+    solo quando si trovano dentro la recommendationsGrid.
+  */
+  .recommendationsGrid :global(.card) {
+    --title-height: 8px;
+    height: calc(140px + var(--title-height)) !important;
+  }
+  .recommendationsGrid :global(.card img) {
+    height: 140px !important;
+  }
+  .recommendationsGrid :global(.card .title) {
+    height: var(--title-height) !important;
+    font-size: 0.5rem !important;
+    line-height: 1 !important;
+    padding: 0 4px !important; /* Aggiunge un po' di spazio laterale */
+  }
 }
