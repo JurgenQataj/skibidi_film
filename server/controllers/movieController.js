@@ -75,13 +75,95 @@ exports.getMovieDetails = async (req, res) => {
   }
 };
 
+// Modificato per accettare 'day' o 'week' come parametro
 exports.getTrendingMovies = async (req, res) => {
+  const { time_window = "week" } = req.query; // 'week' è il default
+  if (!["day", "week"].includes(time_window)) {
+    return res.status(400).json({ message: "Time window non valido." });
+  }
   try {
-    const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT`;
+    const url = `${BASE_URL}/trending/movie/${time_window}?api_key=${API_KEY}&language=it-IT`;
     const response = await axios.get(url);
     res.json(response.data.results);
   } catch (error) {
     console.error("Errore film di tendenza:", error.message);
+    res.status(500).json({ message: "Errore del servizio esterno." });
+  }
+};
+
+// Nuovo: Ottiene i film più popolari in un dato intervallo di date
+exports.getPopularMovies = async (req, res) => {
+  const { start_date, end_date } = req.query;
+  try {
+    let url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&language=it-IT&sort_by=popularity.desc`;
+    if (start_date) url += `&primary_release_date.gte=${start_date}`;
+    if (end_date) url += `&primary_release_date.lte=${end_date}`;
+
+    const response = await axios.get(url);
+    res.json(response.data.results);
+  } catch (error) {
+    console.error("Errore film popolari:", error.message);
+    res.status(500).json({ message: "Errore del servizio esterno." });
+  }
+};
+
+// Nuovo: Ottiene i film con più recensioni nel DB locale
+exports.getMostReviewedMovies = async (req, res) => {
+  try {
+    const mostReviewed = await Review.aggregate([
+      { $group: { _id: "$movie", review_count: { $sum: 1 } } },
+      { $sort: { review_count: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "movies",
+          localField: "_id",
+          foreignField: "_id",
+          as: "movie_details",
+        },
+      },
+      { $unwind: "$movie_details" },
+      {
+        $project: {
+          _id: 0,
+          tmdb_id: "$movie_details.tmdb_id",
+          title: "$movie_details.title",
+          poster_path: "$movie_details.poster_path",
+          review_count: "$review_count",
+        },
+      },
+    ]);
+    res.json(mostReviewed);
+  } catch (error) {
+    console.error("Errore recupero più recensiti:", error.message);
+    res.status(500).json({ message: "Errore del server." });
+  }
+};
+
+// Nuovo: Ottiene la lista dei generi
+exports.getGenres = async (req, res) => {
+  try {
+    const url = `${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=it-IT`;
+    const response = await axios.get(url);
+    res.json(response.data.genres);
+  } catch (error) {
+    console.error("Errore recupero generi:", error.message);
+    res.status(500).json({ message: "Errore del servizio esterno." });
+  }
+};
+
+// Nuovo: Ottiene i film per genere
+exports.getMoviesByGenre = async (req, res) => {
+  const { genreId } = req.params;
+  if (!/^\d+$/.test(genreId)) {
+    return res.status(400).json({ message: "ID genere non valido." });
+  }
+  try {
+    const url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&language=it-IT&with_genres=${genreId}&sort_by=popularity.desc`;
+    const response = await axios.get(url);
+    res.json(response.data.results);
+  } catch (error) {
+    console.error("Errore recupero film per genere:", error.message);
     res.status(500).json({ message: "Errore del servizio esterno." });
   }
 };

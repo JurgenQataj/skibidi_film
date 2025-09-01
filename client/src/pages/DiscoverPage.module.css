@@ -29,3 +29,59 @@
     gap: 15px;
   }
 }
+
+.mainTitle {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 40px;
+  color: var(--primary-color);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toggleButtons button {
+  background-color: #333;
+  color: white;
+  border: 1px solid var(--primary-color);
+  padding: 8px 16px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggleButtons button:hover {
+  background-color: #555;
+}
+
+.toggleButtons button.active {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+}
+
+.genreSelect {
+  background-color: #333;
+  color: white;
+  border: 1px solid var(--primary-color);
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0),
+    var(--primary-color),
+    rgba(255, 255, 255, 0)
+  );
+  margin: 60px 0;
+}
