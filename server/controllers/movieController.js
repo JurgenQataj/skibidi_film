@@ -78,15 +78,6 @@ exports.getMovieDetails = async (req, res) => {
   try {
     const response = await axios.get(url);
     const data = response.data;
-
-    // ← DEBUG: Stampa tutti i dati TMDB
-    console.log("=== DEBUG TMDB DATA ===");
-    console.log("TMDB ID:", tmdbId);
-    console.log("TMDB Title:", data.title);
-    console.log("TMDB Runtime:", data.runtime);
-    console.log("TMDB Budget:", data.budget);
-    console.log("=======================");
-
     const credits = data.credits;
     const director = credits?.crew?.find((member) => member.job === "Director");
     const cast = credits?.cast?.slice(0, 10) || [];
@@ -107,11 +98,6 @@ exports.getMovieDetails = async (req, res) => {
       cast: cast,
       recommendations: data.recommendations?.results || [],
     };
-
-    // ← DEBUG: Stampa cosa stiamo inviando al frontend
-    console.log("=== DEBUG RESPONSE DATA ===");
-    console.log("Sending runtime:", responseData.runtime);
-    console.log("===========================");
 
     res.json(responseData);
   } catch (error) {
