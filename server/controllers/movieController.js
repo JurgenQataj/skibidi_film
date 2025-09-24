@@ -2,28 +2,31 @@ const Movie = require("../models/Movie");
 const Review = require("../models/Review");
 const axios = require("axios");
 
-// Carica la API key in modo sicuro dalle variabili d'ambiente
 const API_KEY = process.env.TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 
-// -------------------------
-// NUOVO: SUGGERIMENTI FILM PER AUTOCOMPLETAMENTO
-// -------------------------
+// SUGGERIMENTI - Versione sicura
 exports.getMovieSuggestions = async (req, res) => {
-  const searchQuery = req.query.query;
-
-  if (!searchQuery || searchQuery.length < 2) {
-    return res.json({ results: [] });
-  }
-
   try {
+    const searchQuery = req.query.query;
+
+    if (!searchQuery || searchQuery.length < 2) {
+      return res.json({ results: [] });
+    }
+
+    if (!API_KEY) {
+      return res.status(500).json({
+        message: "API key not configured",
+        results: [],
+      });
+    }
+
     const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
       searchQuery
     )}&language=it-IT&page=1`;
 
     const response = await axios.get(url);
 
-    // Restituisci solo i primi 5 risultati con i dati essenziali
     const suggestions = response.data.results.slice(0, 5).map((movie) => ({
       id: movie.id,
       title: movie.title,
@@ -33,17 +36,15 @@ exports.getMovieSuggestions = async (req, res) => {
 
     res.json({ results: suggestions });
   } catch (error) {
-    console.error("Errore suggerimenti film:", error.message);
+    console.error("Errore suggestions:", error.message);
     res.status(500).json({
-      message: "Errore durante la comunicazione con il servizio esterno.",
+      message: error.message,
       results: [],
     });
   }
 };
 
-// -------------------------
-// CERCA FILM (invariato)
-// -------------------------
+// Resto del codice come prima...
 exports.searchMovies = async (req, res) => {
   const searchQuery = req.query.query;
   if (!searchQuery) {
@@ -68,7 +69,6 @@ exports.searchMovies = async (req, res) => {
 exports.getMovieDetails = async (req, res) => {
   const { tmdbId } = req.params;
 
-  // Sicurezza: Valida l'input
   if (!/^\d+$/.test(tmdbId)) {
     return res.status(400).json({ message: "ID del film non valido." });
   }
@@ -83,7 +83,6 @@ exports.getMovieDetails = async (req, res) => {
     const director = credits?.crew?.find((member) => member.job === "Director");
     const cast = credits?.cast?.slice(0, 10) || [];
 
-    //  LA MODIFICA È QUI
     res.json({
       id: data.id,
       title: data.title,
@@ -97,7 +96,7 @@ exports.getMovieDetails = async (req, res) => {
       original_language: data.original_language,
       director: director || null,
       cast: cast,
-      recommendations: data.recommendations?.results || [], // Aggiungiamo recommendations qui
+      recommendations: data.recommendations?.results || [],
     });
   } catch (error) {
     if (error.response && error.response.status === 404) {
