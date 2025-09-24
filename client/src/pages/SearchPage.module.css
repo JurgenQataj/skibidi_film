@@ -1,205 +1,79 @@
 .pageContainer {
   padding: 20px;
-  color: white;
-  text-align: center;
-  width: 100%;
-  max-width: 100%; /* evita che esca oltre lo schermo */
-  overflow-x: hidden; /* blocca eventuale scroll orizzontale */
-  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 140px);
 }
 
 .title {
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 2.5rem;
+  font-weight: 600;
 }
 
-.searchForm {
-  margin: 30px auto; /* Centra il form */
+.searchSection {
+  margin-bottom: 40px;
   display: flex;
   justify-content: center;
-  gap: 10px;
-  width: 100%; /* Il form occupa la larghezza del suo contenitore */
-  max-width: 500px; /* Limite massimo per schermi grandi */
 }
 
-.searchInput {
-  width: 100%; /* L'input si adatta al form */
-  padding: 12px;
-  border-radius: var(--border-radius);
-  border: 1px solid #555;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1rem;
-  box-sizing: border-box;
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
 }
 
-.searchButton {
-  padding: 12px 20px;
-  border-radius: var(--border-radius);
-  border: none;
-  background-color: var(--primary-color);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.resultsSection {
+  margin-top: 40px;
 }
 
-.searchButton:hover {
-  background-color: var(--secondary-color);
+.resultsTitle {
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 1.5rem;
+  text-align: center;
 }
 
 .resultsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
-  justify-content: center;
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 20px 0;
 }
 
-/* Stili di base per DESKTOP */
-.pageContainer {
-  padding: 20px;
-  color: white;
+.noResults {
   text-align: center;
-  width: 100%;
-  box-sizing: border-box;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 18px;
 }
 
-.title {
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-}
-
-.searchForm {
-  margin: 30px auto;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 500px;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--border-radius);
-  border: 1px solid #555;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.searchButton {
-  padding: 12px 20px;
-  border-radius: var(--border-radius);
-  border: none;
-  background-color: var(--primary-color);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.searchButton:hover {
-  background-color: var(--secondary-color);
-}
-
-.resultsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
-  justify-content: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 0;
-}
-
+/* Responsive */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 30px;
-    max-width: 100%;
-    overflow-x: hidden;
+    padding: 15px;
   }
 
-  .searchForm {
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 280px;
+  .title {
+    font-size: 2rem;
+    margin-bottom: 25px;
   }
 
   .resultsGrid {
-    grid-template-columns: repeat(3, 120px) !important;
-    gap: 10px !important;
-    justify-content: center !important;
-    padding: 10px 0;
-  }
-
-  /* CARD */
-  .resultsGrid :global(.card) {
-    --title-height: 8px;
-    width: 120px !important;
-    /* MODIFICA: Aggiornato il calcolo con la nuova altezza dell'immagine */
-    height: calc(204px + var(--title-height)) !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #1c1e21 !important;
-  }
-
-  /* IMMAGINE */
-  .resultsGrid :global(.card img) {
-    width: 120px !important;
-    /* MODIFICA: Aumentata l'altezza da 185px a 204px (circa +10%) */
-    height: 204px !important;
-    object-fit: contain !important;
-    background-color: #1c1e21 !important;
-  }
-
-  /* TITOLO */
-  .resultsGrid :global(.card .title) {
-    width: 120px !important;
-    height: var(--title-height) !important;
-    font-size: 0.55rem !important;
-    line-height: 1 !important;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
   }
 }
 
 @media (max-width: 480px) {
   .resultsGrid {
-    grid-template-columns: repeat(3, 100px) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .resultsGrid :global(.card) {
-    --title-height: 8px;
-    width: 100px !important;
-    /* MODIFICA: Aggiornato il calcolo con la nuova altezza dell'immagine */
-    height: calc(176px + var(--title-height)) !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .resultsGrid :global(.card img) {
-    width: 100px !important;
-    /* MODIFICA: Aumentata l'altezza da 160px a 176px (+10%) */
-    height: 176px !important;
-    object-fit: contain !important;
-    background-color: #1c1e21 !important;
-  }
-
-  .resultsGrid :global(.card .title) {
-    width: 100px !important;
-    height: var(--title-height) !important;
-    font-size: 0.5rem !important;
-    line-height: 1 !important;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
+  .title {
+    font-size: 1.8rem;
   }
 }

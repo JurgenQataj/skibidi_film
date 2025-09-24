@@ -1,10 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const movieController = require('../controllers/movieController');
+const movieController = require("../controllers/movieController");
 
-router.get('/trending', movieController.getTrendingMovies);
-router.get('/top-rated', movieController.getTopRatedMovies);
-router.get('/search', movieController.searchMovies);
-router.get('/:tmdbId', movieController.getMovieDetails);
+// Route per ricerca con suggerimenti
+router.get("/suggestions", movieController.getMovieSuggestions);
+
+// Route per ricerca completa
+router.get("/search", movieController.searchMovies);
+
+// Route per dettagli film
+router.get("/:tmdbId", movieController.getMovieDetails);
+
+// Route per film di tendenza
+router.get("/trending/week", movieController.getTrendingMovies);
+
+// Route per film top rated
+router.get("/top-rated/internal", movieController.getTopRatedMovies);
 
 module.exports = router;

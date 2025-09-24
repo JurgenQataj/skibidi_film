@@ -7,7 +7,42 @@ const API_KEY = process.env.TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 
 // -------------------------
-// CERCA FILM
+// NUOVO: SUGGERIMENTI FILM PER AUTOCOMPLETAMENTO
+// -------------------------
+exports.getMovieSuggestions = async (req, res) => {
+  const searchQuery = req.query.query;
+
+  if (!searchQuery || searchQuery.length < 2) {
+    return res.json({ results: [] });
+  }
+
+  try {
+    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
+      searchQuery
+    )}&language=it-IT&page=1`;
+
+    const response = await axios.get(url);
+
+    // Restituisci solo i primi 5 risultati con i dati essenziali
+    const suggestions = response.data.results.slice(0, 5).map((movie) => ({
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+      release_date: movie.release_date,
+    }));
+
+    res.json({ results: suggestions });
+  } catch (error) {
+    console.error("Errore suggerimenti film:", error.message);
+    res.status(500).json({
+      message: "Errore durante la comunicazione con il servizio esterno.",
+      results: [],
+    });
+  }
+};
+
+// -------------------------
+// CERCA FILM (invariato)
 // -------------------------
 exports.searchMovies = async (req, res) => {
   const searchQuery = req.query.query;
