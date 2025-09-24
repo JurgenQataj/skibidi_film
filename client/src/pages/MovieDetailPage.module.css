@@ -84,7 +84,7 @@
   line-height: 1.6;
 }
 
-/* 🆕 STILE PER IL FORM RECENSIONE DOPO LA TRAMA */
+/* STILE PER IL FORM RECENSIONE DOPO LA TRAMA */
 .reviewFormSection {
   margin: 25px 0;
   padding: 20px;
@@ -99,9 +99,9 @@
   background-color: rgba(0, 0, 0, 0.2);
   padding: 20px;
   border-radius: var(--border-radius);
-  display: grid; /* MODIFICA: Usiamo una griglia */
-  grid-template-columns: 1fr 1fr; /* MODIFICA: Due colonne di larghezza uguale */
-  gap: 20px; /* MODIFICA: Spazio tra gli elementi */
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Due colonne di larghezza uguale */
+  gap: 20px;
 }
 
 .infoBox {
@@ -121,6 +121,22 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: bold;
+}
+
+/* 🆕 NUOVO STILE PER LINK TRAILER */
+.trailerLink {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+  transition: opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trailerLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }
 
 .castSection {
@@ -452,7 +468,7 @@
     text-align: left;
   }
 
-  /* 🆕 RESPONSIVE PER IL FORM RECENSIONE */
+  /* RESPONSIVE PER IL FORM RECENSIONE */
   .reviewFormSection {
     margin: 20px 0;
     padding: 15px;
@@ -532,7 +548,7 @@
     line-height: 1.6;
   }
 
-  /* 🆕 RESPONSIVE MOBILE PICCOLO PER FORM RECENSIONE */
+  /* RESPONSIVE MOBILE PICCOLO PER FORM RECENSIONE */
   .reviewFormSection {
     margin: 15px 0;
     padding: 12px;
@@ -546,7 +562,7 @@
   }
 
   .movieCardWrapper {
-    width: 100px; /* Imposta la larghezza del contenitore della card */
+    width: 100px;
   }
 
   .recommendationsGrid :global(.card) {
@@ -560,6 +576,6 @@
     height: var(--title-height) !important;
     font-size: 0.5rem !important;
     line-height: 1 !important;
-    padding: 0 4px !important; /* Aggiunge un po' di spazio laterale */
+    padding: 0 4px !important;
   }
 }

@@ -227,6 +227,47 @@ function MovieDetailPage() {
     return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
   };
 
+  // Formatta la data in italiano
+  const formatReleaseDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    return date.toLocaleDateString("it-IT", options);
+  };
+
+  // Formatta i generi (max 3)
+  const formatGenres = (genres) => {
+    if (!genres || genres.length === 0) return "N/A";
+    return genres
+      .slice(0, 3)
+      .map((genre) => genre.name)
+      .join(", ");
+  };
+
+  // Formatta il rating TMDB
+  const formatRating = (rating) => {
+    if (!rating || rating === 0) return "N/A";
+    return rating.toFixed(1);
+  };
+
+  // Trova il trailer principale
+  const getMainTrailer = (videos) => {
+    if (!videos || videos.length === 0) return null;
+    // Cerca prima "Official Trailer", poi "Trailer", poi il primo video
+    return (
+      videos.find(
+        (video) =>
+          video.type === "Trailer" &&
+          video.site === "YouTube" &&
+          (video.name.includes("Official") || video.name.includes("Trailer"))
+      ) ||
+      videos.find(
+        (video) => video.type === "Trailer" && video.site === "YouTube"
+      ) ||
+      videos[0]
+    );
+  };
+
   return (
     <div className={styles.pageContainer}>
       <div
@@ -304,13 +345,14 @@ function MovieDetailPage() {
           <p className={styles.overview}>{movie.overview}</p>
         </div>
 
-        {/* 🆕 FORM RECENSIONE SUBITO DOPO LA TRAMA */}
+        {/* FORM RECENSIONE SUBITO DOPO LA TRAMA */}
         {loggedInUserId && !hasUserReviewed && (
           <div className={styles.reviewFormSection}>
             <AddReviewForm tmdbId={tmdbId} onReviewAdded={fetchData} />
           </div>
         )}
 
+        {/* 🆕 SEZIONE INFO AGGIORNATA - Layout 2x5 */}
         <div className={styles.infoSection}>
           <div className={styles.infoBox}>
             <h4>Regia</h4>
@@ -319,6 +361,22 @@ function MovieDetailPage() {
           <div className={styles.infoBox}>
             <h4>Durata</h4>
             <p>{formatRuntime(movie.runtime)}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Data Uscita</h4>
+            <p>{formatReleaseDate(movie.release_date)}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Rating TMDB</h4>
+            <p>{formatRating(movie.vote_average)}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Genere</h4>
+            <p>{formatGenres(movie.genres)}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Produttore</h4>
+            <p>{movie.producer?.name || "Non disponibile"}</p>
           </div>
           <div className={styles.infoBox}>
             <h4>Costo</h4>
@@ -332,6 +390,23 @@ function MovieDetailPage() {
             <h4>Lingua</h4>
             <p>{movie.original_language?.toUpperCase()}</p>
           </div>
+          {getMainTrailer(movie.videos) && (
+            <div className={styles.infoBox}>
+              <h4>Trailer</h4>
+              <p>
+                <a
+                  href={`https://youtube.com/watch?v=${
+                    getMainTrailer(movie.videos).key
+                  }`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.trailerLink}
+                >
+                  ▶️ YouTube
+                </a>
+              </p>
+            </div>
+          )}
         </div>
 
         <div className={styles.castSection}>
@@ -367,7 +442,6 @@ function MovieDetailPage() {
           </div>
         )}
 
-        {/* 🆕 RECENSIONI COMMUNITY - SENZA DUPLICAZIONE DEL FORM */}
         <div className={styles.reviewsSection}>
           {loggedInUserId && hasUserReviewed && (
             <div className={styles.alreadyReviewedMessage}>

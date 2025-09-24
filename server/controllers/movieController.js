@@ -73,16 +73,23 @@ exports.getMovieDetails = async (req, res) => {
     return res.status(400).json({ message: "ID del film non valido." });
   }
 
-  const url = `${BASE_URL}/movie/${tmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations`;
+  const url = `${BASE_URL}/movie/${tmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos`;
 
   try {
     const response = await axios.get(url);
     const data = response.data;
+
     const credits = data.credits;
     const director = credits?.crew?.find((member) => member.job === "Director");
+    const producer = credits?.crew?.find(
+      (member) =>
+        member.job === "Producer" ||
+        member.job === "Executive Producer" ||
+        member.job === "Co-Producer"
+    );
     const cast = credits?.cast?.slice(0, 10) || [];
 
-    const responseData = {
+    res.json({
       id: data.id,
       title: data.title,
       overview: data.overview,
@@ -92,14 +99,16 @@ exports.getMovieDetails = async (req, res) => {
       genres: data.genres,
       budget: data.budget,
       revenue: data.revenue,
-      runtime: data.runtime, // ← Assicurati che questa riga ci sia
+      runtime: data.runtime,
       original_language: data.original_language,
+      vote_average: data.vote_average,
+      vote_count: data.vote_count,
       director: director || null,
+      producer: producer || null,
       cast: cast,
+      videos: data.videos?.results || [],
       recommendations: data.recommendations?.results || [],
-    };
-
-    res.json(responseData);
+    });
   } catch (error) {
     if (error.response && error.response.status === 404) {
       return res.status(404).json({ message: "Film non trovato." });
