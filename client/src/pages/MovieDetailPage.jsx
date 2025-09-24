@@ -67,6 +67,10 @@ function MovieDetailPage() {
       const movieData = results[0].data;
 
       setMovie(movieData);
+      console.log("=== DEBUG FRONTEND ===");
+      console.log("Movie data received:", movieData);
+      console.log("Runtime received:", movieData.runtime);
+      console.log("=====================");
 
       if (movieData && Array.isArray(movieData.recommendations)) {
         setRecommendations(movieData.recommendations);
@@ -220,6 +224,14 @@ function MovieDetailPage() {
   const formatCurrency = (num) =>
     num > 0 ? `${num.toLocaleString("it-IT")} $` : "N/A";
 
+  // ← FUNZIONE AGGIUNTA PER FORMATTARE LA DURATA
+  const formatRuntime = (runtime) => {
+    if (!runtime || runtime === 0) return "N/A";
+    const hours = Math.floor(runtime / 60);
+    const minutes = runtime % 60;
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  };
+
   return (
     <div className={styles.pageContainer}>
       <div
@@ -297,11 +309,15 @@ function MovieDetailPage() {
           <p className={styles.overview}>{movie.overview}</p>
         </div>
 
+        {/* ← SEZIONE INFO AGGIORNATA CON DURATA */}
         <div className={styles.infoSection}>
-          {/* NUOVO BLOCCO PER LA REGIA */}
           <div className={styles.infoBox}>
             <h4>Regia</h4>
             <p>{movie.director?.name || "Non disponibile"}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Durata</h4>
+            <p>{formatRuntime(movie.runtime)}</p>
           </div>
           <div className={styles.infoBox}>
             <h4>Costo</h4>

@@ -79,11 +79,19 @@ exports.getMovieDetails = async (req, res) => {
     const response = await axios.get(url);
     const data = response.data;
 
+    // ← DEBUG: Stampa tutti i dati TMDB
+    console.log("=== DEBUG TMDB DATA ===");
+    console.log("TMDB ID:", tmdbId);
+    console.log("TMDB Title:", data.title);
+    console.log("TMDB Runtime:", data.runtime);
+    console.log("TMDB Budget:", data.budget);
+    console.log("=======================");
+
     const credits = data.credits;
     const director = credits?.crew?.find((member) => member.job === "Director");
     const cast = credits?.cast?.slice(0, 10) || [];
 
-    res.json({
+    const responseData = {
       id: data.id,
       title: data.title,
       overview: data.overview,
@@ -93,11 +101,19 @@ exports.getMovieDetails = async (req, res) => {
       genres: data.genres,
       budget: data.budget,
       revenue: data.revenue,
+      runtime: data.runtime, // ← Assicurati che questa riga ci sia
       original_language: data.original_language,
       director: director || null,
       cast: cast,
       recommendations: data.recommendations?.results || [],
-    });
+    };
+
+    // ← DEBUG: Stampa cosa stiamo inviando al frontend
+    console.log("=== DEBUG RESPONSE DATA ===");
+    console.log("Sending runtime:", responseData.runtime);
+    console.log("===========================");
+
+    res.json(responseData);
   } catch (error) {
     if (error.response && error.response.status === 404) {
       return res.status(404).json({ message: "Film non trovato." });
