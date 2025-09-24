@@ -17,7 +17,7 @@ body {
   background-color: #141414; /* Colore di riserva se l'immagine non carica */
 }
 
-/* Usiamo un pseudo-elemento per lo sfondo per una maggiore stabilità */
+/* 💻 DESKTOP - Sfondo per PC (768px+) */
 body::before {
   content: "";
   position: fixed;
@@ -28,9 +28,31 @@ body::before {
   z-index: -1;
 
   background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("/sfondo8.jpg"); /* Assicurati che il tuo file in /public si chiami sfondo1.jpg */
+    url("/lar.jpg"); /* Il tuo sfondo attuale per PC */
 
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+}
+
+/* 📱 MOBILE - Sfondo per cellulare (fino a 767px) */
+@media (max-width: 767px) {
+  body::before {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+      url("/sfondocell.jpg"); /* 🆕 Nuovo sfondo mobile */
+
+    background-attachment: scroll; /* Importante: scroll su mobile per performance */
+    background-size: cover;
+    background-position: center;
+  }
+}
+
+/* 📱 TABLET - Sfondo per tablet (768px - 1024px) - OPZIONALE */
+@media (min-width: 768px) and (max-width: 1024px) {
+  body::before {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+      url("/wow.jpg"); /* 🆕 Sfondo tablet (opzionale) */
+
+    background-attachment: scroll;
+  }
 }
