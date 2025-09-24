@@ -67,10 +67,6 @@ function MovieDetailPage() {
       const movieData = results[0].data;
 
       setMovie(movieData);
-      console.log("=== DEBUG FRONTEND ===");
-      console.log("Movie data received:", movieData);
-      console.log("Runtime received:", movieData.runtime);
-      console.log("=====================");
 
       if (movieData && Array.isArray(movieData.recommendations)) {
         setRecommendations(movieData.recommendations);
