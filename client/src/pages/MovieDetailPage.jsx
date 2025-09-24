@@ -220,7 +220,6 @@ function MovieDetailPage() {
   const formatCurrency = (num) =>
     num > 0 ? `${num.toLocaleString("it-IT")} $` : "N/A";
 
-  // ← FUNZIONE AGGIUNTA PER FORMATTARE LA DURATA
   const formatRuntime = (runtime) => {
     if (!runtime || runtime === 0) return "N/A";
     const hours = Math.floor(runtime / 60);
@@ -305,7 +304,13 @@ function MovieDetailPage() {
           <p className={styles.overview}>{movie.overview}</p>
         </div>
 
-        {/* ← SEZIONE INFO AGGIORNATA CON DURATA */}
+        {/* 🆕 FORM RECENSIONE SUBITO DOPO LA TRAMA */}
+        {loggedInUserId && !hasUserReviewed && (
+          <div className={styles.reviewFormSection}>
+            <AddReviewForm tmdbId={tmdbId} onReviewAdded={fetchData} />
+          </div>
+        )}
+
         <div className={styles.infoSection}>
           <div className={styles.infoBox}>
             <h4>Regia</h4>
@@ -362,10 +367,8 @@ function MovieDetailPage() {
           </div>
         )}
 
+        {/* 🆕 RECENSIONI COMMUNITY - SENZA DUPLICAZIONE DEL FORM */}
         <div className={styles.reviewsSection}>
-          {loggedInUserId && !hasUserReviewed && (
-            <AddReviewForm tmdbId={tmdbId} onReviewAdded={fetchData} />
-          )}
           {loggedInUserId && hasUserReviewed && (
             <div className={styles.alreadyReviewedMessage}>
               <h3>Hai già recensito questo film</h3>
