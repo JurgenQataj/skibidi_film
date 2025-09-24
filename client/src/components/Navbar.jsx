@@ -7,7 +7,7 @@ import {
   FaUser,
   FaListUl,
   FaGlobe,
-  FaBell,
+  FaBell, // ICONA CAMPANELLA
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -15,6 +15,7 @@ import axios from "axios";
 function Navbar() {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+
   const token = localStorage.getItem("token");
   let userId = null;
 
@@ -42,9 +43,8 @@ function Navbar() {
         console.error("Errore caricamento notifiche:", error);
       }
     };
-
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000); // Aggiorna ogni minuto
+    const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, [token]);
 
@@ -53,7 +53,6 @@ function Navbar() {
     if (!showNotifications && unreadCount > 0) {
       try {
         const API_URL = import.meta.env.VITE_API_URL || "";
-        // *** MODIFICA: Salva la risposta del server ***
         const response = await axios.put(
           `${API_URL}/api/notifications/read`,
           {},
@@ -61,7 +60,6 @@ function Navbar() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        // *** MODIFICA: Aggiorna lo stato con i dati dalla risposta ***
         setNotifications(response.data);
       } catch (error) {
         console.error("Errore nel segnare le notifiche come lette:", error);
@@ -88,7 +86,6 @@ function Navbar() {
           <Link to="/my-lists" className={styles.navLink}>
             <FaListUl /> <span>Liste</span>
           </Link>
-
           {userId && (
             <>
               <div className={styles.notificationContainer}>
