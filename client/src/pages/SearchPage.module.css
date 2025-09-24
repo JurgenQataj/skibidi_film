@@ -5,12 +5,14 @@
   min-height: calc(100vh - 140px);
 }
 
+/* ========== TITOLO BIANCO CON OMBRA ========== */
 .title {
   text-align: center;
   margin-bottom: 30px;
-  color: #333;
+  color: white; /* Bianco come richiesto */
   font-size: 2.5rem;
-  font-weight: 600;
+  font-weight: bold; /* Grassetto come richiesto */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.5); /* Ombra per contrasto */
 }
 
 .searchSection {
@@ -30,29 +32,72 @@
   margin-top: 40px;
 }
 
+/* ========== RISULTATI BIANCHI CON OMBRA ========== */
 .resultsTitle {
   margin-bottom: 25px;
-  color: #333;
+  color: white; /* Bianco come richiesto */
   font-size: 1.5rem;
+  font-weight: bold; /* Grassetto come richiesto */
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.5); /* Ombra per contrasto */
 }
 
+/* Resto del CSS della griglia rimane uguale... */
 .resultsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 20px;
   padding: 20px 0;
+  justify-items: center;
 }
 
-.noResults {
-  text-align: center;
-  padding: 60px 20px;
-  color: #666;
-  font-size: 18px;
+.resultsGrid > * {
+  width: 100%;
+  max-width: 180px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Tablet grande - 5 colonne */
+@media (max-width: 1200px) and (min-width: 901px) {
+  .resultsGrid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+  }
+
+  .resultsGrid > * {
+    max-width: 170px;
+  }
+}
+
+/* Tablet - 4 colonne */
+@media (max-width: 900px) and (min-width: 701px) {
+  .resultsGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .resultsGrid > * {
+    max-width: 160px;
+  }
+}
+
+/* Tablet piccolo - 3 colonne */
+@media (max-width: 700px) and (min-width: 481px) {
+  .resultsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+
+  .resultsGrid > * {
+    max-width: 150px;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+}
+
+/* Mobile - 3 colonne */
+@media (max-width: 480px) {
   .pageContainer {
     padding: 15px;
   }
@@ -62,18 +107,51 @@
     margin-bottom: 25px;
   }
 
+  .searchSection {
+    margin-bottom: 30px;
+  }
+
   .resultsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 15px 0;
+  }
+
+  .resultsGrid > * {
+    max-width: 120px;
   }
 }
 
-@media (max-width: 480px) {
+/* Mobile molto piccolo - 2 colonne */
+@media (max-width: 360px) {
+  .pageContainer {
+    padding: 10px;
+  }
+
   .resultsGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .resultsGrid > * {
+    max-width: 110px;
   }
 
   .title {
     font-size: 1.8rem;
+  }
+}
+
+.noResults {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 18px;
+}
+
+@media (max-width: 480px) {
+  .noResults {
+    padding: 40px 15px;
+    font-size: 16px;
   }
 }
