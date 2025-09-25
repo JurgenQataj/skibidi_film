@@ -8,25 +8,147 @@ import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
-const avatars = [
-  "1.png",
-  "4.png",
-  "7.png",
-  "25.png",
-  "39.png",
-  "52.png",
-  "54.png",
-  "6.png",
-  "94.png",
-  "99.png",
-  "130.png",
+// 100 Pokémon: starter base e finale + migliori finali per ogni generazione
+const pokemonAvatars = [
+  // --- Gen 1 ---
+  "001.png",
+  "003.png",
+  "004.png",
+  "006.png",
+  "007.png",
+  "009.png",
+  "065.png",
+  "068.png",
+  "094.png",
   "131.png",
   "143.png",
   "149.png",
   "150.png",
-];
-const avatarBaseUrl =
-  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
+  // --- Gen 2 ---
+  "152.png",
+  "154.png",
+  "155.png",
+  "157.png",
+  "158.png",
+  "160.png",
+  "181.png",
+  "196.png",
+  "197.png",
+  "208.png",
+  "212.png",
+  "242.png",
+  "248.png",
+  "249.png",
+  "250.png",
+  // --- Gen 3 ---
+  "252.png",
+  "254.png",
+  "255.png",
+  "257.png",
+  "258.png",
+  "260.png",
+  "282.png",
+  "306.png",
+  "334.png",
+  "350.png",
+  "373.png",
+  "376.png",
+  "380.png",
+  "381.png",
+  "384.png",
+  // --- Gen 4 ---
+  "387.png",
+  "389.png",
+  "390.png",
+  "392.png",
+  "393.png",
+  "395.png",
+  "407.png",
+  "445.png",
+  "448.png",
+  "461.png",
+  "464.png",
+  "468.png",
+  "472.png",
+  "474.png",
+  "478.png",
+  "483.png",
+  "484.png",
+  "485.png",
+  "487.png",
+  // --- Gen 5 ---
+  "495.png",
+  "497.png",
+  "498.png",
+  "500.png",
+  "501.png",
+  "503.png",
+  "530.png",
+  "542.png",
+  "549.png",
+  "553.png",
+  "576.png",
+  "635.png",
+  "637.png",
+  "646.png",
+  // --- Gen 6 ---
+  "650.png",
+  "652.png",
+  "653.png",
+  "655.png",
+  "656.png",
+  "658.png",
+  "660.png",
+  "681.png",
+  "697.png",
+  "715.png",
+  "719.png",
+  "720.png",
+  // --- Gen 7 ---
+  "722.png",
+  "724.png",
+  "725.png",
+  "727.png",
+  "728.png",
+  "730.png",
+  "745.png",
+  "778.png",
+  "784.png",
+  "786.png",
+  "787.png",
+  "788.png",
+  // --- Gen 8 ---
+  "810.png",
+  "812.png",
+  "813.png",
+  "815.png",
+  "816.png",
+  "818.png",
+  "845.png",
+  "849.png",
+  "861.png",
+  "869.png",
+  "884.png",
+  "887.png",
+  "889.png",
+  "890.png",
+  // --- Gen 9 ---
+  "906.png",
+  "909.png",
+  "912.png",
+  "920.png",
+  "925.png",
+  "930.png",
+  "937.png",
+  "943.png",
+  "954.png",
+  "968.png",
+  "977.png",
+  "981.png",
+  "990.png",
+  "1010.png",
+  "1025.png",
+].map((n) => `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${n}`);
 
 function ProfilePage() {
   const { userId } = useParams();
@@ -180,7 +302,6 @@ function ProfilePage() {
     );
 
   const isOwnProfile = loggedInUserId === profile._id;
-  // --- MODIFICA RICHIESTA: Mostra le prime 24 recensioni (che sono già le più recenti) ---
   const recentReviews = reviews.slice(0, 24);
 
   return (
@@ -204,6 +325,7 @@ function ProfilePage() {
         </div>
       </Modal>
 
+      {/* MODALE MODIFICA PROFILO SOLO POKéMON */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -217,19 +339,19 @@ function ProfilePage() {
             className={styles.bioTextarea}
             maxLength="150"
           />
-          <label className={styles.editLabel}>Scegli un Avatar</label>
+          <label className={styles.editLabel}>
+            Scegli un Avatar Pokémon (HQ)
+          </label>
           <div className={styles.avatarGrid}>
-            {avatars.map((avatarFile) => (
+            {pokemonAvatars.map((url) => (
               <img
-                key={avatarFile}
-                src={`${avatarBaseUrl}${avatarFile}`}
-                alt="avatar"
+                key={url}
+                src={url}
+                alt="avatar Pokémon"
                 className={`${styles.avatarOption} ${
-                  editAvatar === `${avatarBaseUrl}${avatarFile}`
-                    ? styles.selected
-                    : ""
+                  editAvatar === url ? styles.selected : ""
                 }`}
-                onClick={() => setEditAvatar(`${avatarBaseUrl}${avatarFile}`)}
+                onClick={() => setEditAvatar(url)}
               />
             ))}
           </div>
@@ -249,7 +371,6 @@ function ProfilePage() {
         </div>
       </Modal>
 
-      {/* --- MODIFICA RICHIESTA: Nuova struttura per la cronologia completa --- */}
       <Modal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
@@ -280,7 +401,7 @@ function ProfilePage() {
           <img
             src={
               profile.avatar_url ||
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"
+              "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
             }
             alt="Avatar"
             className={styles.avatar}

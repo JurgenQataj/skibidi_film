@@ -67,19 +67,16 @@
 /* GRIGLIA PERFETTA CON CELLE IDENTICHE */
 .reviewsGrid {
   display: grid;
-  grid-template-columns: repeat(
-    6,
-    160px
-  ); /* LARGHEZZA FISSA 160px PER OGNI CELLA */
+  grid-template-columns: repeat(6, 160px);
   gap: 15px;
-  justify-content: center; /* CENTRA LA GRIGLIA */
-  grid-auto-rows: 280px; /* ALTEZZA FISSA 280px PER OGNI RIGA */
+  justify-content: center;
+  grid-auto-rows: 280px;
 }
 
 /* FORZA DIMENSIONI IDENTICHE ASSOLUTE */
 .reviewsGrid .card {
-  width: 160px !important; /* LARGHEZZA FISSA */
-  height: 280px !important; /* ALTEZZA FISSA */
+  width: 160px !important;
+  height: 280px !important;
   display: flex !important;
   flex-direction: column !important;
   max-width: 160px !important;
@@ -88,11 +85,11 @@
 }
 
 .reviewsGrid .card img {
-  width: 160px !important; /* LARGHEZZA FISSA IDENTICA */
-  height: 240px !important; /* ALTEZZA FISSA IDENTICA */
-  object-fit: contain !important; /* MOSTRA TUTTA L'IMMAGINE */
+  width: 160px !important;
+  height: 240px !important;
+  object-fit: contain !important;
   object-position: center !important;
-  background-color: #1c1e21 !important; /* SFONDO PER EVENTUALI SPAZI */
+  background-color: #1c1e21 !important;
   flex-shrink: 0 !important;
   border: none !important;
   margin: 0 !important;
@@ -101,7 +98,7 @@
 
 .reviewsGrid .card .title {
   width: 160px !important;
-  height: 40px !important; /* SPAZIO FISSO PER IL TITOLO */
+  height: 40px !important;
   padding: 5px !important;
   font-size: 0.7rem !important;
   overflow: hidden !important;
@@ -131,7 +128,7 @@
   opacity: 0.9;
 }
 
-/* Stili per il modale di modifica */
+/* --- SEZIONE FOTO PROFILO HQ: POKEMON & MARVEL --- */
 .editLabel {
   display: block;
   font-weight: bold;
@@ -164,12 +161,21 @@
   border-radius: 50%;
   cursor: pointer;
   border: 3px solid transparent;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.19s, transform 0.15s;
+  object-fit: cover;
 }
 .avatarOption.selected {
   border-color: var(--primary-color);
-  transform: scale(1.1);
+  box-shadow: 0 0 14px #e03aff, 0 0 6px #d72638;
+  transform: scale(1.12);
 }
+.avatarOption:hover {
+  border-color: #e03aff;
+  box-shadow: 0 0 15px #d72638, 0 0 7px #e03aff99;
+  transform: scale(1.09);
+}
+/* --- FINE AVATAR HQ --- */
+
 .saveButton {
   width: 100%;
   padding: 12px;
@@ -303,19 +309,13 @@
     grid-template-columns: repeat(3, 120px) !important;
     gap: 10px !important;
     justify-content: center !important;
-    grid-auto-rows: unset; /* Rimuoviamo l'altezza fissa della riga */
+    grid-auto-rows: unset;
   }
 
-  /*
-  MODIFICA CHIAVE: Applicata la tua logica con la variabile --title-height
-  per ridurre lo spazio del titolo e darlo all'immagine.
-  */
   .reviewsGrid .card {
-    --title-height: 8px; /* Altezza titolo ridotta */
+    --title-height: 8px;
     width: 120px !important;
-    height: calc(
-      160px + var(--title-height)
-    ) !important; /* Altezza totale corretta */
+    height: calc(160px + var(--title-height)) !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -324,14 +324,14 @@
 
   .reviewsGrid .card img {
     width: 120px !important;
-    height: 160px !important; /* Manteniamo l'altezza originale dell'immagine */
+    height: 160px !important;
     object-fit: contain !important;
     background-color: #1c1e21 !important;
   }
 
   .reviewsGrid .card .title {
     width: 120px !important;
-    height: var(--title-height) !important; /* Usiamo la variabile */
+    height: var(--title-height) !important;
     font-size: 0.55rem !important;
     line-height: 1 !important;
     text-align: center;
@@ -339,7 +339,6 @@
     overflow: hidden;
   }
 
-  /* ... (altri stili mobile) ... */
   .historyTitle {
     font-size: 0.9rem;
   }
@@ -356,26 +355,20 @@
   }
 }
 
-/* MOBILE MOLTO PICCOLO */
 @media (max-width: 480px) {
   .reviewsGrid {
     grid-template-columns: repeat(3, 100px) !important;
     gap: 8px !important;
   }
-
   .reviewsGrid .card {
     --title-height: 8px;
     width: 100px !important;
-    height: calc(
-      140px + var(--title-height)
-    ) !important; /* Altezza totale corretta */
+    height: calc(140px + var(--title-height)) !important;
   }
-
   .reviewsGrid .card img {
     width: 100px !important;
-    height: 140px !important; /* Manteniamo l'altezza originale dell'immagine */
+    height: 140px !important;
   }
-
   .reviewsGrid .card .title {
     width: 100px !important;
     height: var(--title-height) !important;
