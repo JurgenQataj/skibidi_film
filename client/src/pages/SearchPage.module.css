@@ -7,7 +7,7 @@
   min-height: 100vh;
 }
 
-/* Titolo principale - più sobrio */
+/* Titolo principale */
 .title {
   font-size: 2.5rem;
   font-weight: 700;
@@ -27,7 +27,7 @@
   border: 1px solid #2a2a2a;
 }
 
-/* Sezione filtri - più professionale */
+/* Sezione filtri */
 .filtersSection {
   background: rgba(15, 15, 15, 0.95);
   border-radius: 15px;
@@ -42,7 +42,7 @@
   border-color: #ff4757;
 }
 
-/* Titolo filtri - più sobrio */
+/* Titolo filtri */
 .filtersTitle {
   font-size: 1.5rem;
   font-weight: 600;
@@ -72,7 +72,7 @@
   margin-bottom: 1.5rem;
 }
 
-/* Gruppo filtri - più sobrio */
+/* Gruppo filtri */
 .filterGroup {
   background: rgba(25, 25, 25, 0.6);
   padding: 1.25rem;
@@ -124,7 +124,7 @@
   color: #fff;
 }
 
-/* Bottoni categoria - più professionali */
+/* Bottoni categoria */
 .categoryButtons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -171,7 +171,7 @@
   border-radius: 8px;
   font-size: 0.95rem;
   background: #1a1a1a;
-  color: #000; /* TESTO NERO come richiesto */
+  color: #fff;
   transition: all 0.3s ease;
 }
 
@@ -185,7 +185,6 @@
   border-color: #666;
 }
 
-/* Placeholder personalizzato per anni */
 .yearInput::placeholder {
   color: #888;
   font-style: normal;
@@ -197,7 +196,7 @@
   font-size: 1rem;
 }
 
-/* Slider valutazione - più sobrio */
+/* Slider valutazione */
 .voteSlider {
   width: 100%;
   margin-top: 0.75rem;
@@ -255,7 +254,7 @@
   border-radius: 8px;
   font-size: 0.95rem;
   background: #1a1a1a;
-  color: #000; /* TESTO NERO come richiesto */
+  color: #fff;
   transition: all 0.3s ease;
   margin-top: 0.5rem;
 }
@@ -274,7 +273,7 @@
   color: #888;
 }
 
-/* Azioni filtri - più professionali */
+/* Azioni filtri */
 .filterActions {
   display: flex;
   gap: 1rem;
@@ -335,11 +334,13 @@
   text-align: center;
 }
 
+/* Grid risultati - DIMENSIONI COME ALTRE PAGINE */
 .resultsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
   margin-bottom: 2rem;
+  justify-items: center;
 }
 
 /* Loading */
@@ -402,7 +403,19 @@
   box-shadow: none;
 }
 
-/* Responsive Design */
+/* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .resultsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .resultsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .pageContainer {
     padding: 1rem;
@@ -437,6 +450,13 @@
     width: 100%;
     max-width: 280px;
   }
+
+  /* 3 COLONNE PER TELEFONO */
+  .resultsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+  }
 }
 
 @media (max-width: 480px) {
@@ -451,13 +471,28 @@
     padding: 1rem;
   }
 
+  /* MANTIENI 3 COLONNE per mobile piccolo */
   .resultsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(3, minmax(90px, 1fr));
+    gap: 0.6rem;
+  }
+}
+
+/* DESKTOP - 6 COLONNE */
+@media (min-width: 769px) {
+  .resultsGrid {
+    grid-template-columns: repeat(6, minmax(160px, 1fr));
     gap: 1rem;
   }
 }
 
-/* Animazioni sottili */
+@media (min-width: 1400px) {
+  .resultsGrid {
+    grid-template-columns: repeat(6, minmax(180px, 1fr));
+  }
+}
+
+/* Animazioni */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -477,7 +512,7 @@
   animation: fadeIn 0.7s ease-out;
 }
 
-/* Hover effects sottili */
+/* Hover effects */
 .filterGroup:hover .filterLabel {
   color: #fff;
   transition: color 0.3s ease;
