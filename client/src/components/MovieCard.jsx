@@ -44,4 +44,5 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
   );
 };
 
+// *** AGGIUNTO L'EXPORT DEFAULT CHE MANCAVA! ***
 export default MovieCard;

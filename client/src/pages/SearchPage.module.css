@@ -21,6 +21,179 @@
   justify-content: center;
 }
 
+/* ========== SEZIONE FILTRI ========== */
+.filtersSection {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filtersTitle {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.filterGroup {
+  margin-bottom: 20px;
+}
+
+.filterLabel {
+  display: block;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+/* Pulsanti categoria */
+.categoryButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.categoryBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.categoryBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.categoryBtn.active {
+  background: #007bff;
+  border-color: #007bff;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Select e input */
+.filterSelect,
+.keywordsInput,
+.yearInput {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 1rem;
+}
+
+.filterSelect:focus,
+.keywordsInput:focus,
+.yearInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+}
+
+/* Input anni */
+.yearInputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.yearInput {
+  flex: 1;
+  max-width: 120px;
+}
+
+.yearSeparator {
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Slider voto */
+.voteSlider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
+}
+
+.voteSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.voteSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Pulsanti azioni */
+.filterActions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.applyBtn,
+.resetBtn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.applyBtn {
+  background: #28a745;
+  color: white;
+}
+
+.applyBtn:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.resetBtn {
+  background: #dc3545;
+  color: white;
+}
+
+.resetBtn:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
 .loading {
   text-align: center;
   padding: 40px;
@@ -42,7 +215,7 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), -1px -1px 2px rgba(0, 0, 0, 0.5); /* Ombra per contrasto */
 }
 
-/* Resto del CSS della griglia rimane uguale... */
+/* ========== GRIGLIA ORIGINALE ========== */
 .resultsGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -56,6 +229,42 @@
   max-width: 180px;
 }
 
+/* ========== PULSANTE CARICA ALTRO ========== */
+.loadMoreSection {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.loadMoreBtn {
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.loadMoreBtn:hover:not(:disabled) {
+  background: linear-gradient(45deg, #0056b3, #004494);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+}
+
+.loadMoreBtn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ========== RESPONSIVE ORIGINALE ========== */
+
 /* Tablet grande - 5 colonne */
 @media (max-width: 1200px) and (min-width: 901px) {
   .resultsGrid {
@@ -65,6 +274,10 @@
 
   .resultsGrid > * {
     max-width: 170px;
+  }
+
+  .categoryButtons {
+    justify-content: center;
   }
 }
 
@@ -77,6 +290,19 @@
 
   .resultsGrid > * {
     max-width: 160px;
+  }
+
+  .yearInputs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .yearInput {
+    max-width: 100%;
+  }
+
+  .yearSeparator {
+    display: none;
   }
 }
 
@@ -93,6 +319,18 @@
 
   .title {
     font-size: 2.2rem;
+  }
+
+  .categoryButtons {
+    flex-direction: column;
+  }
+
+  .filterActions {
+    flex-direction: column;
+  }
+
+  .filtersSection {
+    padding: 20px;
   }
 }
 
@@ -120,6 +358,31 @@
   .resultsGrid > * {
     max-width: 120px;
   }
+
+  .filtersSection {
+    padding: 18px;
+  }
+
+  .filtersTitle {
+    font-size: 1.5rem;
+  }
+
+  .categoryButtons {
+    flex-direction: column;
+  }
+
+  .categoryBtn {
+    text-align: center;
+  }
+
+  .filterActions {
+    flex-direction: column;
+  }
+
+  .loadMoreBtn {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
 }
 
 /* Mobile molto piccolo - 2 colonne */
@@ -139,6 +402,14 @@
 
   .title {
     font-size: 1.8rem;
+  }
+
+  .filtersSection {
+    padding: 12px;
+  }
+
+  .filtersTitle {
+    font-size: 1.3rem;
   }
 }
 

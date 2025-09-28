@@ -16,8 +16,11 @@ router.get("/test", (req, res) => {
 // Endpoint per suggestions
 router.get("/suggestions", movieController.getMovieSuggestions);
 
-// Endpoint per search
+// Endpoint per search (ricerca testuale)
 router.get("/search", movieController.searchMovies);
+
+// *** NUOVO: Endpoint per discover con filtri avanzati ***
+router.get("/discover", movieController.discoverMovies);
 
 // Endpoint per trending
 router.get("/trending/week", movieController.getTrendingMovies);
