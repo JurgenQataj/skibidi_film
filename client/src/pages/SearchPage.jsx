@@ -26,6 +26,7 @@ function SearchPage() {
     minRating: 0,
     language: "",
     keywords: "",
+    sortBy: "", // *** NUOVO FILTRO ORDINAMENTO ***
   });
 
   // Lista generi come richiesta
@@ -63,12 +64,22 @@ function SearchPage() {
     { code: "zh", name: "Cinese" },
   ];
 
+  // *** OPZIONI ORDINAMENTO ***
+  const sortOptions = [
+    { value: "", name: "Predefinito" },
+    { value: "popularity.desc", name: "Popolarità Decrescente" },
+    { value: "popularity.asc", name: "Popolarità Crescente" },
+    { value: "vote_average.desc", name: "Valutazione Decrescente" },
+    { value: "vote_average.asc", name: "Valutazione Crescente" },
+    { value: "release_date.desc", name: "Data Rilascio Decrescente" },
+    { value: "release_date.asc", name: "Data Rilascio Crescente" },
+  ];
+
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   // Reset quando cambiano i filtri
   useEffect(() => {
     if (hasSearched) {
-      console.log("*** FRONTEND DEBUG: Filtri cambiati ***", filters);
       setCurrentPage(1);
       setResults([]);
       performSearch(1, true);
@@ -77,12 +88,6 @@ function SearchPage() {
 
   // Gestione ricerca con filtri
   const performSearch = async (page = 1, isNewSearch = false) => {
-    console.log("*** FRONTEND DEBUG: Inizio ricerca ***", {
-      page,
-      isNewSearch,
-      filters,
-    });
-
     if (isNewSearch) {
       setLoading(true);
       setResults([]);
@@ -106,12 +111,8 @@ function SearchPage() {
         }),
         ...(filters.language && { with_original_language: filters.language }),
         ...(filters.keywords && { with_keywords: filters.keywords }),
+        ...(filters.sortBy && { sort_by: filters.sortBy }), // *** NUOVO PARAMETRO ***
       });
-
-      console.log(
-        "*** FRONTEND DEBUG: Parametri inviati ***",
-        params.toString()
-      );
 
       const response = await axios.get(
         `${API_URL}/api/movies/discover?${params.toString()}`
@@ -119,24 +120,10 @@ function SearchPage() {
 
       const newResults = response.data.results || [];
 
-      console.log("*** FRONTEND DEBUG: Risposta ricevuta ***", {
-        nuoviRisultati: newResults.length,
-        primiTreFilm: newResults.slice(0, 3).map((m) => ({
-          titolo: m.title,
-          valutazione: m.vote_average,
-        })),
-      });
-
       if (isNewSearch) {
-        console.log("*** FRONTEND: Sostituzione risultati completa ***");
         setResults(newResults);
       } else {
-        console.log("*** FRONTEND: Aggiunta risultati ***");
-        setResults((prev) => {
-          const combined = [...prev, ...newResults];
-          console.log("Risultati combinati:", combined.length);
-          return combined;
-        });
+        setResults((prev) => [...prev, ...newResults]);
       }
 
       setTotalPages(response.data.total_pages || 0);
@@ -156,8 +143,6 @@ function SearchPage() {
   // Gestione ricerca tramite SearchInput (ricerca testuale)
   const handleSearch = async (query) => {
     if (!query) return;
-
-    console.log("*** FRONTEND: Ricerca testuale ***", query);
 
     setLoading(true);
     setHasSearched(true);
@@ -181,6 +166,7 @@ function SearchPage() {
         minRating: 0,
         language: "",
         keywords: "",
+        sortBy: "",
       });
     } catch (error) {
       console.error("Errore durante la ricerca:", error);
@@ -197,7 +183,6 @@ function SearchPage() {
 
   // Gestione cambio filtri
   const handleFilterChange = (filterType, value) => {
-    console.log("*** FRONTEND: Cambio filtro ***", { filterType, value });
     setFilters((prev) => ({
       ...prev,
       [filterType]: value,
@@ -217,7 +202,6 @@ function SearchPage() {
 
   // Applica filtri
   const handleApplyFilters = () => {
-    console.log("*** FRONTEND: Applica filtri cliccato ***", filters);
     setHasSearched(true);
     setCurrentPage(1);
     setResults([]);
@@ -226,7 +210,6 @@ function SearchPage() {
 
   // Reset filtri
   const handleResetFilters = () => {
-    console.log("*** FRONTEND: Reset filtri ***");
     setFilters({
       category: "popular",
       genre: "",
@@ -234,6 +217,7 @@ function SearchPage() {
       minRating: 0,
       language: "",
       keywords: "",
+      sortBy: "",
     });
     setHasSearched(false);
     setResults([]);
@@ -303,6 +287,25 @@ function SearchPage() {
           </div>
         </div>
 
+        {/* *** NUOVO FILTRO ORDINAMENTO *** */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel} htmlFor="sortBy">
+            Ordina per:
+          </label>
+          <select
+            id="sortBy"
+            className={styles.filterSelect}
+            value={filters.sortBy}
+            onChange={(e) => handleFilterChange("sortBy", e.target.value)}
+          >
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Genere */}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel} htmlFor="genre">
@@ -349,7 +352,7 @@ function SearchPage() {
           </div>
         </div>
 
-        {/* *** VALUTAZIONE MINIMA *** */}
+        {/* Valutazione Minima */}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel} htmlFor="minRating">
             Valutazione Minima: {filters.minRating}/10
@@ -364,7 +367,6 @@ function SearchPage() {
             value={filters.minRating}
             onChange={(e) => {
               const newValue = parseFloat(e.target.value);
-              console.log("*** FRONTEND: Slider cambiato ***", newValue);
               handleFilterChange("minRating", newValue);
             }}
           />
@@ -431,41 +433,12 @@ function SearchPage() {
                 {totalPages > 1 && `(Pagina ${currentPage} di ${totalPages})`}
               </h2>
 
-              {/* DEBUG INFO VISIBILE */}
-              {filters.minRating > 0 && (
-                <div
-                  style={{
-                    color: "white",
-                    textAlign: "center",
-                    marginBottom: "10px",
-                    fontSize: "14px",
-                  }}
-                >
-                  DEBUG: Filtro valutazione ≥{filters.minRating} attivo
-                </div>
-              )}
-
               <div className={styles.resultsGrid}>
                 {results.map((movie, index) => (
-                  <div key={`${movie.id}-${currentPage}-${index}`}>
-                    <MovieCard movie={movie} />
-                    {/* DEBUG SOTTO OGNI LOCANDINA */}
-                    {filters.minRating > 0 && (
-                      <div
-                        style={{
-                          color:
-                            movie.vote_average >= filters.minRating
-                              ? "green"
-                              : "red",
-                          fontSize: "10px",
-                          textAlign: "center",
-                          marginTop: "2px",
-                        }}
-                      >
-                        Rating: {movie.vote_average}
-                      </div>
-                    )}
-                  </div>
+                  <MovieCard
+                    key={`${movie.id}-${currentPage}-${index}`}
+                    movie={movie}
+                  />
                 ))}
               </div>
 
