@@ -332,7 +332,7 @@ function SearchPage() {
           <div className={styles.yearInputs}>
             <input
               type="number"
-              placeholder="Da (es: 2020)"
+              placeholder="Da "
               className={styles.yearInput}
               value={filters.releaseYear.from}
               onChange={(e) => handleYearChange("from", e.target.value)}
@@ -342,7 +342,7 @@ function SearchPage() {
             <span className={styles.yearSeparator}>-</span>
             <input
               type="number"
-              placeholder="A (es: 2024)"
+              placeholder="A "
               className={styles.yearInput}
               value={filters.releaseYear.to}
               onChange={(e) => handleYearChange("to", e.target.value)}
