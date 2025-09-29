@@ -156,16 +156,18 @@
   box-shadow: 0 3px 10px rgba(255, 71, 87, 0.3);
 }
 
-/* Input anni */
+/* Input anni - CORREZIONE: 15% più corti */
 .yearInputs {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-top: 0.5rem;
+  justify-content: center; /* Centrati */
 }
 
 .yearInput {
   flex: 1;
+  max-width: 85%; /* CORREZIONE: 15% più corti */
   padding: 0.75rem 0.875rem;
   border: 1px solid #4a4a4a;
   border-radius: 8px;
@@ -196,10 +198,11 @@
   font-size: 1rem;
 }
 
-/* Slider valutazione */
+/* Slider valutazione - CORREZIONE: 15% più corto */
 .voteSlider {
-  width: 100%;
-  margin-top: 0.75rem;
+  width: 85%; /* CORREZIONE: da 100% a 85% */
+  margin: 0.75rem auto 0 auto; /* Centrato */
+  display: block; /* Per centrare correttamente */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -246,9 +249,11 @@
   border: none;
 }
 
-/* Input keywords */
+/* Input keywords - CORREZIONE: 15% più corto */
 .keywordsInput {
-  width: 100%;
+  width: 85%; /* CORREZIONE: da 100% a 85% */
+  margin: 0.5rem auto 0 auto; /* Centrato */
+  display: block; /* Per centrare correttamente */
   padding: 0.75rem 0.875rem;
   border: 1px solid #4a4a4a;
   border-radius: 8px;
@@ -256,7 +261,6 @@
   background: #1a1a1a;
   color: #fff;
   transition: all 0.3s ease;
-  margin-top: 0.5rem;
 }
 
 .keywordsInput:focus {
@@ -438,6 +442,16 @@
   .yearInputs {
     flex-direction: column;
     gap: 0.5rem;
+    align-items: center;
+  }
+
+  .yearInput {
+    max-width: 85%; /* Mantieni 15% più corti anche su mobile */
+  }
+
+  .voteSlider,
+  .keywordsInput {
+    width: 90%; /* Su mobile un po' meno restrittivi */
   }
 
   .filterActions {
