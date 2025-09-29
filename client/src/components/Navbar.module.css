@@ -19,8 +19,9 @@
   height: 60px;
 }
 
+/* === LOGO ROSSO NETFLIX === */
 .logo {
-  color: #ffffff !important;
+  color: #e50914 !important;
   font-size: 1.5rem;
   font-weight: bold;
   text-decoration: none;
@@ -29,7 +30,7 @@
 }
 
 .logo:hover {
-  color: #8a4baf !important;
+  color: #d72638 !important;
 }
 
 .navLinks {
@@ -213,8 +214,9 @@
     font-size: 1.2rem;
   }
 
+  /* ICONE PIÙ RAVVICINATE SU TABLET */
   .navLinks {
-    gap: 15px;
+    gap: 5px;
   }
 
   .navLink {
@@ -230,9 +232,23 @@
 }
 
 @media (max-width: 480px) {
+  .navbar {
+    padding: 0 10px;
+  }
+
+  .logo {
+    font-size: 1rem;
+  }
+
+  /* ICONE MOLTO PIÙ RAVVICINATE SU MOBILE */
+  .navLinks {
+    gap: 3px;
+  }
+
   .navLink {
     font-size: 1.4rem;
-    padding: 8px;
+    padding: 6px;
+    gap: 0;
   }
 
   .navLink span {
