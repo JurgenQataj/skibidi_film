@@ -20,11 +20,16 @@
 }
 
 .logo {
-  color: white;
+  color: #ffffff !important;
   font-size: 1.5rem;
   font-weight: bold;
   text-decoration: none;
   letter-spacing: 0.5px;
+  transition: color 0.2s ease;
+}
+
+.logo:hover {
+  color: #8a4baf !important;
 }
 
 .navLinks {
@@ -33,14 +38,15 @@
   gap: 30px;
 }
 
+/* === STATO BASE: TUTTO BIANCO === */
 .navLink {
-  color: white;
+  color: #ffffff !important;
   text-decoration: none;
   font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
   background: none;
   border: none;
   cursor: pointer;
@@ -49,35 +55,90 @@
   position: relative;
 }
 
-.navLink:hover {
-  color: var(--primary-color);
-  background-color: rgba(138, 75, 175, 0.1);
+/* Testo dei link sempre bianco di base */
+.navLink span {
+  color: #ffffff !important;
+  transition: color 0.2s ease;
 }
 
-/* === STILI CAMPANELLA NOTIFICHE - SOBRIO === */
+/* Icone sempre bianche di base */
+.navLink svg,
+.navLink i,
+.navLink [data-icon] {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  transition: all 0.2s ease;
+}
+
+/* === HOVER/FOCUS: TUTTO VIOLA === */
+.navLink:hover,
+.navLink:focus-visible {
+  color: #8a4baf !important;
+  background-color: rgba(138, 75, 175, 0.1);
+  outline: none;
+}
+
+/* Testo viola in hover */
+.navLink:hover span,
+.navLink:focus-visible span {
+  color: #8a4baf !important;
+}
+
+/* Icone viola in hover */
+.navLink:hover svg,
+.navLink:hover i,
+.navLink:hover [data-icon],
+.navLink:focus-visible svg,
+.navLink:focus-visible i,
+.navLink:focus-visible [data-icon] {
+  color: #8a4baf !important;
+  fill: #8a4baf !important;
+  stroke: #8a4baf !important;
+}
+
+/* === LINK ATTIVO (se usi NavLink di React Router) === */
+.navLink.active {
+  color: #8a4baf !important;
+}
+
+.navLink.active span {
+  color: #8a4baf !important;
+}
+
+.navLink.active svg,
+.navLink.active i,
+.navLink.active [data-icon] {
+  color: #8a4baf !important;
+  fill: #8a4baf !important;
+  stroke: #8a4baf !important;
+}
+
+/* === CAMPANELLA NOTIFICHE - SENZA BACKGROUND === */
 .notificationContainer {
   position: relative;
 }
 
+/* Campanella identica alle altre icone - NESSUN background */
 .notificationContainer .navLink {
-  padding: 10px;
-  border-radius: 8px;
+  background: none !important;
+  border: none !important;
+  padding: 8px 12px;
+}
+
+.notificationContainer .navLink:hover,
+.notificationContainer .navLink:focus-visible {
   background-color: rgba(138, 75, 175, 0.1);
-  border: 1px solid rgba(138, 75, 175, 0.2);
-  transition: all 0.2s ease;
+  border: none !important;
 }
 
-.notificationContainer .navLink:hover {
-  background-color: rgba(138, 75, 175, 0.2);
-  border-color: var(--primary-color);
-}
-
+/* Badge conta notifiche */
 .notificationBadge {
   position: absolute;
   top: -2px;
   right: -2px;
-  background-color: var(--secondary-color);
-  color: white;
+  background-color: #e50914;
+  color: #ffffff !important;
   border-radius: 50%;
   width: 18px;
   height: 18px;
@@ -89,6 +150,7 @@
   border: 2px solid rgba(10, 10, 10, 0.9);
 }
 
+/* Dropdown notifiche */
 .notificationDropdown {
   position: absolute;
   top: 50px;
@@ -127,7 +189,7 @@
 .showAllLink {
   text-align: center;
   font-weight: 600;
-  color: var(--primary-color);
+  color: #8a4baf !important;
   padding: 12px;
   margin-top: 10px;
   border-top: 1px solid rgba(138, 75, 175, 0.2);
@@ -138,7 +200,7 @@
 
 .showAllLink:hover {
   background-color: rgba(138, 75, 175, 0.1);
-  color: white;
+  color: #ffffff !important;
 }
 
 /* === MEDIA QUERIES === */
