@@ -5,7 +5,7 @@ const Notification = require("../models/Notification");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const { Resend } = require('resend');
+const brevo = require('@getbrevo/brevo');
 
 // --- FUNZIONI DI AUTENTICAZIONE ---
 
@@ -55,7 +55,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD CON RESEND (FUNZIONA SU RENDER) ---
+// --- RECUPERO PASSWORD CON BREVO (300 EMAIL/GIORNO GRATIS) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -74,10 +74,11 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    console.log(`[DEBUG] Token salvato. Invio email con Resend...`);
+    console.log(`[DEBUG] Token salvato. Invio email con Brevo...`);
 
-    // RESEND - Funziona su Render (usa API HTTP, non SMTP)
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    // BREVO - Funziona senza verifica dominio
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
     const frontendUrl = process.env.NODE_ENV === 'production' 
       ? 'https://skibidi-film.vercel.app' 
@@ -87,11 +88,11 @@ exports.forgotPassword = async (req, res) => {
     
     console.log(`[DEBUG] Tento invio a ${user.email}...`);
 
-    const { data, error } = await resend.emails.send({
-      from: 'Skibidi Film <onboarding@resend.dev>',
-      to: [user.email],
+    const sendSmtpEmail = {
+      sender: { email: 'noreply@skibidifilm.com', name: 'Skibidi Film' },
+      to: [{ email: user.email }],
       subject: 'Reset Password Skibidi Film',
-      html: `
+      htmlContent: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #333;">Reset Password</h2>
           <p>Hai richiesto il reset della password per il tuo account Skibidi Film.</p>
@@ -102,18 +103,15 @@ exports.forgotPassword = async (req, res) => {
           <p style="color: #999; font-size: 12px; margin-top: 30px;">Questo link scade tra 1 ora. Se non hai richiesto il reset, ignora questa email.</p>
         </div>
       `
-    });
+    };
 
-    if (error) {
-      console.error('🔥 [DEBUG] ERRORE RESEND:', error);
-      return res.status(500).json({ message: "Errore invio email." });
-    }
+    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
 
-    console.log(`✅ [DEBUG] EMAIL INVIATA! ID: ${data.id}`);
+    console.log(`✅ [DEBUG] EMAIL INVIATA! ID: ${result.messageId}`);
     res.json({ message: "Email di recupero inviata!" });
 
   } catch (error) {
-    console.error("🔥 [DEBUG] ERRORE:", error);
+    console.error("🔥 [DEBUG] ERRORE BREVO:", error);
     res.status(500).json({ message: "Errore invio email." });
   }
 };
