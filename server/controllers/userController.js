@@ -55,7 +55,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD (FIX PER RENDER) ---
+// --- RECUPERO PASSWORD (CONFIGURAZIONE PORTA 587) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -68,27 +68,29 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    // CONFIGURAZIONE SMTP SICURA (Porta 465)
-    // Rimuoviamo 'service: gmail' perché su Render causa timeout spesso
+    // --- NUOVA CONFIGURAZIONE PER EVITARE TIMEOUT ---
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // Usa SSL
+      port: 587,            // Usiamo la porta 587 (Standard per TLS)
+      secure: false,        // false per la 587 (true è solo per la 465)
       auth: { 
         user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS // Render leggerà la password (senza spazi)
+        pass: process.env.EMAIL_PASS 
+      },
+      tls: {
+        rejectUnauthorized: false // Aiuta a bypassare problemi di certificati su Render
       }
     });
 
-    // Invia il link corretto (Vercel in produzione, Localhost in sviluppo)
     const frontendUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://skibidi-film.vercel.app' // Assicurati che questo sia il link Vercel giusto
+      ? 'https://skibidi-film.vercel.app' 
       : 'http://localhost:5173';
 
     const resetUrl = `${frontendUrl}/reset-password/${token}`;
     
     await transporter.sendMail({
       to: user.email,
+      from: `"Skibidi Support" <${process.env.EMAIL_USER}>`, // Mittente più carino
       subject: 'Reset Password Skibidi Film',
       text: `Hai richiesto il reset della password.\n\nClicca qui per procedere: ${resetUrl}\n\nIl link scade in 1 ora.`
     });
@@ -96,7 +98,7 @@ exports.forgotPassword = async (req, res) => {
     res.json({ message: "Email di recupero inviata!" });
   } catch (error) {
     console.error("Errore invio email:", error);
-    res.status(500).json({ message: "Errore invio email." });
+    res.status(500).json({ message: "Errore invio email (Timeout o Credenziali)." });
   }
 };
 
