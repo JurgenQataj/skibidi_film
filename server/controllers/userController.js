@@ -74,27 +74,23 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    console.log(`[DEBUG] Token salvato. Configuro SMTP (Porta 587 + Opzioni TLS)...`);
+    console.log(`[DEBUG] Token salvato. Configuro SMTP con porta 465...`);
 
-    // CONFIGURAZIONE BLINDATA PER RENDER
-    // Usiamo host esplicito, porta 587 e disabilitiamo controlli SSL rigidi
+    // SOLUZIONE: Porta 465 con SSL (funziona su Render)
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // STARTTLS
+      port: 465,
+      secure: true, // SSL
       auth: { 
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS 
       },
       tls: {
-        ciphers: 'SSLv3', // Aiuta la compatibilità
-        rejectUnauthorized: false // FONDAMENTALE: Accetta certificati anche se il firewall li tocca
-      },
-      connectionTimeout: 10000, // Timeout aumentato a 10 secondi
-      greetingTimeout: 5000     // Timeout saluto server aumentato
+        rejectUnauthorized: true
+      }
     });
 
-    // Link dinamico (Vercel se in produzione, Localhost se in sviluppo)
+    // Link dinamico
     const frontendUrl = process.env.NODE_ENV === 'production' 
       ? 'https://skibidi-film.vercel.app' 
       : 'http://localhost:5173';
@@ -107,17 +103,28 @@ exports.forgotPassword = async (req, res) => {
       to: user.email,
       from: `"Skibidi Support" <${process.env.EMAIL_USER}>`,
       subject: 'Reset Password Skibidi Film',
-      text: `Hai richiesto il reset della password.\n\nClicca qui per procedere: ${resetUrl}\n\nIl link scade in 1 ora.`
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Reset Password</h2>
+          <p>Hai richiesto il reset della password per il tuo account Skibidi Film.</p>
+          <p>Clicca sul pulsante qui sotto per reimpostare la password:</p>
+          <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">Reset Password</a>
+          <p>Oppure copia questo link nel browser:</p>
+          <p style="word-break: break-all; color: #666;">${resetUrl}</p>
+          <p style="color: #999; font-size: 12px; margin-top: 30px;">Questo link scade tra 1 ora. Se non hai richiesto il reset, ignora questa email.</p>
+        </div>
+      `
     });
 
-    console.log(`[DEBUG] EMAIL INVIATA CON SUCCESSO!`);
+    console.log(`✅ [DEBUG] EMAIL INVIATA CON SUCCESSO!`);
     res.json({ message: "Email di recupero inviata!" });
 
   } catch (error) {
     console.error("🔥 [DEBUG] ERRORE INVIO:", error);
-    res.status(500).json({ message: "Errore invio email (Timeout o Credenziali)." });
+    res.status(500).json({ message: "Errore invio email. Riprova tra qualche minuto." });
   }
 };
+
 
 exports.resetPassword = async (req, res) => {
   const { token } = req.params;
