@@ -1,19 +1,25 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema(
-  {
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    avatar_url: { type: String },
-    bio: { type: String },
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  
+  // Profilo
+  avatar_url: { type: String, default: "" }, 
+  bio: { type: String, default: "" },
 
-    // Riferimenti agli altri modelli
-    watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Movie" }],
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    // Le liste verranno gestite tramite il modello MovieList
-  },
-  { timestamps: true }
-);
+  // Social & Contenuti
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  
+  // Liste
+  watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
+  lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MovieList' }],
 
-module.exports = mongoose.model("User", UserSchema);
+  // Recupero Password
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
+}, { timestamps: true });
+
+module.exports = mongoose.model('User', userSchema);

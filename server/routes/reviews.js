@@ -1,16 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const reviewController = require("../controllers/reviewController");
-const authMiddleware = require("../middleware/authMiddleware");
+// Importiamo la funzione 'protect' usando le parentesi graffe
+const { protect } = require("../middleware/authMiddleware"); 
 
 // Rotte per le recensioni
-router.post("/", authMiddleware, reviewController.addReview);
+// Usiamo 'protect' direttamente
+router.post("/", protect, reviewController.addReview);
 router.get("/movie/:tmdbId", reviewController.getReviewsForMovie);
 router.get(
   "/status/:tmdbId",
-  authMiddleware,
+  protect, // Usiamo 'protect' direttamente
   reviewController.checkUserReviewStatus
 );
-router.delete("/:reviewId", authMiddleware, reviewController.deleteReview);
+router.delete("/:reviewId", protect, reviewController.deleteReview); // Usiamo 'protect' direttamente
 
 module.exports = router;

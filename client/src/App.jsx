@@ -18,7 +18,10 @@ import ProfilePage from "./pages/ProfilePage";
 import RegistrationPage from "./pages/RegistrationPage";
 import SearchPage from "./pages/SearchPage";
 import WatchlistPage from "./pages/WatchlistPage";
-import NotificationsPage from "./pages/NotificationsPage"; // <-- NUOVO IMPORT
+import NotificationsPage from "./pages/NotificationsPage";
+// NUOVI IMPORT PER PASSWORD RESET
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 // Import Componenti
 import Navbar from "./components/Navbar";
@@ -43,6 +46,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Rotte Pubbliche (Auth) */}
         <Route
           path="/register"
           element={token ? <Navigate to="/" /> : <RegistrationPage />}
@@ -51,7 +55,12 @@ function App() {
           path="/login"
           element={token ? <Navigate to="/" /> : <LoginPage />}
         />
+        
+        {/* NUOVE ROTTE PUBBLICHE (Password Reset) */}
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
+        {/* Rotte Protette (Richiedono Login) */}
         <Route
           path="/"
           element={
@@ -65,8 +74,7 @@ function App() {
           <Route path="discover" element={<DiscoverPage />} />
           <Route path="my-lists" element={<MyListsPage />} />
           <Route path="watchlist" element={<WatchlistPage />} />
-          <Route path="notifications" element={<NotificationsPage />} />{" "}
-          {/* <-- NUOVA ROTTA */}
+          <Route path="notifications" element={<NotificationsPage />} />
           <Route path="list/:listId" element={<ListPage />} />
           <Route path="profile/:userId" element={<ProfilePage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />

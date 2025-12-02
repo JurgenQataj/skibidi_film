@@ -1,25 +1,31 @@
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = (req, res, next) => {
-    const authHeader = req.header('Authorization');
+const protect = (req, res, next) => {
+    let token;
 
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Accesso negato. Nessun token fornito.' });
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            // Estrae il token dall'header
+            token = req.headers.authorization.split(' ')[1];
+
+            // Verifica il token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            // CORREZIONE FONDAMENTALE:
+            // Il token è stato creato come { user: { id: ... } }
+            // Quindi dobbiamo estrarre .user per avere l'oggetto giusto
+            req.user = decoded.user; 
+
+            next();
+        } catch (error) {
+            console.error("Errore verifica token:", error.message);
+            res.status(401).json({ message: 'Non autorizzato, token non valido' });
+        }
     }
-
-    const token = authHeader.split(' ')[1];
 
     if (!token) {
-         return res.status(401).json({ message: 'Accesso negato. Token malformato.' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded.user;
-        next();
-    } catch (ex) {
-        res.status(400).json({ message: 'Token non valido.' });
+        res.status(401).json({ message: 'Non autorizzato, nessun token fornito' });
     }
 };
 
-module.exports = authMiddleware;
+module.exports = { protect };

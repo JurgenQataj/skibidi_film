@@ -50,25 +50,16 @@ function MyListsPage() {
     }
   };
 
-  // --- FUNZIONE DI ELIMINAZIONE LISTA ---
   const handleDeleteList = async (listId) => {
-    // Chiediamo conferma prima di procedere
-    if (
-      window.confirm(
-        "Sei sicuro di voler eliminare questa lista? L'azione è irreversibile."
-      )
-    ) {
+    if (window.confirm("Sei sicuro di voler eliminare questa lista?")) {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(`${API_URL}/api/lists/${listId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // Aggiorniamo la lista di liste dopo l'eliminazione
         fetchLists();
       } catch (error) {
-        alert(
-          error.response?.data?.message || "Errore durante l'eliminazione."
-        );
+        alert(error.response?.data?.message || "Errore durante l'eliminazione.");
       }
     }
   };
@@ -82,14 +73,14 @@ function MyListsPage() {
         <form onSubmit={handleCreateList}>
           <input
             type="text"
-            placeholder="Titolo della lista (es. I miei film preferiti)"
+            placeholder="Titolo della lista"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className={styles.inputField}
             required
           />
           <textarea
-            placeholder="Breve descrizione (opzionale)"
+            placeholder="Descrizione (opzionale)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className={styles.textareaField}
@@ -106,24 +97,26 @@ function MyListsPage() {
           <div className={styles.listsContainer}>
             {lists.map((list) => (
               <div
-                key={list.id}
+                key={list._id} /* CORREZIONE: Usiamo _id di MongoDB */
                 className={`${styles.listCard} ${
-                  list.id === "watchlist" ? styles.watchlistCard : ""
+                  list.id === "watchlist" || list._id === "watchlist" ? styles.watchlistCard : ""
                 }`}
               >
                 <Link
                   to={
-                    list.id === "watchlist" ? "/watchlist" : `/list/${list.id}`
+                    list.id === "watchlist" || list._id === "watchlist" 
+                      ? "/watchlist" 
+                      : `/list/${list._id}`
                   }
                   className={styles.listLink}
                 >
                   <h3>{list.title}</h3>
                   <p>{list.description}</p>
                 </Link>
-                {/* Il bottone chiama la funzione handleDeleteList al click */}
-                {list.id !== "watchlist" && (
+                {/* Mostra il tasto elimina solo se NON è la watchlist */}
+                {list.id !== "watchlist" && list._id !== "watchlist" && (
                   <button
-                    onClick={() => handleDeleteList(list.id)}
+                    onClick={() => handleDeleteList(list._id)}
                     className={styles.deleteButton}
                     title="Elimina lista"
                   >

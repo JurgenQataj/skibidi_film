@@ -18,6 +18,7 @@ function LoginPage() {
     setError("");
     try {
       const API_URL = import.meta.env.VITE_API_URL || "";
+      // Nota: Il backend ora supporta login sia con username che email
       const response = await axios.post(`${API_URL}/api/users/login`, {
         username,
         password,
@@ -35,12 +36,13 @@ function LoginPage() {
     <form onSubmit={handleLogin} className={styles.loginContainer}>
       <h2>Login</h2>
       <div className={styles.inputGroup}>
-        <label>Username:</label>
+        <label>Username o Email:</label>
         <input
           className={styles.inputField}
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          required
         />
       </div>
       <div className={styles.inputGroup}>
@@ -50,13 +52,23 @@ function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
       </div>
       {error && <p style={{ color: "#ff8a8a" }}>{error}</p>}
+      
       <button type="submit" className={styles.submitButton} disabled={loading}>
         {loading ? "Caricamento..." : "Accedi"}
       </button>
-      <p style={{ marginTop: "15px" }}>
+
+      {/* NUOVO LINK RECUPERO PASSWORD */}
+      <div style={{ marginTop: "10px", textAlign: "right" }}>
+        <Link to="/forgot-password" style={{ fontSize: "0.9rem", color: "#aaa", textDecoration: "none" }}>
+          Password dimenticata?
+        </Link>
+      </div>
+
+      <p style={{ marginTop: "20px", textAlign: 'center' }}>
         Non hai un account? <Link to="/register">Registrati</Link>
       </p>
     </form>

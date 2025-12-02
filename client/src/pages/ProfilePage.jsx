@@ -11,143 +11,23 @@ import { useAuth } from "../context/AuthContext";
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
 const pokemonAvatars = [
   // --- Gen 1 ---
-  "001.png",
-  "003.png",
-  "004.png",
-  "006.png",
-  "007.png",
-  "009.png",
-  "065.png",
-  "068.png",
-  "094.png",
-  "131.png",
-  "143.png",
-  "149.png",
-  "150.png",
+  "001.png", "003.png", "004.png", "006.png", "007.png", "009.png", "065.png", "068.png", "094.png", "131.png", "143.png", "149.png", "150.png",
   // --- Gen 2 ---
-  "152.png",
-  "154.png",
-  "155.png",
-  "157.png",
-  "158.png",
-  "160.png",
-  "181.png",
-  "196.png",
-  "197.png",
-  "208.png",
-  "212.png",
-  "242.png",
-  "248.png",
-  "249.png",
-  "250.png",
+  "152.png", "154.png", "155.png", "157.png", "158.png", "160.png", "181.png", "196.png", "197.png", "208.png", "212.png", "242.png", "248.png", "249.png", "250.png",
   // --- Gen 3 ---
-  "252.png",
-  "254.png",
-  "255.png",
-  "257.png",
-  "258.png",
-  "260.png",
-  "282.png",
-  "306.png",
-  "334.png",
-  "350.png",
-  "373.png",
-  "376.png",
-  "380.png",
-  "381.png",
-  "384.png",
+  "252.png", "254.png", "255.png", "257.png", "258.png", "260.png", "282.png", "306.png", "334.png", "350.png", "373.png", "376.png", "380.png", "381.png", "384.png",
   // --- Gen 4 ---
-  "387.png",
-  "389.png",
-  "390.png",
-  "392.png",
-  "393.png",
-  "395.png",
-  "407.png",
-  "445.png",
-  "448.png",
-  "461.png",
-  "464.png",
-  "468.png",
-  "472.png",
-  "474.png",
-  "478.png",
-  "483.png",
-  "484.png",
-  "485.png",
-  "487.png",
+  "387.png", "389.png", "390.png", "392.png", "393.png", "395.png", "407.png", "445.png", "448.png", "461.png", "464.png", "468.png", "472.png", "474.png", "478.png", "483.png", "484.png", "485.png", "487.png",
   // --- Gen 5 ---
-  "495.png",
-  "497.png",
-  "498.png",
-  "500.png",
-  "501.png",
-  "503.png",
-  "530.png",
-  "542.png",
-  "549.png",
-  "553.png",
-  "576.png",
-  "635.png",
-  "637.png",
-  "646.png",
+  "495.png", "497.png", "498.png", "500.png", "501.png", "503.png", "530.png", "542.png", "549.png", "553.png", "576.png", "635.png", "637.png", "646.png",
   // --- Gen 6 ---
-  "650.png",
-  "652.png",
-  "653.png",
-  "655.png",
-  "656.png",
-  "658.png",
-  "660.png",
-  "681.png",
-  "697.png",
-  "715.png",
-  "719.png",
-  "720.png",
+  "650.png", "652.png", "653.png", "655.png", "656.png", "658.png", "660.png", "681.png", "697.png", "715.png", "719.png", "720.png",
   // --- Gen 7 ---
-  "722.png",
-  "724.png",
-  "725.png",
-  "727.png",
-  "728.png",
-  "730.png",
-  "745.png",
-  "778.png",
-  "784.png",
-  "786.png",
-  "787.png",
-  "788.png",
+  "722.png", "724.png", "725.png", "727.png", "728.png", "730.png", "745.png", "778.png", "784.png", "786.png", "787.png", "788.png",
   // --- Gen 8 ---
-  "810.png",
-  "812.png",
-  "813.png",
-  "815.png",
-  "816.png",
-  "818.png",
-  "845.png",
-  "849.png",
-  "861.png",
-  "869.png",
-  "884.png",
-  "887.png",
-  "889.png",
-  "890.png",
+  "810.png", "812.png", "813.png", "815.png", "816.png", "818.png", "845.png", "849.png", "861.png", "869.png", "884.png", "887.png", "889.png", "890.png",
   // --- Gen 9 ---
-  "906.png",
-  "909.png",
-  "912.png",
-  "920.png",
-  "925.png",
-  "930.png",
-  "937.png",
-  "943.png",
-  "954.png",
-  "968.png",
-  "977.png",
-  "981.png",
-  "990.png",
-  "1010.png",
-  "1025.png",
+  "906.png", "909.png", "912.png", "920.png", "925.png", "930.png", "937.png", "943.png", "954.png", "968.png", "977.png", "981.png", "990.png", "1010.png", "1025.png",
 ].map((n) => `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${n}`);
 
 function ProfilePage() {
@@ -158,17 +38,16 @@ function ProfilePage() {
   const [stats, setStats] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modalData, setModalData] = useState({
-    isOpen: false,
-    title: "",
-    content: [],
-  });
+  const [modalData, setModalData] = useState({ isOpen: false, title: "", content: [] });
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  
+  // MODALE MODIFICA
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
+  const [editEmail, setEditEmail] = useState(""); // <--- NUOVO: Stato per l'email
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -236,9 +115,7 @@ function ProfilePage() {
 
   const showModalWith = async (type) => {
     try {
-      const response = await axios.get(
-        `${API_URL}/api/users/${userId}/${type}`
-      );
+      const response = await axios.get(`${API_URL}/api/users/${userId}/${type}`);
       setModalData({
         isOpen: true,
         title: type === "followers" ? "Follower" : "Seguiti",
@@ -252,6 +129,7 @@ function ProfilePage() {
   const handleOpenEditModal = () => {
     setEditBio(profile.bio || "");
     setEditAvatar(profile.avatar_url || "");
+    setEditEmail(profile.email || ""); // <--- Carichiamo l'email attuale
     setIsEditModalOpen(true);
   };
 
@@ -261,13 +139,18 @@ function ProfilePage() {
       const token = localStorage.getItem("token");
       const updatedProfile = await axios.put(
         `${API_URL}/api/users/profile`,
-        { bio: editBio, avatar_url: editAvatar },
+        { 
+          bio: editBio, 
+          avatar_url: editAvatar,
+          email: editEmail // <--- Inviamo anche l'email
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProfile(updatedProfile.data);
       setIsEditModalOpen(false);
+      alert("Profilo aggiornato!");
     } catch (error) {
-      alert("Errore durante l'aggiornamento del profilo.");
+      alert(error.response?.data?.message || "Errore durante l'aggiornamento.");
     }
   };
 
@@ -292,14 +175,8 @@ function ProfilePage() {
     }
   };
 
-  if (loading)
-    return (
-      <p style={{ color: "white", textAlign: "center" }}>Caricamento...</p>
-    );
-  if (!profile || !stats)
-    return (
-      <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>
-    );
+  if (loading) return <p style={{ color: "white", textAlign: "center" }}>Caricamento...</p>;
+  if (!profile || !stats) return <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>;
 
   const isOwnProfile = loggedInUserId === profile._id;
   const recentReviews = reviews.slice(0, 24);
@@ -317,21 +194,39 @@ function ProfilePage() {
               <UserCard
                 key={user._id}
                 user={user}
-                onNavigate={() =>
-                  setModalData({ isOpen: false, title: "", content: [] })
-                }
+                onNavigate={() => setModalData({ isOpen: false, title: "", content: [] })}
               />
             ))}
         </div>
       </Modal>
 
-      {/* MODALE MODIFICA PROFILO SOLO POKéMON */}
+      {/* MODALE MODIFICA PROFILO */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Modifica Profilo"
       >
         <form onSubmit={handleProfileUpdate}>
+          
+          {/* CAMPO EMAIL AGGIUNTO */}
+          <label className={styles.editLabel}>Email (per recupero password)</label>
+          <input 
+            type="email"
+            value={editEmail}
+            onChange={(e) => setEditEmail(e.target.value)}
+            // Stile inline per rapidità, puoi spostarlo nel CSS se preferisci
+            style={{
+              width: '100%', 
+              padding: '8px', 
+              marginBottom: '15px', 
+              borderRadius: '4px', 
+              border: '1px solid #333', 
+              backgroundColor: '#222', 
+              color: 'white'
+            }}
+            placeholder="Inserisci la tua email"
+          />
+
           <label className={styles.editLabel}>La tua Biografia</label>
           <textarea
             value={editBio}
@@ -339,33 +234,24 @@ function ProfilePage() {
             className={styles.bioTextarea}
             maxLength="150"
           />
-          <label className={styles.editLabel}>
-            Scegli un Avatar Pokémon (HQ)
-          </label>
+          <label className={styles.editLabel}>Scegli un Avatar Pokémon (HQ)</label>
           <div className={styles.avatarGrid}>
             {pokemonAvatars.map((url) => (
               <img
                 key={url}
                 src={url}
                 alt="avatar Pokémon"
-                className={`${styles.avatarOption} ${
-                  editAvatar === url ? styles.selected : ""
-                }`}
+                className={`${styles.avatarOption} ${editAvatar === url ? styles.selected : ""}`}
                 onClick={() => setEditAvatar(url)}
               />
             ))}
           </div>
-          <button type="submit" className={styles.saveButton}>
-            Salva Modifiche
-          </button>
+          <button type="submit" className={styles.saveButton}>Salva Modifiche</button>
         </form>
         <hr className={styles.divider} />
         <div className={styles.dangerZone}>
           <h3 className={styles.dangerTitle}>Zona Pericolo</h3>
-          <button
-            onClick={handleDeleteAccount}
-            className={styles.deleteAccountButton}
-          >
+          <button onClick={handleDeleteAccount} className={styles.deleteAccountButton}>
             Elimina Account
           </button>
         </div>
@@ -381,14 +267,12 @@ function ProfilePage() {
             <li key={review._id} className={styles.historyItem}>
               <span className={styles.historyNumber}>{index + 1}</span>
               <img
-                src={`https://image.tmdb.org/t/p/w92${review.movie.poster_path}`}
+                src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w92${review.movie.poster_path}` : "https://placehold.co/92x138?text=No+Img"}
                 alt={`Poster di ${review.movie.title}`}
                 className={styles.historyPoster}
               />
               <div className={styles.historyInfo}>
-                <span className={styles.historyTitle}>
-                  {review.movie.title}
-                </span>
+                <span className={styles.historyTitle}>{review.movie.title}</span>
               </div>
               <span className={styles.historyRating}>{review.rating}/10</span>
             </li>
@@ -399,54 +283,36 @@ function ProfilePage() {
       <div className={styles.pageContainer}>
         <header className={styles.profileHeader}>
           <img
-            src={
-              profile.avatar_url ||
-              "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
-            }
+            src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
             alt="Avatar"
             className={styles.avatar}
           />
           <div className={styles.profileInfo}>
             <h1 className={styles.username}>{profile.username}</h1>
-            <p className={styles.bio}>
-              {profile.bio || "Questo utente non ha ancora una biografia."}
-            </p>
+            <p className={styles.bio}>{profile.bio || "Questo utente non ha ancora una biografia."}</p>
             <div className={styles.statsContainer}>
               <div className={styles.statItem}>
                 <div className={styles.statValue}>{stats.moviesReviewed}</div>
                 <div className={styles.statLabel}>Film Recensiti</div>
               </div>
-              <div
-                className={styles.statItemClickable}
-                onClick={() => showModalWith("followers")}
-              >
+              <div className={styles.statItemClickable} onClick={() => showModalWith("followers")}>
                 <div className={styles.statValue}>{stats.followersCount}</div>
                 <div className={styles.statLabel}>Follower</div>
               </div>
-              <div
-                className={styles.statItemClickable}
-                onClick={() => showModalWith("following")}
-              >
+              <div className={styles.statItemClickable} onClick={() => showModalWith("following")}>
                 <div className={styles.statValue}>{stats.followingCount}</div>
                 <div className={styles.statLabel}>Seguiti</div>
               </div>
             </div>
-            {loggedInUserId &&
-              (isOwnProfile ? (
-                <button
-                  onClick={handleOpenEditModal}
-                  className={styles.editButton}
-                >
-                  Modifica Profilo
-                </button>
+            {loggedInUserId && (
+              isOwnProfile ? (
+                <button onClick={handleOpenEditModal} className={styles.editButton}>Modifica Profilo</button>
               ) : (
-                <button
-                  onClick={handleFollowToggle}
-                  className={styles.followButton}
-                >
+                <button onClick={handleFollowToggle} className={styles.followButton}>
                   {isFollowing ? "Segui già" : "Segui"}
                 </button>
-              ))}
+              )
+            )}
           </div>
         </header>
 
@@ -463,10 +329,7 @@ function ProfilePage() {
           </div>
           {reviews.length > 24 && (
             <div className={styles.showAllContainer}>
-              <button
-                onClick={() => setIsHistoryModalOpen(true)}
-                className={styles.showAllButton}
-              >
+              <button onClick={() => setIsHistoryModalOpen(true)} className={styles.showAllButton}>
                 Mostra Tutta la Cronologia ({reviews.length} film)
               </button>
             </div>

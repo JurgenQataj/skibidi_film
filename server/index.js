@@ -7,28 +7,31 @@ connectDB();
 
 const app = express();
 
-// --- CONFIGURAZIONE CORS MIGLIORATA PER VERCEL ---
-const whitelist = [
-  "http://localhost:5173",
-  "http://192.168.1.6:5173",
-  "https://skibidi-film.vercel.app",
-];
+// --- CONFIGURAZIONE CORS UNIVERSALE PER SVILUPPO ---
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permette le richieste da URL di preview di Vercel e dalla whitelist
+    // !origin -> Permette richieste server-to-server (es. Postman) o app mobili
+    // includes("localhost") -> Permette localhost su QUALSIASI porta (5173, 5174, 5175...)
+    // includes("192.168.") -> Permette l'accesso dalla rete Wi-Fi locale (es. dal cellulare)
+    // endsWith(".vercel.app") -> Permette il frontend in produzione
     if (
       !origin ||
-      whitelist.indexOf(origin) !== -1 ||
+      origin.includes("localhost") ||
+      origin.includes("192.168.") || 
       origin.endsWith(".vercel.app")
     ) {
       callback(null, true);
     } else {
+      console.log("BLOCCATO DA CORS:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
+  credentials: true,
 };
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// ... (tutto uguale sotto) ...
 
 // --- ROTTE (invariate) ---
 app.use("/api/users", require("./routes/users"));
