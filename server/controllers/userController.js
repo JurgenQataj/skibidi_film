@@ -5,7 +5,7 @@ const Notification = require("../models/Notification");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const { Resend } = require('resend');
 
 // --- FUNZIONI DI AUTENTICAZIONE ---
 
@@ -55,7 +55,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD (CONFIGURAZIONE ROBUSTA PER RENDER) ---
+// --- RECUPERO PASSWORD CON RESEND (FUNZIONA SU RENDER) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -74,23 +74,11 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    console.log(`[DEBUG] Token salvato. Configuro SMTP con porta 465...`);
+    console.log(`[DEBUG] Token salvato. Invio email con Resend...`);
 
-    // SOLUZIONE: Porta 465 con SSL (funziona su Render)
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // SSL
-      auth: { 
-        user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS 
-      },
-      tls: {
-        rejectUnauthorized: true
-      }
-    });
+    // RESEND - Funziona su Render (usa API HTTP, non SMTP)
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    // Link dinamico
     const frontendUrl = process.env.NODE_ENV === 'production' 
       ? 'https://skibidi-film.vercel.app' 
       : 'http://localhost:5173';
@@ -99,9 +87,9 @@ exports.forgotPassword = async (req, res) => {
     
     console.log(`[DEBUG] Tento invio a ${user.email}...`);
 
-    await transporter.sendMail({
-      to: user.email,
-      from: `"Skibidi Support" <${process.env.EMAIL_USER}>`,
+    const { data, error } = await resend.emails.send({
+      from: 'Skibidi Film <onboarding@resend.dev>',
+      to: [user.email],
       subject: 'Reset Password Skibidi Film',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -116,15 +104,19 @@ exports.forgotPassword = async (req, res) => {
       `
     });
 
-    console.log(`✅ [DEBUG] EMAIL INVIATA CON SUCCESSO!`);
+    if (error) {
+      console.error('🔥 [DEBUG] ERRORE RESEND:', error);
+      return res.status(500).json({ message: "Errore invio email." });
+    }
+
+    console.log(`✅ [DEBUG] EMAIL INVIATA! ID: ${data.id}`);
     res.json({ message: "Email di recupero inviata!" });
 
   } catch (error) {
-    console.error("🔥 [DEBUG] ERRORE INVIO:", error);
-    res.status(500).json({ message: "Errore invio email. Riprova tra qualche minuto." });
+    console.error("🔥 [DEBUG] ERRORE:", error);
+    res.status(500).json({ message: "Errore invio email." });
   }
 };
-
 
 exports.resetPassword = async (req, res) => {
   const { token } = req.params;
