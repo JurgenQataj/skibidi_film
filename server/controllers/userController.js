@@ -55,7 +55,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD ---
+// --- RECUPERO PASSWORD (CONFIGURAZIONE FIXATA PER RENDER) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -68,22 +68,35 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
+    // --- MODIFICA CRUCIALE PER RENDER ---
+    // Usiamo host esplicito e porta 465 (SSL) per evitare timeout
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // true per la porta 465, false per le altre
+      auth: { 
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS 
+      }
     });
 
-    const resetUrl = `http://localhost:5173/reset-password/${token}`;
+    // Nota: Su Render devi usare il dominio reale del frontend, non localhost!
+    // Se sei in produzione usa l'URL di Vercel, altrimenti localhost
+    const frontendUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://skibidi-film.vercel.app' // <--- CAMBIA QUESTO CON IL TUO LINK VERCEL ESATTO
+      : 'http://localhost:5173';
+
+    const resetUrl = `${frontendUrl}/reset-password/${token}`;
     
     await transporter.sendMail({
       to: user.email,
       subject: 'Reset Password Skibidi Film',
-      text: `Clicca qui per resettare: ${resetUrl}`
+      text: `Clicca qui per resettare la password: ${resetUrl}`
     });
 
     res.json({ message: "Email di recupero inviata!" });
   } catch (error) {
-    console.error(error);
+    console.error("Errore Nodemailer:", error);
     res.status(500).json({ message: "Errore invio email." });
   }
 };
@@ -278,7 +291,6 @@ exports.getUserLists = async (req, res) => {
   try {
     const lists = await MovieList.find({ user: req.params.userId }).sort({ createdAt: -1 });
     
-    // Aggiunge la Watchlist come se fosse una lista normale
     const watchlistPseudoList = {
       _id: "watchlist", 
       title: "Watchlist",
