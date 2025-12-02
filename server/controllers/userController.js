@@ -76,9 +76,12 @@ exports.forgotPassword = async (req, res) => {
 
     console.log(`[DEBUG] Token salvato. Invio email con Brevo...`);
 
-    // BREVO - Funziona senza verifica dominio
+    // BREVO - Configurazione corretta
+    const defaultClient = brevo.ApiClient.instance;
+    const apiKey = defaultClient.authentications['api-key'];
+    apiKey.apiKey = process.env.BREVO_API_KEY;
+
     const apiInstance = new brevo.TransactionalEmailsApi();
-    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
     const frontendUrl = process.env.NODE_ENV === 'production' 
       ? 'https://skibidi-film.vercel.app' 
@@ -88,22 +91,21 @@ exports.forgotPassword = async (req, res) => {
     
     console.log(`[DEBUG] Tento invio a ${user.email}...`);
 
-    const sendSmtpEmail = {
-      sender: { email: 'noreply@skibidifilm.com', name: 'Skibidi Film' },
-      to: [{ email: user.email }],
-      subject: 'Reset Password Skibidi Film',
-      htmlContent: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #333;">Reset Password</h2>
-          <p>Hai richiesto il reset della password per il tuo account Skibidi Film.</p>
-          <p>Clicca sul pulsante qui sotto per reimpostare la password:</p>
-          <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">Reset Password</a>
-          <p>Oppure copia questo link nel browser:</p>
-          <p style="word-break: break-all; color: #666;">${resetUrl}</p>
-          <p style="color: #999; font-size: 12px; margin-top: 30px;">Questo link scade tra 1 ora. Se non hai richiesto il reset, ignora questa email.</p>
-        </div>
-      `
-    };
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.sender = { email: 'noreply@skibidifilm.com', name: 'Skibidi Film' };
+    sendSmtpEmail.to = [{ email: user.email }];
+    sendSmtpEmail.subject = 'Reset Password Skibidi Film';
+    sendSmtpEmail.htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #333;">Reset Password</h2>
+        <p>Hai richiesto il reset della password per il tuo account Skibidi Film.</p>
+        <p>Clicca sul pulsante qui sotto per reimpostare la password:</p>
+        <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">Reset Password</a>
+        <p>Oppure copia questo link nel browser:</p>
+        <p style="word-break: break-all; color: #666;">${resetUrl}</p>
+        <p style="color: #999; font-size: 12px; margin-top: 30px;">Questo link scade tra 1 ora. Se non hai richiesto il reset, ignora questa email.</p>
+      </div>
+    `;
 
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
 
@@ -112,9 +114,11 @@ exports.forgotPassword = async (req, res) => {
 
   } catch (error) {
     console.error("🔥 [DEBUG] ERRORE BREVO:", error);
+    console.error("🔥 [DEBUG] DETTAGLI:", error.response?.body || error.message);
     res.status(500).json({ message: "Errore invio email." });
   }
 };
+
 
 exports.resetPassword = async (req, res) => {
   const { token } = req.params;
