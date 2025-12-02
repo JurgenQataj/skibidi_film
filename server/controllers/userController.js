@@ -55,7 +55,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD (CONFIGURAZIONE PORTA 587 PER RENDER) ---
+// --- RECUPERO PASSWORD (STRATEGIA AUTOMATICA GMAIL + DEBUG) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -74,28 +74,25 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    console.log(`[DEBUG] Token salvato. Configuro SMTP su porta 587...`);
+    console.log(`[DEBUG] Token salvato. Configuro SMTP con service: 'gmail'...`);
 
-    // CONFIGURAZIONE SPECIFICA PER EVITARE TIMEOUT SU RENDER
+    // STRATEGIA 'SERVICE: GMAIL' (Risolve il timeout della porta 587)
+    // Questa configurazione gestisce automaticamente porte e sicurezza.
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,            // Porta standard per STARTTLS (migliore per il cloud)
-      secure: false,        // false per la 587 (true è solo per la 465)
+      service: 'gmail',
       auth: { 
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS 
       }
     });
 
-    // URL DEL FRONTEND (Vercel o Localhost)
-    // Assicurati che l'URL di produzione sia ESATTAMENTE quello del tuo sito Vercel
     const frontendUrl = process.env.NODE_ENV === 'production' 
       ? 'https://skibidi-film.vercel.app' 
       : 'http://localhost:5173';
 
     const resetUrl = `${frontendUrl}/reset-password/${token}`;
     
-    console.log(`[DEBUG] Tento invio a ${user.email} con link: ${resetUrl}`);
+    console.log(`[DEBUG] Tento invio a ${user.email}...`);
 
     await transporter.sendMail({
       to: user.email,
@@ -109,7 +106,7 @@ exports.forgotPassword = async (req, res) => {
 
   } catch (error) {
     console.error("🔥 [DEBUG] ERRORE INVIO:", error);
-    res.status(500).json({ message: "Errore invio email (Timeout o Credenziali)." });
+    res.status(500).json({ message: "Errore invio email (Controlla i log)." });
   }
 };
 
