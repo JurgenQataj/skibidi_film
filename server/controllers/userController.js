@@ -55,7 +55,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD (CONFIGURAZIONE FIXATA PER RENDER) ---
+// --- RECUPERO PASSWORD (FIX PER RENDER) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -68,22 +68,21 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    // --- MODIFICA CRUCIALE PER RENDER ---
-    // Usiamo host esplicito e porta 465 (SSL) per evitare timeout
+    // CONFIGURAZIONE SMTP SICURA (Porta 465)
+    // Rimuoviamo 'service: gmail' perché su Render causa timeout spesso
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
-      secure: true, // true per la porta 465, false per le altre
+      secure: true, // Usa SSL
       auth: { 
         user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS 
+        pass: process.env.EMAIL_PASS // Render leggerà la password (senza spazi)
       }
     });
 
-    // Nota: Su Render devi usare il dominio reale del frontend, non localhost!
-    // Se sei in produzione usa l'URL di Vercel, altrimenti localhost
+    // Invia il link corretto (Vercel in produzione, Localhost in sviluppo)
     const frontendUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://skibidi-film.vercel.app' // <--- CAMBIA QUESTO CON IL TUO LINK VERCEL ESATTO
+      ? 'https://skibidi-film.vercel.app' // Assicurati che questo sia il link Vercel giusto
       : 'http://localhost:5173';
 
     const resetUrl = `${frontendUrl}/reset-password/${token}`;
@@ -91,12 +90,12 @@ exports.forgotPassword = async (req, res) => {
     await transporter.sendMail({
       to: user.email,
       subject: 'Reset Password Skibidi Film',
-      text: `Clicca qui per resettare la password: ${resetUrl}`
+      text: `Hai richiesto il reset della password.\n\nClicca qui per procedere: ${resetUrl}\n\nIl link scade in 1 ora.`
     });
 
     res.json({ message: "Email di recupero inviata!" });
   } catch (error) {
-    console.error("Errore Nodemailer:", error);
+    console.error("Errore invio email:", error);
     res.status(500).json({ message: "Errore invio email." });
   }
 };
