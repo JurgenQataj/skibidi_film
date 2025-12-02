@@ -55,7 +55,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD (STRATEGIA AUTOMATICA GMAIL + DEBUG) ---
+// --- RECUPERO PASSWORD (CONFIGURAZIONE ROBUSTA PER RENDER) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -74,23 +74,26 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    console.log(`[DEBUG] Token salvato. Configuro SMTP con service: 'gmail'...`);
+    console.log(`[DEBUG] Token salvato. Configuro SMTP (Porta 587 + Opzioni TLS)...`);
 
-    // STRATEGIA 'SERVICE: GMAIL' (Risolve il timeout della porta 587)
-    // Questa configurazione gestisce automaticamente porte e sicurezza.
+    // CONFIGURAZIONE BLINDATA PER RENDER
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
-      secure: false, // false per porta 587 (STARTTLS)
+      secure: false, // false per STARTTLS (porta 587)
       auth: { 
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS 
       },
       tls: {
-        rejectUnauthorized: false // Importante per Render per evitare problemi di certificati
-      }
+        ciphers: 'SSLv3', // Aiuta la compatibilità
+        rejectUnauthorized: false // Accetta certificati anche se il firewall fa i capricci
+      },
+      connectionTimeout: 10000, // Timeout aumentato a 10 secondi
+      greetingTimeout: 5000     // Timeout saluto server aumentato
     });
 
+    // Link dinamico (Vercel se in produzione, Localhost se in sviluppo)
     const frontendUrl = process.env.NODE_ENV === 'production' 
       ? 'https://skibidi-film.vercel.app' 
       : 'http://localhost:5173';
@@ -111,7 +114,7 @@ exports.forgotPassword = async (req, res) => {
 
   } catch (error) {
     console.error("🔥 [DEBUG] ERRORE INVIO:", error);
-    res.status(500).json({ message: "Errore invio email (Controlla i log)." });
+    res.status(500).json({ message: "Errore invio email (Timeout o Credenziali)." });
   }
 };
 
