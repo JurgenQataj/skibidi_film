@@ -79,10 +79,15 @@ exports.forgotPassword = async (req, res) => {
     // STRATEGIA 'SERVICE: GMAIL' (Risolve il timeout della porta 587)
     // Questa configurazione gestisce automaticamente porte e sicurezza.
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // false per porta 587 (STARTTLS)
       auth: { 
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS 
+      },
+      tls: {
+        rejectUnauthorized: false // Importante per Render per evitare problemi di certificati
       }
     });
 
