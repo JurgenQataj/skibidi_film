@@ -77,17 +77,18 @@ exports.forgotPassword = async (req, res) => {
     console.log(`[DEBUG] Token salvato. Configuro SMTP (Porta 587 + Opzioni TLS)...`);
 
     // CONFIGURAZIONE BLINDATA PER RENDER
+    // Usiamo host esplicito, porta 587 e disabilitiamo controlli SSL rigidi
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
-      secure: false, // false per STARTTLS (porta 587)
+      secure: false, // STARTTLS
       auth: { 
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS 
       },
       tls: {
         ciphers: 'SSLv3', // Aiuta la compatibilità
-        rejectUnauthorized: false // Accetta certificati anche se il firewall fa i capricci
+        rejectUnauthorized: false // FONDAMENTALE: Accetta certificati anche se il firewall li tocca
       },
       connectionTimeout: 10000, // Timeout aumentato a 10 secondi
       greetingTimeout: 5000     // Timeout saluto server aumentato
