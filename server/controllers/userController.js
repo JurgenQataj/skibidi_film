@@ -12,6 +12,7 @@ const nodemailer = require("nodemailer");
 exports.registerUser = async (req, res) => {
   const { username, email, password, inviteCode } = req.body;
   
+  // Se nel .env non c'è il codice, salta il controllo
   if (process.env.REGISTRATION_SECRET_CODE && inviteCode !== process.env.REGISTRATION_SECRET_CODE) {
     return res.status(403).json({ message: "Codice d'invito non valido." });
   }
@@ -55,50 +56,60 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- RECUPERO PASSWORD (CONFIGURAZIONE PORTA 587) ---
+// --- RECUPERO PASSWORD (STRATEGIA AUTOMATICA GMAIL + DEBUG) ---
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
+  
+  // LOG 1: Vediamo se la richiesta arriva al server
+  console.log(`[DEBUG] Richiesta Password Dimenticata per: ${email}`);
+
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Email non trovata." });
+    if (!user) {
+      console.log(`[DEBUG] Utente non trovato nel DB.`);
+      return res.status(404).json({ message: "Email non trovata." });
+    }
 
     const token = crypto.randomBytes(20).toString('hex');
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    // --- NUOVA CONFIGURAZIONE PER EVITARE TIMEOUT ---
+    console.log(`[DEBUG] Token salvato nel DB. Preparo il transporter (service: gmail)...`);
+
+    // STRATEGIA GMAIL AUTOMATICA (Spesso risolve i timeout su Render)
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,            // Usiamo la porta 587 (Standard per TLS)
-      secure: false,        // false per la 587 (true è solo per la 465)
+      service: 'gmail', 
       auth: { 
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS 
-      },
-      tls: {
-        rejectUnauthorized: false // Aiuta a bypassare problemi di certificati su Render
       }
     });
 
+    // Link dinamico (Vercel se in produzione, Localhost se in sviluppo)
     const frontendUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://skibidi-film.vercel.app' 
+      ? 'https://skibidi-film.vercel.app' // Assicurati che questo link sia quello GIUSTO del tuo sito
       : 'http://localhost:5173';
 
     const resetUrl = `${frontendUrl}/reset-password/${token}`;
     
-    await transporter.sendMail({
+    console.log(`[DEBUG] Configurazione pronta. Tento invio mail a ${user.email}...`);
+
+    const info = await transporter.sendMail({
       to: user.email,
-      from: `"Skibidi Support" <${process.env.EMAIL_USER}>`, // Mittente più carino
+      from: `"Skibidi Support" <${process.env.EMAIL_USER}>`,
       subject: 'Reset Password Skibidi Film',
       text: `Hai richiesto il reset della password.\n\nClicca qui per procedere: ${resetUrl}\n\nIl link scade in 1 ora.`
     });
 
+    console.log(`[DEBUG] EMAIL INVIATA CON SUCCESSO! ID: ${info.messageId}`);
     res.json({ message: "Email di recupero inviata!" });
+
   } catch (error) {
-    console.error("Errore invio email:", error);
-    res.status(500).json({ message: "Errore invio email (Timeout o Credenziali)." });
+    // LOG 2: Stampiamo l'errore completo per capire se è ancora timeout o password errata
+    console.error("🔥 [DEBUG] ERRORE CRITICO INVIO EMAIL:", error);
+    res.status(500).json({ message: "Errore invio email. Controlla i log del server." });
   }
 };
 
