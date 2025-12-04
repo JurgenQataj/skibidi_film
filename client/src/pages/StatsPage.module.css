@@ -36,11 +36,44 @@
   border: 1px solid #333;
 }
 
-.statSection h2 {
+/* NUOVO: Header per allineare Titolo e Select */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #444;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  border-bottom: none; /* Rimuovo border dal h2 perché ora è nel container */
+  padding-bottom: 0;
+}
+
+/* Vecchio stile per h2 non header (come Top All Time) */
+.statSection > h2 {
   border-bottom: 2px solid #444;
   padding-bottom: 0.5rem;
   margin-bottom: 1.5rem;
   color: #e0e0e0;
+}
+
+/* NUOVO: Stile per il menu a tendina */
+.yearSelect {
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.yearSelect:focus {
+  outline: none;
+  border-color: #ff00cc;
 }
 
 .movieList {

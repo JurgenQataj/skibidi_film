@@ -230,10 +230,13 @@ exports.getUserStats = async (req, res) => {
   }
 };
 
-// --- NUOVA FUNZIONE: STATISTICHE AVANZATE (Top 10 2025, All Time, Attori, Registi) ---
+// --- NUOVA FUNZIONE: STATISTICHE AVANZATE DINAMICHE ---
 exports.getUserAdvancedStats = async (req, res) => {
   try {
     const userId = req.params.userId;
+    // Leggiamo l'anno dalla query string, altrimenti usiamo l'anno corrente
+    const targetYear = parseInt(req.query.year) || new Date().getFullYear();
+
     const user = await User.findById(userId).select("username");
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
@@ -243,9 +246,9 @@ exports.getUserAdvancedStats = async (req, res) => {
     // Filtra recensioni valide (dove il film esiste ancora)
     const validReviews = reviews.filter(r => r.movie);
 
-    // 1. Top 10 Film del 2025 (voto più alto)
-    const top2025 = validReviews
-      .filter(r => r.movie.release_year === 2025)
+    // 1. Top 10 Film dell'anno specifico (voto più alto)
+    const topYear = validReviews
+      .filter(r => r.movie.release_year === targetYear)
       .sort((a, b) => b.rating - a.rating)
       .slice(0, 10);
 
@@ -267,7 +270,6 @@ exports.getUserAdvancedStats = async (req, res) => {
     };
 
     // 3. Top 10 Attori più visti
-    // Nota: Funziona solo se il DB Movie ha il campo 'cast' popolato
     let allActors = [];
     validReviews.forEach(r => {
       if (r.movie.cast && Array.isArray(r.movie.cast)) {
@@ -277,7 +279,6 @@ exports.getUserAdvancedStats = async (req, res) => {
     const topActors = countOccurrences(allActors);
 
     // 4. Top 10 Registi più visti
-    // Nota: Funziona solo se il DB Movie ha il campo 'director' popolato
     let allDirectors = [];
     validReviews.forEach(r => {
       if (r.movie.director) {
@@ -288,7 +289,8 @@ exports.getUserAdvancedStats = async (req, res) => {
 
     res.json({
       username: user.username,
-      top2025,
+      topYear,     // Restituiamo la lista dell'anno selezionato
+      targetYear,  // Restituiamo l'anno per conferma
       topAllTime,
       topActors,
       topDirectors

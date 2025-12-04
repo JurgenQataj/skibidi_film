@@ -8,13 +8,22 @@ function StatsPage() {
   const { userId } = useParams();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Imposta l'anno corrente come predefinito
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
+  // Genera una lista di anni (dal corrente indietro fino al 1900)
+  const years = Array.from(new Array(currentYear - 1900 + 1), (val, index) => currentYear - index);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   useEffect(() => {
     const fetchStats = async () => {
+      setLoading(true); // Mostra caricamento quando cambia l'anno
       try {
-        const res = await axios.get(`${API_URL}/api/users/${userId}/advanced-stats`);
+        // Passiamo l'anno selezionato come parametro
+        const res = await axios.get(`${API_URL}/api/users/${userId}/advanced-stats?year=${selectedYear}`);
         setStats(res.data);
       } catch (error) {
         console.error("Errore stats:", error);
@@ -23,7 +32,7 @@ function StatsPage() {
       }
     };
     fetchStats();
-  }, [userId, API_URL]);
+  }, [userId, API_URL, selectedYear]); // Ricarica se cambia selectedYear
 
   if (loading) return <div className={styles.loading}>Caricamento Statistiche...</div>;
   if (!stats) return <div className={styles.error}>Impossibile caricare le statistiche.</div>;
@@ -33,19 +42,31 @@ function StatsPage() {
       <h1 className={styles.pageTitle}>{stats.username}'s Stats</h1>
 
       <div className={styles.statsGrid}>
-        {/* Sezione 1: Top 10 Film 2025 */}
+        {/* Sezione 1: Top 10 Film per Anno Selezionabile */}
         <section className={styles.statSection}>
-          <h2>Top 10 Film 2025</h2>
+          <div className={styles.sectionHeader}>
+            <h2>Top 10 Film {selectedYear}</h2>
+            <select 
+              value={selectedYear} 
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className={styles.yearSelect}
+            >
+              {years.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+          
           <div className={styles.movieList}>
-            {stats.top2025.length > 0 ? (
-              stats.top2025.map((review) => (
+            {stats.topYear && stats.topYear.length > 0 ? (
+              stats.topYear.map((review) => (
                 <div key={review._id} className={styles.rankedItem}>
                   <span className={styles.ratingBadge}>{review.rating}</span>
                   <MovieCard movie={review.movie} />
                 </div>
               ))
             ) : (
-              <p className={styles.emptyMsg}>Nessun film del 2025 recensito.</p>
+              <p className={styles.emptyMsg}>Nessun film del {selectedYear} recensito.</p>
             )}
           </div>
         </section>
@@ -54,7 +75,7 @@ function StatsPage() {
         <section className={styles.statSection}>
           <h2>Top 10 All Time</h2>
           <div className={styles.movieList}>
-            {stats.topAllTime.length > 0 ? (
+            {stats.topAllTime && stats.topAllTime.length > 0 ? (
               stats.topAllTime.map((review) => (
                 <div key={review._id} className={styles.rankedItem}>
                   <span className={styles.ratingBadge}>{review.rating}</span>
@@ -71,7 +92,7 @@ function StatsPage() {
         <section className={styles.statSection}>
           <h2>Top 10 Attori più visti</h2>
           <ul className={styles.textList}>
-            {stats.topActors.length > 0 ? (
+            {stats.topActors && stats.topActors.length > 0 ? (
               stats.topActors.map((actor, idx) => (
                 <li key={idx} className={styles.textItem}>
                   <span className={styles.rank}>#{idx + 1}</span>
@@ -89,7 +110,7 @@ function StatsPage() {
         <section className={styles.statSection}>
           <h2>Top 10 Registi più visti</h2>
           <ul className={styles.textList}>
-            {stats.topDirectors.length > 0 ? (
+            {stats.topDirectors && stats.topDirectors.length > 0 ? (
               stats.topDirectors.map((dir, idx) => (
                 <li key={idx} className={styles.textItem}>
                   <span className={styles.rank}>#{idx + 1}</span>
