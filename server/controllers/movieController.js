@@ -213,63 +213,101 @@ exports.getTopRatedMovies = async (req, res) => {
   }
 };
 
-// --- NUOVA FUNZIONE PER BACKFILL ---
-// Questa funzione aggiorna TUTTI i film nel database scaricando i dati mancanti da TMDB
+// ... (tutto il codice precedente per search, discover, ecc. rimane uguale)
+
+// --- FUNZIONE DI BACKFILL A BLOCCHI (Anti-Timeout) ---
 exports.updateAllMoviesData = async (req, res) => {
-  console.log("Inizio aggiornamento massivo film...");
+  console.log("--- Inizio aggiornamento parziale (Batch) ---");
+  const BATCH_SIZE = 50; // Aggiorna massimo 50 film alla volta per evitare timeout
+
   try {
-    // 1. Trova tutti i film nel DB
-    const allMovies = await Movie.find({});
-    console.log(`Trovati ${allMovies.length} film nel database.`);
+    // 1. Trova i film che HANNO BISOGNO di aggiornamento (campi mancanti)
+    const moviesToUpdate = await Movie.find({
+      $or: [
+        { director: { $exists: false } },
+        { cast: { $exists: false } },
+        { release_year: { $exists: false } },
+        { director: null },
+        { release_year: null },
+        { cast: { $size: 0 } } // Cast vuoto
+      ]
+    }).limit(BATCH_SIZE);
+
+    // Conta quanti ne mancano in totale (per informare l'utente)
+    const totalRemaining = await Movie.countDocuments({
+      $or: [
+        { director: { $exists: false } },
+        { cast: { $exists: false } },
+        { release_year: { $exists: false } },
+        { director: null },
+        { release_year: null },
+        { cast: { $size: 0 } }
+      ]
+    });
+
+    if (moviesToUpdate.length === 0) {
+      return res.json({
+        status: "COMPLETED",
+        message: "Tutti i film sono aggiornati! Non c'è altro da fare.",
+        remaining: 0
+      });
+    }
+
+    console.log(`Trovati ${moviesToUpdate.length} film da aggiornare in questo batch. (Rimasti totali: ${totalRemaining})`);
 
     let updatedCount = 0;
     let errorCount = 0;
 
-    // 2. Cicla su ogni film (usiamo for...of per farlo in sequenza e non intasare l'API)
-    for (const movie of allMovies) {
-      // Se mancano dati importanti (regista, cast o anno)
-      if (!movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year) {
+    for (const movie of moviesToUpdate) {
+      try {
+        // Scarica dettagli da TMDB
+        const tmdbUrl = `${BASE_URL}/movie/${movie.tmdb_id}?api_key=${API_KEY}&language=it-IT&append_to_response=credits`;
+        const response = await axios.get(tmdbUrl);
+        const data = response.data;
+
+        const releaseYear = data.release_date ? new Date(data.release_date).getFullYear() : null;
+        const directorData = data.credits?.crew?.find(c => c.job === "Director");
+        const director = directorData ? directorData.name : "Sconosciuto";
+        const cast = data.credits?.cast?.slice(0, 5).map(c => c.name) || [];
+
+        // Aggiorna usando findByIdAndUpdate
+        await Movie.findByIdAndUpdate(movie._id, {
+          release_year: releaseYear,
+          director: director,
+          cast: cast
+        });
         
-        try {
-          // Scarica dettagli da TMDB
-          const tmdbUrl = `${BASE_URL}/movie/${movie.tmdb_id}?api_key=${API_KEY}&language=it-IT&append_to_response=credits`;
-          const response = await axios.get(tmdbUrl);
-          const data = response.data;
+        updatedCount++;
+        console.log(`[OK] Aggiornato: ${movie.title}`);
+        
+        // Pausa minima per non bloccare tutto
+        await new Promise(resolve => setTimeout(resolve, 20)); 
 
-          // Estrai dati
-          const releaseYear = data.release_date ? new Date(data.release_date).getFullYear() : null;
-          const directorData = data.credits?.crew?.find(c => c.job === "Director");
-          const director = directorData ? directorData.name : "Sconosciuto";
-          const cast = data.credits?.cast?.slice(0, 5).map(c => c.name) || [];
-
-          // Aggiorna il documento
-          movie.release_year = releaseYear;
-          movie.director = director;
-          movie.cast = cast;
-          
-          await movie.save();
-          updatedCount++;
-          console.log(`[OK] Aggiornato: ${movie.title}`);
-          
-          // Piccola pausa per essere gentili con l'API di TMDB (opzionale ma consigliata)
-          await new Promise(resolve => setTimeout(resolve, 100)); 
-
-        } catch (err) {
-          console.error(`[ERRORE] Impossibile aggiornare ${movie.title} (ID: ${movie.tmdb_id}):`, err.message);
-          errorCount++;
+      } catch (err) {
+        console.error(`[ERRORE] Film ID ${movie.tmdb_id}:`, err.message);
+        errorCount++;
+        
+        // Se il film non esiste più su TMDB, marchiamolo come "aggiornato" ma con dati vuoti per non ritentare all'infinito
+        if (err.response && err.response.status === 404) {
+             await Movie.findByIdAndUpdate(movie._id, {
+                director: "Non Trovato",
+                release_year: 0,
+                cast: ["N/A"]
+             });
         }
       }
     }
 
     res.json({
-      message: "Processo completato.",
-      totalMovies: allMovies.length,
-      updated: updatedCount,
-      errors: errorCount
+      status: "IN_PROGRESS",
+      message: `Aggiornati ${updatedCount} film in questo giro.`,
+      errors: errorCount,
+      remaining: totalRemaining - updatedCount,
+      action: "RICARICA LA PAGINA PER CONTINUARE" // Messaggio per te
     });
 
   } catch (error) {
-    console.error("Errore generale backfill:", error);
-    res.status(500).json({ message: "Errore durante l'aggiornamento massivo." });
+    console.error("Errore backfill:", error);
+    res.status(500).json({ message: "Errore del server durante l'aggiornamento." });
   }
 };
