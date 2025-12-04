@@ -12,9 +12,10 @@ router.get("/top-rated", movieController.getTopRatedMovies);
 router.get("/admin/update-all-data", movieController.updateAllMoviesData);
 
 // --- NUOVA ROTTA PERSONA ---
-// IMPORTANTE: Deve stare PRIMA di /:tmdbId altrimenti Express pensa che "person" sia un ID
+// DEVE stare PRIMA di /:tmdbId altrimenti "person" viene letto come un ID film
 router.get("/person/:name", movieController.getMoviesByPerson);
 
+// Rotta dettaglio film (deve essere l'ultima get con un parametro variabile)
 router.get("/:tmdbId", movieController.getMovieDetails);
 
 module.exports = router;
