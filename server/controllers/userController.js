@@ -9,8 +9,9 @@ const SibApiV3Sdk = require("sib-api-v3-sdk");
 
 // Configurazione Brevo (una volta sola a livello di file)
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
+// Se non hai impostato la chiave, evita il crash ma le email non partiranno
 const apiKey = defaultClient.authentications["api-key"];
-apiKey.apiKey = process.env.BREVO_API_KEY;
+apiKey.apiKey = process.env.BREVO_API_KEY || ""; 
 const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // --- FUNZIONI DI AUTENTICAZIONE ---
@@ -100,9 +101,9 @@ exports.forgotPassword = async (req, res) => {
     console.log(`[DEBUG] Tento invio a ${user.email}...`);
 
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-    // Usa la tua email Brevo verificata come sender
+    // Usa la tua email Brevo verificata come sender o una generica se configurata
     sendSmtpEmail.sender = {
-      email: "jurgenklopp144@gmail.com",
+      email: "jurgenklopp144@gmail.com", 
       name: "Skibidi Film",
     };
     sendSmtpEmail.to = [{ email: user.email }];
@@ -230,7 +231,7 @@ exports.getUserStats = async (req, res) => {
   }
 };
 
-// --- NUOVA FUNZIONE: STATISTICHE AVANZATE DINAMICHE ---
+// --- NUOVA FUNZIONE: STATISTICHE AVANZATE DINAMICHE (Con Anno) ---
 exports.getUserAdvancedStats = async (req, res) => {
   try {
     const userId = req.params.userId;

@@ -56,7 +56,22 @@
 }
 
 .director {
-  display: none;
+  /* Rimosso display: none per mostrare il regista */
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+/* 🆕 NUOVO STILE PER LINK PERSONA (Regista/Attori) */
+.personLink {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.personLink:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
 }
 
 .actions {

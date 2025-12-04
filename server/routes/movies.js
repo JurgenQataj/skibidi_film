@@ -8,9 +8,12 @@ router.get("/suggestions", movieController.getMovieSuggestions);
 router.get("/trending", movieController.getTrendingMovies);
 router.get("/top-rated", movieController.getTopRatedMovies);
 
-// --- ROTTA SPECIALE PER AGGIORNAMENTO DATI ---
-// Visita questa rotta una volta dal browser per aggiornare tutto il DB
+// Rotta Admin per aggiornamento
 router.get("/admin/update-all-data", movieController.updateAllMoviesData);
+
+// --- NUOVA ROTTA PERSONA ---
+// IMPORTANTE: Deve stare PRIMA di /:tmdbId altrimenti Express pensa che "person" sia un ID
+router.get("/person/:name", movieController.getMoviesByPerson);
 
 router.get("/:tmdbId", movieController.getMovieDetails);
 

@@ -1,0 +1,51 @@
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: white;
+  min-height: 80vh;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.pageTitle {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #ff00cc, #333399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section {
+  margin-bottom: 4rem;
+}
+
+.sectionTitle {
+  border-left: 5px solid #ff00cc;
+  padding-left: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #eee;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.loading, .error, .emptyMsg {
+  text-align: center;
+  margin-top: 4rem;
+  color: #888;
+  font-size: 1.2rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -298,7 +298,17 @@ function MovieDetailPage() {
 
               <div className={styles.director}>
                 <strong>Regia:</strong>{" "}
-                <span>{movie.director?.name || "Non disponibile"}</span>
+                {/* LINK CLICCABILE PER REGISTA */}
+                {movie.director?.name ? (
+                  <Link 
+                    to={`/person/${encodeURIComponent(movie.director.name)}`} 
+                    className={styles.personLink}
+                  >
+                    {movie.director.name}
+                  </Link>
+                ) : (
+                  <span>Non disponibile</span>
+                )}
               </div>
 
               {loggedInUserId && (
@@ -356,7 +366,19 @@ function MovieDetailPage() {
         <div className={styles.infoSection}>
           <div className={styles.infoBox}>
             <h4>Regia</h4>
-            <p>{movie.director?.name || "Non disponibile"}</p>
+             {/* LINK CLICCABILE PER REGISTA NEI BOX */}
+            <p>
+               {movie.director?.name ? (
+                  <Link 
+                    to={`/person/${encodeURIComponent(movie.director.name)}`} 
+                    className={styles.personLink}
+                  >
+                    {movie.director.name}
+                  </Link>
+                ) : (
+                  "Non disponibile"
+                )}
+            </p>
           </div>
           <div className={styles.infoBox}>
             <h4>Durata</h4>
@@ -422,7 +444,13 @@ function MovieDetailPage() {
                   }
                   alt={actor.name}
                 />
-                <strong>{actor.name}</strong>
+                {/* LINK CLICCABILE PER ATTORE */}
+                <Link 
+                    to={`/person/${encodeURIComponent(actor.name)}`} 
+                    className={styles.personLink}
+                >
+                    <strong>{actor.name}</strong>
+                </Link>
                 <span>{actor.character}</span>
               </div>
             ))}

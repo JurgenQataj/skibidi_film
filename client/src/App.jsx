@@ -21,8 +21,8 @@ import WatchlistPage from "./pages/WatchlistPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-// NUOVO IMPORT
-import StatsPage from "./pages/StatsPage";
+import StatsPage from "./pages/StatsPage"; // Import StatsPage
+import PersonPage from "./pages/PersonPage";
 
 // Import Componenti
 import Navbar from "./components/Navbar";
@@ -77,9 +77,11 @@ function App() {
           <Route path="watchlist" element={<WatchlistPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="list/:listId" element={<ListPage />} />
+          
+          {/* Profilo e Statistiche */}
           <Route path="profile/:userId" element={<ProfilePage />} />
-          {/* NUOVA ROTTA STATS */}
           <Route path="profile/:userId/stats" element={<StatsPage />} />
+          <Route path="person/:name" element={<PersonPage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
         </Route>
       </Routes>

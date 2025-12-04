@@ -12,14 +12,10 @@ exports.getMovieSuggestions = async (req, res) => {
       return res.json({ results: [] });
     }
     if (!API_KEY) {
-      return res
-        .status(500)
-        .json({ message: "API key not configured", results: [] });
+      return res.status(500).json({ message: "API key not configured", results: [] });
     }
 
-    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
-      searchQuery
-    )}&language=it-IT&page=1`;
+    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT&page=1`;
     const response = await axios.get(url);
     const suggestions = response.data.results.slice(0, 5).map((movie) => ({
       id: movie.id,
@@ -37,23 +33,15 @@ exports.getMovieSuggestions = async (req, res) => {
 exports.searchMovies = async (req, res) => {
   const searchQuery = req.query.query;
   if (!searchQuery) {
-    return res
-      .status(400)
-      .json({ message: "Per favore, fornisci un testo per la ricerca." });
+    return res.status(400).json({ message: "Per favore, fornisci un testo per la ricerca." });
   }
   try {
-    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
-      searchQuery
-    )}&language=it-IT`;
+    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT`;
     const response = await axios.get(url);
     res.json(response.data);
   } catch (error) {
     console.error("Errore ricerca film:", error.message);
-    res
-      .status(500)
-      .json({
-        message: "Errore durante la comunicazione con il servizio esterno.",
-      });
+    res.status(500).json({ message: "Errore durante la comunicazione con il servizio esterno." });
   }
 };
 
@@ -66,22 +54,15 @@ exports.discoverMovies = async (req, res) => {
       release_date_lte,
       vote_average_gte,
       with_original_language,
-      with_keywords,
       sort_by,
       page = 1,
     } = req.query;
 
-    let allMovies = [];
-    // Logica semplificata per discover (mantiene la tua logica esistente se serve, 
-    // qui riduco per brevità ma se vuoi il codice completo discover dimmelo. 
-    // Per ora mantengo la logica standard veloce).
-    
     let endpoint = "/movie/popular";
     if (category === "top_rated") endpoint = "/movie/top_rated";
     if (category === "now_playing") endpoint = "/movie/now_playing";
     if (category === "upcoming") endpoint = "/movie/upcoming";
 
-    // Costruzione params base
     const params = {
       api_key: API_KEY,
       language: "it-IT",
@@ -95,7 +76,6 @@ exports.discoverMovies = async (req, res) => {
     if (vote_average_gte) params["vote_average.gte"] = vote_average_gte;
     if (with_original_language) params.with_original_language = with_original_language;
 
-    // Se stiamo filtrando, usiamo /discover/movie invece delle categorie fisse
     let fetchUrl = `${BASE_URL}${endpoint}`;
     if (genre || release_date_gte || release_date_lte || vote_average_gte || with_original_language || sort_by) {
         fetchUrl = `${BASE_URL}/discover/movie`;
@@ -112,10 +92,7 @@ exports.discoverMovies = async (req, res) => {
 
   } catch (error) {
     console.error("ERRORE DISCOVER:", error);
-    res.status(500).json({
-      message: "Errore durante la ricerca.",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Errore durante la ricerca.", error: error.message });
   }
 };
 
@@ -146,6 +123,7 @@ exports.getMovieDetails = async (req, res) => {
       poster_path: data.poster_path,
       backdrop_path: data.backdrop_path,
       release_date: data.release_date,
+      tagline: data.tagline, // Aggiunto tagline
       genres: data.genres,
       budget: data.budget,
       revenue: data.revenue,
@@ -164,9 +142,7 @@ exports.getMovieDetails = async (req, res) => {
       return res.status(404).json({ message: "Film non trovato." });
     }
     console.error("Errore recupero dettagli film:", error.message);
-    res
-      .status(500)
-      .json({ message: "Errore di comunicazione con il servizio esterno." });
+    res.status(500).json({ message: "Errore di comunicazione con il servizio esterno." });
   }
 };
 
@@ -213,15 +189,85 @@ exports.getTopRatedMovies = async (req, res) => {
   }
 };
 
-// ... (tutto il codice precedente per search, discover, ecc. rimane uguale)
+// --- FUNZIONE AGGIORNATA: CERCA PERSONA SU TMDB ---
+exports.getMoviesByPerson = async (req, res) => {
+  const personName = decodeURIComponent(req.params.name);
+  
+  try {
+    // 1. Cerca l'ID della persona su TMDB usando il nome
+    const searchUrl = `${BASE_URL}/search/person?api_key=${API_KEY}&query=${encodeURIComponent(personName)}&language=it-IT`;
+    const searchResponse = await axios.get(searchUrl);
+    
+    // Se non troviamo nessuno su TMDB
+    if (!searchResponse.data.results || searchResponse.data.results.length === 0) {
+       return res.json({ 
+         personName: personName, 
+         directed: [], 
+         acted: [] 
+       });
+    }
 
-// --- FUNZIONE DI BACKFILL A BLOCCHI (Anti-Timeout) ---
+    // Prendiamo il primo risultato
+    const person = searchResponse.data.results[0];
+    const personId = person.id;
+    const officialName = person.name;
+
+    // 2. Ottieni filmografia completa da TMDB
+    const creditsUrl = `${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=it-IT`;
+    const creditsResponse = await axios.get(creditsUrl);
+
+    const cast = creditsResponse.data.cast || [];
+    const crew = creditsResponse.data.crew || [];
+
+    // Formatter
+    const formatMovie = (m) => ({
+      _id: m.id, 
+      tmdb_id: m.id,
+      title: m.title,
+      poster_path: m.poster_path,
+      release_date: m.release_date,
+      vote_average: m.vote_average
+    });
+
+    // 3. Filtra Attore
+    const acted = cast
+      .filter(m => m.poster_path)
+      .map(formatMovie)
+      .sort((a, b) => {
+        const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
+        const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
+        return dateB - dateA;
+      });
+
+    // 4. Filtra Regista
+    const directed = crew
+      .filter(m => m.job === "Director")
+      .filter(m => m.poster_path)
+      .map(formatMovie)
+      .sort((a, b) => {
+        const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
+        const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
+        return dateB - dateA;
+      });
+
+    res.json({
+      personName: officialName,
+      directed,
+      acted
+    });
+
+  } catch (error) {
+    console.error("Errore ricerca persona su TMDB:", error.message);
+    res.status(500).json({ message: "Errore nel recupero della filmografia." });
+  }
+};
+
+// --- FUNZIONE BACKFILL A BATCH (Anti-Timeout) ---
 exports.updateAllMoviesData = async (req, res) => {
   console.log("--- Inizio aggiornamento parziale (Batch) ---");
-  const BATCH_SIZE = 50; // Aggiorna massimo 50 film alla volta per evitare timeout
+  const BATCH_SIZE = 50;
 
   try {
-    // 1. Trova i film che HANNO BISOGNO di aggiornamento (campi mancanti)
     const moviesToUpdate = await Movie.find({
       $or: [
         { director: { $exists: false } },
@@ -229,11 +275,10 @@ exports.updateAllMoviesData = async (req, res) => {
         { release_year: { $exists: false } },
         { director: null },
         { release_year: null },
-        { cast: { $size: 0 } } // Cast vuoto
+        { cast: { $size: 0 } }
       ]
     }).limit(BATCH_SIZE);
 
-    // Conta quanti ne mancano in totale (per informare l'utente)
     const totalRemaining = await Movie.countDocuments({
       $or: [
         { director: { $exists: false } },
@@ -253,14 +298,13 @@ exports.updateAllMoviesData = async (req, res) => {
       });
     }
 
-    console.log(`Trovati ${moviesToUpdate.length} film da aggiornare in questo batch. (Rimasti totali: ${totalRemaining})`);
+    console.log(`Batch: ${moviesToUpdate.length} film. Rimasti: ${totalRemaining}`);
 
     let updatedCount = 0;
     let errorCount = 0;
 
     for (const movie of moviesToUpdate) {
       try {
-        // Scarica dettagli da TMDB
         const tmdbUrl = `${BASE_URL}/movie/${movie.tmdb_id}?api_key=${API_KEY}&language=it-IT&append_to_response=credits`;
         const response = await axios.get(tmdbUrl);
         const data = response.data;
@@ -270,7 +314,6 @@ exports.updateAllMoviesData = async (req, res) => {
         const director = directorData ? directorData.name : "Sconosciuto";
         const cast = data.credits?.cast?.slice(0, 5).map(c => c.name) || [];
 
-        // Aggiorna usando findByIdAndUpdate
         await Movie.findByIdAndUpdate(movie._id, {
           release_year: releaseYear,
           director: director,
@@ -278,16 +321,11 @@ exports.updateAllMoviesData = async (req, res) => {
         });
         
         updatedCount++;
-        console.log(`[OK] Aggiornato: ${movie.title}`);
-        
-        // Pausa minima per non bloccare tutto
         await new Promise(resolve => setTimeout(resolve, 20)); 
 
       } catch (err) {
         console.error(`[ERRORE] Film ID ${movie.tmdb_id}:`, err.message);
         errorCount++;
-        
-        // Se il film non esiste più su TMDB, marchiamolo come "aggiornato" ma con dati vuoti per non ritentare all'infinito
         if (err.response && err.response.status === 404) {
              await Movie.findByIdAndUpdate(movie._id, {
                 director: "Non Trovato",
@@ -300,14 +338,14 @@ exports.updateAllMoviesData = async (req, res) => {
 
     res.json({
       status: "IN_PROGRESS",
-      message: `Aggiornati ${updatedCount} film in questo giro.`,
+      message: `Aggiornati ${updatedCount} film.`,
       errors: errorCount,
       remaining: totalRemaining - updatedCount,
-      action: "RICARICA LA PAGINA PER CONTINUARE" // Messaggio per te
+      action: "RICARICA LA PAGINA PER CONTINUARE"
     });
 
   } catch (error) {
     console.error("Errore backfill:", error);
-    res.status(500).json({ message: "Errore del server durante l'aggiornamento." });
+    res.status(500).json({ message: "Errore del server." });
   }
 };
