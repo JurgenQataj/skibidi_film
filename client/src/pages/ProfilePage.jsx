@@ -47,7 +47,7 @@ function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
-  const [editEmail, setEditEmail] = useState(""); // <--- NUOVO: Stato per l'email
+  const [editEmail, setEditEmail] = useState(""); 
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -129,7 +129,7 @@ function ProfilePage() {
   const handleOpenEditModal = () => {
     setEditBio(profile.bio || "");
     setEditAvatar(profile.avatar_url || "");
-    setEditEmail(profile.email || ""); // <--- Carichiamo l'email attuale
+    setEditEmail(profile.email || ""); 
     setIsEditModalOpen(true);
   };
 
@@ -142,7 +142,7 @@ function ProfilePage() {
         { 
           bio: editBio, 
           avatar_url: editAvatar,
-          email: editEmail // <--- Inviamo anche l'email
+          email: editEmail 
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -200,21 +200,17 @@ function ProfilePage() {
         </div>
       </Modal>
 
-      {/* MODALE MODIFICA PROFILO */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Modifica Profilo"
       >
         <form onSubmit={handleProfileUpdate}>
-          
-          {/* CAMPO EMAIL AGGIUNTO */}
           <label className={styles.editLabel}>Email (per recupero password)</label>
           <input 
             type="email"
             value={editEmail}
             onChange={(e) => setEditEmail(e.target.value)}
-            // Stile inline per rapidità, puoi spostarlo nel CSS se preferisci
             style={{
               width: '100%', 
               padding: '8px', 
@@ -302,6 +298,15 @@ function ProfilePage() {
               <div className={styles.statItemClickable} onClick={() => showModalWith("following")}>
                 <div className={styles.statValue}>{stats.followingCount}</div>
                 <div className={styles.statLabel}>Seguiti</div>
+              </div>
+              {/* NUOVO TASTO STATS */}
+              <div 
+                className={styles.statItemClickable} 
+                onClick={() => navigate(`/profile/${userId}/stats`)}
+                style={{ cursor: "pointer", marginLeft: "10px" }}
+              >
+                <div className={styles.statValue}>📊</div>
+                <div className={styles.statLabel}>Stats</div>
               </div>
             </div>
             {loggedInUserId && (

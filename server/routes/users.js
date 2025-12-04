@@ -13,15 +13,16 @@ router.post("/reset-password/:token", userController.resetPassword);
 router.get("/most-followed", userController.getMostFollowedUsers);
 router.get("/newest", userController.getNewestUsers);
 
-// --- Content (SPOSTATO IN ALTO!) ---
-// Le rotte specifiche DEVONO stare prima di /:userId
+// --- Content ---
 router.get("/feed", protect, userController.getUserFeed); 
 
-// --- Profile (Rotte con parametri :userId vanno DOPO) ---
+// --- Profile ---
 router.get("/:userId/profile", userController.getUserProfile);
 router.put("/profile", protect, userController.updateUserProfile);
 router.delete("/profile", protect, userController.deleteUserProfile);
 router.get("/:userId/stats", userController.getUserStats);
+// Nuova rotta per statistiche avanzate
+router.get("/:userId/advanced-stats", userController.getUserAdvancedStats);
 
 // --- Follow System ---
 router.post("/:userId/follow", protect, userController.followUser);

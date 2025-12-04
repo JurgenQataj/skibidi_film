@@ -2,7 +2,6 @@ const Review = require("../models/Review");
 const Movie = require("../models/Movie");
 const User = require("../models/User");
 const axios = require("axios");
-const mongoose = require("mongoose");
 
 // Aggiungere una recensione
 exports.addReview = async (req, res) => {
@@ -16,19 +15,60 @@ exports.addReview = async (req, res) => {
   }
 
   try {
+    // 1. Cerca il film nel DB locale
     let movie = await Movie.findOne({ tmdb_id: tmdbId });
-    if (!movie) {
-      const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
-      const tmdbResponse = await axios.get(tmdbUrl);
-      const movieData = tmdbResponse.data;
-      movie = new Movie({
-        tmdb_id: movieData.id,
-        title: movieData.title,
-        poster_path: movieData.poster_path,
-      });
-      await movie.save();
+
+    // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno), scaricali da TMDB
+    if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year) {
+      console.log(`[INFO] Aggiornamento dati film ID ${tmdbId} da TMDB...`);
+      
+      const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`;
+      
+      try {
+        const tmdbResponse = await axios.get(tmdbUrl);
+        const movieData = tmdbResponse.data;
+
+        // Estrazione Anno
+        const releaseYear = movieData.release_date 
+          ? new Date(movieData.release_date).getFullYear() 
+          : null;
+
+        // Estrazione Regista (Director)
+        const directorData = movieData.credits?.crew?.find(c => c.job === "Director");
+        const director = directorData ? directorData.name : "Sconosciuto";
+
+        // Estrazione Cast (Top 5 attori)
+        const cast = movieData.credits?.cast?.slice(0, 5).map(c => c.name) || [];
+
+        if (!movie) {
+          // Creazione nuovo film
+          movie = new Movie({
+            tmdb_id: movieData.id,
+            title: movieData.title,
+            poster_path: movieData.poster_path,
+            release_year: releaseYear,
+            director: director,
+            cast: cast,
+          });
+          await movie.save();
+        } else {
+          // Aggiornamento film esistente (Self-healing)
+          movie.release_year = releaseYear;
+          movie.director = director;
+          movie.cast = cast;
+          await movie.save();
+        }
+      } catch (apiError) {
+        console.error("Errore TMDB durante il salvataggio film:", apiError.message);
+        // Se fallisce TMDB ma il film non esiste, non possiamo creare la recensione
+        if (!movie) {
+          return res.status(502).json({ message: "Impossibile recuperare i dati del film." });
+        }
+        // Se il film esisteva già, procediamo anche senza aggiornarlo
+      }
     }
 
+    // 3. Controllo se l'utente ha già recensito
     const existingReview = await Review.findOne({
       user: userId,
       movie: movie._id,
@@ -39,6 +79,7 @@ exports.addReview = async (req, res) => {
         .json({ message: "Hai già recensito questo film." });
     }
 
+    // 4. Creazione Recensione
     const newReview = new Review({
       user: userId,
       movie: movie._id,
@@ -48,6 +89,7 @@ exports.addReview = async (req, res) => {
     });
     await newReview.save();
 
+    // Rimuovi dalla watchlist se presente
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });
 
     res.status(201).json({ message: "Recensione aggiunta con successo!" });
@@ -68,7 +110,7 @@ exports.getReviewsForMovie = async (req, res) => {
     }
 
     const reviews = await Review.find({ movie: movie._id })
-      .populate("user", "username avatar_url _id") // Popola i dati dell'utente
+      .populate("user", "username avatar_url _id")
       .sort({ createdAt: -1 });
 
     const stats = await Review.aggregate([
@@ -82,20 +124,20 @@ exports.getReviewsForMovie = async (req, res) => {
       },
     ]);
 
-    // Formattiamo i dati per il frontend
     const formattedReviews = reviews.map((review) => ({
       id: review._id,
       rating: review.rating,
       comment_text: review.comment_text,
       is_spoiler: review.is_spoiler,
       created_at: review.createdAt,
-      user_id: review.user._id,
-      username: review.user.username,
-      reactions: review.reactions.reduce((acc, reaction) => {
+      user_id: review.user ? review.user._id : null,
+      username: review.user ? review.user.username : "Utente eliminato",
+      avatar_url: review.user ? review.user.avatar_url : null,
+      reactions: review.reactions ? review.reactions.reduce((acc, reaction) => {
         acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
         return acc;
-      }, {}),
-      comment_count: review.comments.length,
+      }, {}) : {},
+      comment_count: review.comments ? review.comments.length : 0,
     }));
 
     res.json({

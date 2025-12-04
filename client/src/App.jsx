@@ -19,9 +19,10 @@ import RegistrationPage from "./pages/RegistrationPage";
 import SearchPage from "./pages/SearchPage";
 import WatchlistPage from "./pages/WatchlistPage";
 import NotificationsPage from "./pages/NotificationsPage";
-// NUOVI IMPORT PER PASSWORD RESET
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+// NUOVO IMPORT
+import StatsPage from "./pages/StatsPage";
 
 // Import Componenti
 import Navbar from "./components/Navbar";
@@ -56,7 +57,7 @@ function App() {
           element={token ? <Navigate to="/" /> : <LoginPage />}
         />
         
-        {/* NUOVE ROTTE PUBBLICHE (Password Reset) */}
+        {/* Rotte Password Reset */}
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
@@ -77,6 +78,8 @@ function App() {
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="list/:listId" element={<ListPage />} />
           <Route path="profile/:userId" element={<ProfilePage />} />
+          {/* NUOVA ROTTA STATS */}
+          <Route path="profile/:userId/stats" element={<StatsPage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
         </Route>
       </Routes>

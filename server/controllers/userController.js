@@ -230,6 +230,76 @@ exports.getUserStats = async (req, res) => {
   }
 };
 
+// --- NUOVA FUNZIONE: STATISTICHE AVANZATE (Top 10 2025, All Time, Attori, Registi) ---
+exports.getUserAdvancedStats = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId).select("username");
+    if (!user) return res.status(404).json({ message: "Utente non trovato" });
+
+    // Otteniamo tutte le recensioni popolate con i dati del film
+    const reviews = await Review.find({ user: userId }).populate("movie");
+
+    // Filtra recensioni valide (dove il film esiste ancora)
+    const validReviews = reviews.filter(r => r.movie);
+
+    // 1. Top 10 Film del 2025 (voto più alto)
+    const top2025 = validReviews
+      .filter(r => r.movie.release_year === 2025)
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 10);
+
+    // 2. Top 10 Film All Time (voto più alto)
+    const topAllTime = [...validReviews]
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 10);
+
+    // Helper per contare occorrenze
+    const countOccurrences = (items) => {
+      const counts = {};
+      items.forEach(item => {
+        if (item) counts[item] = (counts[item] || 0) + 1;
+      });
+      return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1]) // Ordina per conteggio decrescente
+        .slice(0, 10) // Prendi top 10
+        .map(([name, count]) => ({ name, count }));
+    };
+
+    // 3. Top 10 Attori più visti
+    // Nota: Funziona solo se il DB Movie ha il campo 'cast' popolato
+    let allActors = [];
+    validReviews.forEach(r => {
+      if (r.movie.cast && Array.isArray(r.movie.cast)) {
+        allActors = allActors.concat(r.movie.cast);
+      }
+    });
+    const topActors = countOccurrences(allActors);
+
+    // 4. Top 10 Registi più visti
+    // Nota: Funziona solo se il DB Movie ha il campo 'director' popolato
+    let allDirectors = [];
+    validReviews.forEach(r => {
+      if (r.movie.director) {
+        allDirectors.push(r.movie.director);
+      }
+    });
+    const topDirectors = countOccurrences(allDirectors);
+
+    res.json({
+      username: user.username,
+      top2025,
+      topAllTime,
+      topActors,
+      topDirectors
+    });
+
+  } catch (error) {
+    console.error("Errore Advanced Stats:", error);
+    res.status(500).json({ message: "Errore server" });
+  }
+};
+
 // --- SOCIAL E FOLLOW ---
 
 exports.followUser = async (req, res) => {

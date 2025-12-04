@@ -5,6 +5,9 @@ const MovieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   poster_path: { type: String },
   release_year: { type: Number },
+  // Nuovi campi per le statistiche
+  director: { type: String }, 
+  cast: [{ type: String }], // Array di nomi degli attori
 });
 
 module.exports = mongoose.model("Movie", MovieSchema);
