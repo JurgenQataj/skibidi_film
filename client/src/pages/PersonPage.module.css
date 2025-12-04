@@ -1,4 +1,4 @@
-.container {
+container {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -32,6 +32,7 @@
   letter-spacing: 1px;
 }
 
+/* GRIGLIA RESPONSIVE (Stile ProfilePage) */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -48,4 +49,41 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* --- LAYOUT MOBILE (Aggiunto come richiesto) --- */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px; /* Padding ridotto su mobile */
+  }
+
+  .pageTitle {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    border-left-width: 4px;
+  }
+
+  .grid {
+    /* Su tablet/mobile largo: card leggermente più piccole */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    /* Su smartphone: 2 colonne fisse per massimizzare lo spazio */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 10px;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+  }
 }
