@@ -8,6 +8,8 @@ import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
+import { FaChartBar } from "react-icons/fa";
+
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
 const pokemonAvatars = [
   // --- Gen 1 ---
@@ -305,7 +307,7 @@ function ProfilePage() {
                 onClick={() => navigate(`/profile/${userId}/stats`)}
                 style={{ cursor: "pointer", marginLeft: "10px" }}
               >
-                <div className={styles.statValue}>📊</div>
+                <div className={styles.statValue}><FaChartBar /></div>
                 <div className={styles.statLabel}>Stats</div>
               </div>
             </div>
