@@ -226,7 +226,9 @@ exports.getMoviesByPerson = async (req, res) => {
       title: m.title,
       poster_path: m.poster_path,
       release_date: m.release_date,
-      vote_average: m.vote_average
+      vote_average: m.vote_average,
+      vote_count: m.vote_count, // [NUOVO] Espongo i voti per i filtri popolarità
+      genre_ids: m.genre_ids // [NUOVO] Espongo i generi per il filtro documentari
     });
 
     // 3. Filtra Attore
