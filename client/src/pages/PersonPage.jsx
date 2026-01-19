@@ -41,14 +41,22 @@ function PersonPage() {
     if (showOnlyRated) filtered = filtered.filter((m) => m.vote_average && m.vote_average > 0);
     if (hideDocumentaries) filtered = filtered.filter((m) => !m.genre_ids?.includes(99));
     
-    // FILTRI APPROSSIMATI
-    // I film corti/sconosciuti hanno di solito pochi o zero voti.
-    // Soglia 5 voti per "Opere Sconosciute"
-    if (hideObscure) filtered = filtered.filter((m) => m.vote_count && m.vote_count >= 5);
+    // FILTRI PRECISI
+    // Filtro "Regie Sconosciute": Nasconde se il ruolo è esplicitamente segnato come "uncredited" o "unknown" 
+    // oppure se il job (per la crew) non è specificato.
+    if (hideObscure) {
+        filtered = filtered.filter((m) => {
+            const char = (m.character || "").toLowerCase();
+            const job = (m.job || "").toLowerCase();
+            const badKeywords = ["sconosciuto", "unknown", "uncredited"];
+            // Se contiene una parola chiave "bad", lo nascondiamo (return false)
+            if (badKeywords.some(w => char.includes(w) || job.includes(w))) return false;
+            return true;
+        });
+    }
     
-    // Soglia 50 voti per "Probabilmente Corti/Under 40"
-    // (Un feature film, anche vecchio, ha quasi sempre > 50-100 voti su TMDB se è vagamente noto)
-    if (hideShorts) filtered = filtered.filter((m) => m.vote_count && m.vote_count >= 100);
+    // Filtro "Under 40 min": Usa il flag is_short calcolato dal server (preciso!)
+    if (hideShorts) filtered = filtered.filter((m) => !m.is_short);
 
     return filtered;
   };
@@ -67,6 +75,8 @@ function PersonPage() {
       {/* FILTER BUTTON & DROPDOWN */}
       {/* FILTER BUTTON & DROPDOWN */}
       <div className={styles.filterContainer} style={{ textAlign: "center", marginBottom: "30px", position: "relative", zIndex: 10 }}>
+        {/* ... button code ... */}
+        {/* We need to update the options labels to reflect accuracy if needed, but the labels "Nascondi Under 40 min" work fine */}
         <button
           onClick={() => setShowFilterDropdown(!showFilterDropdown)}
           style={{

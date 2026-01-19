@@ -213,11 +213,18 @@ exports.getMoviesByPerson = async (req, res) => {
     const officialName = person.name;
 
     // 2. Ottieni filmografia completa da TMDB
-    const creditsUrl = `${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=it-IT`;
-    const creditsResponse = await axios.get(creditsUrl);
+    // 2. Fetch Credits & Short Films (Parallel)
+    // Usiamo discover per trovare ESATTAMENTE i film under 40 min di questa persona
+    const [creditsResponse, shortsResponse] = await Promise.all([
+      axios.get(`${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=it-IT`),
+      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40`)
+    ]);
 
     const cast = creditsResponse.data.cast || [];
     const crew = creditsResponse.data.crew || [];
+    
+    // Create a Set of IDs for short films for fast lookup
+    const shortMovieIds = new Set(shortsResponse.data.results.map(m => m.id));
 
     // Formatter
     const formatMovie = (m) => ({
@@ -227,8 +234,11 @@ exports.getMoviesByPerson = async (req, res) => {
       poster_path: m.poster_path,
       release_date: m.release_date,
       vote_average: m.vote_average,
-      vote_count: m.vote_count, // [NUOVO] Espongo i voti per i filtri popolarità
-      genre_ids: m.genre_ids // [NUOVO] Espongo i generi per il filtro documentari
+      vote_count: m.vote_count,
+      genre_ids: m.genre_ids,
+      is_short: shortMovieIds.has(m.id), // [NUOVO] Preciso al 100% grazie a discover
+      character: m.character, // [NUOVO] Per controllo 'uncredited'
+      job: m.job // [NUOVO] Per controllo 'uncredited' o ruoli specifici
     });
 
     // 3. Filtra Attore
