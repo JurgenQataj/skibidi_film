@@ -214,10 +214,14 @@ exports.getMoviesByPerson = async (req, res) => {
 
     // 2. Ottieni filmografia completa da TMDB
     // 2. Fetch Credits & Short Films (Parallel)
+    console.log("🎥 Fetching data for:", officialName); // DEBUG LOG
     // Usiamo discover per trovare ESATTAMENTE i film under 40 min di questa persona
-    const [creditsResponse, shortsResponse] = await Promise.all([
+    // E anche per trovare l'ordine di incasso (Revenue) per Cast e Crew
+    const [creditsResponse, shortsResponse, revenueCastResponse, revenueCrewResponse] = await Promise.all([
       axios.get(`${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=it-IT`),
-      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40`)
+      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40`),
+      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_cast=${personId}&sort_by=revenue.desc&page=1`),
+      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_crew=${personId}&sort_by=revenue.desc&page=1`)
     ]);
 
     const cast = creditsResponse.data.cast || [];
@@ -225,9 +229,18 @@ exports.getMoviesByPerson = async (req, res) => {
     
     // Create a Set of IDs for short films for fast lookup
     const shortMovieIds = new Set(shortsResponse.data.results.map(m => m.id));
+    
+    // Revenue Ranks (Map ID -> Rank)
+    const getRevenueRankMap = (list) => {
+      const map = new Map();
+      list.forEach((m, index) => map.set(m.id, index + 1));
+      return map;
+    };
+    const castRevenueMap = getRevenueRankMap(revenueCastResponse.data.results);
+    const crewRevenueMap = getRevenueRankMap(revenueCrewResponse.data.results);
 
     // Formatter
-    const formatMovie = (m) => ({
+    const formatMovie = (m, rankMap) => ({
       _id: m.id, 
       tmdb_id: m.id,
       title: m.title,
@@ -238,13 +251,14 @@ exports.getMoviesByPerson = async (req, res) => {
       genre_ids: m.genre_ids,
       is_short: shortMovieIds.has(m.id), // [NUOVO] Preciso al 100% grazie a discover
       character: m.character, // [NUOVO] Per controllo 'uncredited'
-      job: m.job // [NUOVO] Per controllo 'uncredited' o ruoli specifici
+      job: m.job, // [NUOVO] Per controllo 'uncredited' o ruoli specifici
+      revenue_rank: rankMap ? (rankMap.get(m.id) || 10000) : 10000 // Rank incassi
     });
 
     // 3. Filtra Attore
     const acted = cast
       .filter(m => m.poster_path)
-      .map(formatMovie)
+      .map(m => formatMovie(m, castRevenueMap))
       .sort((a, b) => {
         const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
         const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
@@ -255,7 +269,7 @@ exports.getMoviesByPerson = async (req, res) => {
     const directed = crew
       .filter(m => m.job === "Director")
       .filter(m => m.poster_path)
-      .map(formatMovie)
+      .map(m => formatMovie(m, crewRevenueMap))
       .sort((a, b) => {
         const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
         const dateB = b.release_date ? new Date(b.release_date) : new Date(0);

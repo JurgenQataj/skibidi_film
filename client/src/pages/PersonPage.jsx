@@ -13,6 +13,7 @@ function PersonPage() {
   const [hideShorts, setHideShorts] = useState(false); // [NUOVO] Filtro 'Under 40 min' (approssimato)
   const [hideObscure, setHideObscure] = useState(false); // [NUOVO] Filtro 'Regie sconosciute' (approssimato)
   const [showFilterDropdown, setShowFilterDropdown] = useState(false); // [NUOVO] Stato per il dropdown filtri
+  const [sortBy, setSortBy] = useState("date"); // 'date' | 'revenue'
 
   const API_URL = import.meta.env.VITE_API_URL || "";
   const decodedName = decodeURIComponent(name);
@@ -57,6 +58,27 @@ function PersonPage() {
     
     // Filtro "Under 40 min": Usa il flag is_short calcolato dal server (preciso!)
     if (hideShorts) filtered = filtered.filter((m) => !m.is_short);
+    
+    // DEBUG: Log first movie to check data
+    if (list.length > 0 && sortBy === 'revenue') {
+        console.log("Sort Debug - Movie[0]:", list[0].title, "Rank:", list[0].revenue_rank);
+    }
+    
+    // ORDINAMENTO
+    if (sortBy === "revenue") {
+        filtered.sort((a, b) => {
+            const rankA = a.revenue_rank || 10000;
+            const rankB = b.revenue_rank || 10000;
+            return rankA - rankB;
+        });
+    } else {
+        // Default: Date Descending
+        filtered.sort((a, b) => {
+             const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
+             const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
+             return dateB - dateA;
+        });
+    }
 
     return filtered;
   };
@@ -73,10 +95,30 @@ function PersonPage() {
       
       {/* FILTER TOGGLE */}
       {/* FILTER BUTTON & DROPDOWN */}
-      {/* FILTER BUTTON & DROPDOWN */}
-      <div className={styles.filterContainer} style={{ textAlign: "center", marginBottom: "30px", position: "relative", zIndex: 10 }}>
-        {/* ... button code ... */}
-        {/* We need to update the options labels to reflect accuracy if needed, but the labels "Nascondi Under 40 min" work fine */}
+      <div className={styles.filterContainer} style={{ textAlign: "center", marginBottom: "30px", position: "relative", zIndex: 10, display: "flex", justifyContent: "center", gap: "15px" }}>
+        {/* SORT BUTTON */}
+        <button
+           onClick={() => setSortBy(sortBy === "date" ? "revenue" : "date")}
+           style={{
+            background: sortBy === "revenue" ? "linear-gradient(135deg, #FFD700, #FFA500)" : "#333", // Gold for revenue
+            color: "white",
+            padding: "12px 24px",
+            border: "none",
+            borderRadius: "50px",
+            cursor: "pointer",
+            fontWeight: "bold",
+            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
+            transition: "all 0.3s ease",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "1rem"
+          }}
+          title="Cambia ordinamento"
+        >
+          {sortBy === "revenue" ? "💰 Top Box Office" : "📅 Ordina per Data"}
+        </button>
+
         <button
           onClick={() => setShowFilterDropdown(!showFilterDropdown)}
           style={{
