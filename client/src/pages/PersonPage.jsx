@@ -8,12 +8,27 @@ function PersonPage() {
   const { name } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showOnlyRated, setShowOnlyRated] = useState(false);
-  const [hideDocumentaries, setHideDocumentaries] = useState(false);
-  const [hideShorts, setHideShorts] = useState(false); // [NUOVO] Filtro 'Under 40 min' (approssimato)
-  const [hideObscure, setHideObscure] = useState(false); // [NUOVO] Filtro 'Regie sconosciute' (approssimato)
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false); // [NUOVO] Stato per il dropdown filtri
-  const [sortBy, setSortBy] = useState("date"); // 'date' | 'revenue'
+  // Helper per inizializzare lo stato da localStorage
+  const getInitialState = (key, defaultValue) => {
+    const saved = localStorage.getItem(key);
+    return saved !== null ? JSON.parse(saved) : defaultValue;
+  };
+
+  const [showOnlyRated, setShowOnlyRated] = useState(() => getInitialState("showOnlyRated", false));
+  const [hideDocumentaries, setHideDocumentaries] = useState(() => getInitialState("hideDocumentaries", false));
+  const [hideShorts, setHideShorts] = useState(() => getInitialState("hideShorts", false));
+  const [hideObscure, setHideObscure] = useState(() => getInitialState("hideObscure", false));
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [sortBy, setSortBy] = useState(() => getInitialState("sortBy", "date"));
+
+  // Salva le preferenze ogni volta che cambiano
+  useEffect(() => {
+    localStorage.setItem("showOnlyRated", JSON.stringify(showOnlyRated));
+    localStorage.setItem("hideDocumentaries", JSON.stringify(hideDocumentaries));
+    localStorage.setItem("hideShorts", JSON.stringify(hideShorts));
+    localStorage.setItem("hideObscure", JSON.stringify(hideObscure));
+    localStorage.setItem("sortBy", JSON.stringify(sortBy));
+  }, [showOnlyRated, hideDocumentaries, hideShorts, hideObscure, sortBy]);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
   const decodedName = decodeURIComponent(name);
@@ -58,11 +73,6 @@ function PersonPage() {
     
     // Filtro "Under 40 min": Usa il flag is_short calcolato dal server (preciso!)
     if (hideShorts) filtered = filtered.filter((m) => !m.is_short);
-    
-    // DEBUG: Log first movie to check data
-    if (list.length > 0 && sortBy === 'revenue') {
-        console.log("Sort Debug - Movie[0]:", list[0].title, "Rank:", list[0].revenue_rank);
-    }
     
     // ORDINAMENTO
     if (sortBy === "revenue") {
