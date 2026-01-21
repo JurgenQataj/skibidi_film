@@ -131,24 +131,7 @@ function PersonPage() {
 
         <button
           onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-          style={{
-            background: "linear-gradient(135deg, #6e8efb, #a777e3)",
-            color: "white",
-            padding: "12px 24px",
-            border: "none",
-            borderRadius: "50px",
-            cursor: "pointer",
-            fontWeight: "bold",
-            boxShadow: "0 4px 15px rgba(110, 142, 251, 0.4)",
-            transition: "all 0.3s ease",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "12px",
-            fontSize: "1rem",
-            letterSpacing: "0.5px"
-          }}
-          onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-          onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+          className={styles.filterButton}
         >
           Nascondi film useless {showFilterDropdown ? "▲" : "▼"}
         </button>
