@@ -14,6 +14,11 @@ exports.addReview = async (req, res) => {
       .json({ message: "ID del film e valutazione sono obbligatori." });
   }
 
+  // VALIDAZIONE RATING
+  if (rating < 0 || rating > 10) {
+      return res.status(400).json({ message: "Il voto deve essere compreso tra 0 e 10." });
+  }
+
   try {
     // 1. Cerca il film nel DB locale
     let movie = await Movie.findOne({ tmdb_id: tmdbId });
@@ -186,6 +191,35 @@ exports.deleteReview = async (req, res) => {
     await review.deleteOne();
     res.json({ message: "Recensione eliminata con successo." });
   } catch (error) {
+    res.status(500).json({ message: "Errore del server." });
+  }
+};
+
+// Aggiornare una recensione
+exports.updateReview = async (req, res) => {
+  const { rating, comment_text, is_spoiler } = req.body;
+  try {
+    const review = await Review.findById(req.params.reviewId);
+    if (!review)
+      return res.status(404).json({ message: "Recensione non trovata." });
+
+    if (review.user.toString() !== req.user.id) {
+       return res.status(403).json({ message: "Non hai i permessi." });
+    }
+
+    if (rating !== undefined) {
+        if (rating < 0 || rating > 10) {
+            return res.status(400).json({ message: "Il voto deve essere compreso tra 0 e 10." });
+        }
+        review.rating = rating;
+    }
+    if (comment_text !== undefined) review.comment_text = comment_text;
+    if (is_spoiler !== undefined) review.is_spoiler = is_spoiler;
+
+    await review.save();
+    res.json(review);
+  } catch (error) {
+    console.error("Errore aggiornamento recensione:", error);
     res.status(500).json({ message: "Errore del server." });
   }
 };

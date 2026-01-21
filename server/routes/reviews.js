@@ -14,5 +14,6 @@ router.get(
   reviewController.checkUserReviewStatus
 );
 router.delete("/:reviewId", protect, reviewController.deleteReview); // Usiamo 'protect' direttamente
+router.put("/:reviewId", protect, reviewController.updateReview); // [NEW] Modifica recensione
 
 module.exports = router;

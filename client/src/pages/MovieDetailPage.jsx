@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import styles from "./MovieDetailPage.module.css";
 import AddReviewForm from "../components/AddReviewForm";
 import MovieCard from "../components/MovieCard";
+import EditReviewModal from "../components/EditReviewModal";
 
 function MovieDetailPage() {
   const { tmdbId } = useParams();
@@ -29,6 +30,7 @@ function MovieDetailPage() {
     comments: [],
   });
   const [commentText, setCommentText] = useState("");
+  const [editingReview, setEditingReview] = useState(null); // [NEW] Stato per la recensione in modifica
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -499,12 +501,24 @@ function MovieDetailPage() {
                       {review.rating}/10
                     </span>
                     {loggedInUserId === review.user_id && (
-                      <button
-                        onClick={() => handleDeleteReview(review.id)}
-                        className={styles.deleteButton}
-                      >
-                        Elimina
-                      </button>
+                      <div className={styles.manageButtons} style={{display: "flex", gap: "10px", marginTop: "5px"}}>
+                         <button
+                          onClick={() => setEditingReview(review)}
+                          className={styles.editButton}
+                          style={{
+                              background: "none", border: "1px solid #aaa", color: "#ccc",
+                              padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem"
+                          }}
+                        >
+                          Modifica
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReview(review.id)}
+                          className={styles.deleteButton}
+                        >
+                          Elimina
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -571,6 +585,14 @@ function MovieDetailPage() {
           </div>
         </div>
       </div>
+      {/* MODALE DI MODIFICA */}
+      {editingReview && (
+        <EditReviewModal
+          review={editingReview}
+          onClose={() => setEditingReview(null)}
+          onUpdate={fetchData}
+        />
+      )}
     </div>
   );
 }
