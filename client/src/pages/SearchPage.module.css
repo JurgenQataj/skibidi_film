@@ -549,3 +549,46 @@
 *::-webkit-scrollbar-thumb:hover {
   background: #666;
 }
+
+/* Card Persona */
+.personCard {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.personCard:hover {
+  transform: translateY(-5px);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.personCard img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.personCard h3 {
+  font-size: 1rem;
+  margin: 5px 0;
+  color: white;
+}
+
+.personCard p {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

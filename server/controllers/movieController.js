@@ -8,6 +8,7 @@ const BASE_URL = "https://api.themoviedb.org/3";
 exports.getMovieSuggestions = async (req, res) => {
   try {
     const searchQuery = req.query.query;
+    const type = req.query.type || "movie"; // Default a movie
     if (!searchQuery || searchQuery.length < 2) {
       return res.json({ results: [] });
     }
@@ -15,13 +16,19 @@ exports.getMovieSuggestions = async (req, res) => {
       return res.status(500).json({ message: "API key not configured", results: [] });
     }
 
-    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT&page=1`;
+    // Scegli l'endpoint in base al tipo
+    const endpoint = type === "person" ? "search/person" : "search/movie";
+    const url = `${BASE_URL}/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT&page=1`;
+    
     const response = await axios.get(url);
-    const suggestions = response.data.results.slice(0, 5).map((movie) => ({
-      id: movie.id,
-      title: movie.title,
-      poster_path: movie.poster_path,
-      release_date: movie.release_date,
+    
+    // Mappiamo i risultati gestendo sia film (title, poster_path) che persone (name, profile_path)
+    const suggestions = response.data.results.slice(0, 5).map((item) => ({
+      id: item.id,
+      title: item.title || item.name, // Le persone hanno 'name', i film 'title'
+      poster_path: item.poster_path || item.profile_path, // Le persone hanno 'profile_path'
+      release_date: item.release_date || null, // Le persone non hanno release_date
+      media_type: type 
     }));
     res.json({ results: suggestions });
   } catch (error) {
@@ -41,6 +48,27 @@ exports.searchMovies = async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.error("Errore ricerca film:", error.message);
+    res.status(500).json({ message: "Errore durante la comunicazione con il servizio esterno." });
+  }
+};
+
+exports.searchPerson = async (req, res) => {
+  const searchQuery = req.query.query;
+  if (!searchQuery) {
+    return res.status(400).json({ message: "Per favore, fornisci un nome per la ricerca." });
+  }
+  try {
+    const url = `${BASE_URL}/search/person?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT`;
+    const response = await axios.get(url);
+    const people = response.data.results.map(person => ({
+      id: person.id,
+      name: person.name,
+      profile_path: person.profile_path,
+      known_for: person.known_for?.map(m => m.title || m.name).join(", ")
+    }));
+    res.json({ results: people, total_pages: response.data.total_pages });
+  } catch (error) {
+    console.error("Errore ricerca persona:", error.message);
     res.status(500).json({ message: "Errore durante la comunicazione con il servizio esterno." });
   }
 };

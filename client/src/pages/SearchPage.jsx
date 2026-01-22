@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import styles from "./SearchPage.module.css";
 import MovieCard from "../components/MovieCard";
@@ -13,7 +13,12 @@ function SearchPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [hasMore, setHasMore] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryParam = searchParams.get("query");
+  const modeParam = searchParams.get("mode");
+  const [searchMode, setSearchMode] = useState(modeParam || "movie"); // "movie" | "person"
   const navigate = useNavigate();
+  const ignoreFilterChange = useRef(false); // Per evitare conflitti tra ricerca e filtri
 
   // Stati per i filtri
   const [filters, setFilters] = useState({
@@ -79,6 +84,11 @@ function SearchPage() {
 
   // Reset quando cambiano i filtri
   useEffect(() => {
+    if (ignoreFilterChange.current) {
+      ignoreFilterChange.current = false;
+      return;
+    }
+
     if (hasSearched) {
       setCurrentPage(1);
       setResults([]);
@@ -144,21 +154,28 @@ function SearchPage() {
   const handleSearch = async (query) => {
     if (!query) return;
 
+    // Aggiorniamo SEMPRE l'URL con query e modalità corrente per tenerli sincronizzati
+    // Questo è fondamentale per mantenere la modalità "person" attiva
+    setSearchParams({ query, mode: searchMode });
+
     setLoading(true);
     setHasSearched(true);
     setCurrentPage(1);
     setResults([]);
 
     try {
-      const response = await axios.get(
-        `${API_URL}/api/movies/search?query=${encodeURIComponent(query)}`
-      );
+      const endpoint = searchMode === "movie" 
+        ? `${API_URL}/api/movies/search?query=${encodeURIComponent(query)}`
+        : `${API_URL}/api/movies/search/person?query=${encodeURIComponent(query)}`;
+
+      const response = await axios.get(endpoint);
       const searchResults = response.data.results || [];
       setResults(searchResults);
       setTotalPages(response.data.total_pages || 0);
       setHasMore(1 < (response.data.total_pages || 0));
 
       // Reset filtri quando si fa una ricerca testuale
+      ignoreFilterChange.current = true; // Impedisce che il reset attivi performSearch
       setFilters({
         category: "popular",
         genre: "",
@@ -176,9 +193,48 @@ function SearchPage() {
     }
   };
 
+  // Effetto per gestire la ricerca da URL (es. arrivo dalla Home)
+  useEffect(() => {
+    if (queryParam) {
+      handleSearch(queryParam);
+    } else if (!hasSearched) {
+      // Se non c'è query nell'URL e non ho cercato nulla, mostro i popolari
+      performSearch(1, true);
+    }
+  }, [queryParam]);
+
+  // Sincronizza lo stato searchMode con l'URL (es. se usi tasti avanti/indietro o ricarichi)
+  useEffect(() => {
+    if (modeParam && (modeParam === "movie" || modeParam === "person")) {
+      setSearchMode(modeParam);
+    }
+  }, [modeParam]);
+
+  // Funzione per cambiare modalità e aggiornare l'URL
+  const handleModeChange = (newMode) => {
+    setSearchMode(newMode);
+    if (queryParam) {
+      setSearchParams({ query: queryParam, mode: newMode });
+    }
+  };
+
+  // Effetto per ricaricare i risultati quando cambia la modalità (Film/Persone)
+  useEffect(() => {
+    if (queryParam) {
+      handleSearch(queryParam);
+    } else {
+      setResults([]); // Pulisce i risultati se si cambia tab senza una ricerca attiva
+    }
+  }, [searchMode]);
+
   // Gestione selezione da suggerimenti
-  const handleMovieSelect = (movie) => {
-    navigate(`/movie/${movie.id}`);
+  const handleMovieSelect = (item) => {
+    // item.title contiene il nome della persona grazie alla modifica nel backend
+    if (searchMode === "person") {
+      navigate(`/person/${encodeURIComponent(item.title)}`);
+    } else {
+      navigate(`/movie/${item.id}`);
+    }
   };
 
   // Gestione cambio filtri
@@ -240,8 +296,34 @@ function SearchPage() {
         <SearchInput
           onSearch={handleSearch}
           onMovieSelect={handleMovieSelect}
-          placeholder="Cerca per titolo..."
+          preventNavigation={true}
+          placeholder={searchMode === "movie" ? "Cerca per titolo..." : "Cerca attore o regista..."}
+          mode={searchMode}
         />
+
+        {/* TOGGLE SEARCH MODE */}
+        <div className={styles.modeToggle} style={{display: 'flex', justifyContent: 'center', marginTop: '15px', gap: '10px'}}>
+             <button 
+                onClick={() => handleModeChange("movie")}
+                style={{
+                    padding: '8px 16px',
+                    backgroundColor: searchMode === "movie" ? '#ff00cc' : '#333',
+                    color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold'
+                }}
+             >
+                🎬 Film
+             </button>
+             <button 
+                onClick={() => handleModeChange("person")}
+                style={{
+                    padding: '8px 16px',
+                    backgroundColor: searchMode === "person" ? '#ff00cc' : '#333',
+                    color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold'
+                }}
+             >
+                👤 Persone
+             </button>
+        </div>
       </div>
 
       {/* Sezione Filtri */}
@@ -434,11 +516,22 @@ function SearchPage() {
               </h2>
 
               <div className={styles.resultsGrid}>
-                {results.map((movie, index) => (
-                  <MovieCard
-                    key={`${movie.id}-${currentPage}-${index}`}
-                    movie={movie}
-                  />
+                {results.map((item, index) => (
+                  searchMode === "movie" ? (
+                    <MovieCard
+                        key={`${item.id}-${currentPage}-${index}`}
+                        movie={item}
+                    />
+                  ) : (
+                    <div key={item.id} className={styles.personCard} onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}>
+                        <img 
+                            src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://via.placeholder.com/185x278?text=No+Img"} 
+                            alt={item.name}
+                        />
+                        <h3>{item.name}</h3>
+                        <p>{item.known_for}</p>
+                    </div>
+                  )
                 ))}
               </div>
 

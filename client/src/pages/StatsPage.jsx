@@ -182,6 +182,27 @@ function StatsPage() {
             )}
           </div>
         </section>
+
+        {/* Sezione 6: Top Generi per Voto [NEW] */}
+         <section className={styles.statSection}>
+          <h2>Migliori Generi (Media Voto)</h2>
+          <ul className={styles.textList}>
+            {stats.topGenresByRating && stats.topGenresByRating.length > 0 ? (
+              stats.topGenresByRating.map((genre, idx) => (
+                <li key={idx} className={styles.textItem}>
+                  <span className={styles.rank}>#{idx + 1}</span>
+                  <span className={styles.name}>{genre.name}</span>
+                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {genre.avg}</span>
+                    <span style={{ color: '#aaa', fontSize: '0.9rem' }}>({genre.count} film)</span>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p className={styles.emptyMsg}>Dati insufficienti (servono almeno 2 film per genere).</p>
+            )}
+          </ul>
+        </section>
       </div>
     </div>
   );

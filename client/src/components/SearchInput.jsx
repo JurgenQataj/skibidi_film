@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./SearchInput.module.css";
 
@@ -6,12 +7,15 @@ const SearchInput = ({
   onMovieSelect,
   onSearch,
   placeholder = "Scrivi il titolo di un film...",
+  preventNavigation = false,
+  mode = "movie", // Default mode
 }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const navigate = useNavigate();
 
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
@@ -32,7 +36,7 @@ const SearchInput = ({
       const response = await axios.get(
         `${API_URL}/api/movies/suggestions?query=${encodeURIComponent(
           searchQuery
-        )}`
+        )}&type=${mode}`
       );
       setSuggestions(response.data.results || []);
       setShowSuggestions(true);
@@ -73,6 +77,10 @@ const SearchInput = ({
     e.preventDefault();
     if (query.trim()) {
       setShowSuggestions(false);
+      // Reindirizza alla pagina dei risultati di ricerca
+      if (!preventNavigation) {
+        navigate(`/search?query=${encodeURIComponent(query.trim())}`);
+      }
       if (onSearch) {
         onSearch(query.trim());
       }
@@ -83,29 +91,39 @@ const SearchInput = ({
   const handleSuggestionClick = (movie) => {
     setQuery(movie.title);
     setShowSuggestions(false);
+    
     if (onMovieSelect) {
       onMovieSelect(movie);
+    } else {
+      // Navigazione di default se non gestita dal genitore
+      if (mode === "person") {
+        navigate(`/person/${encodeURIComponent(movie.title)}`);
+      } else {
+        navigate(`/movie/${movie.id}`);
+      }
     }
   };
 
   // Gestione tasti freccia e Enter
   const handleKeyDown = (e) => {
-    if (!showSuggestions || suggestions.length === 0) return;
-
     switch (e.key) {
       case "ArrowDown":
-        e.preventDefault();
-        setActiveSuggestion((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        );
+        if (showSuggestions && suggestions.length > 0) {
+          e.preventDefault();
+          setActiveSuggestion((prev) =>
+            prev < suggestions.length - 1 ? prev + 1 : prev
+          );
+        }
         break;
       case "ArrowUp":
-        e.preventDefault();
-        setActiveSuggestion((prev) => (prev > 0 ? prev - 1 : -1));
+        if (showSuggestions && suggestions.length > 0) {
+          e.preventDefault();
+          setActiveSuggestion((prev) => (prev > 0 ? prev - 1 : -1));
+        }
         break;
       case "Enter":
         e.preventDefault();
-        if (activeSuggestion >= 0) {
+        if (showSuggestions && activeSuggestion >= 0) {
           handleSuggestionClick(suggestions[activeSuggestion]);
         } else {
           handleSubmit(e);
@@ -149,6 +167,9 @@ const SearchInput = ({
           onKeyDown={handleKeyDown}
           autoComplete="off"
         />
+        <button type="submit" className={styles.searchButton} title="Cerca">
+          🔍
+        </button>
       </form>
 
       {showSuggestions && (

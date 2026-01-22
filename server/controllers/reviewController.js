@@ -24,7 +24,7 @@ exports.addReview = async (req, res) => {
     let movie = await Movie.findOne({ tmdb_id: tmdbId });
 
     // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno/generi), scaricali da TMDB
-    if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year || !movie.genres) {
+    if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year || !movie.genres || movie.genres.length === 0) {
       console.log(`[INFO] Aggiornamento dati film ID ${tmdbId} da TMDB...`);
       
       const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`;
@@ -56,15 +56,12 @@ exports.addReview = async (req, res) => {
             poster_path: movieData.poster_path,
             release_year: releaseYear,
             director: director,
-            release_year: releaseYear,
-            director: director,
             cast: cast,
             genres: genres,
           });
           await movie.save();
         } else {
           // Aggiornamento film esistente (Self-healing)
-          movie.release_year = releaseYear;
           movie.release_year = releaseYear;
           movie.director = director;
           movie.cast = cast;

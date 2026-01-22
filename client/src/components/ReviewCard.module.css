@@ -57,8 +57,6 @@
   color: var(--secondary-color);
 }
 
-/* ... (tutti gli stili precedenti) ... */
-
 .comment {
   font-style: italic;
   color: #eee;
@@ -71,9 +69,6 @@
   color: #aaa;
   margin-bottom: 15px;
 }
-
-/* Azioni: Reazioni e Commenti */
-/* ... (il resto degli stili) ... */
 
 /* Azioni: Reazioni e Commenti */
 .actions {
@@ -115,10 +110,6 @@
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-.commentItem {
-  font-size: 0.9rem;
-  margin-bottom: 5px;
 }
 .commentItem a {
   font-weight: bold;
@@ -165,8 +156,6 @@
     height: 229px;
   }
 }
-/* ... (tutti gli stili precedenti) ... */
-
 .commentItem {
   display: flex; /* MODIFICA */
   justify-content: space-between; /* MODIFICA */

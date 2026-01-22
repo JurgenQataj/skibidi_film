@@ -289,24 +289,60 @@ exports.getUserAdvancedStats = async (req, res) => {
     });
     const topDirectors = countOccurrences(allDirectors);
 
-    // 5. Top Generi più visti [NEW]
-    let allGenres = [];
+    // 5 & 6. Statistiche Generi Unificate (Visti e Voto)
+    const genreStats = {}; 
+
     validReviews.forEach(r => {
-      if (r.movie.genres && Array.isArray(r.movie.genres)) {
-        allGenres = allGenres.concat(r.movie.genres);
+      if (r.movie && r.movie.genres && Array.isArray(r.movie.genres)) {
+        r.movie.genres.forEach(genre => {
+          // Normalizzazione robusta
+          let genreName = "";
+          if (typeof genre === 'string') genreName = genre;
+          else if (genre && typeof genre === 'object' && genre.name) genreName = genre.name;
+          
+          genreName = String(genreName).trim();
+          if (!genreName) return;
+
+          if (!genreStats[genreName]) {
+            genreStats[genreName] = { count: 0, sum: 0 };
+          }
+          
+          genreStats[genreName].count += 1;
+          
+          const ratingVal = Number(r.rating);
+          if (!isNaN(ratingVal)) {
+            genreStats[genreName].sum += ratingVal;
+          }
+        });
       }
     });
-    const topGenres = countOccurrences(allGenres);
+
+    const allGenresData = Object.entries(genreStats).map(([name, data]) => ({
+      name,
+      count: data.count,
+      avg: data.count > 0 ? Number((data.sum / data.count).toFixed(1)) : 0
+    }));
+
+    // Top Generi più visti (include avg per display)
+    const topGenres = [...allGenresData]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+    // Top Generi per Voto (include count per display)
+    const topGenresByRating = [...allGenresData]
+      .filter(g => g.count >= 1) 
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, limit);
 
     res.json({
       username: user.username,
       topYear,     // Restituiamo la lista dell'anno selezionato
       targetYear,  // Restituiamo l'anno per conferma
       topAllTime,
-      topAllTime,
       topActors,
       topDirectors,
-      topGenres // [NEW]
+      topGenres,
+      topGenresByRating // [NEW]
     });
 
 
