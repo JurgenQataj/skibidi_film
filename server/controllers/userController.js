@@ -237,6 +237,7 @@ exports.getUserAdvancedStats = async (req, res) => {
     const userId = req.params.userId;
     // Leggiamo l'anno dalla query string, altrimenti usiamo l'anno corrente
     const targetYear = parseInt(req.query.year) || new Date().getFullYear();
+    const limit = parseInt(req.query.limit) || 30; // [NEW] Limit per le classifiche (default 30)
 
     const user = await User.findById(userId).select("username");
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
@@ -266,7 +267,7 @@ exports.getUserAdvancedStats = async (req, res) => {
       });
       return Object.entries(counts)
         .sort((a, b) => b[1] - a[1]) // Ordina per conteggio decrescente
-        .slice(0, 10) // Prendi top 10
+        .slice(0, limit) // [MOD] Usa il limit dinamico invece di 10 fisso
         .map(([name, count]) => ({ name, count }));
     };
 
@@ -288,14 +289,26 @@ exports.getUserAdvancedStats = async (req, res) => {
     });
     const topDirectors = countOccurrences(allDirectors);
 
+    // 5. Top Generi più visti [NEW]
+    let allGenres = [];
+    validReviews.forEach(r => {
+      if (r.movie.genres && Array.isArray(r.movie.genres)) {
+        allGenres = allGenres.concat(r.movie.genres);
+      }
+    });
+    const topGenres = countOccurrences(allGenres);
+
     res.json({
       username: user.username,
       topYear,     // Restituiamo la lista dell'anno selezionato
       targetYear,  // Restituiamo l'anno per conferma
       topAllTime,
+      topAllTime,
       topActors,
-      topDirectors
+      topDirectors,
+      topGenres // [NEW]
     });
+
 
   } catch (error) {
     console.error("Errore Advanced Stats:", error);

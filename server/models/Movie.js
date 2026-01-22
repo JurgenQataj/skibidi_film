@@ -8,6 +8,7 @@ const MovieSchema = new mongoose.Schema({
   // Nuovi campi per le statistiche
   director: { type: String }, 
   cast: [{ type: String }], // Array di nomi degli attori
+  genres: [{ type: String }], // [NEW] Array di generi (es. "Action", "Comedy")
 });
 
 module.exports = mongoose.model("Movie", MovieSchema);

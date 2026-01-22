@@ -23,8 +23,8 @@ exports.addReview = async (req, res) => {
     // 1. Cerca il film nel DB locale
     let movie = await Movie.findOne({ tmdb_id: tmdbId });
 
-    // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno), scaricali da TMDB
-    if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year) {
+    // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno/generi), scaricali da TMDB
+    if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year || !movie.genres) {
       console.log(`[INFO] Aggiornamento dati film ID ${tmdbId} da TMDB...`);
       
       const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`;
@@ -45,6 +45,9 @@ exports.addReview = async (req, res) => {
         // Estrazione Cast (Top 5 attori)
         const cast = movieData.credits?.cast?.slice(0, 5).map(c => c.name) || [];
 
+        // Estrazione Generi
+        const genres = movieData.genres?.map(g => g.name) || [];
+
         if (!movie) {
           // Creazione nuovo film
           movie = new Movie({
@@ -53,14 +56,19 @@ exports.addReview = async (req, res) => {
             poster_path: movieData.poster_path,
             release_year: releaseYear,
             director: director,
+            release_year: releaseYear,
+            director: director,
             cast: cast,
+            genres: genres,
           });
           await movie.save();
         } else {
           // Aggiornamento film esistente (Self-healing)
           movie.release_year = releaseYear;
+          movie.release_year = releaseYear;
           movie.director = director;
           movie.cast = cast;
+          movie.genres = genres;
           await movie.save();
         }
       } catch (apiError) {
