@@ -1,8 +1,22 @@
+/* Blocca lo scroll orizzontale e nasconde le barre di scorrimento globalmente */
+:global(body) {
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+:global(::-webkit-scrollbar) {
+  display: none; /* Chrome, Safari, Opera */
+  width: 0;
+  height: 0;
+}
+
 .pageContainer {
   padding: 40px;
   max-width: 1000px;
   margin: 0 auto;
   color: white;
+  overflow-x: hidden;
 }
 .profileHeader {
   display: flex;
@@ -67,27 +81,28 @@
 /* GRIGLIA PERFETTA CON CELLE IDENTICHE */
 .reviewsGrid {
   display: grid;
-  grid-template-columns: repeat(6, 160px);
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   justify-content: center;
-  grid-auto-rows: 280px;
+  width: 100%;
 }
 
 /* FORZA DIMENSIONI IDENTICHE ASSOLUTE */
 .reviewsGrid .card {
-  width: 160px !important;
-  height: 280px !important;
+  width: 100% !important;
+  height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
-  max-width: 160px !important;
-  min-width: 160px !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
   overflow: hidden !important;
 }
 
 .reviewsGrid .card img {
-  width: 160px !important;
-  height: 240px !important;
-  object-fit: contain !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2/3;
+  object-fit: cover !important;
   object-position: center !important;
   background-color: #1c1e21 !important;
   flex-shrink: 0 !important;
@@ -97,10 +112,8 @@
 }
 
 .reviewsGrid .card .title {
-  width: 160px !important;
-  height: 40px !important;
+  width: 100% !important;
   padding: 5px !important;
-  font-size: 0.7rem !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -237,16 +250,24 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  color: #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .historyItem {
   display: flex;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #444;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
-.historyItem:last-child {
-  border-bottom: none;
+.historyItem:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(5px);
+  border-color: rgba(255, 71, 87, 0.5);
 }
 .historyNumber {
   font-weight: bold;
@@ -271,6 +292,7 @@
 }
 .historyTitle {
   display: block;
+  font-size: 1.1rem;
   font-weight: bold;
   color: white;
   white-space: nowrap;
@@ -304,16 +326,14 @@
   .sectionTitle {
     font-size: 1.5rem;
   }
-
   .reviewsGrid {
     grid-template-columns: repeat(3, 120px) !important;
     gap: 10px !important;
     justify-content: center !important;
     grid-auto-rows: unset;
   }
-
   .reviewsGrid .card {
-    --title-height: 8px;
+    --title-height: 35px;
     width: 120px !important;
     height: calc(160px + var(--title-height)) !important;
     display: flex;
@@ -321,24 +341,25 @@
     align-items: center;
     background-color: #1c1e21 !important;
   }
-
   .reviewsGrid .card img {
     width: 120px !important;
     height: 160px !important;
-    object-fit: contain !important;
+    object-fit: cover !important;
     background-color: #1c1e21 !important;
   }
-
   .reviewsGrid .card .title {
     width: 120px !important;
     height: var(--title-height) !important;
-    font-size: 0.55rem !important;
-    line-height: 1 !important;
+    font-size: 0.6rem !important;
+    line-height: 1.1 !important;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal !important;
     overflow: hidden;
+    padding: 2px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-
   .historyTitle {
     font-size: 0.9rem;
   }
@@ -361,7 +382,7 @@
     gap: 8px !important;
   }
   .reviewsGrid .card {
-    --title-height: 8px;
+    --title-height: 30px;
     width: 100px !important;
     height: calc(140px + var(--title-height)) !important;
   }
@@ -372,6 +393,6 @@
   .reviewsGrid .card .title {
     width: 100px !important;
     height: var(--title-height) !important;
-    font-size: 0.5rem !important;
+    font-size: 0.55rem !important;
   }
 }

@@ -262,7 +262,11 @@ function ProfilePage() {
       >
         <ol className={styles.historyList}>
           {reviews.map((review, index) => (
-            <li key={review._id} className={styles.historyItem}>
+            <li 
+              key={review._id} 
+              className={styles.historyItem}
+              onClick={() => navigate(`/movie/${review.movie.tmdb_id}`)}
+            >
               <span className={styles.historyNumber}>{index + 1}</span>
               <img
                 src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w92${review.movie.poster_path}` : "https://placehold.co/92x138?text=No+Img"}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"; // *** CORREZIONE 1: Importa jwt-decode ***
 import styles from "./WatchlistPage.module.css";
@@ -9,6 +9,7 @@ function ListPage() {
   const { listId } = useParams();
   const [listDetails, setListDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const [loggedInUserId, setLoggedInUserId] = useState(null); // *** CORREZIONE 2: Stato per l'ID utente ***
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -75,13 +76,21 @@ function ListPage() {
       <div className={styles.reviewsGrid}>
         {listDetails.movies && listDetails.movies.length > 0 ? (
           listDetails.movies.map((movie) => (
-            // *** CORREZIONE 6: Passa la funzione e mostra il pulsante solo al proprietario ***
-            <MovieCard
+            <div
               key={movie.tmdb_id}
-              movie={movie}
-              showDeleteButton={isOwner}
-              onDelete={handleRemoveFromList}
-            />
+              className={styles.cardWrapper}
+              onClick={(e) => {
+                if (!e.target.closest("button")) {
+                  navigate(`/movie/${movie.tmdb_id}`);
+                }
+              }}
+            >
+              <MovieCard
+                movie={movie}
+                showDeleteButton={isOwner}
+                onDelete={handleRemoveFromList}
+              />
+            </div>
           ))
         ) : (
           <p className={styles.statusText}>Questa lista è vuota.</p>

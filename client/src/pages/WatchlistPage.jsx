@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./WatchlistPage.module.css";
@@ -7,6 +8,7 @@ import MovieCard from "../components/MovieCard";
 function WatchlistPage() {
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   const fetchWatchlist = useCallback(async () => {
@@ -63,13 +65,22 @@ function WatchlistPage() {
       <div className={styles.reviewsGrid}>
         {watchlist.length > 0 ? (
           watchlist.map((movie) => (
-            // *** CORREZIONE 2: Passa la funzione e la prop per mostrare il pulsante ***
-            <MovieCard
+            <div
               key={movie.tmdb_id}
-              movie={movie}
-              showDeleteButton={true}
-              onDelete={handleRemoveFromWatchlist}
-            />
+              className={styles.cardWrapper}
+              onClick={(e) => {
+                // Naviga solo se NON si clicca su un pulsante (es. elimina)
+                if (!e.target.closest("button")) {
+                  navigate(`/movie/${movie.tmdb_id}`);
+                }
+              }}
+            >
+              <MovieCard
+                movie={movie}
+                showDeleteButton={true}
+                onDelete={handleRemoveFromWatchlist}
+              />
+            </div>
           ))
         ) : (
           <p className={styles.statusText}>La tua watchlist è vuota.</p>
