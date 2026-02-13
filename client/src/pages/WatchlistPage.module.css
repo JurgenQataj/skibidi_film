@@ -46,8 +46,8 @@
 /* Griglia responsive moderna */
 .reviewsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
   padding: 1rem 0;
 }
 
@@ -111,22 +111,22 @@
   }
   
   .reviewsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
   }
   
   .cardWrapper :global(.card img) {
-    height: 210px !important;
+    height: 220px !important;
   }
 }
 
 @media (max-width: 480px) {
   .reviewsGrid {
-    grid-template-columns: repeat(2, 1fr); /* 2 colonne su mobile */
-    gap: 0.8rem;
+    grid-template-columns: repeat(3, 1fr); /* 3 colonne su mobile */
+    gap: 0.5rem;
   }
   
   .cardWrapper :global(.card img) {
-    height: 240px !important;
+    height: 160px !important;
   }
 }
