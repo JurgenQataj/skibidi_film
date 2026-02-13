@@ -1,9 +1,11 @@
 .formContainer {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(12px);
   padding: 30px;
-  border-radius: var(--border-radius);
+  border-radius: 16px;
   margin-bottom: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   /* PREVENZIONE OVERFLOW */
   width: 100%;
   box-sizing: border-box;
@@ -30,14 +32,23 @@
   width: 100%;
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #555;
-  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.3);
   color: white;
   font-size: 1rem;
   box-sizing: border-box;
   /* PREVENZIONE OVERFLOW */
   max-width: 100%;
   resize: vertical; /* Solo resize verticale per textarea */
+  transition: border-color 0.3s, background-color 0.3s, box-shadow 0.3s;
+}
+
+.ratingInput:focus,
+.commentTextarea:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(138, 75, 175, 0.2);
+  outline: none;
 }
 
 .commentTextarea {
@@ -48,20 +59,21 @@
   width: 100%;
   padding: 12px;
   border: none;
-  border-radius: var(--border-radius);
-  background-color: var(--primary-color);
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary-color), #6a3590);
   color: white;
   font-weight: bold;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   /* PREVENZIONE OVERFLOW */
   box-sizing: border-box;
   max-width: 100%;
 }
 
 .submitButton:hover {
-  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(138, 75, 175, 0.4);
 }
 
 .error {

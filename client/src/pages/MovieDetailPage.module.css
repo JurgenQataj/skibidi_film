@@ -17,8 +17,9 @@
 }
 
 .headerOverlay {
-  background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
-  padding: 20px 15px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, #121212 100%);
+  padding: 40px 20px;
+  backdrop-filter: blur(3px);
 }
 
 .headerContent {
@@ -111,18 +112,26 @@
 /* Stile aggiornato per la sezione Info */
 .infoSection {
   margin-top: 30px;
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  border-radius: var(--border-radius);
+  background-color: transparent;
+  padding: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Due colonne di larghezza uguale */
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Griglia responsive automatica */
+  gap: 15px;
 }
 
 .infoBox {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  transition: background-color 0.2s;
+}
+.infoBox:hover {
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .infoBox h4 {
@@ -130,12 +139,13 @@
   color: #ccc;
   font-weight: normal;
   font-size: 0.9rem;
+  margin-bottom: 5px;
 }
 
 .infoBox p {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 /* 🆕 NUOVO STILE PER LINK TRAILER */
@@ -170,6 +180,14 @@
   overflow-x: auto;
   gap: 15px;
   padding: 10px 5px;
+  scrollbar-width: thin; /* Firefox */
+}
+.castGrid::-webkit-scrollbar {
+  height: 6px;
+}
+.castGrid::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
 .actorCard {
@@ -214,17 +232,18 @@
 
 .reviewsSection {
   margin-top: 40px;
-  background-color: rgba(10, 10, 10, 0.7);
-  padding: 20px;
-  border-radius: var(--border-radius);
+  padding: 0;
+  background: transparent;
 }
 
 .reviewsTitle {
   font-size: 1.5rem;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 15px;
   margin-top: 0;
@@ -237,10 +256,10 @@
 }
 
 .reviewItem {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 15px;
-  border-radius: var(--border-radius);
-  margin-bottom: 15px;
+  background-color: rgba(20, 20, 20, 0.6);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -489,15 +508,10 @@
     padding: 15px;
   }
 
+  /* La griglia infoSection ora usa auto-fill, quindi si adatta da sola, 
+     ma possiamo forzare 2 colonne su mobile per risparmiare spazio verticale */
   .infoSection {
-    padding: 15px;
-    margin-top: 15px;
-    grid-template-columns: 1fr; /* Una colonna su mobile */
-  }
-  .infoBox {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    grid-template-columns: 1fr 1fr; 
   }
   .infoBox h4 {
     font-size: 0.9rem;

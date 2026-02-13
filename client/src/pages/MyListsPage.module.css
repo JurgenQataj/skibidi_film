@@ -7,12 +7,13 @@
 
 .createListSection,
 .myListsSection {
-  background-color: rgba(28, 30, 33, 0.7); /* Meno trasparente e più solido */
-  backdrop-filter: blur(10px);
+  background-color: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(12px);
   padding: 30px;
-  border-radius: var(--border-radius);
+  border-radius: 16px;
   margin-bottom: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .inputField,
@@ -21,11 +22,19 @@
   padding: 12px;
   margin-bottom: 15px;
   border-radius: 8px;
-  border: 1px solid #555;
-  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.3);
   color: white;
   font-size: 1rem;
   box-sizing: border-box;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+.inputField:focus,
+.textareaField:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 0, 0, 0.5);
+  outline: none;
 }
 
 .textareaField {
@@ -56,15 +65,16 @@
 
 /* MODIFICA: La card ora non è più un link diretto, ma lo sono i suoi contenuti */
 .listCard {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(40, 40, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 20px;
-  border-radius: var(--border-radius);
+  border-radius: 12px;
   position: relative;
-  transition: background-color 0.2s;
+  transition: transform 0.2s, background-color 0.2s;
 }
 .listCard:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-4px);
 }
 
 /* NUOVO: Stile per il contenuto cliccabile */
