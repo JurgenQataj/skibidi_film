@@ -43,7 +43,7 @@ exports.searchMovies = async (req, res) => {
     return res.status(400).json({ message: "Per favore, fornisci un testo per la ricerca." });
   }
   try {
-    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT`;
+    const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT&region=IT`;
     const response = await axios.get(url);
     res.json(response.data);
   } catch (error) {
@@ -95,7 +95,8 @@ exports.discoverMovies = async (req, res) => {
       api_key: API_KEY,
       language: "it-IT",
       page: page,
-      sort_by: sort_by || "popularity.desc"
+      sort_by: sort_by || "popularity.desc",
+      region: "IT"
     };
 
     if (genre) params.with_genres = genre;
