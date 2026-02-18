@@ -204,6 +204,7 @@
     background: #444;
     border-radius: 2px;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .voteSlider::-webkit-slider-thumb {
@@ -250,9 +251,7 @@
 }
 
 /* RESULTS SECTION */
-.resultsSection {
-    /* No background, just grid */
-}
+
 
 .resultsGrid {
     display: grid;
