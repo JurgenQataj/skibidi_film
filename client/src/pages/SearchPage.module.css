@@ -326,18 +326,54 @@
   color: #888;
 }
 
+/* Quick Apply Button */
+.quickApplyBtn {
+    background: var(--red-main);
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 15px;
+    transition: transform 0.2s;
+}
+
+.quickApplyBtn:hover {
+    transform: scale(1.05);
+    background: #b3001e;
+}
+
 /* Responsive */
+@media (max-width: 768px) {
+    .resultsGrid {
+        grid-template-columns: repeat(3, 120px) !important;
+        gap: 10px !important;
+        justify-content: center !important;
+    }
+    
+    /* Target the Link component (MovieCard wrapper) */
+    .resultsGrid > a {
+        width: 120px !important;
+        height: auto !important;
+        min-width: 0 !important;
+    }
+}
+
 @media (max-width: 600px) {
     .chipsContainer {
-        justify-content: flex-start; /* Left align to allow scroll on small screens */
+        justify-content: flex-start; 
     }
+}
+
+@media (max-width: 480px) {
     .resultsGrid {
-        grid-template-columns: repeat(3, 1fr) !important; /* Force 3 cols */
+        grid-template-columns: repeat(3, 100px) !important;
         gap: 8px !important;
     }
-    /* Ensure cards shrink enough to fit 3 in a row */
-    .resultsGrid > div {
-        min-width: 0 !important;
-        width: 100% !important;
+    
+    .resultsGrid > a {
+        width: 100px !important;
     }
 }

@@ -347,15 +347,23 @@ function SearchPage() {
         )}
       </div>
 
-      {/* Advanced Filters Toggle */}
+      {/* Advanced Filters Toggle & Apply Button */}
       {searchMode === "movie" && (
         <div className={styles.filterToggleBar}>
             <button 
                 className={styles.toggleFiltersBtn}
                 onClick={() => setShowFilters(!showFilters)}
             >
-                {showFilters ? "Nascondi Filtri Avanzati" : "Mostra Filtri Avanzati (Genere, Anno, Voto...)"}
+                {showFilters ? "Nascondi Filtri" : "Filtri Avanzati"}
                 <span className={styles.icon}>{showFilters ? "▲" : "▼"}</span>
+            </button>
+            
+            <button 
+                className={styles.quickApplyBtn} 
+                onClick={handleApplyFilters}
+                title="Applica i filtri correnti"
+            >
+                Applica
             </button>
         </div>
       )}
