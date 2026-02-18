@@ -332,7 +332,12 @@
         justify-content: flex-start; /* Left align to allow scroll on small screens */
     }
     .resultsGrid {
-        grid-template-columns: repeat(3, 1fr); /* 3 cols on mobile */
-        gap: 0.5rem;
+        grid-template-columns: repeat(3, 1fr) !important; /* Force 3 cols */
+        gap: 8px !important;
+    }
+    /* Ensure cards shrink enough to fit 3 in a row */
+    .resultsGrid > div {
+        min-width: 0 !important;
+        width: 100% !important;
     }
 }
