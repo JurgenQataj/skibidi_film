@@ -11,6 +11,8 @@ import {
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { formatDistanceToNow } from "date-fns";
+import { it } from "date-fns/locale";
 
 function Navbar() {
   const [notifications, setNotifications] = useState([]);
@@ -67,6 +69,39 @@ function Navbar() {
     }
   };
 
+  const timeAgo = (date) => {
+    if (!date) return "";
+    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: it });
+  };
+
+  const getNotificationLink = (notification) => {
+    if (!notification || !notification.sender) return "/";
+    switch (notification.type) {
+      case "new_follower": return `/profile/${notification.sender._id}`;
+      case "new_reaction":
+      case "new_comment":
+        if (notification.targetReview?.movie?.tmdb_id) {
+          return `/movie/${notification.targetReview.movie.tmdb_id}`;
+        }
+        return "/";
+      default: return "/";
+    }
+  };
+
+  const getNotificationText = (notification) => {
+    if (!notification || !notification.sender) return "Nuova notifica";
+    switch (notification.type) {
+      case "new_follower":
+        return <span><strong>{notification.sender.username}</strong> ha iniziato a seguirti</span>;
+      case "new_reaction":
+        return <span><strong>{notification.sender.username}</strong> ha messo like alla tua recensione</span>;
+      case "new_comment":
+        return <span><strong>{notification.sender.username}</strong> ha commentato la tua recensione</span>;
+      default:
+        return <span>Nuova notifica da {notification.sender.username}</span>;
+    }
+  };
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.navContent}>
@@ -99,22 +134,42 @@ function Navbar() {
                 </button>
                 {showNotifications && (
                   <div className={styles.notificationDropdown}>
-                    {notifications.slice(0, 5).map((n) => (
-                      <div key={n._id} className={styles.notificationItem}>
-                        {n.type === "new_follower" &&
-                          `Nuovo follower: ${n.sender.username}`}
-                        {n.type === "new_reaction" &&
-                          `${n.sender.username} ha messo like alla tua recensione`}
-                        {n.type === "new_comment" &&
-                          `${n.sender.username} ha commentato la tua recensione`}
-                      </div>
-                    ))}
+                    <div className={styles.dropdownHeader}>
+                      <span className={styles.dropdownTitle}>Notifiche</span>
+                      {unreadCount > 0 && <span className={styles.dropdownUnread}>{unreadCount} nuove</span>}
+                    </div>
+                    
+                    <div className={styles.dropdownBody}>
+                      {notifications.length > 0 ? (
+                        notifications.slice(0, 5).map((n) => (
+                          <Link 
+                            to={getNotificationLink(n)} 
+                            key={n._id} 
+                            className={`${styles.notificationItem} ${!n.read ? styles.unread : ""}`}
+                            onClick={() => setShowNotifications(false)}
+                          >
+                            <img 
+                              src={n.sender?.avatar_url || "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"} 
+                              alt="avatar" 
+                              className={styles.dropdownAvatar} 
+                            />
+                            <div className={styles.dropdownContent}>
+                              <p className={styles.dropdownText}>{getNotificationText(n)}</p>
+                              <span className={styles.dropdownTime}>{timeAgo(n.createdAt)}</span>
+                            </div>
+                          </Link>
+                        ))
+                      ) : (
+                        <div className={styles.emptyNotifications}>Nessuna notifica.</div>
+                      )}
+                    </div>
+
                     <Link
                       to="/notifications"
                       onClick={() => setShowNotifications(false)}
                       className={styles.showAllLink}
                     >
-                      Mostra tutte
+                      Mostra tutte le notifiche
                     </Link>
                   </div>
                 )}

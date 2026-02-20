@@ -18,9 +18,11 @@ exports.getNotifications = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
+    // Rimuoviamo il filtro severo che svuotava l'array se un film era stato eliminato
+    // ma passiamo tutto al frontend, che ha adesso i fallback necessari per non esplodere.
     const validNotifications = notifications.filter((n) => {
-      if (n.type === "new_follower") return true;
-      return n.targetReview && n.targetReview.movie;
+      // Se manca il mittente (utente eliminato), la passiamo comunque e il frontend mostrerà "Utente eliminato"
+      return true; 
     });
 
     res.json(validNotifications);
@@ -56,8 +58,8 @@ exports.markAsRead = async (req, res) => {
 
     // Filtra di nuovo per sicurezza
     const validUpdatedNotifications = updatedNotifications.filter((n) => {
-      if (n.type === "new_follower") return true;
-      return n.targetReview && n.targetReview.movie;
+      // Come sopra, permettiamo a tutte di passare per non svuotare la lista.
+      return true;
     });
 
     res.json(validUpdatedNotifications); // Invia l'elenco aggiornato al frontend

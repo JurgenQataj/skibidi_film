@@ -53,6 +53,7 @@ function RegistrationPage() {
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          maxLength={10}
           required
         />
       </div>

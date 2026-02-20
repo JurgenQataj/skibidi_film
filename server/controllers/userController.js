@@ -28,6 +28,10 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ message: "Compila tutti i campi." });
     }
 
+    if (username.length > 10) {
+      return res.status(400).json({ message: "Il nome utente non può superare i 10 caratteri." });
+    }
+
     const userExists = await User.findOne({ $or: [{ username }, { email }] });
     if (userExists) return res.status(409).json({ message: "Username o Email già in uso." });
 

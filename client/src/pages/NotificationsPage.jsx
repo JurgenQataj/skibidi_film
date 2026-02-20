@@ -51,7 +51,8 @@ function NotificationsPage() {
   };
 
   const getNotificationText = (notification) => {
-    if (!notification || !notification.sender) return "Notifica non valida.";
+    // Gestione notifica senza mittente valido
+    if (!notification || !notification.sender) return "Nuova notifica da un utente eliminato.";
 
     switch (notification.type) {
       case "new_follower":
@@ -104,7 +105,7 @@ function NotificationsPage() {
               >
                 <img
                   src={
-                    notification.sender.avatar_url ||
+                    notification?.sender?.avatar_url ||
                     "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"
                   }
                   alt="avatar"
