@@ -177,7 +177,8 @@ exports.getMovieDetails = async (req, res) => {
 
 exports.getTrendingMovies = async (req, res) => {
   try {
-    const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT`;
+    const timeWindow = req.query.timeWindow === "day" ? "day" : "week";
+    const url = `${BASE_URL}/trending/movie/${timeWindow}?api_key=${API_KEY}&language=it-IT`;
     const response = await axios.get(url);
     res.json(response.data.results);
   } catch (error) {

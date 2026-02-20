@@ -1,0 +1,149 @@
+.trendingRowContainer {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff; /* Forza il bianco */
+  font-weight: 600;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Aggiunge contrasto */
+}
+
+.toggleContainer {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.5); /* Sfondo più scuro per i tasti */
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toggleButton {
+  background: transparent;
+  border: none;
+  color: #fff; /* Fatto bianco per essere più leggibile */
+  padding: 6px 16px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.toggleButton.active {
+  background: var(--primary-color, #ff4081);
+  color: #fff;
+  text-shadow: none; /* Rimuove l'ombra se è attivo e su sfondo colorato */
+}
+
+.scrollContainer {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding: 0.5rem 1rem 1rem 1rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  scroll-behavior: smooth;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Wrapper con larghezza fissa: impedisce che titoli lunghi allarghino la card */
+.cardWrapper {
+  flex: 0 0 120px;
+  width: 120px;
+  max-width: 120px;
+  overflow: hidden; /* Taglia qualsiasi contenuto che tracima */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Le immagini si adattano al wrapper */
+.cardWrapper > * {
+  width: 100% !important;
+  max-width: 120px !important;
+  box-sizing: border-box;
+}
+
+.cardWrapper img {
+  width: 120px !important;
+  height: 144px !important; /* 180px - 20% */
+  object-fit: cover !important;
+}
+
+.loader {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-color, #fff);
+  width: 100%;
+}
+
+.error {
+  padding: 1rem;
+  text-align: center;
+  color: #ff4d4f;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: 0;
+  }
+  .scrollContainer {
+    padding: 0.5rem 0 1rem 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.2rem;
+  }
+  .toggleButton {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+  }
+  .scrollContainer {
+    gap: 10px;
+  }
+  .cardWrapper {
+    flex: 0 0 100px;
+    width: 100px;
+    max-width: 100px;
+  }
+  .cardWrapper > * {
+    max-width: 100px !important;
+  }
+  .cardWrapper img {
+    width: 100px !important;
+    height: 120px !important; /* 150px - 20% */
+  }
+}
+
+@media (max-width: 480px) {
+  .cardWrapper {
+    flex: 0 0 90px;
+    width: 90px;
+    max-width: 90px;
+  }
+  .cardWrapper > * {
+    max-width: 90px !important;
+  }
+  .cardWrapper img {
+    width: 90px !important;
+    height: 108px !important; /* 135px - 20% */
+  }
+}

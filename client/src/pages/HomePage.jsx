@@ -4,6 +4,8 @@ import styles from "./HomePage.module.css";
 import ReviewCard from "../components/ReviewCard";
 import { useAuth } from "../context/AuthContext";
 
+import TrendingRow from "../components/TrendingRow";
+
 function HomePage() {
   const { logout } = useAuth();
   const [feed, setFeed] = useState([]);
@@ -83,6 +85,7 @@ function HomePage() {
           Logout
         </button>
       </header>
+      <TrendingRow />
       <div className={styles.feedContainer}>
         {feed.map((review, index) => {
           if (feed.length === index + 1) {
