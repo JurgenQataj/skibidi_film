@@ -51,7 +51,7 @@
   display: flex;
   gap: 15px;
   overflow-x: auto;
-  padding: 0.5rem 1rem 1rem 1rem;
+  padding: 0.5rem 0 1rem 0;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
   scroll-behavior: smooth;
@@ -101,9 +101,6 @@
 @media (min-width: 768px) {
   .header {
     padding: 0;
-  }
-  .scrollContainer {
-    padding: 0.5rem 0 1rem 0;
   }
 }
 

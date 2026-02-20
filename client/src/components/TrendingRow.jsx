@@ -15,7 +15,7 @@ const TrendingRow = () => {
       setError(null);
       try {
         const API_URL = import.meta.env.VITE_API_URL || "";
-        const response = await axios.get(`${API_URL}/api/movies/trending?timeWindow=${timeWindow}`);
+        const response = await axios.get(`${API_URL}/api/movies/trending?timeWindow=${timeWindow}&_t=${Date.now()}`);
         setMovies(response.data || []);
       } catch (err) {
         console.error("Errore caricamento tendenze:", err);
