@@ -80,7 +80,7 @@
 
 .cardWrapper img {
   width: 120px !important;
-  height: 144px !important; /* 180px - 20% */
+  height: 115px !important; /* 144px - 20% ≈ 115px */
   object-fit: cover !important;
 }
 
@@ -109,6 +109,9 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .trendingRowContainer {
+    margin-top: -15px; /* Riduce il distacco dalla cima su mobile */
+  }
   .title {
     font-size: 1.2rem;
   }
