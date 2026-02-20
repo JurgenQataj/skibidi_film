@@ -23,6 +23,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import StatsPage from "./pages/StatsPage"; // Import StatsPage
 import PersonPage from "./pages/PersonPage";
+import CollectionPage from "./pages/CollectionPage"; // [NEW] Import CollectionPage
 
 // Import Componenti
 import Navbar from "./components/Navbar";
@@ -83,6 +84,7 @@ function App() {
           <Route path="profile/:userId/stats" element={<StatsPage />} />
           <Route path="person/:name" element={<PersonPage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
+          <Route path="collection/:id" element={<CollectionPage />} />
         </Route>
       </Routes>
     </Router>

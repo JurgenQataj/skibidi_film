@@ -499,7 +499,7 @@ function SearchPage() {
                   ) : (
                     <div key={item.id} className={styles.personCard} onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}>
                         <img 
-                            src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://via.placeholder.com/185x278?text=No+Img"} 
+                            src={item.profile_path ? `https://image.tmdb.org/t/p/w342${item.profile_path}` : "https://via.placeholder.com/342x513?text=No+Img"} 
                             alt={item.name}
                         />
                         <h3>{item.name}</h3>

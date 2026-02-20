@@ -87,7 +87,7 @@ exports.addComment = async (req, res) => {
       populatedComments[populatedComments.length - 1]
     );
 
-    // Notifica (opzionale)
+    // Notifica al creatore della recensione (se non è lui stesso a commentare)
     if (review.user.toString() !== userId) {
       try {
         const notification = new Notification({
@@ -97,10 +97,35 @@ exports.addComment = async (req, res) => {
           targetReview: review._id,
         });
         await notification.save();
-        console.log("🔔 Notifica creata");
+        console.log("🔔 Notifica creata per l'autore della recensione");
       } catch (notifError) {
-        console.log("⚠️ Errore notifica (non critico):", notifError.message);
+        console.log("⚠️ Errore notifica creatore (non critico):", notifError.message);
       }
+    }
+
+    // Notifica a TUTTI gli altri utenti che hanno commentato (Thread)
+    try {
+      // Trova tutti gli ID univoci degli utenti che hanno commentato finora
+      // Escludi l'autore del nuovo commento e l'autore della recensione (già notificato sopra)
+      const otherCommenters = [...new Set(
+        review.comments
+          .map(c => c.user ? c.user._id?.toString() || c.user.toString() : null)
+          .filter(id => id && id !== userId && id !== review.user.toString())
+      )];
+
+      console.log(`🔔 Trovati ${otherCommenters.length} altri partecipanti alla discussione da notificare.`);
+
+      for (const commenterId of otherCommenters) {
+        const threadNotification = new Notification({
+          recipient: commenterId,
+          sender: userId,
+          type: "new_comment", // Puoi anche creare un tipo nuovo tipo "new_thread_comment" in futuro se vuoi testo diverso
+          targetReview: review._id,
+        });
+        await threadNotification.save();
+      }
+    } catch (threadNotifError) {
+      console.log("⚠️ Errore notifica thread (non critico):", threadNotifError.message);
     }
 
     console.log("✅ Invio risposta con", populatedComments.length, "commenti");

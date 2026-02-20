@@ -1,48 +1,74 @@
 .loginContainer {
-  background-color: rgba(0, 0, 0, 0.75); /* Sfondo nero semi-trasparente */
-  backdrop-filter: blur(10px); /* Effetto sfocato dello sfondo */
-  padding: 60px;
-  border-radius: var(--border-radius);
-  color: white; /* Testo bianco per contrasto */
-  min-width: 350px;
+  background-color: rgba(10, 10, 12, 0.85); /* Sfondo più scuro ed elegante */
+  backdrop-filter: blur(15px);
+  padding: 50px 40px;
+  border-radius: 16px;
+  color: white;
+  width: 100%;
+  max-width: 420px; /* Limita la larghezza massima su PC */
+  margin: 40px auto; /* Centra orizzontalmente */
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  gap: 24px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(138, 75, 175, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.loginContainer h2 {
+  text-align: center;
+  margin: 0 0 10px 0;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   width: 100%;
 }
 
+.inputGroup label {
+  width: 60%;
+  text-align: left;
+}
+
 .inputField {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--border-radius);
-  border: 1px solid #ddd;
+  width: 60%; /* Dimezzato su PC */
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
   box-sizing: border-box;
   font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--primary-color, #8a4baf);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.inputField::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .submitButton {
   padding: 12px 15px;
   border-radius: var(--border-radius);
   border: none;
-  background-color: var(
-    --primary-color
-  ); /* Usiamo il viola come colore primario */
+  background-color: var(--primary-color);
   color: white;
   font-weight: bold;
   font-size: 16px;
   cursor: pointer;
-  width: 100%;
-  margin-top: 10px;
+  width: 60%; /* Allineato agli input */
+  margin: 10px auto 0 auto;
   transition: background-color 0.2s ease-in-out;
+  display: block;
 }
 
 .submitButton:hover {
@@ -55,7 +81,37 @@
 @media (max-width: 768px) {
   .loginContainer {
     width: 90%;
-    padding: 30px;
-    min-width: unset; /* Rimuove la larghezza minima */
+    max-width: unset;
+    padding: 35px 25px;
+    margin: 20px auto;
+    border-radius: 20px;
+    gap: 20px;
+  }
+  
+  .loginContainer h2 {
+    font-size: 1.8rem;
+  }
+  
+  .inputGroup label {
+    width: 100%;
+  }
+
+  .inputField {
+    width: 100%; /* Torna full width su mobile */
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  .submitButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .loginContainer {
+    width: 95%;
+    padding: 30px 20px;
+    margin: 15px auto;
+    border-radius: 16px;
   }
 }

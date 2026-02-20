@@ -131,7 +131,7 @@ exports.getMovieDetails = async (req, res) => {
     return res.status(400).json({ message: "ID del film non valido." });
   }
 
-  const url = `${BASE_URL}/movie/${tmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos`;
+  const url = `${BASE_URL}/movie/${tmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos,watch/providers`;
   try {
     const response = await axios.get(url);
     const data = response.data;
@@ -165,6 +165,8 @@ exports.getMovieDetails = async (req, res) => {
       cast: cast,
       videos: data.videos?.results || [],
       recommendations: data.recommendations?.results || [],
+      collection: data.belongs_to_collection || null, // [NUOVO] Saga
+      watch_providers: data["watch/providers"]?.results?.IT?.flatrate || [], // [NUOVO] Dove vederlo (Streaming IT)
     });
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -315,6 +317,42 @@ exports.getMoviesByPerson = async (req, res) => {
   } catch (error) {
     console.error("Errore ricerca persona su TMDB:", error.message);
     res.status(500).json({ message: "Errore nel recupero della filmografia." });
+  }
+};
+
+// --- FUNZIONE SAGA (COLLECTION) ---
+exports.getCollectionDetails = async (req, res) => {
+  const { id } = req.params;
+  if (!/^\d+$/.test(id)) {
+    return res.status(400).json({ message: "ID della collezione non valido." });
+  }
+
+  try {
+    const url = `${BASE_URL}/collection/${id}?api_key=${API_KEY}&language=it-IT`;
+    const response = await axios.get(url);
+    
+    // TMDB ordina tendenzialmente per data, ma per sicurezza ordiniamo noi
+    const parts = response.data.parts || [];
+    parts.sort((a, b) => {
+      const dateA = a.release_date ? new Date(a.release_date) : new Date("2099");
+      const dateB = b.release_date ? new Date(b.release_date) : new Date("2099");
+      return dateA - dateB;
+    });
+
+    res.json({
+      id: response.data.id,
+      name: response.data.name,
+      overview: response.data.overview,
+      poster_path: response.data.poster_path,
+      backdrop_path: response.data.backdrop_path,
+      parts: parts
+    });
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return res.status(404).json({ message: "Collezione non trovata." });
+    }
+    console.error("Errore recupero collezione:", error.message);
+    res.status(500).json({ message: "Errore di comunicazione con il servizio esterno." });
   }
 };
 

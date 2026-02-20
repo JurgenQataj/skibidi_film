@@ -283,8 +283,8 @@ function MovieDetailPage() {
             <img
               src={
                 movie.poster_path
-                  ? `${posterBaseUrl}w400${movie.poster_path}`
-                  : "https://via.placeholder.com/400x600.png?text=No+Image"
+                  ? `${posterBaseUrl}w500${movie.poster_path}`
+                  : "https://via.placeholder.com/500x750.png?text=No+Image"
               }
               alt={`Locandina di ${movie.title}`}
               className={styles.poster}
@@ -414,6 +414,35 @@ function MovieDetailPage() {
             <h4>Lingua</h4>
             <p>{movie.original_language?.toUpperCase()}</p>
           </div>
+          {movie.collection && (
+            <div className={styles.infoBox}>
+              <h4>Saga</h4>
+              <p>
+                <Link 
+                  to={`/collection/${movie.collection.id}`} 
+                  className={styles.personLink}
+                >
+                  {movie.collection.name.replace(" - Collection", "")}
+                </Link>
+              </p>
+            </div>
+          )}
+          {movie.watch_providers && movie.watch_providers.length > 0 && (
+             <div className={styles.infoBox}>
+               <h4>Dove Vederlo</h4>
+               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "5px" }}>
+                 {movie.watch_providers.map((provider) => (
+                   <img 
+                      key={provider.provider_id}
+                      src={`https://image.tmdb.org/t/p/original${provider.logo_path}`} 
+                      alt={provider.provider_name}
+                      title={provider.provider_name}
+                      style={{ width: "24px", height: "24px", borderRadius: "4px" }}
+                   />
+                 ))}
+               </div>
+             </div>
+          )}
           {getMainTrailer(movie.videos) && (
             <div className={styles.infoBox}>
               <h4>Trailer</h4>
@@ -441,8 +470,8 @@ function MovieDetailPage() {
                 <img
                   src={
                     actor.profile_path
-                      ? `${posterBaseUrl}w185${actor.profile_path}`
-                      : "https://via.placeholder.com/185x278.png?text=No+Image"
+                      ? `${posterBaseUrl}w342${actor.profile_path}`
+                      : "https://via.placeholder.com/342x513.png?text=No+Image"
                   }
                   alt={actor.name}
                 />
