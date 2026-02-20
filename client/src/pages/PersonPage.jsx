@@ -101,7 +101,30 @@ function PersonPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.pageTitle}>{data.personName}</h1>
+      
+      {/* SEZIONE INFO PERSONA */}
+      <div className={styles.personHeader}>
+        <img
+          src={
+            data.profile_path
+              ? `https://image.tmdb.org/t/p/w342${data.profile_path}`
+              : "https://via.placeholder.com/342x513?text=No+Photo"
+          }
+          alt={data.personName}
+          className={styles.personImage}
+        />
+        <div className={styles.personInfo}>
+          <h1 className={styles.pageTitle}>{data.personName}</h1>
+          {data.biography ? (
+            <div className={styles.biographyContainer}>
+              <h3 className={styles.biographyTitle}>Biografia</h3>
+              <p className={styles.biographyText}>{data.biography}</p>
+            </div>
+          ) : (
+            <p className={styles.biographyText}>Nessuna biografia disponibile in italiano su TMDB.</p>
+          )}
+        </div>
+      </div>
       
       {/* FILTER TOGGLE */}
       {/* FILTER BUTTON & DROPDOWN */}

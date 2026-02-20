@@ -6,33 +6,52 @@ import MovieCard from "../components/MovieCard";
 import SearchInput from "../components/SearchInput";
 
 function SearchPage() {
-  const [results, setResults] = useState([]);
+  // Helper per inizializzare lo stato da sessionStorage
+  const getInitialState = (key, defaultValue) => {
+    const saved = sessionStorage.getItem(key);
+    return saved !== null ? JSON.parse(saved) : defaultValue;
+  };
+
+  const [results, setResults] = useState(() => getInitialState("search_results", []));
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
+  const [hasSearched, setHasSearched] = useState(() => getInitialState("search_hasSearched", false));
+  const [currentPage, setCurrentPage] = useState(() => getInitialState("search_currentPage", 1));
+  const [totalPages, setTotalPages] = useState(() => getInitialState("search_totalPages", 0));
+  const [hasMore, setHasMore] = useState(() => getInitialState("search_hasMore", false));
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParam = searchParams.get("query");
   const modeParam = searchParams.get("mode");
-  const [searchMode, setSearchMode] = useState(modeParam || "movie"); // "movie" | "person"
+  const [searchMode, setSearchMode] = useState(() => {
+    if (modeParam) return modeParam;
+    return getInitialState("search_mode", "movie");
+  });
   const navigate = useNavigate();
   const ignoreFilterChange = useRef(false); // Per evitare conflitti tra ricerca e filtri
+  const isInitialMountFilter = useRef(true);
+  const isInitialMountMode = useRef(true);
 
   // Stati per i filtri
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState(() => getInitialState("search_filters", {
     category: "popular",
     genre: "",
-    releaseYear: {
-      from: "",
-      to: "",
-    },
+    releaseYear: { from: "", to: "" },
     minRating: 0,
     language: "",
     keywords: "",
-    sortBy: "", // *** NUOVO FILTRO ORDINAMENTO ***
-  });
+    sortBy: "",
+  }));
+
+  // Salva in sessionStorage ad ogni modifica
+  useEffect(() => {
+    sessionStorage.setItem("search_results", JSON.stringify(results));
+    sessionStorage.setItem("search_hasSearched", JSON.stringify(hasSearched));
+    sessionStorage.setItem("search_currentPage", JSON.stringify(currentPage));
+    sessionStorage.setItem("search_totalPages", JSON.stringify(totalPages));
+    sessionStorage.setItem("search_hasMore", JSON.stringify(hasMore));
+    sessionStorage.setItem("search_mode", JSON.stringify(searchMode));
+    sessionStorage.setItem("search_filters", JSON.stringify(filters));
+  }, [results, hasSearched, currentPage, totalPages, hasMore, searchMode, filters]);
 
   // Lista generi come richiesta
   const genres = [
@@ -84,6 +103,11 @@ function SearchPage() {
 
   // Reset quando cambiano i filtri
   useEffect(() => {
+    if (isInitialMountFilter.current) {
+      isInitialMountFilter.current = false;
+      return;
+    }
+
     if (ignoreFilterChange.current) {
       ignoreFilterChange.current = false;
       return;
@@ -222,6 +246,11 @@ function SearchPage() {
 
   // Effetto per ricaricare i risultati quando cambia la modalità (Film/Persone)
   useEffect(() => {
+    if (isInitialMountMode.current) {
+      isInitialMountMode.current = false;
+      return;
+    }
+
     if (queryParam) {
       handleSearch(queryParam);
     } else {

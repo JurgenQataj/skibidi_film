@@ -249,15 +249,19 @@ exports.getMoviesByPerson = async (req, res) => {
     console.log("🎥 Fetching data for:", officialName); // DEBUG LOG
     // Usiamo discover per trovare ESATTAMENTE i film under 40 min di questa persona
     // E anche per trovare l'ordine di incasso (Revenue) per Cast e Crew
-    const [creditsResponse, shortsResponse, revenueCastResponse, revenueCrewResponse] = await Promise.all([
+    // [NUOVO] Fetch person details per biografia e profile path
+    const [creditsResponse, shortsResponse, revenueCastResponse, revenueCrewResponse, personDetailsResponse] = await Promise.all([
       axios.get(`${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=it-IT`),
       axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40`),
       axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_cast=${personId}&sort_by=revenue.desc&page=1`),
-      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_crew=${personId}&sort_by=revenue.desc&page=1`)
+      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_crew=${personId}&sort_by=revenue.desc&page=1`),
+      axios.get(`${BASE_URL}/person/${personId}?api_key=${API_KEY}&language=it-IT`) // <-- Dettagli persona
     ]);
 
     const cast = creditsResponse.data.cast || [];
     const crew = creditsResponse.data.crew || [];
+    const biography = personDetailsResponse.data.biography || "";
+    const profilePath = personDetailsResponse.data.profile_path || null;
     
     // Create a Set of IDs for short films for fast lookup
     const shortMovieIds = new Set(shortsResponse.data.results.map(m => m.id));
@@ -310,6 +314,8 @@ exports.getMoviesByPerson = async (req, res) => {
 
     res.json({
       personName: officialName,
+      biography,
+      profile_path: profilePath,
       directed,
       acted
     });
