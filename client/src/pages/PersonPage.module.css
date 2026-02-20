@@ -8,14 +8,56 @@
 }
 
 .pageTitle {
-  text-align: center;
-  font-size: 3rem;
-  margin-bottom: 3rem;
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
+  color: var(--primary-color, #a862d2);
   font-weight: 800;
-  background: linear-gradient(45deg, #ff00cc, #333399);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+}
+
+.personHeader {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+  background-color: rgba(20, 20, 22, 0.6);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.personImage {
+  width: 150px; /* Ridotta da 200px */
+  height: 225px; /* Proporzione 2:3 */
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+}
+
+.personInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.biographyContainer {
+  margin-top: 10px;
+}
+
+.biographyTitle {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+.biographyText {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: pre-line;
 }
 
 .section {
@@ -111,8 +153,8 @@
   }
 
   .personImage {
-    width: 150px;
-    height: 225px;
+    width: 100px; /* Ridotta moltissimo su mobile */
+    height: 150px;
   }
 
   .biographyTitle {
