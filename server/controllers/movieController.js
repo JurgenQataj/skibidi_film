@@ -166,7 +166,10 @@ exports.getMovieDetails = async (req, res) => {
       videos: data.videos?.results || [],
       recommendations: data.recommendations?.results || [],
       collection: data.belongs_to_collection || null, // [NUOVO] Saga
-      watch_providers: data["watch/providers"]?.results?.IT?.flatrate || [], // [NUOVO] Dove vederlo (Streaming IT)
+      watch_providers: {
+        flatrate: data["watch/providers"]?.results?.IT?.flatrate || [],
+        link: data["watch/providers"]?.results?.IT?.link || null
+      }, // [NUOVO] Dove vederlo (Streaming IT) with link
     });
   } catch (error) {
     if (error.response && error.response.status === 404) {
