@@ -79,12 +79,7 @@ function HomePage() {
 
   return (
     <div className={styles.pageContainer}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Il tuo Feed</h1>
-        <button onClick={logout} className={styles.logoutButton}>
-          Logout
-        </button>
-      </header>
+
       <TrendingRow />
       <div className={styles.feedContainer}>
         {feed.map((review, index) => {

@@ -102,7 +102,16 @@ function Navbar() {
   };
 
   return (
-    <nav className={styles.navbar}>
+    <>
+      {/* Mobile Topbar con Logo (visibile solo su mobile) */}
+      <div className={styles.mobileTopbar}>
+        <Link to="/" className={styles.mobileLogo}>
+          <img src="/icona3.png" alt="logo" className={styles.logoImg} />
+          Skibidi Film
+        </Link>
+      </div>
+
+      <nav className={styles.navbar}>
       <div className={styles.navContent}>
         <Link to="/" className={styles.logo}>
           <img src="/icona3.png" alt="logo" className={styles.logoImg} />
@@ -180,6 +189,7 @@ function Navbar() {
         </div>
       </div>
     </nav>
+    </>
   );
 }
 

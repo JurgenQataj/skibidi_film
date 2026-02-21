@@ -138,3 +138,11 @@ textarea:focus,
 select:focus {
   border-color: var(--violet-bright);
 }
+
+/* === MEDIA QUERIES === */
+@media (max-width: 768px) {
+  body {
+    padding-top: 54px; /* Spazio per la topbar con logo in alto (ora più piccola) */
+    padding-bottom: 70px; /* Spazio per la navbar in basso */
+  }
+}

@@ -23,7 +23,7 @@
 /* IMMAGINI CON DIMENSIONI IDENTICHE E FISSE - 20% PIÙ GRANDI */
 .card img {
   width: 100% !important;
-  height: 240px !important; /* ERA 200px, ORA 240px (+20%) */
+  height: 204px !important; /* Ridotto del 15% rispetto a prima (era 240px) */
   display: block !important;
   object-fit: cover !important;
   object-position: center !important;

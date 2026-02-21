@@ -84,14 +84,14 @@
 }
 
 .statValue {
-  font-size: 1.44rem;
+  font-size: 1.58rem; /* Ingrandito del 10% (da 1.44rem) */
   font-weight: 700;
   color: white;
   line-height: 1;
 }
 
 .statLabel {
-  font-size: 0.82rem;
+  font-size: 0.9rem; /* Ingrandito del 10% (da 0.82rem) */
   color: rgba(255, 255, 255, 0.38);
   margin-top: 4px;
   letter-spacing: 0.04em;
