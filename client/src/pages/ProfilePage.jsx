@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import styles from "./ProfilePage.module.css";
 import MovieCard from "../components/MovieCard";
@@ -36,6 +36,7 @@ const pokemonAvatars = [
 function ProfilePage() {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
@@ -74,8 +75,9 @@ function ProfilePage() {
         const currentUserId = token ? jwtDecode(token).user.id : null;
         setLoggedInUserId(currentUserId);
 
+        const cacheBuster = `_t=${Date.now()}`;
         const [profileRes, statsRes, reviewsRes] = await Promise.all([
-          axios.get(`${API_URL}/api/users/${userId}/profile`),
+          axios.get(`${API_URL}/api/users/${userId}/profile?${cacheBuster}`),
           axios.get(`${API_URL}/api/users/${userId}/stats`),
           axios.get(`${API_URL}/api/users/${userId}/reviews`),
         ]);
@@ -107,7 +109,7 @@ function ProfilePage() {
       }
     };
     fetchData();
-  }, [userId, API_URL]);
+  }, [userId, API_URL, location.key]);
 
   const handleFollowToggle = async () => {
     const token = localStorage.getItem("token");

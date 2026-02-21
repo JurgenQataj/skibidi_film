@@ -557,7 +557,7 @@ exports.getPartialCollections = async (req, res) => {
             reviewedMovies: new Set()
           });
         }
-        collectionMap.get(cid).reviewedMovies.add(movie.tmdb_id);
+        collectionMap.get(cid).reviewedMovies.add(Number(movie.tmdb_id));
       }
     }
 
@@ -603,5 +603,107 @@ exports.getPartialCollections = async (req, res) => {
   } catch (error) {
     console.error("Errore recupero saghe parziali:", error);
     res.status(500).json({ message: "Errore locale durante il fetch saghe parziali." });
+  }
+};
+
+// --- HELPER: SINCRONIZZAZIONE COLLEZIONI (Saghe) ---
+exports.syncUserCollections = async (userId) => {
+  const axios = require('axios');
+  const TMDB_API_KEY = process.env.TMDB_API_KEY;
+
+  try {
+    const Review = require("../models/Review");
+    const User = require("../models/User");
+    const Movie = require("../models/Movie");
+
+    const reviews = await Review.find({ user: userId }).populate('movie');
+    const user = await User.findById(userId);
+    if (!user || !reviews.length) {
+      console.log(`[SYNC] Nessuna recensione trovata per ${userId}`);
+      return;
+    }
+
+    const collectionMap = new Map();
+
+    for (const r of reviews) {
+      const movie = r.movie;
+      if (!movie) continue;
+
+      // Se non abbiamo info e non abbiamo mai checkato (id non è -1 e non c'è id valido)
+      const needsCheck = !movie.collection_info || 
+                         (movie.collection_info.id === undefined) || 
+                         (Object.keys(movie.toObject().collection_info || {}).length === 0);
+
+      if (needsCheck) {
+        try {
+          const res = await axios.get(`https://api.themoviedb.org/3/movie/${movie.tmdb_id}?api_key=${TMDB_API_KEY}&language=it-IT`);
+          const coll = res.data.belongs_to_collection;
+          movie.collection_info = coll ? {
+            id: coll.id, 
+            name: coll.name, 
+            poster_path: coll.poster_path, 
+            backdrop_path: coll.backdrop_path
+          } : { id: -1 }; // Usiamo -1 per indicare "nessuna collezione" evitiamo re-fetch
+          await movie.save();
+        } catch (err) {
+          console.error(`[SYNC] Errore TMDB per ${movie.title}:`, err.message);
+        }
+      }
+
+      if (movie.collection_info && movie.collection_info.id && movie.collection_info.id > 0) {
+        const cid = movie.collection_info.id;
+        if (!collectionMap.has(cid)) {
+          collectionMap.set(cid, {
+            id: cid,
+            name: movie.collection_info.name,
+            poster_path: movie.collection_info.poster_path,
+            reviewedMovies: new Set()
+          });
+        }
+        collectionMap.get(cid).reviewedMovies.add(Number(movie.tmdb_id));
+      }
+    }
+
+    const completed = [];
+    const promises = Array.from(collectionMap.values()).map(async (collData) => {
+      try {
+        const response = await axios.get(`https://api.themoviedb.org/3/collection/${collData.id}?api_key=${TMDB_API_KEY}&language=it-IT`);
+        // Filtriamo film già usciti
+        const parts = response.data.parts.filter(p => p.release_date && new Date(p.release_date) <= new Date());
+        const totalRequired = parts.length;
+
+        let foundCount = 0;
+        const missingMovies = [];
+        for (const p of parts) {
+          if (collData.reviewedMovies.has(Number(p.id))) {
+            foundCount++;
+          } else {
+            missingMovies.push(p.title);
+          }
+        }
+
+        if (foundCount === totalRequired && totalRequired > 1) {
+          completed.push({
+            id: collData.id,
+            name: collData.name,
+            poster_path: collData.poster_path
+          });
+        } else if (foundCount > 0) {
+          console.log(`[SYNC] Saga ${collData.name} INCOMPLETA: ${foundCount}/${totalRequired}. Mancano: ${missingMovies.join(", ")}`);
+        }
+      } catch (err) {
+        console.error(`[SYNC] Errore verifica saga ${collData.id}:`, err.message);
+      }
+    });
+
+    await Promise.all(promises);
+
+    await User.updateOne(
+      { _id: user._id },
+      { $set: { completedCollections: completed } }
+    );
+    console.log(`[SYNC] Update per ${user.username}: ${completed.length} saghe nel DB.`);
+  } catch (error) {
+    console.error("Errore syncUserCollections:", error);
   }
 };

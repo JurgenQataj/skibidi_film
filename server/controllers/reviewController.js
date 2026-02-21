@@ -1,6 +1,7 @@
 const Review = require("../models/Review");
 const Movie = require("../models/Movie");
 const User = require("../models/User");
+const userController = require("./userController");
 const axios = require("axios");
 
 // Aggiungere una recensione
@@ -58,6 +59,12 @@ exports.addReview = async (req, res) => {
             director: director,
             cast: cast,
             genres: genres,
+            collection_info: movieData.belongs_to_collection ? {
+              id: movieData.belongs_to_collection.id,
+              name: movieData.belongs_to_collection.name,
+              poster_path: movieData.belongs_to_collection.poster_path,
+              backdrop_path: movieData.belongs_to_collection.backdrop_path
+            } : null,
           });
           await movie.save();
         } else {
@@ -66,6 +73,16 @@ exports.addReview = async (req, res) => {
           movie.director = director;
           movie.cast = cast;
           movie.genres = genres;
+          if (movieData.belongs_to_collection) {
+            movie.collection_info = {
+              id: movieData.belongs_to_collection.id,
+              name: movieData.belongs_to_collection.name,
+              poster_path: movieData.belongs_to_collection.poster_path,
+              backdrop_path: movieData.belongs_to_collection.backdrop_path
+            };
+          } else {
+            movie.collection_info = null;
+          }
           await movie.save();
         }
       } catch (apiError) {
@@ -101,6 +118,9 @@ exports.addReview = async (req, res) => {
 
     // Rimuovi dalla watchlist se presente
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });
+
+    // 5. Sync collezioni (AWAITED per live update)
+    await userController.syncUserCollections(userId);
 
     res.status(201).json({ message: "Recensione aggiunta con successo!" });
   } catch (error) {
@@ -194,6 +214,10 @@ exports.deleteReview = async (req, res) => {
     }
 
     await review.deleteOne();
+
+    // Sync collezioni (AWAITED per live update) dopo eliminazione
+    await userController.syncUserCollections(req.user.id);
+
     res.json({ message: "Recensione eliminata con successo." });
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
