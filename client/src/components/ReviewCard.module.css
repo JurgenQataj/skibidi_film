@@ -58,6 +58,10 @@
   transition: color 0.2s;
 }
 
+.authorLink:visited {
+  color: #fff;
+}
+
 .authorLink:hover {
   color: #d72638; /*--red-bright*/
 }
@@ -69,6 +73,10 @@
   font-size: 1.15rem;
   letter-spacing: 0.3px;
   transition: color 0.2s;
+}
+
+.movieTitleLink:visited {
+  color: #fff;
 }
 
 .movieTitleLink:hover {
@@ -260,6 +268,9 @@
     padding: 12px;
     border-radius: 14px;
     gap: 12px;
+    margin-left: 10px; /* Crea distanza elegante dal bordo sinistro */
+    margin-right: 10px; /* Crea distanza elegante dal bordo destro */
+    width: auto; /* Sovrascrive 100% per permettere i bordi */
   }
 
   .poster {

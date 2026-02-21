@@ -107,7 +107,7 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .trendingRowContainer {
-    margin-top: -15px; /* Riduce il distacco dalla cima su mobile */
+    margin-top: 2px; /* Lieve distacco positivo senza eccesso */
   }
   .title {
     font-size: 1.2rem;
