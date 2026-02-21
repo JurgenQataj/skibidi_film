@@ -547,6 +547,7 @@ exports.getNewestUsers = async (req, res) => {
 exports.getPartialCollections = async (req, res) => {
   const { userId } = req.params;
   const User = require('../models/User');
+  console.log(`[ROUTE] getPartialCollections per userId: ${userId}`);
 
   try {
     const user = await User.findById(userId);

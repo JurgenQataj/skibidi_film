@@ -10,6 +10,7 @@ router.post("/forgot-password", userController.forgotPassword);
 router.post("/reset-password/:token", userController.resetPassword);
 
 // --- Social & Discovery ---
+router.get("/version", (req, res) => res.json({ version: "1.2.5", timestamp: new Date() }));
 router.get("/most-followed", userController.getMostFollowedUsers);
 router.get("/newest", userController.getNewestUsers);
 
@@ -32,8 +33,8 @@ router.get("/:userId/followers", userController.getFollowers);
 router.get("/:userId/following", userController.getFollowing);
 
 // --- Altre rotte specifiche ---
+router.get("/:userId/partial-collections", protect, userController.getPartialCollections);
 router.get("/:userId/reviews", userController.getUserReviews);
 router.get("/:userId/lists", userController.getUserLists);
-router.get("/:userId/partial-collections", protect, userController.getPartialCollections);
 
 module.exports = router;
