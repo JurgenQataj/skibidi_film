@@ -33,45 +33,46 @@ function LoginPage() {
   };
 
   return (
-    <form onSubmit={handleLogin} className={styles.loginContainer}>
-      <h2>Login</h2>
-      <div className={styles.inputGroup}>
-        <label>Username o Email:</label>
-        <input
-          className={styles.inputField}
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-      </div>
-      <div className={styles.inputGroup}>
-        <label>Password:</label>
-        <input
-          className={styles.inputField}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      {error && <p style={{ color: "#ff8a8a" }}>{error}</p>}
-      
-      <button type="submit" className={styles.submitButton} disabled={loading}>
-        {loading ? "Caricamento..." : "Accedi"}
-      </button>
+    <div className={styles.pageWrapper}>
+      <form onSubmit={handleLogin} className={styles.loginContainer}>
+        <h2>Login</h2>
+        <div className={styles.inputGroup}>
+          <label>Username o Email:</label>
+          <input
+            className={styles.inputField}
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+        <div className={styles.inputGroup}>
+          <label>Password:</label>
+          <input
+            className={styles.inputField}
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        {error && <p style={{ color: "#ff8a8a" }}>{error}</p>}
+        
+        <button type="submit" className={styles.submitButton} disabled={loading}>
+          {loading ? "Caricamento..." : "Accedi"}
+        </button>
 
-      {/* NUOVO LINK RECUPERO PASSWORD */}
-      <div style={{ marginTop: "10px", textAlign: "right" }}>
-        <Link to="/forgot-password" style={{ fontSize: "0.9rem", color: "#aaa", textDecoration: "none" }}>
-          Password dimenticata?
-        </Link>
-      </div>
+        <div style={{ marginTop: "10px", textAlign: "right" }}>
+          <Link to="/forgot-password" style={{ fontSize: "0.9rem", color: "#aaa", textDecoration: "none" }}>
+            Password dimenticata?
+          </Link>
+        </div>
 
-      <p style={{ marginTop: "20px", textAlign: 'center' }}>
-        Non hai un account? <Link to="/register">Registrati</Link>
-      </p>
-    </form>
+        <p style={{ marginTop: "20px", textAlign: 'center' }}>
+          Non hai un account? <Link to="/register">Registrati</Link>
+        </p>
+      </form>
+    </div>
   );
 }
 export default LoginPage;

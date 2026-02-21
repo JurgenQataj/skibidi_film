@@ -5,9 +5,8 @@ import {
   FaHome,
   FaSearch,
   FaUser,
-  FaListUl,
   FaGlobe,
-  FaBell, // ICONA CAMPANELLA
+  FaBell,
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -106,6 +105,7 @@ function Navbar() {
     <nav className={styles.navbar}>
       <div className={styles.navContent}>
         <Link to="/" className={styles.logo}>
+          <img src="/icona3.png" alt="logo" className={styles.logoImg} />
           Skibidi Film
         </Link>
         <div className={styles.navLinks}>
@@ -118,14 +118,12 @@ function Navbar() {
           <Link to="/discover" className={styles.navLink}>
             <FaGlobe /> <span>Scopri</span>
           </Link>
-          <Link to="/my-lists" className={styles.navLink}>
-            <FaListUl /> <span>Liste</span>
-          </Link>
+
           {userId && (
             <>
               <div className={styles.notificationContainer}>
                 <button onClick={handleBellClick} className={styles.navLink}>
-                  <FaBell />
+                  <FaBell /> <span>Notifiche</span>
                   {unreadCount > 0 && (
                     <span className={styles.notificationBadge}>
                       {unreadCount}

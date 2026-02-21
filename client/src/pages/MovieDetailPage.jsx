@@ -6,6 +6,7 @@ import styles from "./MovieDetailPage.module.css";
 import AddReviewForm from "../components/AddReviewForm";
 import MovieCard from "../components/MovieCard";
 import EditReviewModal from "../components/EditReviewModal";
+import { SkeletonMovieCard } from "../components/Skeleton";
 
 function MovieDetailPage() {
   const { tmdbId } = useParams();
@@ -214,7 +215,11 @@ function MovieDetailPage() {
 
   const customLists = userLists.filter((list) => list.id !== "watchlist");
 
-  if (loading) return <p className={styles.loading}>Caricamento...</p>;
+  if (loading) return (
+    <div style={{ maxWidth: "900px", margin: "60px auto", padding: "0 30px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px,1fr))", gap: "15px" }}>
+      {Array.from({ length: 6 }).map((_, i) => <SkeletonMovieCard key={i} />)}
+    </div>
+  );
   if (error) return <p className={styles.loading}>{error}</p>;
   if (!movie) return <p className={styles.loading}>Film non trovato.</p>;
 

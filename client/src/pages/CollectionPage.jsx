@@ -73,7 +73,6 @@ function CollectionPage() {
       </div>
 
       <div className={styles.mainContent}>
-        <h2>Film della Saga (Ordine Cronologico)</h2>
         <div className={styles.moviesGrid}>
           {collection.parts && collection.parts.length > 0 ? (
             collection.parts.map((movie) => (

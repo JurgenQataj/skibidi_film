@@ -1,0 +1,84 @@
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+/* ── Base skeleton ───────────────────────────── */
+.skeleton {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 0%,
+    rgba(255,255,255,0.09) 45%,
+    rgba(255,255,255,0.04) 90%
+  );
+  background-size: 1200px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ── MovieCard ───────────────────────────────── */
+.movieCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.moviePoster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  height: unset;
+  border-radius: 8px;
+}
+.movieTitle {
+  width: 70%;
+  height: 11px;
+  margin: 2px auto 0;
+}
+
+/* ── PersonRow ───────────────────────────────── */
+.personRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+}
+
+/* ── UserCard ────────────────────────────────── */
+.userCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px;
+}
+
+/* ── ListCard ────────────────────────────────── */
+.listCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+}
+
+/* ── Shared primitives ───────────────────────── */
+.lines { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+.circle44 { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+.circle64 { width: 64px; height: 64px; border-radius: 50%; }
+.square28 { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; }
+
+.lineLong  { width: 80%; height: 12px; }
+.lineMed   { width: 65%; height: 12px; }
+.lineShort { width: 50%; height: 10px; }

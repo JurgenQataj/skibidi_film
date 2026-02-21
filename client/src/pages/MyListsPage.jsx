@@ -3,12 +3,15 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
 import styles from "./MyListsPage.module.css";
+import { FaPlus, FaTrash, FaFilm, FaBookmark } from "react-icons/fa";
+import { SkeletonListCard } from "../components/Skeleton";
 
 function MyListsPage() {
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -16,10 +19,8 @@ function MyListsPage() {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Utente non autenticato");
-
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.user.id;
-
       const response = await axios.get(`${API_URL}/api/users/${userId}/lists`);
       setLists(response.data);
     } catch (error) {
@@ -29,9 +30,7 @@ function MyListsPage() {
     }
   }, [API_URL]);
 
-  useEffect(() => {
-    fetchLists();
-  }, [fetchLists]);
+  useEffect(() => { fetchLists(); }, [fetchLists]);
 
   const handleCreateList = async (e) => {
     e.preventDefault();
@@ -44,6 +43,7 @@ function MyListsPage() {
       );
       setTitle("");
       setDescription("");
+      setIsFormOpen(false);
       fetchLists();
     } catch (error) {
       alert(error.response?.data?.message || "Errore nella creazione.");
@@ -64,74 +64,99 @@ function MyListsPage() {
     }
   };
 
-  if (loading) return <p className={styles.statusText}>Caricamento...</p>;
+  if (loading) return (
+    <div className={styles.pageContainer}>
+      <div className={styles.listsGrid}>
+        {Array.from({ length: 4 }).map((_, i) => <SkeletonListCard key={i} />)}
+      </div>
+    </div>
+  );
+
+  const isWatchlist = (list) => list.id === "watchlist" || list._id === "watchlist";
 
   return (
     <div className={styles.pageContainer}>
-      <div className={styles.createListSection}>
-        <h2>Crea una Nuova Lista</h2>
-        <form onSubmit={handleCreateList}>
-          <input
-            type="text"
-            placeholder="Titolo della lista"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className={styles.inputField}
-            required
-          />
-          <textarea
-            placeholder="Descrizione (opzionale)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className={styles.textareaField}
-          />
-          <button type="submit" className={styles.button}>
-            Crea Lista
-          </button>
-        </form>
+      {/* Header */}
+      <div className={styles.pageHeader}>
+        <div className={styles.headerLeft}>
+          <span className={styles.headerIcon}>🗂️</span>
+          <h1 className={styles.pageTitle}>Le mie Liste</h1>
+        </div>
+        <button
+          className={`${styles.newListBtn} ${isFormOpen ? styles.newListBtnActive : ""}`}
+          onClick={() => setIsFormOpen(!isFormOpen)}
+        >
+          <FaPlus style={{ transition: "transform 0.2s", transform: isFormOpen ? "rotate(45deg)" : "none" }} />
+          <span>{isFormOpen ? "Annulla" : "Nuova Lista"}</span>
+        </button>
       </div>
 
-      <div className={styles.myListsSection}>
-        <h2>Le Mie Liste</h2>
-        {lists.length > 0 ? (
-          <div className={styles.listsContainer}>
-            {lists.map((list) => (
-              <div
-                key={list._id} /* CORREZIONE: Usiamo _id di MongoDB */
-                className={`${styles.listCard} ${
-                  list.id === "watchlist" || list._id === "watchlist" ? styles.watchlistCard : ""
-                }`}
+      {/* Form creazione lista */}
+      {isFormOpen && (
+        <div className={styles.createForm}>
+          <form onSubmit={handleCreateList}>
+            <input
+              type="text"
+              placeholder="Nome della lista…"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={styles.inputField}
+              required
+              autoFocus
+            />
+            <textarea
+              placeholder="Descrizione (opzionale)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={styles.textareaField}
+            />
+            <button type="submit" className={styles.submitBtn}>
+              Crea Lista
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Griglia liste */}
+      {lists.length > 0 ? (
+        <div className={styles.listsGrid}>
+          {lists.map((list) => (
+            <div
+              key={list._id}
+              className={`${styles.listCard} ${isWatchlist(list) ? styles.watchlistCard : ""}`}
+            >
+              <Link
+                to={isWatchlist(list) ? "/watchlist" : `/list/${list._id}`}
+                className={styles.listLink}
               >
-                <Link
-                  to={
-                    list.id === "watchlist" || list._id === "watchlist" 
-                      ? "/watchlist" 
-                      : `/list/${list._id}`
-                  }
-                  className={styles.listLink}
+                <div className={styles.cardIcon}>
+                  {isWatchlist(list) ? <FaBookmark /> : <FaFilm />}
+                </div>
+                <div className={styles.cardContent}>
+                  <h3 className={styles.cardTitle}>{list.title}</h3>
+                  {list.description && (
+                    <p className={styles.cardDesc}>{list.description}</p>
+                  )}
+                </div>
+              </Link>
+              {!isWatchlist(list) && (
+                <button
+                  onClick={() => handleDeleteList(list._id)}
+                  className={styles.deleteButton}
+                  title="Elimina lista"
                 >
-                  <h3>{list.title}</h3>
-                  <p>{list.description}</p>
-                </Link>
-                {/* Mostra il tasto elimina solo se NON è la watchlist */}
-                {list.id !== "watchlist" && list._id !== "watchlist" && (
-                  <button
-                    onClick={() => handleDeleteList(list._id)}
-                    className={styles.deleteButton}
-                    title="Elimina lista"
-                  >
-                    X
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className={styles.statusText}>
-            Non hai ancora creato nessuna lista.
-          </p>
-        )}
-      </div>
+                  <FaTrash />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.emptyState}>
+          <p>Non hai ancora creato nessuna lista.</p>
+          <p className={styles.emptyHint}>Premi "Nuova Lista" per iniziare!</p>
+        </div>
+      )}
     </div>
   );
 }

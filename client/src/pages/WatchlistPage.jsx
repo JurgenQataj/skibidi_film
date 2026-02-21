@@ -4,6 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./WatchlistPage.module.css";
 import MovieCard from "../components/MovieCard";
+import { SkeletonMovieCard } from "../components/Skeleton";
 
 function WatchlistPage() {
   const [watchlist, setWatchlist] = useState([]);
@@ -51,8 +52,13 @@ function WatchlistPage() {
     }
   };
 
-  if (loading)
-    return <p className={styles.statusText}>Caricamento della watchlist...</p>;
+  if (loading) return (
+    <div className={styles.pageContainer}>
+      <div className={styles.reviewsGrid}>
+        {Array.from({ length: 8 }).map((_, i) => <SkeletonMovieCard key={i} />)}
+      </div>
+    </div>
+  );
 
   return (
     <div className={styles.pageContainer}>

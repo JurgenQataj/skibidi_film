@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./ProfilePage.module.css";
 import MovieCard from "../components/MovieCard";
@@ -8,7 +8,8 @@ import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
-import { FaChartBar } from "react-icons/fa";
+import { FaChartBar, FaListUl } from "react-icons/fa";
+import { SkeletonMovieCard } from "../components/Skeleton";
 
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
 const pokemonAvatars = [
@@ -39,9 +40,11 @@ function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalData, setModalData] = useState({ isOpen: false, title: "", content: [] });
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isListsModalOpen, setIsListsModalOpen] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   
@@ -71,6 +74,12 @@ function ProfilePage() {
         setProfile(profileRes.data);
         setStats(statsRes.data);
         setReviews(reviewsRes.data || []);
+
+        // Carica le liste pubbliche dell'utente
+        try {
+          const listsRes = await axios.get(`${API_URL}/api/users/${userId}/lists`);
+          setLists(listsRes.data || []);
+        } catch { setLists([]); }
 
         if (currentUserId && currentUserId !== userId) {
           const followStatusRes = await axios.get(
@@ -177,7 +186,15 @@ function ProfilePage() {
     }
   };
 
-  if (loading) return <p style={{ color: "white", textAlign: "center" }}>Caricamento...</p>;
+  if (loading) return (
+    <div className={styles.pageContainer}>
+      <div className={styles.reviewsGrid}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <SkeletonMovieCard key={i} />
+        ))}
+      </div>
+    </div>
+  );
   if (!profile || !stats) return <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>;
 
   const isOwnProfile = loggedInUserId === profile._id;
@@ -269,7 +286,7 @@ function ProfilePage() {
             >
               <span className={styles.historyNumber}>{index + 1}</span>
               <img
-                src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w92${review.movie.poster_path}` : "https://placehold.co/92x138?text=No+Img"}
+                src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
                 alt={`Poster di ${review.movie.title}`}
                 className={styles.historyPoster}
               />
@@ -282,20 +299,58 @@ function ProfilePage() {
         </ol>
       </Modal>
 
+      {/* Modal Liste */}
+      <Modal
+        isOpen={isListsModalOpen}
+        onClose={() => setIsListsModalOpen(false)}
+        title={isOwnProfile ? "Le mie Liste" : `Liste di ${profile.username}`}
+      >
+        <div className={styles.userList}>
+          {lists.filter((l) => l._id !== "watchlist" && l.id !== "watchlist").length === 0 ? (
+            <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center" }}>Nessuna lista creata.</p>
+          ) : (
+            lists
+              .filter((l) => l._id !== "watchlist" && l.id !== "watchlist")
+              .map((list) => (
+                <Link
+                  key={list._id}
+                  to={`/list/${list._id}`}
+                  className={styles.listCard}
+                  onClick={() => setIsListsModalOpen(false)}
+                >
+                  <span className={styles.listCardIcon}>🎬</span>
+                  <div>
+                    <div className={styles.listCardTitle}>{list.title}</div>
+                    {list.description && (
+                      <div className={styles.listCardDesc}>{list.description}</div>
+                    )}
+                  </div>
+                </Link>
+              ))
+          )}
+        </div>
+      </Modal>
+
       <div className={styles.pageContainer}>
+        {/* ── Header stile Instagram ── */}
         <header className={styles.profileHeader}>
+          {/* Avatar */}
           <img
             src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
             alt="Avatar"
             className={styles.avatar}
           />
-          <div className={styles.profileInfo}>
+
+          {/* Right column */}
+          <div className={styles.profileRight}>
+            {/* Username */}
             <h1 className={styles.username}>{profile.username}</h1>
-            <p className={styles.bio}>{profile.bio || "Questo utente non ha ancora una biografia."}</p>
+
+            {/* Stats: Film | Follower | Seguiti */}
             <div className={styles.statsContainer}>
               <div className={styles.statItem}>
                 <div className={styles.statValue}>{stats.moviesReviewed}</div>
-                <div className={styles.statLabel}>Film Recensiti</div>
+                <div className={styles.statLabel}>Film</div>
               </div>
               <div className={styles.statItemClickable} onClick={() => showModalWith("followers")}>
                 <div className={styles.statValue}>{stats.followersCount}</div>
@@ -305,32 +360,40 @@ function ProfilePage() {
                 <div className={styles.statValue}>{stats.followingCount}</div>
                 <div className={styles.statLabel}>Seguiti</div>
               </div>
-              {/* NUOVO TASTO STATS */}
-              <div 
-                className={styles.statItemClickable} 
-                onClick={() => navigate(`/profile/${userId}/stats`)}
-                style={{ cursor: "pointer", marginLeft: "10px" }}
-              >
-                <div className={styles.statValue}><FaChartBar /></div>
-                <div className={styles.statLabel}>Stats</div>
+            </div>
+
+            {/* Bio */}
+            {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
+
+            {/* Actions row: button + Stats + Liste */}
+            <div className={styles.actionsRow}>
+              {loggedInUserId && (
+                isOwnProfile ? (
+                  <button onClick={handleOpenEditModal} className={styles.editButton}>Modifica Profilo</button>
+                ) : (
+                  <button onClick={handleFollowToggle} className={styles.followButton}>
+                    {isFollowing ? "Segui già" : "Segui"}
+                  </button>
+                )
+              )}
+              <div className={styles.iconBtn} onClick={() => navigate(`/profile/${userId}/stats`)} title="Stats">
+                <FaChartBar />
+              </div>
+              <div className={styles.iconBtn} onClick={() => setIsListsModalOpen(true)} title="Liste">
+                <FaListUl />
               </div>
             </div>
-            {loggedInUserId && (
-              isOwnProfile ? (
-                <button onClick={handleOpenEditModal} className={styles.editButton}>Modifica Profilo</button>
-              ) : (
-                <button onClick={handleFollowToggle} className={styles.followButton}>
-                  {isFollowing ? "Segui già" : "Segui"}
-                </button>
-              )
-            )}
           </div>
         </header>
 
         <section>
           <h2 className={styles.sectionTitle}>Ultime Recensioni</h2>
           <div className={styles.reviewsGrid}>
-            {recentReviews.length > 0 ? (
+            {loading ? (
+              Array.from({ length: 12 }).map((_, i) => (
+                <SkeletonMovieCard key={i} />
+              ))
+            ) : recentReviews.length > 0 ? (
               recentReviews.map((review) => (
                 <MovieCard key={review._id} movie={review.movie} />
               ))

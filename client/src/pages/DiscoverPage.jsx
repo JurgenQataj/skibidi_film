@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./DiscoverPage.module.css";
 import UserCard from "../components/UserCard";
+import { SkeletonUserCard } from "../components/Skeleton";
+
+const SKELETON_COUNT = 6;
 
 function DiscoverPage() {
   const [mostFollowed, setMostFollowed] = useState([]);
@@ -29,24 +32,31 @@ function DiscoverPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <section>
-        <h1 className={styles.title}>Utenti più Seguiti</h1>
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionIcon}>👑</span>
+          <h1 className={styles.title}>Più Seguiti</h1>
+          <div className={styles.divider} />
+        </div>
         <div className={styles.gridContainer}>
-          {loading ? (
-            <p>Caricamento...</p>
-          ) : (
-            mostFollowed.map((user) => <UserCard key={user._id} user={user} />)
-          )}
+          {loading
+            ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
+            : mostFollowed.map((user) => <UserCard key={user._id} user={user} />)
+          }
         </div>
       </section>
-      <section>
-        <h1 className={styles.title}>Nuovi Iscritti</h1>
+
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionIcon}>✨</span>
+          <h1 className={styles.title}>Nuovi Iscritti</h1>
+          <div className={styles.divider} />
+        </div>
         <div className={styles.gridContainer}>
-          {loading ? (
-            <p>Caricamento...</p>
-          ) : (
-            newestUsers.map((user) => <UserCard key={user._id} user={user} />)
-          )}
+          {loading
+            ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
+            : newestUsers.map((user) => <UserCard key={user._id} user={user} />)
+          }
         </div>
       </section>
     </div>

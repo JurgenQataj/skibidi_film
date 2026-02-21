@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./TrendingRow.module.css";
 import MovieCard from "./MovieCard";
+import { SkeletonMovieCard } from "./Skeleton";
 
 const TrendingRow = () => {
   const [timeWindow, setTimeWindow] = useState("day"); // 'day' o 'week'
@@ -49,7 +50,13 @@ const TrendingRow = () => {
       </div>
 
       {loading ? (
-        <div className={styles.loader}>Caricamento...</div>
+        <div className={styles.scrollContainer}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className={styles.cardWrapper}>
+              <SkeletonMovieCard />
+            </div>
+          ))}
+        </div>
       ) : error ? (
         <div className={styles.error}>{error}</div>
       ) : (

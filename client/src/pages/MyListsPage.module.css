@@ -1,131 +1,238 @@
 .pageContainer {
-  padding: 40px;
+  padding: 50px 40px;
   color: white;
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-.createListSection,
-.myListsSection {
-  background-color: rgba(30, 30, 30, 0.6);
-  backdrop-filter: blur(12px);
-  padding: 30px;
-  border-radius: 16px;
-  margin-bottom: 40px;
+/* ── Header ────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerIcon {
+  font-size: 1.6rem;
+}
+
+.pageTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.newListBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 98, 210, 0.4);
+  background: rgba(168, 98, 210, 0.1);
+  color: rgba(168, 98, 210, 0.9);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.newListBtn:hover,
+.newListBtnActive {
+  background: rgba(168, 98, 210, 0.2);
+  border-color: rgba(168, 98, 210, 0.7);
+  color: #c985f0;
+}
+
+/* ── Form ───────────────────────────────────── */
+.createForm {
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .inputField,
 .textareaField {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.25);
   color: white;
-  font-size: 1rem;
+  font-size: 0.95rem;
   box-sizing: border-box;
-  transition: border-color 0.3s, background-color 0.3s;
+  transition: border-color 0.2s;
+}
+
+.inputField::placeholder,
+.textareaField::placeholder {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .inputField:focus,
 .textareaField:focus {
-  border-color: var(--primary-color);
-  background-color: rgba(0, 0, 0, 0.5);
+  border-color: rgba(168, 98, 210, 0.6);
   outline: none;
 }
 
 .textareaField {
-  min-height: 80px;
+  min-height: 70px;
   resize: vertical;
 }
 
-.button {
-  padding: 12px 20px;
-  border-radius: var(--border-radius);
+.submitBtn {
+  padding: 11px 22px;
+  border-radius: 10px;
   border: none;
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, #a862d2, #7b3fa8);
   color: white;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: opacity 0.2s;
 }
 
-.button:hover {
-  background-color: var(--secondary-color);
-}
+.submitBtn:hover { opacity: 0.85; }
 
-.listsContainer {
+/* ── Lista cards ────────────────────────────── */
+.listsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
 }
 
-/* MODIFICA: La card ora non è più un link diretto, ma lo sono i suoi contenuti */
 .listCard {
-  background-color: rgba(40, 40, 40, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
   padding: 20px;
-  border-radius: 12px;
   position: relative;
-  transition: transform 0.2s, background-color 0.2s;
+  transition: all 0.22s ease;
 }
+
 .listCard:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(168, 98, 210, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-/* NUOVO: Stile per il contenuto cliccabile */
+.watchlistCard {
+  border-color: rgba(168, 98, 210, 0.45);
+  background: rgba(168, 98, 210, 0.07);
+}
+
 .listLink {
-  text-decoration: none; /* Rimuove la sottolineatura */
+  text-decoration: none;
   color: inherit;
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
 }
 
-.listCard h3 {
-  margin-top: 0;
-  color: var(--primary-color);
-}
-.listCard p {
-  color: #ccc;
-}
-
-.statusText {
-  font-style: italic;
-  color: #ccc;
+.cardIcon {
+  font-size: 1.2rem;
+  color: rgba(168, 98, 210, 0.75);
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
-/* MODIFICA: Stile migliorato per il pulsante Elimina */
+.watchlistCard .cardIcon {
+  color: #c985f0;
+}
+
+.cardContent {
+  flex: 1;
+  overflow: hidden;
+}
+
+.cardTitle {
+  margin: 0 0 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardDesc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Delete button ──────────────────────────── */
 .deleteButton {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(255, 77, 77, 0.8);
-  color: white;
-  border: none;
-  border-radius: 50%;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 77, 77, 0.12);
+  color: rgba(255, 100, 100, 0.7);
+  border: 1px solid rgba(255, 77, 77, 0.2);
+  border-radius: 8px;
   width: 30px;
   height: 30px;
   cursor: pointer;
-  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  transition: background-color 0.2s;
+  font-size: 11px;
+  transition: all 0.18s;
 }
+
 .deleteButton:hover {
-  background: #cc0000;
+  background: rgba(255, 77, 77, 0.25);
+  color: #ff6464;
+  border-color: rgba(255, 77, 77, 0.5);
 }
-.watchlistCard {
-  border: 2px solid var(--primary-color);
-  background-color: rgba(138, 75, 175, 0.2);
+
+/* ── Empty state ────────────────────────────── */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.4);
 }
-/* --- Media Queries per il Mobile --- */
+
+.emptyHint {
+  font-size: 0.85rem;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.statusText {
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 60px 0;
+}
+
+/* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
-  .pageContainer {
-    padding: 20px;
-  }
+  .pageContainer { padding: 30px 20px; }
+  .listsGrid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pageTitle { font-size: 1.4rem; }
+}
+
+@media (max-width: 480px) {
+  .listsGrid { grid-template-columns: 1fr; }
 }

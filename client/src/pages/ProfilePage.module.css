@@ -1,90 +1,199 @@
-/* Blocca lo scroll orizzontale e nasconde le barre di scorrimento globalmente */
+/* ── Global scrollbar hide ──────────────────── */
 :global(body) {
   overflow-x: hidden;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
 :global(::-webkit-scrollbar) {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
   width: 0;
   height: 0;
 }
 
+/* ── Page ───────────────────────────────────── */
 .pageContainer {
-  padding: 40px;
-  max-width: 1000px;
+  padding: 50px 40px;
+  max-width: 960px;
   margin: 0 auto;
   color: white;
   overflow-x: hidden;
 }
+
+/* ── Profile header (Instagram-style) ──────── */
 .profileHeader {
   display: flex;
-  align-items: center;
-  gap: 30px;
-  margin-bottom: 50px;
+  align-items: flex-start;
+  gap: 32px;
+  margin-bottom: 44px;
 }
+
 .avatar {
-  width: 150px;
-  height: 150px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--primary-color);
+  border: 2px solid rgba(168, 98, 210, 0.45);
+  box-shadow: 0 0 24px rgba(168, 98, 210, 0.12);
+  flex-shrink: 0;
 }
-.profileInfo {
-  text-align: left;
+
+/* Right column: username / stats / actions / bio */
+.profileRight {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
 }
+
 .username {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin: 0;
+  letter-spacing: -0.02em;
 }
+
 .bio {
-  font-size: 1.1rem;
-  color: #ccc;
-  margin-top: 10px;
-  max-width: 500px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 420px;
 }
+
+/* ── Stats row ──────────────────────────────── */
 .statsContainer {
   display: flex;
-  gap: 30px;
-  margin-top: 20px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
+
 .statItem,
 .statItemClickable {
   text-align: center;
-  padding: 10px;
+  padding: 4px 8px;
   border-radius: 8px;
-  transition: background-color 0.2s;
+  transition: background 0.18s;
 }
+
 .statItemClickable {
   cursor: pointer;
 }
+
 .statItemClickable:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
 }
+
 .statValue {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 1.44rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
 }
+
 .statLabel {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.38);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Actions row ────────────────────────────── */
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
   font-size: 0.9rem;
-  color: #ccc;
+  transition: all 0.18s ease;
 }
 
+.iconBtn:hover {
+  background: rgba(168, 98, 210, 0.15);
+  border-color: rgba(168, 98, 210, 0.4);
+  color: rgba(200, 150, 240, 0.9);
+}
+
+/* ── Section title ──────────────────────────── */
 .sectionTitle {
-  font-size: 2rem;
-  border-bottom: 2px solid var(--primary-color);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 20px;
   padding-bottom: 10px;
-  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* GRIGLIA PERFETTA CON CELLE IDENTICHE */
+/* ── GRIGLIA FILM (INVARIATA) ───────────────── */
 .reviewsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   justify-content: center;
   width: 100%;
+}
+
+/* GRIGLIA LISTE NEL PROFILO */
+.listsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.listCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  text-decoration: none;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.listCard:hover {
+  background: rgba(168, 98, 210, 0.1);
+  border-color: rgba(168, 98, 210, 0.4);
+  transform: translateY(-2px);
+}
+
+.listCardIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.listCardTitle {
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listCardDesc {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
 /* FORZA DIMENSIONI IDENTICHE ASSOLUTE */
@@ -119,219 +228,269 @@
   white-space: nowrap !important;
 }
 
+/* ── Modale: lista utenti ───────────────────── */
 .userList {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
+/* ── Buttons ────────────────────────────────── */
 .followButton,
 .editButton {
-  margin-top: 20px;
-  padding: 8px 20px;
-  border: none;
-  border-radius: var(--border-radius);
-  background-color: var(--primary-color);
-  color: white;
-  font-weight: bold;
+  padding: 7px 20px;
+  border: 1px solid rgba(168, 98, 210, 0.4);
+  border-radius: 10px;
+  background: rgba(168, 98, 210, 0.12);
+  color: rgba(200, 150, 240, 0.9);
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-.followButton:hover,
-.editButton:hover {
-  opacity: 0.9;
+  transition: all 0.2s;
 }
 
-/* --- SEZIONE FOTO PROFILO HQ: POKEMON & MARVEL --- */
+.followButton:hover,
+.editButton:hover {
+  background: rgba(168, 98, 210, 0.25);
+  border-color: rgba(168, 98, 210, 0.65);
+}
+
+/* ── Edit modal ─────────────────────────────── */
 .editLabel {
   display: block;
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
   text-align: left;
 }
+
 .bioTextarea {
   width: 100%;
-  min-height: 100px;
-  background-color: #333;
+  min-height: 90px;
+  background: rgba(0, 0, 0, 0.3);
   color: white;
-  border: 1px solid #555;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
   padding: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   box-sizing: border-box;
+  font-size: 0.9rem;
+  resize: vertical;
+  transition: border-color 0.2s;
 }
+
+.bioTextarea:focus {
+  outline: none;
+  border-color: rgba(168, 98, 210, 0.5);
+}
+
 .avatarGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   gap: 10px;
-  margin-bottom: 20px;
-  background-color: rgba(0, 0, 0, 0.2);
+  margin-bottom: 18px;
+  background: rgba(0, 0, 0, 0.15);
   padding: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
 }
+
 .avatarOption {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid transparent;
-  transition: border-color 0.2s, box-shadow 0.19s, transform 0.15s;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.15s;
   object-fit: cover;
 }
+
 .avatarOption.selected {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 14px #e03aff, 0 0 6px #d72638;
+  border-color: rgba(168, 98, 210, 0.9);
   transform: scale(1.12);
+  box-shadow: 0 0 12px rgba(168, 98, 210, 0.5);
 }
+
 .avatarOption:hover {
-  border-color: #e03aff;
-  box-shadow: 0 0 15px #d72638, 0 0 7px #e03aff99;
-  transform: scale(1.09);
+  border-color: rgba(168, 98, 210, 0.5);
+  transform: scale(1.08);
 }
-/* --- FINE AVATAR HQ --- */
 
 .saveButton {
   width: 100%;
-  padding: 12px;
+  padding: 11px;
   border: none;
-  border-radius: 8px;
-  background-color: var(--primary-color);
+  border-radius: 10px;
+  background: rgba(168, 98, 210, 0.35);
   color: white;
-  font-weight: bold;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-}
-.divider {
-  border: none;
-  border-top: 1px solid #555;
-  margin: 25px 0;
-}
-.dangerZone {
-  text-align: center;
-}
-.dangerTitle {
-  color: #ff4d4d;
-  margin-top: 0;
-}
-.deleteAccountButton {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background-color: #cc0000;
-  color: white;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.deleteAccountButton:hover {
-  background-color: #ff4d4d;
+  transition: background 0.2s;
 }
 
+.saveButton:hover { background: rgba(168, 98, 210, 0.55); }
+
+.divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  margin: 22px 0;
+}
+
+.dangerZone { text-align: center; }
+
+.dangerTitle {
+  color: rgba(255, 80, 80, 0.8);
+  margin-top: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+.deleteAccountButton {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid rgba(200, 50, 50, 0.35);
+  border-radius: 10px;
+  background: rgba(180, 30, 30, 0.15);
+  color: rgba(255, 100, 100, 0.85);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteAccountButton:hover {
+  background: rgba(180, 30, 30, 0.3);
+  border-color: rgba(200, 50, 50, 0.6);
+}
+
+/* ── Show all button ────────────────────────── */
 .showAllContainer {
   text-align: center;
-  margin-top: 30px;
+  margin-top: 24px;
 }
+
 .showAllButton {
-  padding: 12px 25px;
-  font-size: 1rem;
-  font-weight: bold;
-  color: white;
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: var(--border-radius);
+  padding: 9px 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(200, 150, 240, 0.85);
+  background: rgba(168, 98, 210, 0.12);
+  border: 1px solid rgba(168, 98, 210, 0.3);
+  border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
 }
+
 .showAllButton:hover {
-  background-color: var(--secondary-color);
+  background: rgba(168, 98, 210, 0.25);
+  color: rgba(220, 170, 255, 1);
 }
+
+/* ── History list ───────────────────────────── */
 .historyList {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
+
 .historyItem {
   display: flex;
   align-items: center;
-  padding: 15px;
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
   transition: all 0.2s ease;
   cursor: pointer;
+  gap: 10px;
 }
+
 .historyItem:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  transform: translateX(5px);
-  border-color: rgba(255, 71, 87, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(168, 98, 210, 0.4);
+  transform: translateX(3px);
 }
+
 .historyNumber {
-  font-weight: bold;
-  color: var(--primary-color);
-  width: 40px;
+  font-weight: 600;
+  color: rgba(168, 98, 210, 0.7);
+  width: 24px;
   text-align: center;
   flex-shrink: 0;
-  font-size: 1.1rem;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
 }
+
 .historyPoster {
-  width: 40px;
-  height: 60px;
+  width: 32px;
+  height: 48px;
   object-fit: cover;
   border-radius: 4px;
-  margin-left: 10px;
-  margin-right: 15px;
   flex-shrink: 0;
+  opacity: 0.9;
 }
+
 .historyInfo {
   flex-grow: 1;
   overflow: hidden;
 }
+
 .historyTitle {
   display: block;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: white;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.historyRating {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--primary-color);
-  margin-left: 15px;
-  flex-shrink: 0;
+  letter-spacing: 0.01em;
 }
 
+.historyRating {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-color, #a862d2);
+  margin-left: auto;
+  flex-shrink: 0;
+  background: rgba(168, 98, 210, 0.1);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(168, 98, 210, 0.2);
+}
+
+/* ── Responsive ─────────────────────────────── */
 @media (max-width: 768px) {
-  .pageContainer {
-    padding: 20px;
-  }
+  .pageContainer { padding: 24px 16px; }
+
   .profileHeader {
-    flex-direction: column;
-    text-align: center;
-    gap: 20px;
+    gap: 16px;
+    margin-bottom: 28px;
   }
+
+  .avatar { width: 72px; height: 72px; }
+  .username { font-size: 1.2rem; }
+
   .statsContainer {
-    justify-content: center;
-    gap: 15px;
+    gap: 12px;
   }
-  .statValue {
-    font-size: 1.5rem;
-  }
-  .sectionTitle {
-    font-size: 1.5rem;
-  }
+
+  .statValue { font-size: 1rem; }
+  .sectionTitle { font-size: 0.72rem; }
+
   .reviewsGrid {
     grid-template-columns: repeat(3, 120px) !important;
     gap: 10px !important;
     justify-content: center !important;
     grid-auto-rows: unset;
   }
+
   .reviewsGrid .card {
     --title-height: 35px;
     width: 120px !important;
@@ -341,12 +500,14 @@
     align-items: center;
     background-color: #1c1e21 !important;
   }
+
   .reviewsGrid .card img {
     width: 120px !important;
     height: 160px !important;
     object-fit: cover !important;
     background-color: #1c1e21 !important;
   }
+
   .reviewsGrid .card .title {
     width: 120px !important;
     height: var(--title-height) !important;
@@ -360,20 +521,11 @@
     align-items: center;
     justify-content: center;
   }
-  .historyTitle {
-    font-size: 0.9rem;
-  }
-  .historyRating {
-    font-size: 1rem;
-  }
-  .historyNumber {
-    width: 30px;
-    font-size: 1rem;
-  }
-  .historyPoster {
-    margin-left: 5px;
-    margin-right: 10px;
-  }
+
+  .historyTitle { font-size: 0.8rem; }
+  .historyRating { font-size: 0.78rem; }
+  .historyNumber { width: 20px; font-size: 0.75rem; }
+  .historyPoster { width: 26px; height: 39px; }
 }
 
 @media (max-width: 480px) {
@@ -381,15 +533,18 @@
     grid-template-columns: repeat(3, 100px) !important;
     gap: 8px !important;
   }
+
   .reviewsGrid .card {
     --title-height: 30px;
     width: 100px !important;
     height: calc(140px + var(--title-height)) !important;
   }
+
   .reviewsGrid .card img {
     width: 100px !important;
     height: 140px !important;
   }
+
   .reviewsGrid .card .title {
     width: 100px !important;
     height: var(--title-height) !important;

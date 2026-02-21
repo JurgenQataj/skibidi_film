@@ -1,379 +1,384 @@
-/* Container principale */
+/* ── Container ─────────────────────────────── */
 .pageContainer {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem; /* Ridotto padding per mobile first approach */
+  padding: 40px 30px;
   min-height: 100vh;
-  background: transparent;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 28px;
 }
 
-/* HERO SECTION CSS */
+/* ── Hero / search area ────────────────────── */
 .heroSection {
-  background: rgba(36, 16, 44, 0.95);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid var(--violet-main);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 20px;
+  padding: 36px 20px 28px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
 }
 
 .searchBarWrapper {
-    width: 100%;
-    max-width: 600px;
+  width: 100%;
+  max-width: 560px;
 }
 
-/* Mode Toggle Container & Pills */
+/* ── Mode toggle ───────────────────────────── */
 .modeToggle {
   display: flex;
-  justify-content: center;
-  gap: 15px;
-  background: rgba(0,0,0,0.3);
-  padding: 5px;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px;
   border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .modeButton {
-  padding: 8px 24px;
-  border-radius: 25px;
+  padding: 7px 22px;
+  border-radius: 24px;
   border: none;
   background: transparent;
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.45);
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
   transition: all 0.2s ease;
 }
 
 .modeButtonActive {
-  background: var(--violet-main);
-  color: #fff;
-  font-weight: 700;
-  box-shadow: 0 2px 10px rgba(81, 26, 126, 0.4);
+  background: rgba(168, 98, 210, 0.25);
+  color: rgba(200, 150, 240, 0.95);
+  font-weight: 600;
 }
 
 .modeButton:hover:not(.modeButtonActive) {
-  color: #fff;
-  background: rgba(255,255,255,0.05);
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.05);
 }
 
-/* Category Chips Container (Horizontal Scroll) */
+/* ── Category chips ────────────────────────── */
 .chipsContainer {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 10px;
-    width: 100%;
-    padding-bottom: 10px; /* Space for scrollbar if any */
-    /* Nasccondere scrollbar esteticamente */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    justify-content: center;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 8px;
+  width: 100%;
+  padding-bottom: 4px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  justify-content: center;
 }
 
-.chipsContainer::-webkit-scrollbar {
-    display: none;
-}
+.chipsContainer::-webkit-scrollbar { display: none; }
 
 .chip {
-    flex: 0 0 auto;
-    padding: 8px 20px;
-    background: transparent;
-    border: 1px solid #555;
-    border-radius: 20px;
-    color: #ccc;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  flex: 0 0 auto;
+  padding: 6px 18px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  letter-spacing: 0.02em;
 }
 
 .chipActive {
-    background: var(--red-main);
-    border-color: var(--red-main);
-    color: white;
-    font-weight: 600;
+  background: rgba(168, 98, 210, 0.2);
+  border-color: rgba(168, 98, 210, 0.5);
+  color: rgba(200, 150, 240, 0.95);
+  font-weight: 600;
 }
 
 .chip:hover:not(.chipActive) {
-    border-color: #888;
-    color: white;
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* FILTER TOGGLE BAR */
+/* ── Filter toggle bar ─────────────────────── */
 .filterToggleBar {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
 .toggleFiltersBtn {
-    background: transparent;
-    border: none;
-    color: var(--violet-bright);
-    cursor: pointer;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    transition: color 0.2s;
-}
-
-.toggleFiltersBtn:hover {
-    color: var(--text-light);
-}
-
-.icon {
-    font-size: 0.8em;
-}
-
-/* COLLAPSIBLE FILTERS SECTION */
-.filtersSection {
-    background: rgba(20, 20, 20, 0.9);
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 1px solid #333;
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.filtersGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.2rem;
-}
-
-.filterGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.filterLabel {
-    font-size: 0.8rem;
-    color: #888;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-left: 2px;
-}
-
-.filterSelect, .yearInput, .keywordsInput, .ratingInput {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid #444;
-    padding: 8px 10px;
-    border-radius: 6px;
-    color: white;
-    font-size: 0.9rem;
-    width: 100%;
-}
-
-.ratingInput {
-    width: 80px; /* Shortened width */
-    text-align: center;
-}
-
-.filterSelect:focus, .yearInput:focus, .keywordsInput:focus, .ratingInput:focus {
-    outline: none;
-    border-color: var(--violet-main);
-}
-
-.yearInputs {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.yearSeparator {
-    color: #555;
-}
-
-/* Slider Overrides for Compactness */
-.voteSlider {
-    width: 100%;
-    margin-top: 5px;
-    height: 4px;
-    background: #444;
-    border-radius: 2px;
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.voteSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: var(--red-main);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-/* Filter Actions */
-.filterActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-    border-top: 1px solid #333;
-    padding-top: 15px;
-}
-
-.applyBtn {
-    background: var(--red-main);
-    color: white;
-    border: none;
-    padding: 8px 24px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.resetBtn {
-    background: transparent;
-    color: #999;
-    border: 1px solid #444;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.resetBtn:hover {
-    color: white;
-    border-color: #666;
-}
-
-/* RESULTS SECTION */
-
-
-.resultsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-    justify-items: center;
-}
-
-.noResults {
-    text-align: center;
-    color: #888;
-    margin-top: 2rem;
-}
-
-.loadMoreSection {
-    text-align: center;
-    margin-top: 2rem;
-}
-
-.loadMoreBtn {
-    background: transparent;
-    border: 2px solid var(--violet-main);
-    color: white;
-    padding: 8px 24px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.loadMoreBtn:hover {
-    background: var(--violet-main);
-}
-
-/* Card Persona Minimal */
-.personCard {
-  background: #1a1a1a;
-  border-radius: 8px;
-  padding: 10px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
   cursor: pointer;
-  height: 100%;
+  font-size: 0.82rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  border: 1px solid transparent;
+  gap: 6px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+
+.toggleFiltersBtn:hover { color: rgba(255, 255, 255, 0.7); }
+
+.icon { font-size: 0.75em; }
+
+.quickApplyBtn {
+  background: rgba(168, 98, 210, 0.2);
+  color: rgba(200, 150, 240, 0.9);
+  border: 1px solid rgba(168, 98, 210, 0.3);
+  padding: 5px 16px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.personCard:hover {
-  background: #252525;
-  border-color: var(--violet-main);
-  transform: translateY(-2px);
-}
-
-.personCard img {
-  width: 100%;
-  aspect-ratio: 2/3;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-bottom: 8px;
-}
-
-.personCard h3 {
-  font-size: 0.95rem;
-  margin: 4px 0;
-  color: white;
-}
-
-.personCard p {
-  font-size: 0.8rem;
-  color: #888;
-}
-
-/* Quick Apply Button */
-.quickApplyBtn {
-    background: var(--red-main);
-    color: white;
-    border: none;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-left: 15px;
-    transition: transform 0.2s;
-}
-
 .quickApplyBtn:hover {
-    transform: scale(1.05);
-    background: #b3001e;
+  background: rgba(168, 98, 210, 0.35);
 }
 
-/* Responsive */
+/* ── Filters section ───────────────────────── */
+.filtersSection {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filterLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.filterSelect,
+.yearInput,
+.keywordsInput,
+.ratingInput {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.88rem;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.filterSelect:focus,
+.yearInput:focus,
+.keywordsInput:focus,
+.ratingInput:focus {
+  outline: none;
+  border-color: rgba(168, 98, 210, 0.5);
+}
+
+.ratingInput {
+  width: 80px;
+  text-align: center;
+}
+
+.yearInputs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.yearSeparator { color: rgba(255, 255, 255, 0.2); }
+
+.filterActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 14px;
+}
+
+.applyBtn {
+  background: rgba(168, 98, 210, 0.25);
+  color: rgba(200, 150, 240, 0.95);
+  border: 1px solid rgba(168, 98, 210, 0.35);
+  padding: 7px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+
+.applyBtn:hover { background: rgba(168, 98, 210, 0.4); }
+
+.resetBtn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 7px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+
+.resetBtn:hover {
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Loading / no results ──────────────────── */
+.loading,
+.noResults {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 40px 0;
+  font-size: 0.9rem;
+}
+
+/* ── Results grid (MovieCards — UNCHANGED) ─── */
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  justify-items: center;
+}
+
+/* ── Person list (compact rows) ────────────── */
+.personList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.personRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.personRow:hover {
+  background: rgba(168, 98, 210, 0.1);
+  border-color: rgba(168, 98, 210, 0.4);
+  transform: translateX(3px);
+}
+
+.personRowImg {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  flex-shrink: 0;
+  border: 1px solid rgba(168, 98, 210, 0.3);
+}
+
+.personRowInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.personRowName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.personRowRole {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Load more ─────────────────────────────── */
+.loadMoreSection {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.loadMoreBtn {
+  background: transparent;
+  border: 1px solid rgba(168, 98, 210, 0.35);
+  color: rgba(200, 150, 240, 0.75);
+  padding: 9px 28px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+
+.loadMoreBtn:hover {
+  background: rgba(168, 98, 210, 0.15);
+  color: rgba(200, 150, 240, 1);
+}
+
+/* ── Responsive ────────────────────────────── */
 @media (max-width: 768px) {
-    .resultsGrid {
-        grid-template-columns: repeat(3, 120px) !important;
-        gap: 10px !important;
-        justify-content: center !important;
-    }
-    
-    /* Target the Link component (MovieCard wrapper) */
-    .resultsGrid > a {
-        width: 120px !important;
-        height: auto !important;
-        min-width: 0 !important;
-    }
-}
+  .pageContainer { padding: 20px 15px; gap: 18px; }
+  .heroSection { padding: 24px 15px 20px; border-radius: 14px; }
 
-@media (max-width: 600px) {
-    .chipsContainer {
-        justify-content: flex-start; 
-    }
+  .resultsGrid {
+    grid-template-columns: repeat(3, 120px) !important;
+    gap: 10px !important;
+    justify-content: center !important;
+  }
+
+  .resultsGrid > a {
+    width: 120px !important;
+    height: auto !important;
+    min-width: 0 !important;
+  }
+
+  .chipsContainer { justify-content: flex-start; }
 }
 
 @media (max-width: 480px) {
-    .resultsGrid {
-        grid-template-columns: repeat(3, 100px) !important;
-        gap: 8px !important;
-    }
-    
-    .resultsGrid > a {
-        width: 100px !important;
-    }
+  .resultsGrid {
+    grid-template-columns: repeat(3, 100px) !important;
+    gap: 8px !important;
+  }
+
+  .resultsGrid > a { width: 100px !important; }
 }

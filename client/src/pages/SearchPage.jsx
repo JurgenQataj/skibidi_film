@@ -4,6 +4,7 @@ import axios from "axios";
 import styles from "./SearchPage.module.css";
 import MovieCard from "../components/MovieCard";
 import SearchInput from "../components/SearchInput";
+import { SkeletonMovieCard, SkeletonPersonRow } from "../components/Skeleton";
 
 function SearchPage() {
   // Helper per inizializzare lo stato da sessionStorage
@@ -348,13 +349,13 @@ function SearchPage() {
                 onClick={() => handleModeChange("movie")}
                 className={`${styles.modeButton} ${searchMode === "movie" ? styles.modeButtonActive : ""}`}
              >
-                🎬 Film
+                Film
              </button>
              <button 
                 onClick={() => handleModeChange("person")}
                 className={`${styles.modeButton} ${searchMode === "person" ? styles.modeButtonActive : ""}`}
              >
-                👤 Persone
+                Persone
              </button>
         </div>
 
@@ -507,8 +508,12 @@ function SearchPage() {
       )}
 
       {loading && (
-        <div className={styles.loading}>
-          <p>Caricamento...</p>
+        <div className={searchMode === "person" ? styles.personList : styles.resultsGrid}>
+          {Array.from({ length: searchMode === "person" ? 6 : 12 }).map((_, i) =>
+            searchMode === "person"
+              ? <SkeletonPersonRow key={i} />
+              : <SkeletonMovieCard key={i} />
+          )}
         </div>
       )}
 
@@ -518,24 +523,29 @@ function SearchPage() {
             <>
               {/* Removed redundant "Trovati X risultati" if styling is minimal/clean, or keep it small */}
               
-              <div className={styles.resultsGrid}>
-                {results.map((item, index) => (
+              <div className={searchMode === "person" ? styles.personList : styles.resultsGrid}>
+                {results.map((item, index) =>
                   searchMode === "movie" ? (
                     <MovieCard
                         key={`${item.id}-${currentPage}-${index}`}
                         movie={item}
                     />
                   ) : (
-                    <div key={item.id} className={styles.personCard} onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}>
-                        <img 
-                            src={item.profile_path ? `https://image.tmdb.org/t/p/w342${item.profile_path}` : "https://via.placeholder.com/342x513?text=No+Img"} 
+                    <div key={item.id} className={styles.personRow} onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}>
+                        <img
+                            src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://via.placeholder.com/185x278?text=No+Img"}
                             alt={item.name}
+                            className={styles.personRowImg}
                         />
-                        <h3>{item.name}</h3>
-                        <p>{item.known_for}</p>
+                        <div className={styles.personRowInfo}>
+                          <span className={styles.personRowName}>{item.name}</span>
+                          {item.known_for && (
+                            <span className={styles.personRowRole}>{item.known_for}</span>
+                          )}
+                        </div>
                     </div>
                   )
-                ))}
+                )}
               </div>
 
               {/* Pulsante Carica Altro */}

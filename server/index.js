@@ -18,7 +18,8 @@ const corsOptions = {
       !origin ||
       origin.includes("localhost") ||
       origin.includes("192.168.") || 
-      origin.endsWith(".vercel.app")
+      origin.endsWith(".vercel.app") ||
+      origin.endsWith(".loca.lt")
     ) {
       callback(null, true);
     } else {

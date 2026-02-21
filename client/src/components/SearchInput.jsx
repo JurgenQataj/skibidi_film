@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./SearchInput.module.css";
+import { FaSearch } from "react-icons/fa";
 
 const SearchInput = ({
   onMovieSelect,
@@ -168,12 +169,12 @@ const SearchInput = ({
           autoComplete="off"
         />
         <button type="submit" className={styles.searchButton} title="Cerca">
-          🔍
+          <FaSearch />
         </button>
       </form>
 
       {showSuggestions && (
-        <ul ref={suggestionsRef} className={styles.suggestionsList}>
+        <ul ref={suggestionsRef} className={styles.suggestionsContainer}>
           {loading ? (
             <li className={styles.loadingItem}>Caricamento...</li>
           ) : suggestions.length > 0 ? (
@@ -185,22 +186,20 @@ const SearchInput = ({
                 }`}
                 onClick={() => handleSuggestionClick(movie)}
               >
-                <div className={styles.movieInfo}>
-                  {movie.poster_path && (
-                    <img
-                      src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
-                      alt={movie.title}
-                      className={styles.posterThumb}
-                    />
+                {movie.poster_path && (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w185${movie.poster_path}`}
+                    alt={movie.title}
+                    className={styles.suggestionPoster}
+                  />
+                )}
+                <div className={styles.suggestionInfo}>
+                  <p className={styles.suggestionTitle}>{movie.title}</p>
+                  {movie.release_date && (
+                    <p className={styles.suggestionYear}>
+                      {movie.release_date.substring(0, 4)}
+                    </p>
                   )}
-                  <div className={styles.movieDetails}>
-                    <span className={styles.movieTitle}>{movie.title}</span>
-                    {movie.release_date && (
-                      <span className={styles.movieYear}>
-                        ({movie.release_date.substring(0, 4)})
-                      </span>
-                    )}
-                  </div>
                 </div>
               </li>
             ))

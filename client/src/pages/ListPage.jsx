@@ -4,6 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode"; // *** CORREZIONE 1: Importa jwt-decode ***
 import styles from "./WatchlistPage.module.css";
 import MovieCard from "../components/MovieCard";
+import { SkeletonMovieCard } from "../components/Skeleton";
 
 function ListPage() {
   const { listId } = useParams();
@@ -54,7 +55,13 @@ function ListPage() {
     }
   };
 
-  if (loading) return <p className={styles.statusText}>Caricamento...</p>;
+  if (loading) return (
+    <div className={styles.pageContainer}>
+      <div className={styles.reviewsGrid}>
+        {Array.from({ length: 8 }).map((_, i) => <SkeletonMovieCard key={i} />)}
+      </div>
+    </div>
+  );
   if (!listDetails)
     return <p className={styles.statusText}>Lista non trovata.</p>;
 

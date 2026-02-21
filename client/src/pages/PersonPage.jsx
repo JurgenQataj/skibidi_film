@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import styles from "./PersonPage.module.css";
 import MovieCard from "../components/MovieCard";
+import { SkeletonMovieCard } from "../components/Skeleton";
 
 function PersonPage() {
   const { name } = useParams();
@@ -49,7 +50,13 @@ function PersonPage() {
     fetchData();
   }, [name, API_URL]);
 
-  if (loading) return <div className={styles.loading}>Caricamento filmografia di {decodedName}...</div>;
+  if (loading) return (
+    <div className={styles.container}>
+      <div className={styles.grid}>
+        {Array.from({ length: 12 }).map((_, i) => <SkeletonMovieCard key={i} />)}
+      </div>
+    </div>
+  );
   if (!data) return <div className={styles.error}>Nessun dato trovato per "{decodedName}".</div>;
 
   const filterMovies = (list) => {
@@ -107,7 +114,7 @@ function PersonPage() {
         <img
           src={
             data.profile_path
-              ? `https://image.tmdb.org/t/p/w342${data.profile_path}`
+              ? `https://image.tmdb.org/t/p/w500${data.profile_path}`
               : "https://via.placeholder.com/342x513?text=No+Photo"
           }
           alt={data.personName}

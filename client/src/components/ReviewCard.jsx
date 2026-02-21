@@ -19,7 +19,7 @@ function ReviewCard({ review, onInteraction }) {
   const token = localStorage.getItem("token");
   const loggedInUserId = token ? jwtDecode(token).user.id : null;
 
-  const posterBaseUrl = "https://image.tmdb.org/t/p/w342";
+  const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
   const placeholderPoster =
     "https://via.placeholder.com/200x300.png?text=No+Image";
   const API_URL = import.meta.env.VITE_API_URL || "";
