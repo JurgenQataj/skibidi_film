@@ -538,15 +538,35 @@ exports.getPartialCollections = async (req, res) => {
   const { userId } = req.params;
   const axios = require('axios');
   const TMDB_API_KEY = process.env.TMDB_API_KEY;
+  const Movie = require('../models/Movie');
 
   try {
     const reviews = await Review.find({ user: userId }).populate('movie');
-    const collectionMap = new Map(); // cid -> { name, poster_path, reviewedMovies: Set }
+    const collectionMap = new Map();
 
-    // Raccoglie ids recensiti
+    // Aggiornamento self-healing: recupera collection_info da TMDB se mancante
     for (const r of reviews) {
       const movie = r.movie;
-      if (movie && movie.collection_info && movie.collection_info.id) {
+      if (!movie) continue;
+
+      const needsCheck = !movie.collection_info ||
+                         (movie.collection_info.id === undefined) ||
+                         (Object.keys(movie.toObject().collection_info || {}).length === 0);
+
+      if (needsCheck) {
+        try {
+          const tmdbRes = await axios.get(`https://api.themoviedb.org/3/movie/${movie.tmdb_id}?api_key=${TMDB_API_KEY}&language=it-IT`);
+          const coll = tmdbRes.data.belongs_to_collection;
+          movie.collection_info = coll
+            ? { id: coll.id, name: coll.name, poster_path: coll.poster_path, backdrop_path: coll.backdrop_path }
+            : { id: -1 };
+          await movie.save();
+        } catch (err) {
+          console.error(`[PARTIAL] Errore TMDB self-healing film ${movie.tmdb_id}:`, err.message);
+        }
+      }
+
+      if (movie.collection_info && movie.collection_info.id && movie.collection_info.id > 0) {
         const cid = movie.collection_info.id;
         if (!collectionMap.has(cid)) {
           collectionMap.set(cid, {
@@ -563,11 +583,9 @@ exports.getPartialCollections = async (req, res) => {
 
     const partials = [];
 
-    // Validazione Asincrona Parallela su TMDB per futuro proofing
     const promises = Array.from(collectionMap.values()).map(async (collData) => {
       try {
         const response = await axios.get(`https://api.themoviedb.org/3/collection/${collData.id}?api_key=${TMDB_API_KEY}&language=it-IT`);
-        // Filtriamo le pellicole già uscite o in uscita entro oggi
         const parts = response.data.parts.filter(p => p.release_date && new Date(p.release_date) <= new Date());
         const totalRequired = parts.length;
 
@@ -576,7 +594,6 @@ exports.getPartialCollections = async (req, res) => {
           if (collData.reviewedMovies.has(p.id)) foundCount++;
         }
 
-        // Se l'utente ne ha visto almeno 1 ma MENO del totale richiesto, è Parziale
         if (foundCount > 0 && foundCount < totalRequired && totalRequired > 1) {
           partials.push({
             id: collData.id,
@@ -589,14 +606,11 @@ exports.getPartialCollections = async (req, res) => {
           });
         }
       } catch (err) {
-        // Ignora gentilmente errori di singola saga
         console.error(`Errore TMDB su Saga ID ${collData.id}:`, err.message);
       }
     });
 
     await Promise.all(promises);
-
-    // Ordiniamo per quante mancano, chi ne mancano meno in cima
     partials.sort((a, b) => a.missing - b.missing);
 
     res.json(partials);
@@ -605,6 +619,7 @@ exports.getPartialCollections = async (req, res) => {
     res.status(500).json({ message: "Errore locale durante il fetch saghe parziali." });
   }
 };
+
 
 // --- HELPER: SINCRONIZZAZIONE COLLEZIONI (Saghe) ---
 exports.syncUserCollections = async (userId) => {
