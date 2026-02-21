@@ -62,7 +62,8 @@ function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
-  const [editEmail, setEditEmail] = useState(""); 
+  const [editEmail, setEditEmail] = useState("");
+  const [editUsername, setEditUsername] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -151,7 +152,8 @@ function ProfilePage() {
   const handleOpenEditModal = () => {
     setEditBio(profile.bio || "");
     setEditAvatar(profile.avatar_url || "");
-    setEditEmail(profile.email || ""); 
+    setEditEmail(profile.email || "");
+    setEditUsername(profile.username || "");
     setIsEditModalOpen(true);
   };
 
@@ -164,7 +166,8 @@ function ProfilePage() {
         { 
           bio: editBio, 
           avatar_url: editAvatar,
-          email: editEmail 
+          email: editEmail,
+          username: editUsername
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -236,6 +239,25 @@ function ProfilePage() {
         title="Modifica Profilo"
       >
         <form onSubmit={handleProfileUpdate}>
+          <label className={styles.editLabel}>Username</label>
+          <input
+            type="text"
+            value={editUsername}
+            onChange={(e) => setEditUsername(e.target.value)}
+            maxLength={10}
+            style={{
+              width: '100%',
+              padding: '8px',
+              marginBottom: '15px',
+              borderRadius: '4px',
+              border: '1px solid #333',
+              backgroundColor: '#222',
+              color: 'white',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Max 10 caratteri"
+          />
+
           <label className={styles.editLabel}>Email (per recupero password)</label>
           <input 
             type="email"
@@ -248,7 +270,8 @@ function ProfilePage() {
               borderRadius: '4px', 
               border: '1px solid #333', 
               backgroundColor: '#222', 
-              color: 'white'
+              color: 'white',
+              boxSizing: 'border-box'
             }}
             placeholder="Inserisci la tua email"
           />

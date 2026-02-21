@@ -172,15 +172,24 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { bio, avatar_url, email } = req.body;
+    const { bio, avatar_url, email, username } = req.body;
     
     if (email) {
       const emailExists = await User.findOne({ email, _id: { $ne: req.user.id } });
       if (emailExists) return res.status(400).json({ message: "Email già in uso." });
     }
 
+    if (username) {
+      if (username.length > 10) {
+        return res.status(400).json({ message: "Il nome utente non può superare i 10 caratteri." });
+      }
+      const usernameExists = await User.findOne({ username, _id: { $ne: req.user.id } });
+      if (usernameExists) return res.status(400).json({ message: "Username già in uso." });
+    }
+
     const updateData = { bio, avatar_url };
     if (email) updateData.email = email;
+    if (username) updateData.username = username;
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -192,6 +201,7 @@ exports.updateUserProfile = async (req, res) => {
     res.status(500).json({ message: "Errore aggiornamento profilo." });
   }
 };
+
 
 exports.deleteUserProfile = async (req, res) => {
   try {

@@ -17,11 +17,22 @@ const userSchema = new mongoose.Schema({
   watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
   lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MovieList' }],
 
-  // Trofei/Badge
+  // Trofei/Badge saghe
   completedCollections: [{ 
     id: Number, 
     name: String, 
     poster_path: String 
+  }],
+
+  // Saghe incomplete (aggiornate da syncUserCollections)
+  partialCollections: [{
+    id: Number,
+    name: String,
+    poster_path: String,
+    backdrop_path: String,
+    seen: Number,
+    total: Number,
+    missing: Number
   }],
 
   // Recupero Password

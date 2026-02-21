@@ -102,8 +102,9 @@
 .actionsRow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;     /* SEMPRE su una riga */
+  overflow: hidden;       /* non sfora mai */
 }
 
 .iconBtn {
@@ -319,15 +320,18 @@
 /* ── Buttons ────────────────────────────────── */
 .followButton,
 .editButton {
-  padding: 9px 24px;
+  padding: 9px 14px;        /* più compatto orizzontalmente */
   border: 1px solid rgba(168, 98, 210, 0.6);
   border-radius: 10px;
   background: rgba(168, 98, 210, 0.2);
-  color: #ffffff; /* Bianco richiesto */
+  color: #ffffff;
   font-weight: 600;
-  font-size: 0.95rem; /* Leggermente più grande */
+  font-size: 0.82rem;        /* leggermente ridotto */
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;       /* non va mai a capo */
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .followButton:hover,
