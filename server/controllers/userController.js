@@ -532,3 +532,76 @@ exports.getNewestUsers = async (req, res) => {
     res.status(500).json({ message: "Errore server" });
   }
 };
+
+// --- COLLEZIONI PARZIALI INTELLIGENTI ---
+exports.getPartialCollections = async (req, res) => {
+  const { userId } = req.params;
+  const axios = require('axios');
+  const TMDB_API_KEY = process.env.TMDB_API_KEY;
+
+  try {
+    const reviews = await Review.find({ user: userId }).populate('movie');
+    const collectionMap = new Map(); // cid -> { name, poster_path, reviewedMovies: Set }
+
+    // Raccoglie ids recensiti
+    for (const r of reviews) {
+      const movie = r.movie;
+      if (movie && movie.collection_info && movie.collection_info.id) {
+        const cid = movie.collection_info.id;
+        if (!collectionMap.has(cid)) {
+          collectionMap.set(cid, {
+            id: cid,
+            name: movie.collection_info.name,
+            poster_path: movie.collection_info.poster_path,
+            backdrop_path: movie.collection_info.backdrop_path,
+            reviewedMovies: new Set()
+          });
+        }
+        collectionMap.get(cid).reviewedMovies.add(movie.tmdb_id);
+      }
+    }
+
+    const partials = [];
+
+    // Validazione Asincrona Parallela su TMDB per futuro proofing
+    const promises = Array.from(collectionMap.values()).map(async (collData) => {
+      try {
+        const response = await axios.get(`https://api.themoviedb.org/3/collection/${collData.id}?api_key=${TMDB_API_KEY}&language=it-IT`);
+        // Filtriamo le pellicole già uscite o in uscita entro oggi
+        const parts = response.data.parts.filter(p => p.release_date && new Date(p.release_date) <= new Date());
+        const totalRequired = parts.length;
+
+        let foundCount = 0;
+        for (const p of parts) {
+          if (collData.reviewedMovies.has(p.id)) foundCount++;
+        }
+
+        // Se l'utente ne ha visto almeno 1 ma MENO del totale richiesto, è Parziale
+        if (foundCount > 0 && foundCount < totalRequired && totalRequired > 1) {
+          partials.push({
+            id: collData.id,
+            name: collData.name,
+            poster_path: collData.poster_path,
+            backdrop_path: collData.backdrop_path,
+            seen: foundCount,
+            total: totalRequired,
+            missing: totalRequired - foundCount
+          });
+        }
+      } catch (err) {
+        // Ignora gentilmente errori di singola saga
+        console.error(`Errore TMDB su Saga ID ${collData.id}:`, err.message);
+      }
+    });
+
+    await Promise.all(promises);
+
+    // Ordiniamo per quante mancano, chi ne mancano meno in cima
+    partials.sort((a, b) => a.missing - b.missing);
+
+    res.json(partials);
+  } catch (error) {
+    console.error("Errore recupero saghe parziali:", error);
+    res.status(500).json({ message: "Errore locale durante il fetch saghe parziali." });
+  }
+};

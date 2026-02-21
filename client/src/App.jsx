@@ -24,6 +24,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import StatsPage from "./pages/StatsPage"; // Import StatsPage
 import PersonPage from "./pages/PersonPage";
 import CollectionPage from "./pages/CollectionPage"; // [NEW] Import CollectionPage
+import PartialCollectionsPage from "./pages/PartialCollectionsPage";
 
 // Import Componenti
 import Navbar from "./components/Navbar";
@@ -78,6 +79,7 @@ function App() {
           <Route path="watchlist" element={<WatchlistPage />} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="list/:listId" element={<ListPage />} />
+          <Route path="partial-collections" element={<PartialCollectionsPage />} />
           
           {/* Profilo e Statistiche */}
           <Route path="profile/:userId" element={<ProfilePage />} />

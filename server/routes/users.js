@@ -34,5 +34,6 @@ router.get("/:userId/following", userController.getFollowing);
 // --- Altre rotte specifiche ---
 router.get("/:userId/reviews", userController.getUserReviews);
 router.get("/:userId/lists", userController.getUserLists);
+router.get("/:userId/partial-collections", userController.getPartialCollections);
 
 module.exports = router;

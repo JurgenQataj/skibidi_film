@@ -3,7 +3,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
 import styles from "./MyListsPage.module.css";
-import { FaPlus, FaTrash, FaFilm, FaBookmark } from "react-icons/fa";
+import { FaPlus, FaTrash, FaFilm, FaBookmark, FaHourglassHalf } from "react-icons/fa";
 import { SkeletonListCard } from "../components/Skeleton";
 
 function MyListsPage() {
@@ -128,6 +128,19 @@ function MyListsPage() {
             <div className={styles.cardContent}>
               <h3 className={styles.cardTitle}>Watchlist</h3>
               <p className={styles.cardDesc}>I film che vuoi guardare</p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Card Saghe Iniziate fissa */}
+        <div className={styles.listCard}>
+          <Link to="/partial-collections" className={styles.listLink}>
+            <div className={styles.cardIcon}>
+              <FaHourglassHalf />
+            </div>
+            <div className={styles.cardContent}>
+              <h3 className={styles.cardTitle}>Saghe Iniziate</h3>
+              <p className={styles.cardDesc}>Collezioni cinematografiche da ultimare</p>
             </div>
           </Link>
         </div>
