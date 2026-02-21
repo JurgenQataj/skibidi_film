@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./UserCard.module.css";
 
-const MAX_USERNAME_LENGTH = 12;
+const MAX_USERNAME_LENGTH = 11;
 
 const UserCard = ({ user, onNavigate }) => {
   const navigate = useNavigate();
