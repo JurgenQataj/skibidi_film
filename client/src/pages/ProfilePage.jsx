@@ -8,7 +8,7 @@ import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
-import { FaChartBar, FaListUl } from "react-icons/fa";
+import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { SkeletonMovieCard } from "../components/Skeleton";
 
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
@@ -47,6 +47,15 @@ function ProfilePage() {
   const [isListsModalOpen, setIsListsModalOpen] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [showAllBadges, setShowAllBadges] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Resize listener
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // MODALE MODIFICA
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -387,6 +396,33 @@ function ProfilePage() {
         </header>
 
         <section>
+          {profile.completedCollections && profile.completedCollections.length > 0 && (
+            <div className={styles.badgesWrapper}>
+              <div className={styles.badgesHeader}>
+                <h2 className={styles.sectionTitle} style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
+                  Saghe Completate ({profile.completedCollections.length})
+                </h2>
+                {profile.completedCollections.length > (isMobile ? 6 : 10) && (
+                  <button 
+                    onClick={() => setShowAllBadges(!showAllBadges)} 
+                    className={styles.badgeToggleBtn}
+                    title={showAllBadges ? "Mostra meno" : "Mostra tutte"}
+                  >
+                    {showAllBadges ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+                )}
+              </div>
+              <div className={styles.badgesGrid}>
+                {(showAllBadges ? profile.completedCollections : profile.completedCollections.slice(0, isMobile ? 6 : 10)).map(coll => (
+                  <Link key={coll.id} to={`/collection/${coll.id}`} className={styles.badgeCard}>
+                    <img src={coll.poster_path ? `https://image.tmdb.org/t/p/w200${coll.poster_path}` : "https://via.placeholder.com/200x300.png?text=Badge+"} alt={coll.name} />
+                    <div className={styles.badgeName}>{coll.name}</div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           <h2 className={styles.sectionTitle}>Ultime Recensioni</h2>
           <div className={styles.reviewsGrid}>
             {loading ? (

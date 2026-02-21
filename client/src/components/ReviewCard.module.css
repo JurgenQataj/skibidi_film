@@ -109,10 +109,9 @@
 /* Riga unificata base (Time + Like + Commenti) */
 .footerRow {
   display: flex;
-  justify-content: flex-end; /* Allinea blocco a destra */
+  justify-content: space-between; /* Spalma i 3 blocchi regolarmente */
   align-items: center;
-  gap: 16px; /* Distanza tra timestamp e azioni */
-  margin-top: auto; /* La spinge sul fondo */
+  margin-top: auto; 
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   width: 100%;
@@ -122,14 +121,20 @@
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.4);
   margin: 0;
-  margin-right: auto; /* Ripinge la scritta circa... verso l'estremità sinistra */
+  flex: 1; /* Prende spazio e spinge a sinistra */
 }
 
-/* Azioni: Reazioni e Commenti */
-.actions {
+/* Nuovi contenitori strutturali */
+.centerAction {
+  flex: 1;
   display: flex;
-  gap: 16px;
-  align-items: center;
+  justify-content: center; /* Tasti centrali */
+}
+
+.rightAction {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end; /* Likes a destra */
 }
 
 .reactions {
@@ -303,38 +308,54 @@
   }
 
   .timestamp {
-    font-size: 0.75rem;
-    margin: 0;
-    margin-right: auto; /* Mantieni a sx su mobile */
+    font-size: 0.65rem; /* Rimpicciolito per fare spazio */
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
   }
 
   /* Rimuovo i padding verticali pesanti e le separazioni per i mobile */
   .footerRow {
-    flex-wrap: nowrap; /* Tieni sulla stessa riga il timestamp e l'inizio actions */
-    gap: 8px; /* Avvicinalo se strabordano le traduzioni */
+    flex-wrap: nowrap;
+    gap: 4px; /* Pochissimo gap */
     padding-top: 10px;
     justify-content: space-between;
+    width: 100%;
+    overflow: hidden; /* Evita sforamenti a dx */
   }
 
-  .actions {
-    gap: 10px;
-    width: auto; /* Non occorre 100% siccome stanno sulla stessa riga */
+  .centerAction {
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .rightAction {
+    flex: 1;
     justify-content: flex-end;
+    white-space: nowrap;
   }
 
   .reactions {
-    flex-wrap: wrap; /* Evita schiacciamenti sui telefoni stretti */
-    gap: 8px;
+    flex-wrap: nowrap; /* VIETA ASSOLUTAMENTE DI ANDARE A CAPO SU MOBILE */
+    gap: 4px;
+    align-items: center;
   }
 
   .reactions button {
-    font-size: 0.9rem;
-    padding: 5px 10px;
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    white-space: nowrap;
   }
   
+  .reactions span {
+    font-size: 0.75rem; /* Anche il numero del mi piace è reso più piccolo per allineamento */
+  }
+
   .commentToggle {
-    font-size: 0.85rem;
-    padding: 4px 0;
+    font-size: 0.70rem;
+    padding: 3px 6px;
+    white-space: nowrap;
   }
 
   .commentForm {

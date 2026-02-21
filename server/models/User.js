@@ -17,6 +17,13 @@ const userSchema = new mongoose.Schema({
   watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
   lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MovieList' }],
 
+  // Trofei/Badge
+  completedCollections: [{ 
+    id: Number, 
+    name: String, 
+    poster_path: String 
+  }],
+
   // Recupero Password
   resetPasswordToken: String,
   resetPasswordExpires: Date

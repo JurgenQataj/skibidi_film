@@ -166,21 +166,26 @@ function ReviewCard({ review, onInteraction }) {
           <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
 
           {token && (
-            <div className={styles.actions}>
-              <div className={styles.reactions}>
-                <button
-                  onClick={() => handleReaction("love")}
-                  title="Love"
-                  disabled={!loggedInUserId}
-                >
-                  ❤️
+            <>
+              <div className={styles.centerAction}>
+                <button onClick={toggleComments} className={styles.commentToggle}>
+                  {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
                 </button>
-                <span>{reactionCount}</span>
               </div>
-              <button onClick={toggleComments} className={styles.commentToggle}>
-                {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
-              </button>
-            </div>
+              
+              <div className={styles.rightAction}>
+                <div className={styles.reactions}>
+                  <button
+                    onClick={() => handleReaction("love")}
+                    title="Love"
+                    disabled={!loggedInUserId}
+                  >
+                    ❤️
+                  </button>
+                  <span>{reactionCount}</span>
+                </div>
+              </div>
+            </>
           )}
         </div>
 

@@ -229,6 +229,86 @@
   white-space: nowrap !important;
 }
 
+/* ── Badges / Collezioni Completate ── */
+.badgesWrapper {
+  margin-bottom: 40px;
+}
+
+.badgesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 10px;
+}
+
+.badgeToggleBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.badgeToggleBtn:hover {
+  background: rgba(168, 98, 210, 0.2);
+  border-color: rgba(168, 98, 210, 0.5);
+  color: #ffd700;
+  transform: translateY(-1px);
+}
+
+.badgesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); /* Miniature molto più piccole */
+  gap: 15px;
+}
+
+.badgeCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+  position: relative;
+  text-decoration: none;
+}
+
+.badgeCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(168, 98, 210, 0.5);
+  box-shadow: 0 4px 16px rgba(168, 98, 210, 0.2);
+}
+
+.badgeCard img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-bottom: 2px solid #a1001c; /* Bordo rubino per stile badge completato */
+}
+
+.badgeName {
+  padding: 4px 2px;
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-align: center;
+  color: #ffd700;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Modale: lista utenti ───────────────────── */
 .userList {
   display: flex;
@@ -484,6 +564,11 @@
 
   .statValue { font-size: 1rem; }
   .sectionTitle { font-size: 0.72rem; }
+
+  .badgesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+    gap: 8px;
+  }
 
   .reviewsGrid {
     grid-template-columns: repeat(3, 120px) !important;
