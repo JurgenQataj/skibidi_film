@@ -78,11 +78,45 @@
 
 .stats {
   display: flex;
+  align-items: center;
   gap: 20px;
   font-size: 1.1rem;
   color: var(--primary-color, #a862d2);
   font-weight: bold;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.9);
+}
+
+.unseenToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(168, 98, 210, 0.4);
+  padding: 6px 14px;
+  border-radius: 20px;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 500;
+  text-shadow: none;
+}
+
+.unseenToggle:hover {
+  background: rgba(168, 98, 210, 0.3);
+  border-color: rgba(168, 98, 210, 0.7);
+}
+
+.unseenToggle input[type="checkbox"] {
+  accent-color: var(--primary-color, #a862d2);
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.toggleText {
+  letter-spacing: 0.02em;
 }
 
 .mainContent {

@@ -3,12 +3,15 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./CollectionPage.module.css";
 import MovieCard from "../components/MovieCard";
+import { jwtDecode } from "jwt-decode";
 
 function CollectionPage() {
   const { id } = useParams();
   const [collection, setCollection] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userReviewIds, setUserReviewIds] = useState(new Set());
+  const [showUnseen, setShowUnseen] = useState(false);
 
   useEffect(() => {
     const fetchCollection = async () => {
@@ -19,6 +22,21 @@ function CollectionPage() {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const response = await axios.get(`${API_URL}/api/movies/collection/${id}`, { headers });
         setCollection(response.data);
+
+        // Fetch delle recensioni dell'utente loggato per il filtro "visti"
+        if (token) {
+          try {
+            const decoded = jwtDecode(token);
+            const userId = decoded?.user?.id;
+            if (userId) {
+              const reviewsRes = await axios.get(`${API_URL}/api/users/${userId}/reviews`);
+              const seenIds = new Set(reviewsRes.data.map(r => r.movie.tmdb_id));
+              setUserReviewIds(seenIds);
+            }
+          } catch (e) {
+            console.error("Errore fetch user reviews per filtro:", e);
+          }
+        }
       } catch (err) {
         console.error("Errore nel recupero della saga:", err);
         setError("Impossibile caricare i dati della saga.");
@@ -66,6 +84,16 @@ function CollectionPage() {
               </p>
               <div className={styles.stats}>
                 <span>{collection.parts?.length || 0} Film</span>
+                {userReviewIds.size > 0 && (
+                  <label className={styles.unseenToggle}>
+                    <input 
+                      type="checkbox" 
+                      checked={showUnseen} 
+                      onChange={(e) => setShowUnseen(e.target.checked)}
+                    />
+                    <span className={styles.toggleText}>Nascondi i film visti</span>
+                  </label>
+                )}
               </div>
             </div>
           </div>
@@ -74,15 +102,21 @@ function CollectionPage() {
 
       <div className={styles.mainContent}>
         <div className={styles.moviesGrid}>
-          {collection.parts && collection.parts.length > 0 ? (
-            collection.parts.map((movie) => (
-              <div key={movie.id} className={styles.movieWrapper}>
-                <MovieCard movie={{ ...movie, tmdb_id: movie.id }} />
-              </div>
-            ))
-          ) : (
-            <p>Nessun film trovato in questa collezione.</p>
-          )}
+          {(() => {
+            const displayedMovies = showUnseen 
+              ? collection.parts.filter(m => !userReviewIds.has(m.id))
+              : collection.parts;
+
+            return displayedMovies && displayedMovies.length > 0 ? (
+              displayedMovies.map((movie) => (
+                <div key={movie.id} className={styles.movieWrapper}>
+                  <MovieCard movie={{ ...movie, tmdb_id: movie.id }} />
+                </div>
+              ))
+            ) : (
+              <p>Nessun film da mostrare coi filtri attuali.</p>
+            );
+          })()}
         </div>
       </div>
     </div>
