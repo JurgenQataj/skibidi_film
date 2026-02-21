@@ -40,8 +40,8 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
 }
 
 .card {
@@ -134,20 +134,27 @@
   font-size: 1.1rem;
 }
 
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+
 @media (max-width: 768px) {
   .titleArea h1 { font-size: 1.8rem; }
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
   }
-  .info { padding: 10px; }
-  .name { font-size: 0.9rem; margin-bottom: 8px; }
-  .progressBadge { font-size: 0.7rem; padding: 3px 6px; }
+  .info { padding: 8px; }
+  .name { font-size: 0.8rem; margin-bottom: 6px; }
+  .progressBadge { font-size: 0.65rem; padding: 2px 5px; }
 }

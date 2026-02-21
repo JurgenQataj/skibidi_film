@@ -320,8 +320,8 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 44px; /* Ridotta del 20% (da 55px) */
-    background-color: rgba(10, 10, 10, 0.85);
+    height: 44px;
+    background-color: #0a0a0a; /* OPACO: evita trasparenza sul gradiente rosso del body */
     backdrop-filter: blur(20px);
     z-index: 1000;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -351,9 +351,10 @@
     top: auto;
     bottom: 0;
     border-bottom: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    height: 60px; /* Altezza fissa per la navbar mobile */
+    height: 60px;
+    background-color: #0a0a0a; /* OPACO: evita che il gradiente rosso del body trapeli */
   }
 
   .navContent {

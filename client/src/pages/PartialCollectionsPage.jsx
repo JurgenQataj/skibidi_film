@@ -20,7 +20,8 @@ function PartialCollectionsPage() {
       const userId = decoded.user.id;
 
       const res = await axios.get(`${API_URL}/api/users/${userId}/partial-collections`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 30000 // 30s — la prima volta può impiegare di più per il self-healing
       });
       setPartials(res.data);
     } catch (err) {

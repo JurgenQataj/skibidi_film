@@ -542,183 +542,196 @@ exports.getPartialCollections = async (req, res) => {
 
   try {
     const reviews = await Review.find({ user: userId }).populate('movie');
+    const validReviews = reviews.filter(r => r.movie);
+
+    // --- STEP 1: Self-healing PARALLELO ---
+    // Trova tutti i film senza collection_info e recupera da TMDB in parallelo
+    const moviesNeedingSync = validReviews
+      .map(r => r.movie)
+      .filter(movie => {
+        const ci = movie.collection_info;
+        if (!ci) return true;
+        const ciObj = movie.toObject().collection_info || {};
+        return Object.keys(ciObj).length === 0 || ci.id === undefined;
+      });
+
+    if (moviesNeedingSync.length > 0) {
+      await Promise.allSettled(
+        moviesNeedingSync.map(async (movie) => {
+          try {
+            const r = await axios.get(
+              `https://api.themoviedb.org/3/movie/${movie.tmdb_id}?api_key=${TMDB_API_KEY}&language=it-IT`,
+              { timeout: 8000 }
+            );
+            const coll = r.data.belongs_to_collection;
+            movie.collection_info = coll
+              ? { id: coll.id, name: coll.name, poster_path: coll.poster_path, backdrop_path: coll.backdrop_path }
+              : { id: -1 }; // sentinella: nessuna saga, non ritentare
+            await movie.save();
+          } catch (err) {
+            console.error(`[PARTIAL] self-heal film ${movie.tmdb_id}:`, err.message);
+          }
+        })
+      );
+    }
+
+    // --- STEP 2: Raggruppa film per saga ---
     const collectionMap = new Map();
-
-    // Aggiornamento self-healing: recupera collection_info da TMDB se mancante
-    for (const r of reviews) {
+    for (const r of validReviews) {
       const movie = r.movie;
-      if (!movie) continue;
-
-      const needsCheck = !movie.collection_info ||
-                         (movie.collection_info.id === undefined) ||
-                         (Object.keys(movie.toObject().collection_info || {}).length === 0);
-
-      if (needsCheck) {
-        try {
-          const tmdbRes = await axios.get(`https://api.themoviedb.org/3/movie/${movie.tmdb_id}?api_key=${TMDB_API_KEY}&language=it-IT`);
-          const coll = tmdbRes.data.belongs_to_collection;
-          movie.collection_info = coll
-            ? { id: coll.id, name: coll.name, poster_path: coll.poster_path, backdrop_path: coll.backdrop_path }
-            : { id: -1 };
-          await movie.save();
-        } catch (err) {
-          console.error(`[PARTIAL] Errore TMDB self-healing film ${movie.tmdb_id}:`, err.message);
-        }
-      }
-
-      if (movie.collection_info && movie.collection_info.id && movie.collection_info.id > 0) {
-        const cid = movie.collection_info.id;
-        if (!collectionMap.has(cid)) {
-          collectionMap.set(cid, {
-            id: cid,
-            name: movie.collection_info.name,
-            poster_path: movie.collection_info.poster_path,
-            backdrop_path: movie.collection_info.backdrop_path,
-            reviewedMovies: new Set()
+      const ci = movie.collection_info;
+      if (ci && ci.id && ci.id > 0) {
+        if (!collectionMap.has(ci.id)) {
+          collectionMap.set(ci.id, {
+            id: ci.id,
+            name: ci.name,
+            poster_path: ci.poster_path,
+            backdrop_path: ci.backdrop_path,
+            reviewedTmdbIds: new Set()
           });
         }
-        collectionMap.get(cid).reviewedMovies.add(Number(movie.tmdb_id));
+        collectionMap.get(ci.id).reviewedTmdbIds.add(Number(movie.tmdb_id));
       }
     }
 
+    // --- STEP 3: Valida ogni saga su TMDB in PARALLELO (live = sempre aggiornato) ---
+    // Questo è il cuore: controlla quanti film usciti ha la saga e quanti ne ha visti l'utente
+    const today = new Date();
     const partials = [];
 
-    const promises = Array.from(collectionMap.values()).map(async (collData) => {
-      try {
-        const response = await axios.get(`https://api.themoviedb.org/3/collection/${collData.id}?api_key=${TMDB_API_KEY}&language=it-IT`);
-        const parts = response.data.parts.filter(p => p.release_date && new Date(p.release_date) <= new Date());
-        const totalRequired = parts.length;
+    await Promise.allSettled(
+      Array.from(collectionMap.values()).map(async (coll) => {
+        try {
+          const r = await axios.get(
+            `https://api.themoviedb.org/3/collection/${coll.id}?api_key=${TMDB_API_KEY}&language=it-IT`,
+            { timeout: 8000 }
+          );
+          // Solo i film già usciti contano (future-proof: nuovi film si aggiungono da soli)
+          const releasedParts = (r.data.parts || []).filter(
+            p => p.release_date && new Date(p.release_date) <= today
+          );
+          const total = releasedParts.length;
+          if (total < 2) return; // saghe con 1 solo film non contano
 
-        let foundCount = 0;
-        for (const p of parts) {
-          if (collData.reviewedMovies.has(p.id)) foundCount++;
+          const seen = releasedParts.filter(p => coll.reviewedTmdbIds.has(Number(p.id))).length;
+
+          if (seen > 0 && seen < total) {
+            // Saga incompleta: l'utente ha visto almeno 1 ma non tutti
+            partials.push({
+              id: coll.id,
+              name: coll.name,
+              poster_path: coll.poster_path,
+              backdrop_path: coll.backdrop_path,
+              seen,
+              total,
+              missing: total - seen
+            });
+          }
+          // Se seen === total → saga COMPLETA, non va nelle parziali
+        } catch (err) {
+          console.error(`[PARTIAL] errore saga ${coll.id}:`, err.message);
         }
+      })
+    );
 
-        if (foundCount > 0 && foundCount < totalRequired && totalRequired > 1) {
-          partials.push({
-            id: collData.id,
-            name: collData.name,
-            poster_path: collData.poster_path,
-            backdrop_path: collData.backdrop_path,
-            seen: foundCount,
-            total: totalRequired,
-            missing: totalRequired - foundCount
-          });
-        }
-      } catch (err) {
-        console.error(`Errore TMDB su Saga ID ${collData.id}:`, err.message);
-      }
-    });
-
-    await Promise.all(promises);
+    // Ordina: chi manca meno è più vicina al completamento
     partials.sort((a, b) => a.missing - b.missing);
-
     res.json(partials);
+
   } catch (error) {
-    console.error("Errore recupero saghe parziali:", error);
-    res.status(500).json({ message: "Errore locale durante il fetch saghe parziali." });
+    console.error('Errore getPartialCollections:', error);
+    res.status(500).json({ message: 'Errore del server nel recupero saghe.' });
   }
 };
 
 
-// --- HELPER: SINCRONIZZAZIONE COLLEZIONI (Saghe) ---
+
+// --- HELPER: SINCRONIZZAZIONE COLLEZIONI (chiamato su ogni add/delete recensione) ---
 exports.syncUserCollections = async (userId) => {
   const axios = require('axios');
   const TMDB_API_KEY = process.env.TMDB_API_KEY;
+  const Movie = require('../models/Movie');
 
   try {
-    const Review = require("../models/Review");
-    const User = require("../models/User");
-    const Movie = require("../models/Movie");
-
     const reviews = await Review.find({ user: userId }).populate('movie');
     const user = await User.findById(userId);
-    if (!user || !reviews.length) {
-      console.log(`[SYNC] Nessuna recensione trovata per ${userId}`);
-      return;
-    }
+    if (!user) return;
 
-    const collectionMap = new Map();
+    const validMovies = reviews.map(r => r.movie).filter(Boolean);
 
-    for (const r of reviews) {
-      const movie = r.movie;
-      if (!movie) continue;
-
-      // Se non abbiamo info e non abbiamo mai checkato (id non è -1 e non c'è id valido)
-      const needsCheck = !movie.collection_info || 
-                         (movie.collection_info.id === undefined) || 
-                         (Object.keys(movie.toObject().collection_info || {}).length === 0);
-
-      if (needsCheck) {
-        try {
-          const res = await axios.get(`https://api.themoviedb.org/3/movie/${movie.tmdb_id}?api_key=${TMDB_API_KEY}&language=it-IT`);
-          const coll = res.data.belongs_to_collection;
-          movie.collection_info = coll ? {
-            id: coll.id, 
-            name: coll.name, 
-            poster_path: coll.poster_path, 
-            backdrop_path: coll.backdrop_path
-          } : { id: -1 }; // Usiamo -1 per indicare "nessuna collezione" evitiamo re-fetch
-          await movie.save();
-        } catch (err) {
-          console.error(`[SYNC] Errore TMDB per ${movie.title}:`, err.message);
-        }
-      }
-
-      if (movie.collection_info && movie.collection_info.id && movie.collection_info.id > 0) {
-        const cid = movie.collection_info.id;
-        if (!collectionMap.has(cid)) {
-          collectionMap.set(cid, {
-            id: cid,
-            name: movie.collection_info.name,
-            poster_path: movie.collection_info.poster_path,
-            reviewedMovies: new Set()
-          });
-        }
-        collectionMap.get(cid).reviewedMovies.add(Number(movie.tmdb_id));
-      }
-    }
-
-    const completed = [];
-    const promises = Array.from(collectionMap.values()).map(async (collData) => {
-      try {
-        const response = await axios.get(`https://api.themoviedb.org/3/collection/${collData.id}?api_key=${TMDB_API_KEY}&language=it-IT`);
-        // Filtriamo film già usciti
-        const parts = response.data.parts.filter(p => p.release_date && new Date(p.release_date) <= new Date());
-        const totalRequired = parts.length;
-
-        let foundCount = 0;
-        const missingMovies = [];
-        for (const p of parts) {
-          if (collData.reviewedMovies.has(Number(p.id))) {
-            foundCount++;
-          } else {
-            missingMovies.push(p.title);
-          }
-        }
-
-        if (foundCount === totalRequired && totalRequired > 1) {
-          completed.push({
-            id: collData.id,
-            name: collData.name,
-            poster_path: collData.poster_path
-          });
-        } else if (foundCount > 0) {
-          console.log(`[SYNC] Saga ${collData.name} INCOMPLETA: ${foundCount}/${totalRequired}. Mancano: ${missingMovies.join(", ")}`);
-        }
-      } catch (err) {
-        console.error(`[SYNC] Errore verifica saga ${collData.id}:`, err.message);
-      }
+    // --- Self-healing PARALLELO: recupera collection_info per film senza ---
+    const needsSync = validMovies.filter(movie => {
+      const ci = movie.collection_info;
+      if (!ci) return true;
+      const ciObj = movie.toObject().collection_info || {};
+      return Object.keys(ciObj).length === 0 || ci.id === undefined;
     });
 
-    await Promise.all(promises);
+    if (needsSync.length > 0) {
+      await Promise.allSettled(
+        needsSync.map(async (movie) => {
+          try {
+            const r = await axios.get(
+              `https://api.themoviedb.org/3/movie/${movie.tmdb_id}?api_key=${TMDB_API_KEY}&language=it-IT`,
+              { timeout: 8000 }
+            );
+            const coll = r.data.belongs_to_collection;
+            movie.collection_info = coll
+              ? { id: coll.id, name: coll.name, poster_path: coll.poster_path, backdrop_path: coll.backdrop_path }
+              : { id: -1 };
+            await movie.save();
+          } catch (err) {
+            console.error(`[SYNC] self-heal film ${movie.tmdb_id}:`, err.message);
+          }
+        })
+      );
+    }
 
-    await User.updateOne(
-      { _id: user._id },
-      { $set: { completedCollections: completed } }
+    // --- Raggruppa per saga ---
+    const collectionMap = new Map();
+    for (const movie of validMovies) {
+      const ci = movie.collection_info;
+      if (ci && ci.id && ci.id > 0) {
+        if (!collectionMap.has(ci.id)) {
+          collectionMap.set(ci.id, {
+            id: ci.id,
+            name: ci.name,
+            poster_path: ci.poster_path,
+            reviewedTmdbIds: new Set()
+          });
+        }
+        collectionMap.get(ci.id).reviewedTmdbIds.add(Number(movie.tmdb_id));
+      }
+    }
+
+    // --- Verifica saghe completate in PARALLELO su TMDB ---
+    const completed = [];
+    const today = new Date();
+    await Promise.allSettled(
+      Array.from(collectionMap.values()).map(async (coll) => {
+        try {
+          const r = await axios.get(
+            `https://api.themoviedb.org/3/collection/${coll.id}?api_key=${TMDB_API_KEY}&language=it-IT`,
+            { timeout: 8000 }
+          );
+          const released = (r.data.parts || []).filter(
+            p => p.release_date && new Date(p.release_date) <= today
+          );
+          if (released.length < 2) return;
+          const seen = released.filter(p => coll.reviewedTmdbIds.has(Number(p.id))).length;
+          if (seen === released.length) {
+            completed.push({ id: coll.id, name: coll.name, poster_path: coll.poster_path });
+          }
+        } catch (err) {
+          console.error(`[SYNC] errore saga ${coll.id}:`, err.message);
+        }
+      })
     );
-    console.log(`[SYNC] Update per ${user.username}: ${completed.length} saghe nel DB.`);
+
+    // --- Aggiorna le saghe completate sul profilo utente ---
+    await User.updateOne({ _id: user._id }, { $set: { completedCollections: completed } });
+    console.log(`[SYNC] ${user.username}: ${completed.length} saghe complete`);
   } catch (error) {
-    console.error("Errore syncUserCollections:", error);
+    console.error('[SYNC] Errore syncUserCollections:', error);
   }
 };

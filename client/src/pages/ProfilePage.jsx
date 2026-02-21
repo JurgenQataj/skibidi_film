@@ -8,7 +8,7 @@ import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
-import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
 import { SkeletonMovieCard } from "../components/Skeleton";
 
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
@@ -376,7 +376,7 @@ function ProfilePage() {
             {/* Bio */}
             {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
 
-            {/* Actions row: button + Stats + Liste */}
+            {/* Actions row: button + Stats + Liste + Logout */}
             <div className={styles.actionsRow}>
               {loggedInUserId && (
                 isOwnProfile ? (
@@ -393,6 +393,16 @@ function ProfilePage() {
               <div className={styles.iconBtn} onClick={() => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true)} title="Liste">
                 <FaListUl />
               </div>
+              {isOwnProfile && (
+                <div
+                  className={styles.iconBtn}
+                  onClick={() => { logout(); navigate("/login"); }}
+                  title="Logout"
+                  style={{ color: '#e50914' }}
+                >
+                  <FaSignOutAlt />
+                </div>
+              )}
             </div>
           </div>
         </header>
