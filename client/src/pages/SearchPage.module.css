@@ -2,7 +2,7 @@
 .pageContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 30px;
+  padding: 40px 100px; /* Aumentato ulteriormente il margine laterale su PC */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -264,9 +264,18 @@
 
 .resultsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 1rem;
-  justify-items: center;
+  grid-template-columns: repeat(6, 1fr); /* 6 elementi per riga su PC */
+  gap: 15px; /* Spazio standard */
+  justify-items: stretch;
+  align-items: stretch; /* Obbliga le colonne alla medesima altezza */
+  width: 100%;
+}
+
+.resultsGrid > a {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Person list (compact rows) ────────────── */
@@ -357,7 +366,11 @@
 /* ── Responsive ────────────────────────────── */
 @media (max-width: 768px) {
   .pageContainer { padding: 20px 15px; gap: 18px; }
-  .heroSection { padding: 24px 15px 20px; border-radius: 14px; }
+  .heroSection { 
+    padding: 24px 15px 20px; 
+    border-radius: 14px; 
+    background: rgba(255, 255, 255, 0.08); /* Sfondo sbiadito e schiarito meno cupo per mobile */
+  }
 
   .resultsGrid {
     grid-template-columns: repeat(3, 120px) !important;

@@ -1,86 +1,77 @@
 .card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 16px;
-  padding: 16px 10px 14px;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
   color: white;
   cursor: pointer;
-  transition: all 0.22s ease;
-  backdrop-filter: blur(6px);
-  text-align: center;
+  transition: background 0.2s ease;
+  border-radius: 8px;
+  text-align: left;
 }
 
 .card:hover {
-  background: rgba(168, 98, 210, 0.12);
-  border-color: rgba(168, 98, 210, 0.45);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(168, 98, 210, 0.15);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .avatarWrapper {
   position: relative;
-  width: 62px;
-  height: 62px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
 }
 
 .avatar {
-  width: 62px;
-  height: 62px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(168, 98, 210, 0.35);
-  transition: border-color 0.22s ease;
-}
-
-.card:hover .avatar {
-  border-color: rgba(168, 98, 210, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .userInfo {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  width: 100%;
+  justify-content: center;
+  gap: 2px;
+  flex-grow: 1;
   overflow: hidden;
 }
 
 .username {
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 500;
+  font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
   letter-spacing: 0.01em;
-  color: rgba(255, 255, 255, 0.95);
+  color: #fff;
 }
 
 .followers {
-  font-size: 0.72rem;
-  color: rgba(168, 98, 210, 0.8);
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 @media (max-width: 768px) {
   .card {
-    padding: 12px 8px 10px;
-    border-radius: 12px;
-    gap: 7px;
+    padding: 6px 8px;
+    gap: 10px;
   }
 
-  .avatarWrapper,
-  .avatar {
-    width: 50px;
-    height: 50px;
+  .avatarWrapper {
+    width: 38px;
+    height: 38px;
   }
 
   .username {
-    font-size: 0.78rem;
+    font-size: 0.9rem;
+  }
+  
+  .followers {
+    font-size: 0.75rem;
   }
 }

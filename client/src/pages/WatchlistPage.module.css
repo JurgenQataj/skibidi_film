@@ -2,7 +2,7 @@
 .pageContainer {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 4rem; /* Più spazio dai bordi laterali su PC */
   background-color: #0a0a0a;
   min-height: 100vh;
   color: #ffffff;
@@ -43,12 +43,14 @@
   font-weight: 600;
 }
 
-/* Griglia responsive moderna */
+/* Griglia responsive moderna e fissa */
 .reviewsGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1.5rem;
-  padding: 1rem 0;
+  gap: 15px;
+  justify-items: stretch;
+  align-items: stretch;
+  width: 100%;
 }
 
 /* Wrapper per la card: gestisce click, hover e layout */
@@ -60,6 +62,11 @@
   background: #1c1e21;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
 }
 
 .cardWrapper:hover {
@@ -69,7 +76,7 @@
   border: 1px solid rgba(255, 71, 87, 0.3);
 }
 
-/* Override stili interni MovieCard per adattarli al nuovo wrapper */
+/* Override stili interni MovieCard per adattarli al nuovo wrapper evitando distorsioni */
 .cardWrapper :global(.card) {
   width: 100% !important;
   height: 100% !important;
@@ -78,10 +85,10 @@
   margin: 0 !important;
 }
 
+/* L'altezza è ereditata dall'aspect-ratio: 2/3 globale di .card img e scalata dalla grid */
 .cardWrapper :global(.card img) {
   width: 100% !important;
-  height: 300px !important; /* Immagini più alte e impattanti */
-  object-fit: cover !important;
+  height: auto !important;
 }
 
 .cardWrapper :global(.card .title) {
@@ -100,10 +107,10 @@
   font-weight: 300;
 }
 
-/* Responsive Design */
+/* Responsive Design - Allineato a ProfilePage per omogeneità */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 1rem;
+    padding: 1.5rem 2rem; /* Più respiro anche su tablet/mobile */
   }
   
   .title {
@@ -111,22 +118,70 @@
   }
   
   .reviewsGrid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem;
+    grid-template-columns: repeat(3, 120px) !important;
+    gap: 10px !important;
+    justify-content: center !important;
+    padding: 0;
   }
   
+  .cardWrapper :global(.card) {
+    --title-height: 35px;
+    width: 120px !important;
+    height: calc(160px + var(--title-height)) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .cardWrapper :global(.card img) {
-    height: 220px !important;
+    width: 120px !important;
+    height: 160px !important;
+    object-fit: cover !important;
+  }
+
+  .cardWrapper :global(.card .title) {
+    width: 120px !important;
+    height: var(--title-height) !important;
+    font-size: 0.6rem !important;
+    line-height: 1.1 !important;
+    text-align: center;
+    white-space: normal !important;
+    overflow: hidden;
+    padding: 2px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: unset;
   }
 }
 
 @media (max-width: 480px) {
+  .pageContainer {
+    padding: 1rem 1.5rem; /* Margine laterale aumentato sui telefoni */
+  }
+
   .reviewsGrid {
-    grid-template-columns: repeat(3, 1fr); /* 3 colonne su mobile */
-    gap: 0.5rem;
+    grid-template-columns: repeat(3, 100px) !important; /* Forza sempre 3 colonne precise */
+    gap: 8px !important;
+    justify-content: center !important;
   }
   
+  .cardWrapper :global(.card) {
+    --title-height: 30px;
+    width: 100px !important;
+    height: calc(140px + var(--title-height)) !important;
+  }
+
   .cardWrapper :global(.card img) {
-    height: 160px !important;
+    width: 100px !important;
+    height: 140px !important;
+  }
+
+  .cardWrapper :global(.card .title) {
+    width: 100px !important;
+    height: var(--title-height) !important;
+    font-size: 0.55rem !important;
+    padding: 2px !important;
+    min-height: unset;
   }
 }

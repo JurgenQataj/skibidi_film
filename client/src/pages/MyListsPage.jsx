@@ -117,43 +117,51 @@ function MyListsPage() {
         </div>
       )}
 
-      {/* Griglia liste */}
-      {lists.length > 0 ? (
-        <div className={styles.listsGrid}>
-          {lists.map((list) => (
-            <div
-              key={list._id}
-              className={`${styles.listCard} ${isWatchlist(list) ? styles.watchlistCard : ""}`}
-            >
-              <Link
-                to={isWatchlist(list) ? "/watchlist" : `/list/${list._id}`}
-                className={styles.listLink}
-              >
-                <div className={styles.cardIcon}>
-                  {isWatchlist(list) ? <FaBookmark /> : <FaFilm />}
-                </div>
-                <div className={styles.cardContent}>
-                  <h3 className={styles.cardTitle}>{list.title}</h3>
-                  {list.description && (
-                    <p className={styles.cardDesc}>{list.description}</p>
-                  )}
-                </div>
-              </Link>
-              {!isWatchlist(list) && (
-                <button
-                  onClick={() => handleDeleteList(list._id)}
-                  className={styles.deleteButton}
-                  title="Elimina lista"
-                >
-                  <FaTrash />
-                </button>
-              )}
+      {/* Griglia liste: Watchlist e Custom */}
+      <div className={styles.listsGrid}>
+        {/* Card Watchlist fissa */}
+        <div className={`${styles.listCard} ${styles.watchlistCard}`}>
+          <Link to="/watchlist" className={styles.listLink}>
+            <div className={styles.cardIcon}>
+              <FaBookmark />
             </div>
-          ))}
+            <div className={styles.cardContent}>
+              <h3 className={styles.cardTitle}>Watchlist</h3>
+              <p className={styles.cardDesc}>I film che vuoi guardare</p>
+            </div>
+          </Link>
         </div>
-      ) : (
+
+        {/* Liste dell'utente filtrate dalla watchlist (già esposta sopra staticamente) */}
+        {lists
+          .filter(list => list._id !== "watchlist" && list.id !== "watchlist")
+          .map((list) => (
+          <div key={list._id} className={styles.listCard}>
+            <Link to={`/list/${list._id}`} className={styles.listLink}>
+              <div className={styles.cardIcon}>
+                <FaFilm />
+              </div>
+              <div className={styles.cardContent}>
+                <h3 className={styles.cardTitle}>{list.title}</h3>
+                {list.description && (
+                  <p className={styles.cardDesc}>{list.description}</p>
+                )}
+              </div>
+            </Link>
+            <button
+              onClick={() => handleDeleteList(list._id)}
+              className={styles.deleteButton}
+              title="Elimina lista"
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {lists.length === 0 && (
         <div className={styles.emptyState}>
-          <p>Non hai ancora creato nessuna lista.</p>
+          <p>Non hai ancora creato nessuna lista personalizzata.</p>
           <p className={styles.emptyHint}>Premi "Nuova Lista" per iniziare!</p>
         </div>
       )}

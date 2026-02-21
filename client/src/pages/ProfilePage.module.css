@@ -107,24 +107,24 @@
 }
 
 .iconBtn {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.55);
+  color: #ffffff; /* Bianco richiesto */
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.1rem; /* Leggermente più grandi */
   transition: all 0.18s ease;
 }
 
 .iconBtn:hover {
-  background: rgba(168, 98, 210, 0.15);
-  border-color: rgba(168, 98, 210, 0.4);
-  color: rgba(200, 150, 240, 0.9);
+  background: rgba(168, 98, 210, 0.25);
+  border-color: rgba(168, 98, 210, 0.5);
+  color: #ffffff;
 }
 
 /* ── Section title ──────────────────────────── */
@@ -142,9 +142,10 @@
 /* ── GRIGLIA FILM (INVARIATA) ───────────────── */
 .reviewsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(6, 1fr); /* 6 per riga esatti su PC */
   gap: 15px;
-  justify-content: center;
+  justify-items: stretch;
+  align-items: stretch; /* Colonne alla medesima altezza in ogni fila */
   width: 100%;
 }
 
@@ -238,13 +239,13 @@
 /* ── Buttons ────────────────────────────────── */
 .followButton,
 .editButton {
-  padding: 7px 20px;
-  border: 1px solid rgba(168, 98, 210, 0.4);
+  padding: 9px 24px;
+  border: 1px solid rgba(168, 98, 210, 0.6);
   border-radius: 10px;
-  background: rgba(168, 98, 210, 0.12);
-  color: rgba(200, 150, 240, 0.9);
+  background: rgba(168, 98, 210, 0.2);
+  color: #ffffff; /* Bianco richiesto */
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.95rem; /* Leggermente più grande */
   cursor: pointer;
   transition: all 0.2s;
 }

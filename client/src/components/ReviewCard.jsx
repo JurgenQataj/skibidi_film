@@ -161,25 +161,28 @@ function ReviewCard({ review, onInteraction }) {
           Voto: <span className={styles.ratingValue}>{rating}</span>
         </div>
         {comment_text && <p className={styles.comment}>"{comment_text}"</p>}
-        <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
+        {/* Nuova riga combinata Footer */}
+        <div className={styles.footerRow}>
+          <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
 
-        {token && (
-          <div className={styles.actions}>
-            <div className={styles.reactions}>
-              <button
-                onClick={() => handleReaction("love")}
-                title="Love"
-                disabled={!loggedInUserId}
-              >
-                ❤️
+          {token && (
+            <div className={styles.actions}>
+              <div className={styles.reactions}>
+                <button
+                  onClick={() => handleReaction("love")}
+                  title="Love"
+                  disabled={!loggedInUserId}
+                >
+                  ❤️
+                </button>
+                <span>{reactionCount}</span>
+              </div>
+              <button onClick={toggleComments} className={styles.commentToggle}>
+                {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
               </button>
-              <span>{reactionCount}</span>
             </div>
-            <button onClick={toggleComments} className={styles.commentToggle}>
-              {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
-            </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {comments.shown && (
           <div className={styles.commentsSection}>

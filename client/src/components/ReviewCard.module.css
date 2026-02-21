@@ -98,19 +98,29 @@
   font-size: 1rem;
 }
 
+/* Riga unificata base (Time + Like + Commenti) */
+.footerRow {
+  display: flex;
+  justify-content: flex-end; /* Allinea blocco a destra */
+  align-items: center;
+  gap: 16px; /* Distanza tra timestamp e azioni */
+  margin-top: auto; /* La spinge sul fondo */
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
 .timestamp {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 16px;
-  margin-top: auto; /* Spinge verso il basso se c'è spazio */
+  margin: 0;
+  margin-right: auto; /* Ripinge la scritta circa... verso l'estremità sinistra */
 }
 
 /* Azioni: Reazioni e Commenti */
 .actions {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 12px;
   display: flex;
-  justify-content: space-between;
+  gap: 16px;
   align-items: center;
 }
 
@@ -283,14 +293,22 @@
 
   .timestamp {
     font-size: 0.75rem;
-    margin-bottom: 10px;
+    margin: 0;
+    margin-right: auto; /* Mantieni a sx su mobile */
+  }
+
+  /* Rimuovo i padding verticali pesanti e le separazioni per i mobile */
+  .footerRow {
+    flex-wrap: nowrap; /* Tieni sulla stessa riga il timestamp e l'inizio actions */
+    gap: 8px; /* Avvicinalo se strabordano le traduzioni */
+    padding-top: 10px;
+    justify-content: space-between;
   }
 
   .actions {
-    padding-top: 8px;
-    flex-direction: column;
-    align-items: flex-start;
     gap: 10px;
+    width: auto; /* Non occorre 100% siccome stanno sulla stessa riga */
+    justify-content: flex-end;
   }
 
   .reactions {

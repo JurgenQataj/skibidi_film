@@ -198,7 +198,7 @@ function ProfilePage() {
   if (!profile || !stats) return <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>;
 
   const isOwnProfile = loggedInUserId === profile._id;
-  const recentReviews = reviews.slice(0, 24);
+  const recentReviews = reviews.slice(0, 60);
 
   return (
     <>
@@ -379,7 +379,7 @@ function ProfilePage() {
               <div className={styles.iconBtn} onClick={() => navigate(`/profile/${userId}/stats`)} title="Stats">
                 <FaChartBar />
               </div>
-              <div className={styles.iconBtn} onClick={() => setIsListsModalOpen(true)} title="Liste">
+              <div className={styles.iconBtn} onClick={() => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true)} title="Liste">
                 <FaListUl />
               </div>
             </div>
@@ -401,7 +401,7 @@ function ProfilePage() {
               <p>Questo utente non ha ancora recensito nessun film.</p>
             )}
           </div>
-          {reviews.length > 24 && (
+          {reviews.length > 60 && (
             <div className={styles.showAllContainer}>
               <button onClick={() => setIsHistoryModalOpen(true)} className={styles.showAllButton}>
                 Mostra Tutta la Cronologia ({reviews.length} film)
