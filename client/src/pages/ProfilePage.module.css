@@ -64,7 +64,7 @@
 .statsContainer {
   display: flex;
   gap: 20px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .statItem,
@@ -560,6 +560,7 @@
 
   .statsContainer {
     gap: 12px;
+    flex-wrap: nowrap;
   }
 
   .statValue { font-size: 1rem; }

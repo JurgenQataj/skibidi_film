@@ -115,6 +115,8 @@
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   width: 100%;
+  flex-wrap: nowrap; /* Evita andata a capo degli elementi principali */
+  gap: 8px;
 }
 
 .timestamp {
@@ -141,6 +143,8 @@
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: nowrap; /* Mai a capo numero e icona */
+  white-space: nowrap;
 }
 
 .reactions button {
@@ -266,7 +270,7 @@
 }
 
 /* --- Media Queries per il Mobile --- */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .card {
     flex-direction: row; /* Fianco a fianco invece che incollonato */
     align-items: flex-start;
@@ -312,6 +316,8 @@
     flex: 1;
     text-align: left;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Rimuovo i padding verticali pesanti e le separazioni per i mobile */
