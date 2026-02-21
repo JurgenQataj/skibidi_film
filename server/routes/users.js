@@ -10,9 +10,9 @@ router.post("/forgot-password", userController.forgotPassword);
 router.post("/reset-password/:token", userController.resetPassword);
 
 // --- Social & Discovery ---
-router.get("/version", (req, res) => res.json({ version: "1.2.6", timestamp: new Date() }));
-router.get("/:userId/partial-collections", protect, userController.getPartialCollections);
-router.post("/:userId/sync-sagas", protect, userController.manualSyncSagas);
+router.get("/version", (req, res) => res.json({ version: "1.2.7", timestamp: new Date() }));
+router.get("/my-partial-collections", protect, userController.getPartialCollections);
+router.post("/sync-my-sagas", protect, userController.manualSyncSagas);
 router.get("/most-followed", userController.getMostFollowedUsers);
 router.get("/newest", userController.getNewestUsers);
 

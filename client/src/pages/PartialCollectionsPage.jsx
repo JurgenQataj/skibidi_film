@@ -17,12 +17,10 @@ function PartialCollectionsPage() {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Utente non autenticato");
-      const decoded = jwtDecode(token);
-      const userId = decoded.user.id;
 
-      const res = await axios.get(`${API_URL}/api/users/${userId}/partial-collections`, {
+      const res = await axios.get(`${API_URL}/api/users/my-partial-collections`, {
         headers: { Authorization: `Bearer ${token}` },
-        timeout: 30000 // 30s — la prima volta può impiegare di più per il self-healing
+        timeout: 45000 // 45s
       });
       setPartials(res.data);
     } catch (err) {
@@ -38,11 +36,10 @@ function PartialCollectionsPage() {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Utente non autenticato");
-      const decoded = jwtDecode(token);
-      const userId = decoded.user.id;
 
-      const res = await axios.post(`${API_URL}/api/users/${userId}/sync-sagas`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await axios.post(`${API_URL}/api/users/sync-my-sagas`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 60000 // 1 minuto
       });
       setPartials(res.data);
     } catch (err) {

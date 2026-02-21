@@ -545,8 +545,8 @@ exports.getNewestUsers = async (req, res) => {
 
 // --- COLLEZIONI PARZIALI INTELLIGENTI (Ora legge dal DB Cache) ---
 exports.getPartialCollections = async (req, res) => {
-  const { userId } = req.params;
   const User = require('../models/User');
+  const userId = req.user.id; // Prende l'ID dal token JWT
   console.log(`[ROUTE] getPartialCollections per userId: ${userId}`);
 
   try {
@@ -576,7 +576,7 @@ exports.getPartialCollections = async (req, res) => {
 
 // --- SINCRONIZZAZIONE MANUALE (per il pulsante nel frontend) ---
 exports.manualSyncSagas = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.id; // Prende l'ID dal token JWT
   const User = require('../models/User');
   try {
     console.log(`[SYNC-MANUAL] Inizio sincronizzazione per ${userId}`);
