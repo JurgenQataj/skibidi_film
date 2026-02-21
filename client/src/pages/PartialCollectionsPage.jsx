@@ -8,6 +8,7 @@ import { SkeletonListCard } from "../components/Skeleton";
 function PartialCollectionsPage() {
   const [partials, setPartials] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
@@ -31,6 +32,26 @@ function PartialCollectionsPage() {
       setLoading(false);
     }
   }, [API_URL]);
+
+  const handleManualSync = async () => {
+    setSyncing(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Utente non autenticato");
+      const decoded = jwtDecode(token);
+      const userId = decoded.user.id;
+
+      const res = await axios.post(`${API_URL}/api/users/${userId}/sync-sagas`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPartials(res.data);
+    } catch (err) {
+      console.error(err);
+      setError("Errore durante la sincronizzazione.");
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   useEffect(() => {
     fetchPartials();
@@ -58,7 +79,17 @@ function PartialCollectionsPage() {
         <div className={styles.emptyState}>{error}</div>
       ) : partials.length === 0 ? (
         <div className={styles.emptyState}>
-          <p>Non hai nessuna saga in sospeso. Ottimo lavoro!</p>
+          <p>Non abbiamo ancora analizzato le tue saghe o non ne hai di sospese.</p>
+          <button 
+            className={styles.syncButton} 
+            onClick={handleManualSync}
+            disabled={syncing}
+          >
+            {syncing ? "Sincronizzazione in corso..." : "Sincronizza ora"}
+          </button>
+          <p style={{ fontSize: '0.8rem', marginTop: '15px', color: 'rgba(255,255,255,0.3)' }}>
+            L'analisi richiede circa 20-30 secondi la prima volta.
+          </p>
         </div>
       ) : (
         <div className={styles.grid}>

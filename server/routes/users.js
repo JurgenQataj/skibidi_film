@@ -33,6 +33,7 @@ router.get("/:userId/followers", userController.getFollowers);
 router.get("/:userId/following", userController.getFollowing);
 
 // --- Altre rotte specifiche ---
+router.post("/:userId/sync-sagas", protect, userController.manualSyncSagas);
 router.get("/:userId/partial-collections", protect, userController.getPartialCollections);
 router.get("/:userId/reviews", userController.getUserReviews);
 router.get("/:userId/lists", userController.getUserLists);

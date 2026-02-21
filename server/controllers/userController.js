@@ -557,6 +557,13 @@ exports.getPartialCollections = async (req, res) => {
     // La sincronizzazione avverrà alla prossima recensione o possiamo forzarla se necessario
     const partials = user.partialCollections || [];
     
+    // TRIGGER AUTOMATICO: Se la cache è vuota, avviamo una sincronizzazione in background
+    // Non usiamo 'await' così la risposta è immediata (niente timeout)
+    if (partials.length === 0) {
+      console.log(`[SYNC-AUTO] Trigger background sync per ${userId}`);
+      exports.syncUserCollections(userId).catch(err => console.error("Errore background sync:", err));
+    }
+    
     // Ordina per film mancanti (più vicini al completamento in alto)
     partials.sort((a, b) => a.missing - b.missing);
     
@@ -564,6 +571,21 @@ exports.getPartialCollections = async (req, res) => {
   } catch (error) {
     console.error('Errore getPartialCollections:', error);
     res.status(500).json({ message: 'Errore del server nel recupero saghe.' });
+  }
+};
+
+// --- SINCRONIZZAZIONE MANUALE (per il pulsante nel frontend) ---
+exports.manualSyncSagas = async (req, res) => {
+  const { userId } = req.params;
+  const User = require('../models/User');
+  try {
+    console.log(`[SYNC-MANUAL] Inizio sincronizzazione per ${userId}`);
+    await exports.syncUserCollections(userId);
+    const user = await User.findById(userId);
+    res.json(user.partialCollections || []);
+  } catch (error) {
+    console.error('Errore manualSyncSagas:', error);
+    res.status(500).json({ message: 'Sincronizzazione fallita.' });
   }
 };
 
