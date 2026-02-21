@@ -6,6 +6,7 @@ import {
   Outlet,
 } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { useState } from "react";
 
 // Import Pagine
 import DiscoverPage from "./pages/DiscoverPage";
@@ -30,6 +31,7 @@ import PartialCollectionsPage from "./pages/PartialCollectionsPage";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UpdatePrompt from "./components/UpdatePrompt";
+import SplashScreen from "./components/SplashScreen";
 import "./App.css";
 
 // Layout per le pagine protette che mostra la Navbar
@@ -46,9 +48,19 @@ function MainLayout() {
 
 function App() {
   const { token } = useAuth();
+  // Mostra splash solo al primo accesso della sessione
+  const [showSplash, setShowSplash] = useState(
+    () => !sessionStorage.getItem('splashShown')
+  );
+
+  const handleSplashFinish = () => {
+    sessionStorage.setItem('splashShown', '1');
+    setShowSplash(false);
+  };
 
   return (
     <Router>
+      {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
       <UpdatePrompt />
       <Routes>
         {/* Rotte Pubbliche (Auth) */}

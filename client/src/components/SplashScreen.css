@@ -1,0 +1,91 @@
+/* Splash Screen - copre tutto lo schermo */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0a0a0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Fase entrata: inizia invisibile e sale */
+.splash-enter .splash-content {
+  animation: splashIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Fase uscita: svanisce verso l'alto */
+.splash-exit {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+/* Contenuto centrato */
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  opacity: 0;
+}
+
+.splash-hold .splash-content,
+.splash-exit .splash-content {
+  opacity: 1;
+}
+
+/* Logo */
+.splash-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 22px;
+  box-shadow: 0 0 60px rgba(229, 9, 20, 0.4), 0 0 120px rgba(229, 9, 20, 0.15);
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+/* Titolo */
+.splash-title {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-shadow: 0 0 30px rgba(229, 9, 20, 0.5);
+}
+
+/* Emoji ciak */
+.splash-sub {
+  font-size: 1.4rem;
+  margin: 0;
+  animation: spin 1.2s ease-in-out;
+}
+
+/* Animazione entrata */
+@keyframes splashIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.75) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Glow pulsante sul logo */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 40px rgba(229, 9, 20, 0.4), 0 0 80px rgba(229, 9, 20, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 70px rgba(229, 9, 20, 0.7), 0 0 140px rgba(229, 9, 20, 0.3);
+  }
+}
+
+/* Rotazione emoji */
+@keyframes spin {
+  0% { transform: rotate(0deg) scale(0.5); opacity: 0; }
+  60% { transform: rotate(15deg) scale(1.2); opacity: 1; }
+  100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}

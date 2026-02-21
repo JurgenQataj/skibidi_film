@@ -18,7 +18,12 @@ export default defineConfig(({ command }) => {
           name: 'Skibidi Film',
           short_name: 'Skibidi Film',
           description: 'Track your watched movies and reviews',
-          theme_color: '#ffffff',
+          theme_color: '#0a0a0f',
+          background_color: '#0a0a0f',
+          display: 'standalone',
+          orientation: 'portrait',
+          start_url: '/',
+          scope: '/',
           icons: [
             {
               src: 'pwa-192x192.png',
@@ -29,6 +34,12 @@ export default defineConfig(({ command }) => {
               src: 'pwa-512x512.png',
               sizes: '512x512',
               type: 'image/png'
+            },
+            {
+              src: 'pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         }
