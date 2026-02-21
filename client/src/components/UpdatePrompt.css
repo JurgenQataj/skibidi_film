@@ -1,0 +1,48 @@
+.update-prompt {
+  position: fixed;
+  bottom: 80px; /* sopra la navbar mobile */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  animation: slideUp 0.3s ease;
+}
+
+.update-prompt button {
+  background: #e50914;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.update-prompt button:hover {
+  background: #ff1a25;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

@@ -29,6 +29,7 @@ import PartialCollectionsPage from "./pages/PartialCollectionsPage";
 // Import Componenti
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UpdatePrompt from "./components/UpdatePrompt";
 import "./App.css";
 
 // Layout per le pagine protette che mostra la Navbar
@@ -48,6 +49,7 @@ function App() {
 
   return (
     <Router>
+      <UpdatePrompt />
       <Routes>
         {/* Rotte Pubbliche (Auth) */}
         <Route
