@@ -59,15 +59,20 @@ exports.discoverTv = async (req, res) => {
     if (release_date_gte) params["first_air_date.gte"] = release_date_gte;
     if (release_date_lte) params["first_air_date.lte"] = release_date_lte;
     if (vote_average_gte) params["vote_average.gte"] = vote_average_gte;
-    if (vote_count_gte) params["vote_count.gte"] = vote_count_gte; // [NUOVO] Aggiungi parametro
+    if (vote_count_gte) params["vote_count.gte"] = parseInt(vote_count_gte); // Assicura che sia numero
     if (with_original_language) params.with_original_language = with_original_language;
-    if (with_keywords) params.with_keywords = with_keywords; // [NUOVO] Aggiungere ai parametri
+    if (with_keywords) params.with_keywords = with_keywords;
+
+    // Se c'è una categoria specifica e non c'è un ordinamento manuale,
+    // impostiamo il sort_by corretto per quella categoria quando usiamo discover
+    if (category === "top_rated" && !sort_by) params.sort_by = "vote_average.desc";
 
     let fetchUrl = `${BASE_URL}${endpoint}`;
     if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || (sort_by && sort_by !== "popularity.desc")) {
-        // [MODIFICA] Se c'è un qualsiasi filtro, forza l'uso di discover/tv
         fetchUrl = `${BASE_URL}/discover/tv`;
     }
+
+    console.log(`🔍 DISCOVER TV URL: ${fetchUrl} | Params:`, { ...params, api_key: "HIDDEN" });
 
     const response = await axios.get(fetchUrl, { params });
     

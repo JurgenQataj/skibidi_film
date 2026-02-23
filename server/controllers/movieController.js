@@ -46,6 +46,7 @@ exports.searchKeywords = async (req, res) => {
     return res.status(400).json({ message: "Per favore, fornisci una parola chiave per la ricerca." });
   }
   try {
+    console.log(`🔍 SEARCH KEYWORDS QUERY: ${searchQuery}`);
     const url = `${BASE_URL}/search/keyword?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`;
     const response = await axios.get(url);
     res.json(response.data);
@@ -122,15 +123,22 @@ exports.discoverMovies = async (req, res) => {
     if (release_date_gte) params["primary_release_date.gte"] = release_date_gte;
     if (release_date_lte) params["primary_release_date.lte"] = release_date_lte;
     if (vote_average_gte) params["vote_average.gte"] = vote_average_gte;
-    if (vote_count_gte) params["vote_count.gte"] = vote_count_gte; // [NUOVO] Aggiungi parametro
+    if (vote_count_gte) params["vote_count.gte"] = parseInt(vote_count_gte); // Assicura che sia un numero
     if (with_original_language) params.with_original_language = with_original_language;
-    if (with_keywords) params.with_keywords = with_keywords; // [NUOVO] Aggiungere ai parametri
+    if (with_keywords) params.with_keywords = with_keywords;
+
+    // Se c'è una categoria specifica (es. top_rated) e non c'è un ordinamento manuale,
+    // impostiamo il sort_by corretto per quella categoria quando usiamo discover
+    if (category === "top_rated" && !sort_by) params.sort_by = "vote_average.desc";
+    if (category === "upcoming" && !sort_by) params.sort_by = "primary_release_date.desc";
 
     let fetchUrl = `${BASE_URL}${endpoint}`;
     if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || (sort_by && sort_by !== "popularity.desc")) {
         // [MODIFICA] Se c'è un qualsiasi filtro, forza l'uso di discover/movie
         fetchUrl = `${BASE_URL}/discover/movie`;
     }
+
+    console.log(`🔍 DISCOVER MOVIES URL: ${fetchUrl} | Params:`, { ...params, api_key: "HIDDEN" });
 
     const response = await axios.get(fetchUrl, { params });
     
