@@ -5,6 +5,8 @@ import styles from "./SearchPage.module.css";
 import MovieCard from "../components/MovieCard";
 import SearchInput from "../components/SearchInput";
 import { SkeletonMovieCard, SkeletonPersonRow } from "../components/Skeleton";
+import KeywordInput from "../components/KeywordInput";
+import CustomSelect from "../components/CustomSelect";
 
 function SearchPage() {
   // Helper per inizializzare lo stato da sessionStorage
@@ -38,8 +40,9 @@ function SearchPage() {
     genre: "",
     releaseYear: { from: "", to: "" },
     minRating: 0,
+    minVoteCount: 0, // [NUOVO] Filtro numero minimo di voti
     language: "",
-    keywords: "",
+    keywords: [], // Changed to array for multiple keywords
     sortBy: "",
   }));
 
@@ -146,8 +149,11 @@ function SearchPage() {
         ...(filters.minRating > 0 && {
           vote_average_gte: filters.minRating.toString(),
         }),
+        ...(filters.minVoteCount > 0 && {
+          vote_count_gte: filters.minVoteCount.toString(), // [NUOVO] Passa al backend
+        }),
         ...(filters.language && { with_original_language: filters.language }),
-        ...(filters.keywords && { with_keywords: filters.keywords }),
+        ...(filters.keywords.length > 0 && { with_keywords: filters.keywords.map(k => k.id).join(",") }),
         ...(filters.sortBy && { sort_by: filters.sortBy }),
       });
 
@@ -212,8 +218,9 @@ function SearchPage() {
         genre: "",
         releaseYear: { from: "", to: "" },
         minRating: 0,
+        minVoteCount: 0,
         language: "",
-        keywords: "",
+        keywords: [],
         sortBy: "",
       });
     } catch (error) {
@@ -309,8 +316,9 @@ function SearchPage() {
       genre: "",
       releaseYear: { from: "", to: "" },
       minRating: 0,
+      minVoteCount: 0,
       language: "",
-      keywords: "",
+      keywords: [],
       sortBy: "",
     });
     setHasSearched(false);
@@ -416,34 +424,23 @@ function SearchPage() {
                 {/* Ordinamento */}
                 <div className={styles.filterGroup}>
                 <label className={styles.filterLabel}>Ordina per</label>
-                <select
-                    className={styles.filterSelect}
+                <CustomSelect
+                    options={sortOptions}
                     value={filters.sortBy}
-                    onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-                >
-                    {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.name}
-                    </option>
-                    ))}
-                </select>
+                    onChange={(val) => handleFilterChange("sortBy", val)}
+                    placeholder="Predefinito"
+                />
                 </div>
 
                 {/* Genere */}
                 <div className={styles.filterGroup}>
                 <label className={styles.filterLabel}>Genere</label>
-                <select
-                    className={styles.filterSelect}
+                <CustomSelect
+                    options={[{ id: "", name: "Tutti" }, ...genres]}
                     value={filters.genre}
-                    onChange={(e) => handleFilterChange("genre", e.target.value)}
-                >
-                    <option value="">Tutti</option>
-                    {genres.map((genre) => (
-                    <option key={genre.id} value={genre.id}>
-                        {genre.name}
-                    </option>
-                    ))}
-                </select>
+                    onChange={(val) => handleFilterChange("genre", val)}
+                    placeholder="Tutti"
+                />
                 </div>
 
                 {/* Anno */}
@@ -489,21 +486,43 @@ function SearchPage() {
                 />
                 </div>
 
+                {/* Voto Minimo Numero */}
+                <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>N. Voti Minimi</label>
+                <input
+                    type="number"
+                    className={styles.ratingInput} 
+                    min="0"
+                    step="100"
+                    placeholder="Es: 1000"
+                    value={filters.minVoteCount === 0 ? "" : filters.minVoteCount}
+                    onChange={(e) => {
+                      let val = parseInt(e.target.value);
+                      if (isNaN(val)) val = 0;
+                      if (val < 0) val = 0;
+                      handleFilterChange("minVoteCount", val);
+                    }}
+                />
+                </div>
+
                 {/* Lingua */}
                 <div className={styles.filterGroup}>
                 <label className={styles.filterLabel}>Lingua</label>
-                <select
-                    className={styles.filterSelect}
+                <CustomSelect
+                    options={[{ code: "", name: "Tutte" }, ...languages].map(l => ({ id: l.code, name: l.name }))}
                     value={filters.language}
-                    onChange={(e) => handleFilterChange("language", e.target.value)}
-                >
-                    <option value="">Tutte</option>
-                    {languages.map((lang) => (
-                    <option key={lang.code} value={lang.code}>
-                        {lang.name}
-                    </option>
-                    ))}
-                </select>
+                    onChange={(val) => handleFilterChange("language", val)}
+                    placeholder="Tutte"
+                />
+                </div>
+
+                {/* Keywords (NEW) */}
+                <div className={styles.filterGroup} style={{ gridColumn: "1 / -1" }}>
+                   <label className={styles.filterLabel}>Parole Chiave (Keywords)</label>
+                   <KeywordInput 
+                     selectedKeywords={filters.keywords} 
+                     onChange={(newKeywords) => handleFilterChange("keywords", newKeywords)} 
+                   />
                 </div>
             </div>
 

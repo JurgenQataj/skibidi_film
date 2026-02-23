@@ -2,11 +2,11 @@
 .pageContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 100px; /* Aumentato ulteriormente il margine laterale su PC */
+  padding: 20px 40px; 
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px;
 }
 
 /* ── Hero / search area ────────────────────── */
@@ -14,50 +14,61 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 36px 20px 28px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Sostituisce il riquadro completo con una linea pulita */
 }
 
 .searchBarWrapper {
   width: 100%;
-  max-width: 560px;
+  max-width: 600px;
 }
 
 /* ── Mode toggle ───────────────────────────── */
 .modeToggle {
   display: flex;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.25);
-  padding: 4px;
-  border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 16px;
+  background: transparent;
+  padding: 0;
+  border: none;
 }
 
 .modeButton {
-  padding: 7px 22px;
-  border-radius: 24px;
+  padding: 4px 8px;
+  border-radius: 0;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.88rem;
-  letter-spacing: 0.02em;
-  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.modeButton::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: var(--primary-color, #a862d2);
+  transition: width 0.2s ease;
 }
 
 .modeButtonActive {
-  background: rgba(168, 98, 210, 0.25);
-  color: rgba(200, 150, 240, 0.95);
+  color: rgba(255, 255, 255, 0.95);
   font-weight: 600;
 }
 
+.modeButtonActive::after {
+  width: 100%;
+}
+
 .modeButton:hover:not(.modeButtonActive) {
-  color: rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* ── Category chips ────────────────────────── */
@@ -65,9 +76,9 @@
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
-  padding-bottom: 4px;
+  padding-bottom: 8px;
   -ms-overflow-style: none;
   scrollbar-width: none;
   justify-content: center;
@@ -77,27 +88,25 @@
 
 .chip {
   flex: 0 0 auto;
-  padding: 6px 18px;
+  padding: 4px 12px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.82rem;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
   white-space: nowrap;
   cursor: pointer;
-  transition: all 0.18s ease;
-  letter-spacing: 0.02em;
+  transition: color 0.2s ease;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-weight: 500;
 }
 
 .chipActive {
-  background: rgba(168, 98, 210, 0.2);
-  border-color: rgba(168, 98, 210, 0.5);
-  color: rgba(200, 150, 240, 0.95);
-  font-weight: 600;
+  color: white;
+  font-weight: 700;
 }
 
 .chip:hover:not(.chipActive) {
-  border-color: rgba(255, 255, 255, 0.25);
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -105,103 +114,112 @@
 .filterToggleBar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
+  justify-content: space-between;
+  padding: 0 10px;
 }
 
 .toggleFiltersBtn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   transition: color 0.2s;
+  padding: 0;
 }
 
-.toggleFiltersBtn:hover { color: rgba(255, 255, 255, 0.7); }
+.toggleFiltersBtn:hover { color: white; }
 
-.icon { font-size: 0.75em; }
+.icon { font-size: 0.7em; }
 
 .quickApplyBtn {
-  background: rgba(168, 98, 210, 0.2);
-  color: rgba(200, 150, 240, 0.9);
-  border: 1px solid rgba(168, 98, 210, 0.3);
-  padding: 5px 16px;
-  border-radius: 16px;
-  font-size: 0.82rem;
+  background: transparent;
+  color: var(--primary-color, #a862d2);
+  border: 1px solid var(--primary-color, #a862d2);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
   font-weight: 600;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .quickApplyBtn:hover {
-  background: rgba(168, 98, 210, 0.35);
+  background: rgba(168, 98, 210, 0.1);
 }
 
 /* ── Filters section ───────────────────────── */
 .filtersSection {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 14px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  padding: 16px 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
   animation: slideDown 0.2s ease-out;
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 .filtersGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Più compatto per mobile */
+  gap: 16px 12px;
 }
 
 .filterGroup {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .filterLabel {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
 }
 
 .filterSelect,
 .yearInput,
-.keywordsInput,
 .ratingInput {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 8px 10px;
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 4px 0;
+  border-radius: 0;
   color: white;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   width: 100%;
   transition: border-color 0.2s;
 }
 
 .filterSelect:focus,
 .yearInput:focus,
-.keywordsInput:focus,
 .ratingInput:focus {
   outline: none;
-  border-color: rgba(168, 98, 210, 0.5);
+  border-bottom-color: var(--primary-color, #a862d2);
+}
+
+/* Nascondere la freccina standard nei select minimali */
+.filterSelect {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
 }
 
 .ratingInput {
-  width: 80px;
-  text-align: center;
+  text-align: left;
 }
 
 .yearInputs {
@@ -210,64 +228,66 @@
   align-items: center;
 }
 
-.yearSeparator { color: rgba(255, 255, 255, 0.2); }
+.yearInput {
+  width: 100%;
+}
+
+.yearSeparator { color: rgba(255, 255, 255, 0.3); font-size: 0.8rem; }
 
 .filterActions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 14px;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .applyBtn {
-  background: rgba(168, 98, 210, 0.25);
-  color: rgba(200, 150, 240, 0.95);
-  border: 1px solid rgba(168, 98, 210, 0.35);
-  padding: 7px 22px;
-  border-radius: 8px;
+  background: var(--primary-color, #a862d2);
+  color: white;
+  border: none;
+  padding: 6px 20px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.88rem;
-  transition: all 0.2s;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
 }
 
-.applyBtn:hover { background: rgba(168, 98, 210, 0.4); }
+.applyBtn:hover { opacity: 0.9; }
 
 .resetBtn {
   background: transparent;
-  color: rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 7px 16px;
-  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  border: none;
+  padding: 6px 16px;
   cursor: pointer;
-  font-size: 0.88rem;
-  transition: all 0.2s;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .resetBtn:hover {
-  color: rgba(255, 255, 255, 0.7);
-  border-color: rgba(255, 255, 255, 0.25);
+  color: white;
 }
 
 /* ── Loading / no results ──────────────────── */
 .loading,
 .noResults {
   text-align: center;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.4);
   padding: 40px 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-/* ── Results grid (MovieCards — UNCHANGED) ─── */
-
+/* ── Results grid (MovieCards) ─────────────── */
 .resultsGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* 6 elementi per riga su PC */
-  gap: 15px; /* Spazio standard */
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
   justify-items: stretch;
-  align-items: stretch; /* Obbliga le colonne alla medesima altezza */
+  align-items: stretch;
   width: 100%;
 }
 
@@ -282,7 +302,7 @@
 .personList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   max-width: 600px;
   margin: 0 auto;
   width: 100%;
@@ -292,28 +312,25 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
+  padding: 8px 12px;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .personRow:hover {
-  background: rgba(168, 98, 210, 0.1);
-  border-color: rgba(168, 98, 210, 0.4);
-  transform: translateX(3px);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .personRowImg {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   object-position: top;
   flex-shrink: 0;
-  border: 1px solid rgba(168, 98, 210, 0.3);
+  background: rgba(255,255,255,0.05);
 }
 
 .personRowInfo {
@@ -324,16 +341,16 @@
 }
 
 .personRowName {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .personRowRole {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.4);
   white-space: nowrap;
   overflow: hidden;
@@ -343,55 +360,65 @@
 /* ── Load more ─────────────────────────────── */
 .loadMoreSection {
   text-align: center;
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
 .loadMoreBtn {
   background: transparent;
-  border: 1px solid rgba(168, 98, 210, 0.35);
-  color: rgba(200, 150, 240, 0.75);
-  padding: 9px 28px;
-  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 8px 32px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
   transition: all 0.2s;
 }
 
 .loadMoreBtn:hover {
-  background: rgba(168, 98, 210, 0.15);
-  color: rgba(200, 150, 240, 1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
 }
 
 /* ── Responsive ────────────────────────────── */
 @media (max-width: 768px) {
-  .pageContainer { padding: 20px 15px; gap: 18px; }
+  .pageContainer { padding: 10px 15px; gap: 16px; }
+  
   .heroSection { 
-    padding: 24px 15px 20px; 
-    border-radius: 14px; 
-    background: rgba(255, 255, 255, 0.08); /* Sfondo sbiadito e schiarito meno cupo per mobile */
+    padding: 10px 0 16px; 
+    border-bottom: none; /* Rimuove la linea su mobile per risparmiare spazio */
+  }
+
+  .filterToggleBar {
+      padding: 0;
+  }
+
+  .chipsContainer { 
+      justify-content: flex-start; 
+      padding-bottom: 0;
+  }
+
+  .filtersGrid {
+      grid-template-columns: repeat(2, 1fr); /* 2 colonne strette su mobile per evitare scroll */
+      gap: 12px;
   }
 
   .resultsGrid {
-    grid-template-columns: repeat(3, 120px) !important;
-    gap: 10px !important;
-    justify-content: center !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    justify-content: center;
   }
 
   .resultsGrid > a {
-    width: 120px !important;
-    height: auto !important;
-    min-width: 0 !important;
+    width: 100%;
+    height: auto;
   }
-
-  .chipsContainer { justify-content: flex-start; }
 }
 
 @media (max-width: 480px) {
   .resultsGrid {
-    grid-template-columns: repeat(3, 100px) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* 4 colonne compatte su mobile */
+    gap: 6px !important;
   }
-
-  .resultsGrid > a { width: 100px !important; }
 }

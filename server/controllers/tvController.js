@@ -35,7 +35,9 @@ exports.discoverTv = async (req, res) => {
       release_date_gte,
       release_date_lte,
       vote_average_gte,
+      vote_count_gte, // [NUOVO] Estrarre limite minimo voti
       with_original_language,
+      with_keywords, // [NUOVO] Estrarre le keywords passate
       sort_by,
       page = 1,
     } = req.query;
@@ -57,10 +59,13 @@ exports.discoverTv = async (req, res) => {
     if (release_date_gte) params["first_air_date.gte"] = release_date_gte;
     if (release_date_lte) params["first_air_date.lte"] = release_date_lte;
     if (vote_average_gte) params["vote_average.gte"] = vote_average_gte;
+    if (vote_count_gte) params["vote_count.gte"] = vote_count_gte; // [NUOVO] Aggiungi parametro
     if (with_original_language) params.with_original_language = with_original_language;
+    if (with_keywords) params.with_keywords = with_keywords; // [NUOVO] Aggiungere ai parametri
 
     let fetchUrl = `${BASE_URL}${endpoint}`;
-    if (genre || release_date_gte || release_date_lte || vote_average_gte || with_original_language || sort_by) {
+    if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || (sort_by && sort_by !== "popularity.desc")) {
+        // [MODIFICA] Se c'è un qualsiasi filtro, forza l'uso di discover/tv
         fetchUrl = `${BASE_URL}/discover/tv`;
     }
 

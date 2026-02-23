@@ -26,6 +26,7 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
 
   const isTv = movie.media_type === "tv";
   const linkPath = isTv ? `/tv/${movieId}` : `/movie/${movieId}`;
+  const rating = movie.vote_average ? movie.vote_average.toFixed(1) : null;
 
   return (
     // L'intera card rimane un link
@@ -42,6 +43,11 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
           alt={`Locandina di ${movieTitle}`}
           data-movie-img
         />
+        {rating && parseFloat(rating) > 0 && (
+          <div className={styles.ratingBadge}>
+            <span style={{color: '#ffd700'}}>★</span> {rating}
+          </div>
+        )}
         <div className={styles.title} data-movie-title>{movieTitle}</div>
       </div>
     </Link>

@@ -40,6 +40,20 @@ exports.getMovieSuggestions = async (req, res) => {
   }
 };
 
+exports.searchKeywords = async (req, res) => {
+  const searchQuery = req.query.query;
+  if (!searchQuery) {
+    return res.status(400).json({ message: "Per favore, fornisci una parola chiave per la ricerca." });
+  }
+  try {
+    const url = `${BASE_URL}/search/keyword?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`;
+    const response = await axios.get(url);
+    res.json(response.data);
+  } catch (error) {
+    console.error("Errore ricerca keywords:", error.message);
+    res.status(500).json({ message: "Errore durante la comunicazione con il servizio esterno (Keywords)." });
+  }
+};
 exports.searchMovies = async (req, res) => {
   const searchQuery = req.query.query;
   if (!searchQuery) {
@@ -84,7 +98,9 @@ exports.discoverMovies = async (req, res) => {
       release_date_gte,
       release_date_lte,
       vote_average_gte,
+      vote_count_gte, // [NUOVO] Estrarre limite minimo voti
       with_original_language,
+      with_keywords, // [NUOVO] Estrarre le keywords passate
       sort_by,
       page = 1,
     } = req.query;
@@ -106,10 +122,13 @@ exports.discoverMovies = async (req, res) => {
     if (release_date_gte) params["primary_release_date.gte"] = release_date_gte;
     if (release_date_lte) params["primary_release_date.lte"] = release_date_lte;
     if (vote_average_gte) params["vote_average.gte"] = vote_average_gte;
+    if (vote_count_gte) params["vote_count.gte"] = vote_count_gte; // [NUOVO] Aggiungi parametro
     if (with_original_language) params.with_original_language = with_original_language;
+    if (with_keywords) params.with_keywords = with_keywords; // [NUOVO] Aggiungere ai parametri
 
     let fetchUrl = `${BASE_URL}${endpoint}`;
-    if (genre || release_date_gte || release_date_lte || vote_average_gte || with_original_language || sort_by) {
+    if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || (sort_by && sort_by !== "popularity.desc")) {
+        // [MODIFICA] Se c'è un qualsiasi filtro, forza l'uso di discover/movie
         fetchUrl = `${BASE_URL}/discover/movie`;
     }
 

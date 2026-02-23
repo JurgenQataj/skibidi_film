@@ -66,6 +66,24 @@
 
 /* ... Aggiungi questo codice alla fine del file ... */
 
+.ratingBadge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  color: white;
+  font-size: 0.65rem; /* Ridotto del ~10% */
+  font-weight: 700;
+  padding: 3px 5px; /* Padding leggermente ridotto per proporzione */
+  border-radius: 6px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
 /* Stile per il pulsante di eliminazione sulla card */
 .deleteButton {
   position: absolute;
@@ -115,11 +133,20 @@
     font-size: 0.6rem;
     height: 24px;
   }
+
+  .ratingBadge {
+    font-size: 0.55rem;
+    padding: 2px 4px;
+  }
 }
 
 @media (max-width: 395px) {
   .title {
     font-size: 0.55rem;
     height: 20px;
+  }
+
+  .ratingBadge {
+    font-size: 0.5rem;
   }
 }
