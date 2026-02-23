@@ -1,8 +1,23 @@
 const Review = require("../models/Review");
 const Movie = require("../models/Movie");
 const User = require("../models/User");
+const Notification = require("../models/Notification");
 const userController = require("./userController");
 const axios = require("axios");
+
+// Estrae @username dal testo e restituisce gli ID utenti trovati
+async function extractMentions(text) {
+  if (!text) return [];
+  const mentionRegex = /@(\w+)/g;
+  const usernames = [];
+  let match;
+  while ((match = mentionRegex.exec(text)) !== null) {
+    usernames.push(match[1]);
+  }
+  if (usernames.length === 0) return [];
+  const users = await User.find({ username: { $in: usernames } }).select("_id");
+  return users.map((u) => u._id);
+}
 
 // Aggiungere una recensione
 exports.addReview = async (req, res) => {
@@ -127,6 +142,24 @@ exports.addReview = async (req, res) => {
       is_spoiler,
     });
     await newReview.save();
+
+    try {
+      if (comment_text) {
+        const mentionedIds = await extractMentions(comment_text);
+        const validMentions = mentionedIds.filter(id => id.toString() !== userId);
+        for (const mentionId of validMentions) {
+          const mentionNotif = new Notification({
+            recipient: mentionId,
+            sender: userId,
+            type: "review_mention",
+            targetReview: newReview._id,
+          });
+          await mentionNotif.save();
+        }
+      }
+    } catch (mentionNotifError) {
+      console.log("⚠️ Errore notifica menzione recensione:", mentionNotifError.message);
+    }
 
     // Rimuovi dalla watchlist se presente
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });

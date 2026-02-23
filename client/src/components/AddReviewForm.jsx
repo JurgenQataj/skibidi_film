@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import styles from "./AddReviewForm.module.css";
 
@@ -6,6 +6,58 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
   const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
+  const [mentionSearch, setMentionSearch] = useState("");
+  const [mentionUsers, setMentionUsers] = useState([]);
+  const [showMentionDropdown, setShowMentionDropdown] = useState(false);
+  const [mentionPosition, setMentionPosition] = useState(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (!mentionSearch) {
+      setMentionUsers([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || "";
+        const res = await axios.get(
+          `${API_URL}/api/users/search?q=${mentionSearch}&limit=5`
+        );
+        setMentionUsers(res.data || []);
+      } catch {
+        setMentionUsers([]);
+      }
+    }, 200);
+    return () => clearTimeout(t);
+  }, [mentionSearch]);
+
+  const handleCommentChange = (e) => {
+    const value = e.target.value;
+    setComment(value);
+    const cursor = e.target.selectionStart;
+    const upToCursor = value.slice(0, cursor);
+    const atMatch = upToCursor.match(/@(\w*)$/);
+    if (atMatch) {
+      setMentionSearch(atMatch[1]);
+      setMentionPosition(upToCursor.lastIndexOf("@"));
+      setShowMentionDropdown(true);
+    } else {
+      setShowMentionDropdown(false);
+      setMentionSearch("");
+      setMentionPosition(null);
+    }
+  };
+
+  const handleSelectMention = (username) => {
+    if (mentionPosition === null) return;
+    const before = comment.slice(0, mentionPosition);
+    const after = comment.slice(mentionPosition + mentionSearch.length + 1);
+    setComment(`${before}@${username} ${after}`);
+    setShowMentionDropdown(false);
+    setMentionSearch("");
+    setMentionPosition(null);
+    inputRef.current?.focus();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,11 +108,37 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
           className={styles.ratingInput}
         />
       </div>
-      <div className={styles.inputGroup}>
-        <label>Commento (opzionale)</label>
+      <div className={styles.inputGroup} style={{ position: "relative" }}>
+        <label>Commento (opzionale) Usa @ per taggare</label>
+        {showMentionDropdown && mentionUsers.length > 0 && (
+          <div className={styles.mentionDropdown}>
+            {mentionUsers.map((u) => (
+              <button
+                key={u._id}
+                type="button"
+                className={styles.mentionOption}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSelectMention(u.username);
+                }}
+              >
+                <img
+                  src={
+                    u.avatar_url ||
+                    "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
+                  }
+                  alt={u.username}
+                  className={styles.mentionAvatar}
+                />
+                <span>@{u.username}</span>
+              </button>
+            ))}
+          </div>
+        )}
         <textarea
+          ref={inputRef}
           value={comment}
-          onChange={(e) => setComment(e.target.value)}
+          onChange={handleCommentChange}
           className={styles.commentTextarea}
           rows="4"
         />

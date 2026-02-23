@@ -100,11 +100,15 @@ function PersonPage() {
     return filtered;
   };
 
-  const directedMovies = data ? filterMovies(data.directed) : [];
-  const actedMovies = data ? filterMovies(data.acted) : [];
+  const directedMovies = data?.directed ? filterMovies(data.directed) : [];
+  const actedMovies = data?.acted ? filterMovies(data.acted) : [];
+  const directedTvMovies = data?.directedTv ? filterMovies(data.directedTv) : [];
+  const actedTvMovies = data?.actedTv ? filterMovies(data.actedTv) : [];
 
   const hasDirected = directedMovies.length > 0;
   const hasActed = actedMovies.length > 0;
+  const hasDirectedTv = directedTvMovies.length > 0;
+  const hasActedTv = actedTvMovies.length > 0;
 
   return (
     <div className={styles.container}>
@@ -128,7 +132,7 @@ function PersonPage() {
               <p className={styles.biographyText}>{data.biography}</p>
             </div>
           ) : (
-            <p className={styles.biographyText}>Nessuna biografia disponibile in italiano su TMDB.</p>
+            <p className={styles.biographyText}>Nessuna biografia disponibile su TMDB.</p>
           )}
         </div>
       </div>
@@ -139,22 +143,8 @@ function PersonPage() {
         {/* SORT BUTTON */}
         <button
            onClick={() => setSortBy(sortBy === "date" ? "revenue" : "date")}
-           style={{
-            background: sortBy === "revenue" ? "linear-gradient(135deg, #FFD700, #FFA500)" : "#333", // Gold for revenue
-            color: "white",
-            padding: "12px 24px",
-            border: "none",
-            borderRadius: "50px",
-            cursor: "pointer",
-            fontWeight: "bold",
-            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
-            transition: "all 0.3s ease",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            fontSize: "1rem"
-          }}
-          title="Cambia ordinamento"
+           className={styles.sortButton}
+           title="Cambia ordinamento"
         >
           {sortBy === "revenue" ? "💰 Top Box Office" : "📅 Ordina per Data"}
         </button>
@@ -163,7 +153,7 @@ function PersonPage() {
           onClick={() => setShowFilterDropdown(!showFilterDropdown)}
           className={styles.filterButton}
         >
-          Nascondi film useless {showFilterDropdown ? "▲" : "▼"}
+          ⚙️ Nascondi film {showFilterDropdown ? "▲" : "▼"}
         </button>
 
         {showFilterDropdown && (
@@ -224,8 +214,8 @@ function PersonPage() {
         )}
       </div>
       
-      {!hasDirected && !hasActed && (
-        <p className={styles.emptyMsg}>Nessun film trovato nel database per questa persona.</p>
+      {!hasDirected && !hasActed && !hasDirectedTv && !hasActedTv && (
+        <p className={styles.emptyMsg}>Nessun contenuto trovato nel database per questa persona.</p>
       )}
 
       {hasDirected && (
@@ -245,6 +235,28 @@ function PersonPage() {
           <div className={styles.grid}>
             {actedMovies.map(movie => (
               <MovieCard key={movie._id} movie={movie} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {hasDirectedTv && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Regia Serie TV ({directedTvMovies.length})</h2>
+          <div className={styles.grid}>
+            {directedTvMovies.map(show => (
+              <MovieCard key={`tv-dir-${show._id}`} movie={show} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {hasActedTv && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Serie TV ({actedTvMovies.length})</h2>
+          <div className={styles.grid}>
+            {actedTvMovies.map(show => (
+              <MovieCard key={`tv-act-${show._id}`} movie={show} />
             ))}
           </div>
         </section>

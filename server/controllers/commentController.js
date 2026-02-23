@@ -1,6 +1,21 @@
 // ==================== STEP 1: Sostituisci commentController.js con versione DEBUG ====================
 const Review = require("../models/Review");
 const Notification = require("../models/Notification");
+const User = require("../models/User");
+
+// Estrae @username dal testo e restituisce gli ID utenti trovati
+async function extractMentions(text) {
+  if (!text) return [];
+  const mentionRegex = /@(\w+)/g;
+  const usernames = [];
+  let match;
+  while ((match = mentionRegex.exec(text)) !== null) {
+    usernames.push(match[1]);
+  }
+  if (usernames.length === 0) return [];
+  const users = await User.find({ username: { $in: usernames } }).select("_id");
+  return users.map((u) => u._id);
+}
 
 exports.addComment = async (req, res) => {
   console.log("🐛 === DEBUG addComment START ===");
@@ -101,6 +116,22 @@ exports.addComment = async (req, res) => {
       } catch (notifError) {
         console.log("⚠️ Errore notifica creatore (non critico):", notifError.message);
       }
+    }
+
+    try {
+      const mentionedIds = await extractMentions(comment_text);
+      const validMentions = mentionedIds.filter(id => id.toString() !== userId);
+      for (const mentionId of validMentions) {
+        const mentionNotif = new Notification({
+          recipient: mentionId,
+          sender: userId,
+          type: "comment_mention",
+          targetReview: review._id,
+        });
+        await mentionNotif.save();
+      }
+    } catch (mentionNotifError) {
+      console.log("⚠️ Errore notifica menzione (non critico):", mentionNotifError.message);
     }
 
     // Notifica a TUTTI gli altri utenti che hanno commentato (Thread)

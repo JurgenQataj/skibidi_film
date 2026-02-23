@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./ReviewCard.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import { jwtDecode } from "jwt-decode";
+
+function renderText(text) {
+  if (!text) return null;
+  return text.split(/(@\w+)/g).map((part, i) =>
+    part.startsWith('@')
+      ? <span key={i} className={styles.mentionTag}>{part}</span>
+      : part
+  );
+}
 
 function ReviewCard({ review, onInteraction }) {
   if (!review || !review.movie || !review.user || !review.movie.tmdb_id) {
@@ -16,6 +25,12 @@ function ReviewCard({ review, onInteraction }) {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isDeletingComment, setIsDeletingComment] = useState(null);
 
+  const [mentionSearch, setMentionSearch] = useState("");
+  const [mentionUsers, setMentionUsers] = useState([]);
+  const [showMentionDropdown, setShowMentionDropdown] = useState(false);
+  const [mentionPosition, setMentionPosition] = useState(null);
+  const inputRef = useRef(null);
+
   const token = localStorage.getItem("token");
   const loggedInUserId = token ? jwtDecode(token).user.id : null;
 
@@ -23,6 +38,52 @@ function ReviewCard({ review, onInteraction }) {
   const placeholderPoster =
     "https://via.placeholder.com/200x300.png?text=No+Image";
   const API_URL = import.meta.env.VITE_API_URL || "";
+
+  useEffect(() => {
+    if (!mentionSearch) {
+      setMentionUsers([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const res = await axios.get(
+          `${API_URL}/api/users/search?q=${mentionSearch}&limit=5`
+        );
+        setMentionUsers(res.data || []);
+      } catch {
+        setMentionUsers([]);
+      }
+    }, 200);
+    return () => clearTimeout(t);
+  }, [mentionSearch, API_URL]);
+
+  const handleCommentChange = (e) => {
+    const value = e.target.value;
+    setCommentText(value);
+    const cursor = e.target.selectionStart;
+    const upToCursor = value.slice(0, cursor);
+    const atMatch = upToCursor.match(/@(\w*)$/);
+    if (atMatch) {
+      setMentionSearch(atMatch[1]);
+      setMentionPosition(upToCursor.lastIndexOf("@"));
+      setShowMentionDropdown(true);
+    } else {
+      setShowMentionDropdown(false);
+      setMentionSearch("");
+      setMentionPosition(null);
+    }
+  };
+
+  const handleSelectMention = (username) => {
+    if (mentionPosition === null) return;
+    const before = commentText.slice(0, mentionPosition);
+    const after = commentText.slice(mentionPosition + mentionSearch.length + 1);
+    setCommentText(`${before}@${username} ${after}`);
+    setShowMentionDropdown(false);
+    setMentionSearch("");
+    setMentionPosition(null);
+    inputRef.current?.focus();
+  };
 
   const handleReaction = async (reactionType) => {
     if (!token) return;
@@ -160,7 +221,7 @@ function ReviewCard({ review, onInteraction }) {
         <div className={styles.rating}>
           Voto: <span className={styles.ratingValue}>{rating}</span>
         </div>
-        {comment_text && <p className={styles.comment}>"{comment_text}"</p>}
+        {comment_text && <p className={styles.comment}>{renderText(comment_text)}</p>}
         {/* Nuova riga combinata Footer */}
         <div className={styles.footerRow}>
           <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
@@ -203,7 +264,7 @@ function ReviewCard({ review, onInteraction }) {
                       >
                         <strong>{comment.user.username}:</strong>
                       </Link>
-                      <span> {comment.comment_text}</span>
+                      <span> {renderText(comment.comment_text)}</span>
                     </div>
                     {loggedInUserId === comment.user._id && (
                       <button
@@ -221,22 +282,50 @@ function ReviewCard({ review, onInteraction }) {
             )}
 
             {token && (
-              <form onSubmit={handleAddComment} className={styles.commentForm}>
-                <input
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Rispondi..."
-                  disabled={isSubmittingComment}
-                  maxLength={500}
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmittingComment || !commentText.trim()}
-                >
-                  {isSubmittingComment ? "..." : "Invia"}
-                </button>
-              </form>
+              <div style={{ position: "relative" }}>
+                {showMentionDropdown && mentionUsers.length > 0 && (
+                  <div className={styles.mentionDropdown}>
+                    {mentionUsers.map((u) => (
+                      <button
+                        key={u._id}
+                        type="button"
+                        className={styles.mentionOption}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSelectMention(u.username);
+                        }}
+                      >
+                        <img
+                          src={
+                            u.avatar_url ||
+                            "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
+                          }
+                          alt={u.username}
+                          className={styles.mentionAvatar}
+                        />
+                        <span>@{u.username}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <form onSubmit={handleAddComment} className={styles.commentForm}>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={commentText}
+                    onChange={handleCommentChange}
+                    placeholder="Rispondi... usa @ per taggare"
+                    disabled={isSubmittingComment}
+                    maxLength={500}
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmittingComment || !commentText.trim()}
+                  >
+                    {isSubmittingComment ? "..." : "Invia"}
+                  </button>
+                </form>
+              </div>
             )}
           </div>
         )}

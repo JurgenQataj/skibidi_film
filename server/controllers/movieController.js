@@ -283,18 +283,29 @@ exports.getMoviesByPerson = async (req, res) => {
     // Usiamo discover per trovare ESATTAMENTE i film under 40 min di questa persona
     // E anche per trovare l'ordine di incasso (Revenue) per Cast e Crew
     // [NUOVO] Fetch person details per biografia e profile path
-    const [creditsResponse, shortsResponse, revenueCastResponse, revenueCrewResponse, personDetailsResponse] = await Promise.all([
+    const [creditsResponse, shortsResponse, revenueCastResponse, revenueCrewResponse, personDetailsIt, tvCreditsResponse] = await Promise.all([
       axios.get(`${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=it-IT`),
       axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40`),
       axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_cast=${personId}&sort_by=revenue.desc&page=1`),
       axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_crew=${personId}&sort_by=revenue.desc&page=1`),
-      axios.get(`${BASE_URL}/person/${personId}?api_key=${API_KEY}&language=it-IT`) // <-- Dettagli persona
+      axios.get(`${BASE_URL}/person/${personId}?api_key=${API_KEY}&language=it-IT`), // <-- Dettagli persona (IT)
+      axios.get(`${BASE_URL}/person/${personId}/tv_credits?api_key=${API_KEY}&language=it-IT`) // <-- TV Credits
     ]);
 
     const cast = creditsResponse.data.cast || [];
     const crew = creditsResponse.data.crew || [];
-    const biography = personDetailsResponse.data.biography || "";
-    const profilePath = personDetailsResponse.data.profile_path || null;
+    let biography = personDetailsIt.data.biography || "";
+    const profilePath = personDetailsIt.data.profile_path || null;
+    
+    // [NUOVO] Fallback inglese se la biografia in italiano è vuota
+    if (!biography) {
+      try {
+        const personDetailsEn = await axios.get(`${BASE_URL}/person/${personId}?api_key=${API_KEY}&language=en-US`);
+        biography = personDetailsEn.data.biography || "";
+      } catch (err) {
+        console.error("Errore recupero biografia inglese:", err.message);
+      }
+    }
     
     // Create a Set of IDs for short films for fast lookup
     const shortMovieIds = new Set(shortsResponse.data.results.map(m => m.id));
@@ -308,20 +319,21 @@ exports.getMoviesByPerson = async (req, res) => {
     const castRevenueMap = getRevenueRankMap(revenueCastResponse.data.results);
     const crewRevenueMap = getRevenueRankMap(revenueCrewResponse.data.results);
 
-    // Formatter
-    const formatMovie = (m, rankMap) => ({
+    // Formatter per Film (e TV)
+    const formatMovie = (m, rankMap, isTv = false) => ({
       _id: m.id, 
       tmdb_id: m.id,
-      title: m.title,
+      title: isTv ? m.name : m.title, // [MODIFIED] Le serie TV usano "name"
       poster_path: m.poster_path,
-      release_date: m.release_date,
+      release_date: isTv ? m.first_air_date : m.release_date, // [MODIFIED] Serie TV usano "first_air_date"
       vote_average: m.vote_average,
       vote_count: m.vote_count,
       genre_ids: m.genre_ids,
-      is_short: shortMovieIds.has(m.id), // [NUOVO] Preciso al 100% grazie a discover
-      character: m.character, // [NUOVO] Per controllo 'uncredited'
-      job: m.job, // [NUOVO] Per controllo 'uncredited' o ruoli specifici
-      revenue_rank: rankMap ? (rankMap.get(m.id) || 10000) : 10000 // Rank incassi
+      is_short: isTv ? false : shortMovieIds.has(m.id), // No short filter for TV
+      character: m.character, 
+      job: m.job, 
+      revenue_rank: rankMap ? (rankMap.get(m.id) || 10000) : 10000,
+      media_type: isTv ? 'tv' : 'movie' // [ADDED] Per il routing sul frontend
     });
 
     // 3. Filtra Attore
@@ -334,11 +346,38 @@ exports.getMoviesByPerson = async (req, res) => {
         return dateB - dateA;
       });
 
-    // 4. Filtra Regista
+    // 4. Filtra Regista (Film)
     const directed = crew
       .filter(m => m.job === "Director")
       .filter(m => m.poster_path)
       .map(m => formatMovie(m, crewRevenueMap))
+      .sort((a, b) => {
+        const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
+        const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
+        return dateB - dateA;
+      });
+
+    // --- TV SHOWS ---
+    const tvCast = tvCreditsResponse.data.cast || [];
+    const tvCrew = tvCreditsResponse.data.crew || [];
+
+    // 5. Filtra Attore (Serie TV)
+    const actedTv = tvCast
+      .filter(m => m.poster_path)
+      .map(m => formatMovie(m, null, true)) // isTv = true
+      .sort((a, b) => {
+        const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
+        const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
+        return dateB - dateA;
+      });
+
+    // 6. Filtra Regista (Serie TV) / Creatore
+    // NB: Nelle serie TV la regia è per episodio. TMDB a volte passa job=Director o job=Creator.
+    const directedTv = tvCrew
+      .filter(m => m.job === "Director" || m.job === "Creator" || m.job === "Executive Producer" || m.job === "Series Director")
+      .filter(m => m.poster_path)
+      .map(m => formatMovie(m, null, true))
+      .filter((v, i, a) => a.findIndex(t => (t.tmdb_id === v.tmdb_id)) === i) // Rimuovi duplicati (stessa serie, più ruoli)
       .sort((a, b) => {
         const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
         const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
@@ -350,7 +389,9 @@ exports.getMoviesByPerson = async (req, res) => {
       biography,
       profile_path: profilePath,
       directed,
-      acted
+      acted,
+      directedTv, // [NUOVO]
+      actedTv     // [NUOVO]
     });
 
   } catch (error) {

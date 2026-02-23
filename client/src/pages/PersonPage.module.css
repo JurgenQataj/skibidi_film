@@ -77,41 +77,51 @@
 /* GRIGLIA RESPONSIVE */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* ESATTO: 4 colonne su PC */
   gap: 1.5rem;
 }
 
-/* BUTTON STYLES */
-.filterButton {
-  background: rgba(20, 20, 20, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 0, 204, 0.3);
+/* BUTTON STYLES (Modernized) */
+.filterButton, .sortButton {
+  background: rgba(30, 30, 40, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: white;
-  padding: 12px 24px;
-  border-radius: 50px;
+  padding: 10px 20px;
+  border-radius: 12px; /* Sleeker, less pill-shaped */
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
   letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.2s ease-in-out;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.filterButton:hover {
-  background: rgba(255, 0, 204, 0.1);
-  border-color: rgba(255, 0, 204, 0.8);
-  box-shadow: 0 0 20px rgba(255, 0, 204, 0.4);
+.sortButton {
+  /* Minor distinct hue for sort button */
+  background: rgba(45, 30, 50, 0.7);
+  border-color: rgba(168, 98, 210, 0.4);
+}
+
+.filterButton:hover, .sortButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  text-shadow: 0 0 8px rgba(255, 0, 204, 0.6);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-.filterButton:active {
+.sortButton:hover {
+  border-color: rgba(168, 98, 210, 0.8);
+  box-shadow: 0 6px 16px rgba(168, 98, 210, 0.3);
+}
+
+.filterButton:active, .sortButton:active {
   transform: translateY(0);
-  box-shadow: 0 0 10px rgba(255, 0, 204, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .loading, .error, .emptyMsg {
@@ -169,17 +179,17 @@
   }
 
   .grid {
-    /* Tablet / Mobile largo */
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 15px;
+    /* Tablet / Mobile largo: 4 colonne */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .grid {
-    /* Mobile: imposta minmax a 105px per permettere 3 colonne (3x105=315 < 360px) */
-    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); 
-    gap: 10px;
+    /* Mobile piccolo: 4 colonne, gap ancora più piccolo per farceli stare bene */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 8px;
   }
 
   .pageTitle {

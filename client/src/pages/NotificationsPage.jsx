@@ -36,6 +36,8 @@ function NotificationsPage() {
         return `/profile/${notification.sender._id}`;
       case "new_reaction":
       case "new_comment":
+      case "review_mention":
+      case "comment_mention":
         // CONTROLLO DI SICUREZZA ANCORA PIÙ SPECIFICO
         if (
           notification.targetReview &&
@@ -76,6 +78,20 @@ function NotificationsPage() {
           <>
             <strong>{notification.sender.username}</strong> ha commentato la tua
             recensione.
+          </>
+        );
+      case "review_mention":
+        return (
+          <>
+            <strong>{notification.sender.username}</strong> ti ha menzionato in una
+            recensione.
+          </>
+        );
+      case "comment_mention":
+        return (
+          <>
+            <strong>{notification.sender.username}</strong> ti ha menzionato in un
+            commento.
           </>
         );
       case "chat_mention":
