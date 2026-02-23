@@ -83,6 +83,8 @@ function Navbar() {
           return `/${notification.targetReview.movie.media_type === "tv" ? "tv" : "movie"}/${notification.targetReview.movie.tmdb_id}`;
         }
         return "/";
+      case "chat_mention":
+        return "/discover";
       default: return "/";
     }
   };
@@ -96,6 +98,8 @@ function Navbar() {
         return <span><strong>{notification.sender.username}</strong> ha messo like alla tua recensione</span>;
       case "new_comment":
         return <span><strong>{notification.sender.username}</strong> ha commentato la tua recensione</span>;
+      case "chat_mention":
+        return <span><strong>{notification.sender.username}</strong> ti ha menzionato nella chat globale</span>;
       default:
         return <span>Nuova notifica da {notification.sender.username}</span>;
     }

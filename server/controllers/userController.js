@@ -556,6 +556,23 @@ exports.getNewestUsers = async (req, res) => {
   }
 };
 
+// --- RICERCA UTENTI (per @mention autocomplete) ---
+exports.searchUsers = async (req, res) => {
+  try {
+    const q = req.query.q || '';
+    const limit = parseInt(req.query.limit) || 5;
+    if (!q.trim()) return res.json([]);
+    const users = await User.find({
+      username: { $regex: `^${q.trim()}`, $options: 'i' },
+    })
+      .select('_id username avatar_url')
+      .limit(limit);
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Errore server' });
+  }
+};
+
 // --- COLLEZIONI PARZIALI INTELLIGENTI (Ora legge dal DB Cache) ---
 exports.getPartialCollections = async (req, res) => {
   const User = require('../models/User');

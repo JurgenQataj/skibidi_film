@@ -15,6 +15,8 @@ router.get("/my-partial-collections", protect, userController.getPartialCollecti
 router.post("/sync-my-sagas", protect, userController.manualSyncSagas);
 router.get("/most-followed", userController.getMostFollowedUsers);
 router.get("/newest", userController.getNewestUsers);
+router.get("/search", userController.searchUsers); // Per @mention autocomplete
+
 
 // --- Content ---
 router.get("/feed", protect, userController.getUserFeed); 

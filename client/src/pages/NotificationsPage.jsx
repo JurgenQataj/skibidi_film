@@ -45,6 +45,8 @@ function NotificationsPage() {
           return `/${notification.targetReview.movie.media_type === "tv" ? "tv" : "movie"}/${notification.targetReview.movie.tmdb_id}`;
         }
         return "/"; // Link di fallback se i dati sono corrotti
+      case "chat_mention":
+        return "/discover";
       default:
         return "/";
     }
@@ -74,6 +76,13 @@ function NotificationsPage() {
           <>
             <strong>{notification.sender.username}</strong> ha commentato la tua
             recensione.
+          </>
+        );
+      case "chat_mention":
+        return (
+          <>
+            <strong>{notification.sender.username}</strong> ti ha menzionato nella
+            chat globale.
           </>
         );
       default:
