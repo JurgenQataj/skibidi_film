@@ -45,6 +45,7 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [modalData, setModalData] = useState({ isOpen: false, title: "", content: [] });
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isTvHistoryModalOpen, setIsTvHistoryModalOpen] = useState(false);
   const [isListsModalOpen, setIsListsModalOpen] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -215,6 +216,10 @@ function ProfilePage() {
   const isOwnProfile = loggedInUserId === profile._id;
   const recentReviews = reviews.slice(0, 60);
 
+  // Split reviews
+  const movieReviews = reviews.filter(r => r.movie && r.movie.media_type !== "tv");
+  const tvReviews = reviews.filter(r => r.movie && r.movie.media_type === "tv");
+
   return (
     <>
       <Modal
@@ -305,14 +310,14 @@ function ProfilePage() {
       <Modal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
-        title={`Cronologia Completa di ${profile.username}`}
+        title={`Cronologia Film di ${profile.username}`}
       >
         <ol className={styles.historyList}>
-          {reviews.map((review, index) => (
+          {movieReviews.map((review, index) => (
             <li 
               key={review._id} 
               className={styles.historyItem}
-              onClick={() => navigate(`/${review.movie.media_type === "tv" ? "tv" : "movie"}/${review.movie.tmdb_id}`)}
+              onClick={() => navigate(`/movie/${review.movie.tmdb_id}`)}
             >
               <span className={styles.historyNumber}>{index + 1}</span>
               <img
@@ -322,6 +327,33 @@ function ProfilePage() {
               />
               <div className={styles.historyInfo}>
                 <span className={styles.historyTitle}>{review.movie.title}</span>
+              </div>
+              <span className={styles.historyRating}>{review.rating}/10</span>
+            </li>
+          ))}
+        </ol>
+      </Modal>
+
+      <Modal
+        isOpen={isTvHistoryModalOpen}
+        onClose={() => setIsTvHistoryModalOpen(false)}
+        title={`Cronologia Serie TV di ${profile.username}`}
+      >
+        <ol className={styles.historyList}>
+          {tvReviews.map((review, index) => (
+            <li 
+              key={review._id} 
+              className={styles.historyItem}
+              onClick={() => navigate(`/tv/${review.movie.tmdb_id}`)}
+            >
+              <span className={styles.historyNumber}>{index + 1}</span>
+              <img
+                src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
+                alt={`Poster di ${review.movie.title}`}
+                className={styles.historyPoster}
+              />
+              <div className={styles.historyInfo}>
+                <span className={styles.historyTitle}>{review.movie.name || review.movie.title}</span>
               </div>
               <span className={styles.historyRating}>{review.rating}/10</span>
             </li>
@@ -473,10 +505,24 @@ function ProfilePage() {
               <p>Questo utente non ha ancora recensito nessun film.</p>
             )}
           </div>
-          {reviews.length > 60 && (
+          {movieReviews.length > 0 && (
+            <div className={styles.showAllContainer} style={{ marginBottom: "10px" }}>
+              <button 
+                onClick={() => setIsHistoryModalOpen(true)} 
+                className={styles.showAllButton}
+              >
+                Cronologia Film ({movieReviews.length})
+              </button>
+            </div>
+          )}
+          {tvReviews.length > 0 && (
             <div className={styles.showAllContainer}>
-              <button onClick={() => setIsHistoryModalOpen(true)} className={styles.showAllButton}>
-                Mostra Tutta la Cronologia ({reviews.length} film)
+              <button 
+                onClick={() => setIsTvHistoryModalOpen(true)} 
+                className={styles.showAllButton}
+                style={{ background: 'linear-gradient(135deg, #1f253d, #2f3a61)' }}
+              >
+                Cronologia Serie TV ({tvReviews.length})
               </button>
             </div>
           )}
