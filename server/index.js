@@ -7,6 +7,13 @@ connectDB();
 
 const app = express();
 
+// Warn early if TMDB_API_KEY is missing
+if (!process.env.TMDB_API_KEY) {
+  console.error("❌ CRITICAL: TMDB_API_KEY is not set in environment variables! All TMDB API calls will fail.");
+} else {
+  console.log("✅ TMDB_API_KEY is configured.");
+}
+
 // --- CONFIGURAZIONE CORS UNIVERSALE PER SVILUPPO ---
 const corsOptions = {
   origin: function (origin, callback) {
@@ -47,6 +54,30 @@ app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/chat", require("./routes/chatRoutes")); // [NEW] Chat Routes
 
 app.get("/", (req, res) => res.send("Skibidi Film API Running"));
+
+// Health check endpoint to diagnose configuration issues
+app.get("/api/health", async (req, res) => {
+  const axios = require("axios");
+  const tmdbKey = process.env.TMDB_API_KEY;
+  let tmdbStatus = "❌ NOT SET";
+  let tmdbTest = null;
+  if (tmdbKey) {
+    try {
+      const r = await axios.get(`https://api.themoviedb.org/3/movie/550?api_key=${tmdbKey}`);
+      tmdbStatus = `✅ OK (${r.status})`;
+      tmdbTest = r.data.title;
+    } catch(e) {
+      tmdbStatus = `❌ FAILED: ${e.message}`;
+    }
+  }
+  res.json({
+    status: "running",
+    tmdb_api_key: tmdbKey ? "SET" : "MISSING",
+    tmdb_connectivity: tmdbStatus,
+    tmdb_test_movie: tmdbTest,
+    node_env: process.env.NODE_ENV || "not set"
+  });
+});
 
 // --- MODIFICA PER RENDER: Avvia il server e ascolta su una porta ---
 const PORT = process.env.PORT || 5000;
