@@ -61,6 +61,53 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* Container for relative positioning of the arrows */
+.rowWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Navigational buttons */
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.navButton:hover {
+  background-color: var(--primary-color, #ff4081);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.navButton.left {
+  left: -20px;
+}
+
+.navButton.right {
+  right: -20px;
+}
+
+/* Ensure padding doesn't conflict with arrows */
+.scrollContainer {
+  flex: 1;
+}
+
 /* Wrapper con larghezza fissa: impedisce che titoli lunghi allarghino la card */
 .cardWrapper {
   flex: 0 0 120px;
@@ -106,6 +153,10 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .navButton {
+    display: none; /* Disable native buttons on mobile/touch interfaces */
+  }
+
   .trendingRowContainer {
     margin-top: 2px; /* Lieve distacco positivo senza eccesso */
   }

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import styles from "./TrendingRow.module.css";
 import MovieCard from "./MovieCard";
 import { SkeletonMovieCard } from "./Skeleton";
@@ -9,6 +10,18 @@ const TrendingRow = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const scrollRef = useRef(null);
+
+  const handleScroll = (direction) => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollTo =
+        direction === "left"
+          ? scrollLeft - clientWidth + 100
+          : scrollLeft + clientWidth - 100;
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -60,12 +73,30 @@ const TrendingRow = () => {
       ) : error ? (
         <div className={styles.error}>{error}</div>
       ) : (
-        <div className={styles.scrollContainer}>
-          {movies.map((movie) => (
-            <div key={movie.id} className={styles.cardWrapper}>
-              <MovieCard movie={movie} />
-            </div>
-          ))}
+        <div className={styles.rowWrapper}>
+          <button
+            className={`${styles.navButton} ${styles.left}`}
+            onClick={() => handleScroll("left")}
+            aria-label="Scorri a sinistra"
+          >
+            <FaChevronLeft size={24} />
+          </button>
+
+          <div className={styles.scrollContainer} ref={scrollRef}>
+            {movies.map((movie) => (
+              <div key={movie.id} className={styles.cardWrapper}>
+                <MovieCard movie={movie} />
+              </div>
+            ))}
+          </div>
+
+          <button
+            className={`${styles.navButton} ${styles.right}`}
+            onClick={() => handleScroll("right")}
+            aria-label="Scorri a destra"
+          >
+            <FaChevronRight size={24} />
+          </button>
         </div>
       )}
     </div>

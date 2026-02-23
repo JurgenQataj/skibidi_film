@@ -570,6 +570,21 @@
   .statValue { font-size: 1rem; }
   .sectionTitle { font-size: 0.72rem; }
 
+  .actionsRow {
+    margin-left: -88px; /* Offset the 72px avatar + 16px gap to align with left edge */
+    width: calc(100% + 88px); /* Span exactly the full inner container width W-32 */
+    justify-content: center; /* D1 == D2 - absolute screen center */
+    margin-top: 20px; /* Clear the avatar vertically */
+    gap: 12px;
+  }
+
+  .followButton,
+  .editButton {
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    flex-grow: 0; /* Keep the button natural size */
+  }
+
   .badgesGrid {
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 6px;
@@ -640,5 +655,59 @@
     width: 100px !important;
     height: var(--title-height) !important;
     font-size: 0.55rem !important;
+  }
+}
+
+/* ── S23 / iPhone SE (Very Narrow) ──────────── */
+@media (max-width: 395px) {
+  .profileHeader {
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .username {
+    font-size: 1.1rem;
+  }
+
+  .statsContainer {
+    gap: 6px;
+  }
+
+  .statItem,
+  .statItemClickable {
+    padding: 2px 4px;
+  }
+
+  .statValue {
+    font-size: 0.9rem;
+  }
+
+  .statLabel {
+    font-size: 0.65rem;
+  }
+
+  .actionsRow {
+    margin-left: -76px; /* Offset the 64px avatar + 12px gap to align with left edge */
+    width: calc(100% + 76px); /* Span exactly the full inner container width W-32 */
+    justify-content: center; /* D1 == D2 - absolute screen center */
+    margin-top: 15px; /* Clear the avatar vertically */
+    gap: 12px;
+  }
+
+  .followButton,
+  .editButton {
+    padding: 7px 16px;
+    font-size: 0.8rem;
+    flex-grow: 0; /* Important: do NOT stretch the button, keep it natural */
+  }
+
+  .iconBtn {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
   }
 }
