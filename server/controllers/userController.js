@@ -272,8 +272,8 @@ exports.getUserAdvancedStats = async (req, res) => {
     // Otteniamo tutte le recensioni popolate con i dati del film
     const reviews = await Review.find({ user: userId }).populate("movie");
 
-    // Filtra recensioni valide (dove il film esiste ancora)
-    const validReviews = reviews.filter(r => r.movie);
+    // Filtra recensioni valide (dove il film esiste ancora e NON è una serie tv)
+    const validReviews = reviews.filter(r => r.movie && r.movie.media_type !== "tv");
 
     // 1. Top 10 Film dell'anno specifico (voto più alto)
     const topYear = validReviews
@@ -617,7 +617,7 @@ exports.syncUserCollections = async (userId) => {
     const user = await User.findById(userId);
     if (!user) return;
 
-    const validMovies = reviews.map(r => r.movie).filter(Boolean);
+    const validMovies = reviews.map(r => r.movie).filter(movie => movie && movie.media_type !== "tv");
 
     // --- Self-healing PARALLELO: recupera collection_info per film senza ---
     const needsSync = validMovies.filter(movie => {
