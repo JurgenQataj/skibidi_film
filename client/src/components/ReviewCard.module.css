@@ -47,7 +47,8 @@
   gap: 6px;
 }
 
-.movieTitleLink {
+.movieTitleLink,
+.movieTitleLink:visited {
   font-weight: 700;
   font-size: 1.15rem;
   color: #fff;
@@ -56,6 +57,7 @@
 
 .movieTitleLink:hover {
   text-decoration: underline;
+  color: #fff;
 }
 
 .releaseYear {
@@ -70,7 +72,8 @@
   gap: 8px;
 }
 
-.authorLink {
+.authorLink,
+.authorLink:visited {
   font-size: 0.85rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.5);

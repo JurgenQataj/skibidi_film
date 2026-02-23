@@ -397,17 +397,18 @@ function ProfilePage() {
         <div className={styles.pageContainer}>
         {/* ── Header stile Instagram ── */}
         <header className={styles.profileHeader}>
-          {/* Avatar */}
-          <img
-            src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
-            alt="Avatar"
-            className={styles.avatar}
-          />
+          {/* Avatar and Username on the same line */}
+          <div className={styles.nameAvatarRow}>
+            <img
+              src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
+              alt="Avatar"
+              className={styles.avatar}
+            />
+            <h1 className={styles.username}>{profile.username}</h1>
+          </div>
 
           {/* Right column */}
           <div className={styles.profileRight}>
-            {/* Username */}
-            <h1 className={styles.username}>{profile.username}</h1>
 
             {/* Stats: Film | Serie TV | Follower | Seguiti */}
             <div className={styles.statsContainer}>
