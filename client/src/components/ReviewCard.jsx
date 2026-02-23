@@ -194,33 +194,53 @@ function ReviewCard({ review, onInteraction }) {
 
   return (
     <div className={styles.card}>
-      <Link to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}>
-        <img
-          src={
-            movie.poster_path
-              ? `${posterBaseUrl}${movie.poster_path}`
-              : placeholderPoster
-          }
-          alt={`Locandina di ${movie.title}`}
-          className={styles.poster}
-        />
-      </Link>
-      <div className={styles.content}>
-        <div className={styles.header}>
-          <Link to={`/profile/${user._id}`} className={styles.authorLink}>
-            {user.username || "Utente"}
-          </Link>
-          <span> ha recensito </span>
-          <Link
-            to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}
-            className={styles.movieTitleLink}
-          >
-            {movie.title}
-          </Link>
+      <div className={styles.leftColumn}>
+        <Link to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}>
+          <img
+            src={
+              movie.poster_path
+                ? `${posterBaseUrl}${movie.poster_path}`
+                : placeholderPoster
+            }
+            alt={`Locandina di ${movie.title}`}
+            className={styles.poster}
+          />
+        </Link>
+      </div>
+      <div className={styles.rightColumn}>
+        <div className={styles.headerRow}>
+          <div className={styles.movieTitleWrapper}>
+            <Link
+              to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}
+              className={styles.movieTitleLink}
+            >
+              {movie.title}
+            </Link>
+            {movie.release_date && (
+              <span className={styles.releaseYear}>
+                {movie.release_date.split("-")[0]}
+              </span>
+            )}
+          </div>
+          <div className={styles.userInfoWrapper}>
+            <Link to={`/profile/${user._id}`} className={styles.authorLink}>
+              {user.username || "Utente"}
+            </Link>
+            <img
+              src={
+                user.avatar_url ||
+                "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"
+              }
+              alt="avatar"
+              className={styles.userAvatar}
+            />
+          </div>
         </div>
-        <div className={styles.rating}>
-          Voto: <span className={styles.ratingValue}>{rating}</span>
+        
+        <div className={styles.ratingRow}>
+          <span className={styles.ratingValue}>{rating}/10</span>
         </div>
+        
         {comment_text && <p className={styles.comment}>{renderText(comment_text)}</p>}
         {/* Nuova riga combinata Footer */}
         <div className={styles.footerRow}>
