@@ -102,7 +102,7 @@
 
   .title {
     font-size: 0.7rem;
-    height: 40px;
+    height: 28px;
   }
 }
 
@@ -113,13 +113,13 @@
 
   .title {
     font-size: 0.6rem;
-    height: 35px;
+    height: 24px;
   }
 }
 
 @media (max-width: 395px) {
   .title {
     font-size: 0.55rem;
-    height: 32px;
+    height: 20px;
   }
 }

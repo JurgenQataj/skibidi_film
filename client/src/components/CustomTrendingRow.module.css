@@ -19,8 +19,10 @@
   color: #fff; /* Forza il bianco */
   font-weight: 600;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Aggiunge contrasto */
-  text-align: center;
-  flex-grow: 1;
+  text-align: left; /* NON più center */
+  flex-grow: 0; /* NON più 1 */
+  margin-right: auto; /* Lo spinge a sinistra, attaccandosi appena dopo il toggle Film/SerieTV */
+  margin-left: 6px; /* Leggero distacco dal toggle Switch */
 }
 
 .toggleContainer {
@@ -169,12 +171,12 @@
     padding: 0 4px; /* Ridotto il padding laterale ai minimi termini */
   }
   .title {
-    font-size: 0.8rem;
+    font-size: 0.88rem; /* +10% */
     padding: 0 2px;
     white-space: nowrap; /* Impedisce che il titolo vada a capo */
   }
   .toggleButton {
-    font-size: 0.70rem;
+    font-size: 0.77rem; /* +10% */
     padding: 4px 6px;
     white-space: nowrap;
   }
@@ -215,10 +217,10 @@
 /* Samsung A52 (width around 412px) e S23 (360px) - shrink everything to fit one line */
 @media (max-width: 414px) {
   .title {
-    font-size: 0.7rem; 
+    font-size: 0.77rem; /* +10% */
   }
   .toggleButton {
-    font-size: 0.65rem;
+    font-size: 0.71rem; /* +10% */
     padding: 4px 4px;
   }
   .toggleContainer {
@@ -233,11 +235,11 @@
     gap: 2px;
   }
   .title {
-    font-size: 0.65rem; /* Prevent wrapping "In Tendenza" */
+    font-size: 0.71rem; /* +10% */
   }
   .toggleButton {
     padding: 4px 4px;
-    font-size: 0.6rem;
+    font-size: 0.66rem; /* +10% */
     letter-spacing: -0.5px; /* Comprime leggermente il testo per farlo entrare */
   }
   .cardWrapper {
