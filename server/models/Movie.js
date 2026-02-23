@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
 const MovieSchema = new mongoose.Schema({
-  tmdb_id: { type: Number, required: true, unique: true },
+  tmdb_id: { type: Number, required: true },
+  media_type: { type: String, enum: ['movie', 'tv'], default: 'movie' },
   title: { type: String, required: true },
   poster_path: { type: String },
   release_year: { type: Number },
@@ -16,5 +17,7 @@ const MovieSchema = new mongoose.Schema({
     backdrop_path: String
   }
 });
+
+MovieSchema.index({ tmdb_id: 1, media_type: 1 }, { unique: true });
 
 module.exports = mongoose.model("Movie", MovieSchema);

@@ -10,7 +10,7 @@
 /* Il colore scuro DEVE essere sull'elemento html (root):
    copre status bar area, overscroll, safe-area su Android/iOS */
 html {
-  background: #0a0a0f;
+  background: #0a0110;
 }
 
 body {
@@ -20,45 +20,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0a0a0f;
+  background-color: #0a0110;
 }
 
-/* 💻 DESKTOP - Sfondo per PC (768px+) */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("/lar.jpg"); /* Il tuo sfondo attuale per PC */
-
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
-
-/* 📱 MOBILE - Sfondo per cellulare (fino a 767px) */
-@media (max-width: 767px) {
-  body::before {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-      url("/sfondocell.jpg"); /* 🆕 Nuovo sfondo mobile */
-
-    background-attachment: scroll; /* Importante: scroll su mobile per performance */
-    background-size: cover;
-    background-position: center;
-  }
-}
-
-/* 📱 TABLET - Sfondo per tablet (768px - 1024px) - OPZIONALE */
-@media (min-width: 768px) and (max-width: 1024px) {
-  body::before {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
-      url("/wow.jpg"); /* 🆕 Sfondo tablet (opzionale) */
-
-    background-attachment: scroll;
-  }
-}

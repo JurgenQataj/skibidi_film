@@ -133,7 +133,7 @@ function ReviewCard({ review, onInteraction }) {
 
   return (
     <div className={styles.card}>
-      <Link to={`/movie/${movie.tmdb_id}`}>
+      <Link to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}>
         <img
           src={
             movie.poster_path
@@ -151,7 +151,7 @@ function ReviewCard({ review, onInteraction }) {
           </Link>
           <span> ha recensito </span>
           <Link
-            to={`/movie/${movie.tmdb_id}`}
+            to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}
             className={styles.movieTitleLink}
           >
             {movie.title}

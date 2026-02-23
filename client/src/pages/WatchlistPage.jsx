@@ -77,7 +77,7 @@ function WatchlistPage() {
               onClick={(e) => {
                 // Naviga solo se NON si clicca su un pulsante (es. elimina)
                 if (!e.target.closest("button")) {
-                  navigate(`/movie/${movie.tmdb_id}`);
+                  navigate(`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`);
                 }
               }}
             >

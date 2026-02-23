@@ -4,7 +4,7 @@ import styles from "./HomePage.module.css";
 import ReviewCard from "../components/ReviewCard";
 import { useAuth } from "../context/AuthContext";
 
-import TrendingRow from "../components/TrendingRow";
+import CustomTrendingRow from "../components/CustomTrendingRow";
 
 function HomePage() {
   const { logout } = useAuth();
@@ -80,7 +80,7 @@ function HomePage() {
   return (
     <div className={styles.pageContainer}>
 
-      <TrendingRow />
+      <CustomTrendingRow />
       <div className={styles.feedContainer}>
         {feed.map((review, index) => {
           if (feed.length === index + 1) {

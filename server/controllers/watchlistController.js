@@ -2,15 +2,19 @@ const User = require("../models/User");
 const Movie = require("../models/Movie");
 const axios = require("axios");
 
-const findOrCreateMovie = async (tmdbId) => {
-  let movie = await Movie.findOne({ tmdb_id: tmdbId });
+const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
+  let movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
   if (!movie) {
-    const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+    const tmdbUrl = mediaType === "tv"
+      ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
+      : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+      
     const tmdbResponse = await axios.get(tmdbUrl);
     const movieData = tmdbResponse.data;
     movie = new Movie({
       tmdb_id: movieData.id,
-      title: movieData.title,
+      media_type: mediaType,
+      title: mediaType === "tv" ? movieData.name : movieData.title,
       poster_path: movieData.poster_path,
     });
     await movie.save();
@@ -19,13 +23,13 @@ const findOrCreateMovie = async (tmdbId) => {
 };
 
 exports.addToWatchlist = async (req, res) => {
-  const { tmdbId } = req.body;
+  const { tmdbId, mediaType = "movie" } = req.body;
   const userId = req.user.id;
 
   if (!tmdbId) return res.status(400).json({ message: "ID mancante." });
 
   try {
-    const movie = await findOrCreateMovie(tmdbId);
+    const movie = await findOrCreateMovie(tmdbId, mediaType);
     await User.findByIdAndUpdate(userId, { $addToSet: { watchlist: movie._id } });
     res.status(200).json({ message: "Aggiunto alla watchlist." });
   } catch (error) {
@@ -36,10 +40,11 @@ exports.addToWatchlist = async (req, res) => {
 
 exports.removeFromWatchlist = async (req, res) => {
   const { tmdbId } = req.params;
+  const mediaType = req.query.mediaType || "movie";
   const userId = req.user.id;
 
   try {
-    const movie = await Movie.findOne({ tmdb_id: tmdbId });
+    const movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
     if (!movie) return res.status(200).json({ message: "Non presente." });
 
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });
@@ -63,10 +68,11 @@ exports.getWatchlist = async (req, res) => {
 
 exports.getWatchlistStatus = async (req, res) => {
   const { tmdbId } = req.params;
+  const mediaType = req.query.mediaType || "movie";
   const userId = req.user.id;
 
   try {
-    const movie = await Movie.findOne({ tmdb_id: tmdbId });
+    const movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
     if (!movie) return res.json({ isInWatchlist: false });
 
     const user = await User.findById(userId);

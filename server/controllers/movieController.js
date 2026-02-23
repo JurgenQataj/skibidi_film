@@ -17,7 +17,10 @@ exports.getMovieSuggestions = async (req, res) => {
     }
 
     // Scegli l'endpoint in base al tipo
-    const endpoint = type === "person" ? "search/person" : "search/movie";
+    let endpoint = "search/movie";
+    if (type === "person") endpoint = "search/person";
+    else if (type === "tv") endpoint = "search/tv";
+    
     const url = `${BASE_URL}/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT&page=1`;
     
     const response = await axios.get(url);
@@ -25,9 +28,9 @@ exports.getMovieSuggestions = async (req, res) => {
     // Mappiamo i risultati gestendo sia film (title, poster_path) che persone (name, profile_path)
     const suggestions = response.data.results.slice(0, 5).map((item) => ({
       id: item.id,
-      title: item.title || item.name, // Le persone hanno 'name', i film 'title'
+      title: item.title || item.name, // Le persone o serie tv hanno 'name', i film 'title'
       poster_path: item.poster_path || item.profile_path, // Le persone hanno 'profile_path'
-      release_date: item.release_date || null, // Le persone non hanno release_date
+      release_date: item.release_date || item.first_air_date || null, // Le serie tv hanno first_air_date
       media_type: type 
     }));
     res.json({ results: suggestions });

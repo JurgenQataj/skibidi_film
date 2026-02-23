@@ -9,14 +9,17 @@
   align-items: center;
   margin-bottom: 1rem;
   padding: 0 1rem;
+  flex-wrap: nowrap;
 }
 
 .title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   color: #fff; /* Forza il bianco */
   font-weight: 600;
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Aggiunge contrasto */
+  text-align: center;
+  flex-grow: 1;
 }
 
 .toggleContainer {
@@ -162,11 +165,12 @@
     margin-top: 2px; /* Lieve distacco positivo senza eccesso */
   }
   .title {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
+    padding: 0 5px;
   }
   .toggleButton {
-    font-size: 0.8rem;
-    padding: 4px 12px;
+    font-size: 0.75rem;
+    padding: 4px 8px;
   }
   .scrollContainer {
     gap: 10px;

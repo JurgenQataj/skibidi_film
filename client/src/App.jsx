@@ -14,6 +14,7 @@ import HomePage from "./pages/HomePage";
 import ListPage from "./pages/ListPage";
 import LoginPage from "./pages/LoginPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
+import TvShowDetailPage from "./pages/TvShowDetailPage"; // [NEW] Import TvShowDetailPage
 import MyListsPage from "./pages/MyListsPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegistrationPage from "./pages/RegistrationPage";
@@ -100,6 +101,7 @@ function App() {
           <Route path="profile/:userId/stats" element={<StatsPage />} />
           <Route path="person/:name" element={<PersonPage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
+          <Route path="tv/:tmdbId" element={<TvShowDetailPage />} /> {/* [NEW] TV Route */}
           <Route path="collection/:id" element={<CollectionPage />} />
         </Route>
       </Routes>

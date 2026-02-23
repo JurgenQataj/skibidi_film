@@ -13,7 +13,7 @@ exports.getNotifications = async (req, res) => {
         populate: {
           path: "movie",
           model: "Movie",
-          select: "tmdb_id title poster_path",
+          select: "tmdb_id title poster_path media_type",
         },
       })
       .sort({ createdAt: -1 });
@@ -51,7 +51,7 @@ exports.markAsRead = async (req, res) => {
         populate: {
           path: "movie",
           model: "Movie",
-          select: "tmdb_id title poster_path",
+          select: "tmdb_id title poster_path media_type",
         },
       })
       .sort({ createdAt: -1 });

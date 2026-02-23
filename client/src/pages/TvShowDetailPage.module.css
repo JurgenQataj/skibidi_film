@@ -1,0 +1,610 @@
+.pageContainer {
+  color: white;
+  padding-bottom: 30px;
+}
+
+.loading {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-top: 50px;
+  padding: 20px;
+}
+
+.header {
+  width: 100%;
+  background-size: cover;
+  background-position: center 20%;
+}
+
+.headerOverlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, #121212 100%);
+  padding: 40px 20px;
+  backdrop-filter: blur(3px);
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.poster {
+  width: 60%;
+  max-width: 200px;
+  height: auto;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.details {
+  width: 100%;
+}
+
+.title {
+  font-size: 1.8rem;
+  margin: 0 0 10px 0;
+}
+
+.tagline {
+  font-size: 1rem;
+  font-style: italic;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.director {
+  /* Rimosso display: none per mostrare il regista */
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+/* 🆕 NUOVO STILE PER LINK PERSONA (Regista/Attori) */
+.personLink {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.personLink:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  position: relative;
+}
+
+.mainContent {
+  padding: 0 15px;
+  margin: 25px auto;
+  max-width: 1200px;
+}
+
+.overviewSection h3 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.overview {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* STILE PER IL FORM RECENSIONE DOPO LA TRAMA */
+.reviewFormSection {
+  margin: 25px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Stile aggiornato per la sezione Info */
+.infoSection {
+  margin-top: 30px;
+  background-color: transparent;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Griglia responsive automatica */
+  gap: 15px;
+}
+
+.infoBox {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  transition: background-color 0.2s;
+}
+.infoBox:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.infoBox h4 {
+  margin: 0;
+  color: #ccc;
+  font-weight: normal;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.infoBox p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* 🆕 NUOVO STILE PER LINK TRAILER */
+.trailerLink {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+  transition: opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trailerLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.castSection {
+  margin-top: 40px;
+}
+
+.castSection h2 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.castGrid {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px 5px;
+  scrollbar-width: thin; /* Firefox */
+}
+.castGrid::-webkit-scrollbar {
+  height: 6px;
+}
+.castGrid::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.actorCard {
+  min-width: 120px;
+  max-width: 120px;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.actorCard img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+}
+
+.actorCard strong,
+.actorCard span {
+  font-size: 0.8rem;
+  padding: 5px;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- NUOVI STILI PER I FILM CONSIGLIATI --- */
+.recommendationsGrid {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px 5px;
+}
+
+.movieCardWrapper {
+  width: 150px;
+  flex-shrink: 0;
+}
+/* --- FINE NUOVI STILI --- */
+
+.reviewsSection {
+  margin-top: 40px;
+  padding: 0;
+  background: transparent;
+}
+
+.reviewsTitle {
+  font-size: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.reviewStats {
+  font-size: 0.9rem;
+  font-weight: normal;
+}
+
+.reviewItem {
+  background-color: rgba(20, 20, 20, 0.6);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reviewHeader div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reviewActions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+
+.reactions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.reactions button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 0;
+}
+
+.actionButton,
+.deleteButton,
+.commentButton {
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+.actionButton {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 18px;
+}
+.actionButton:hover {
+  opacity: 0.8;
+}
+.deleteButton {
+  background-color: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+}
+.deleteButton:hover {
+  background-color: #ff4d4d;
+  color: white;
+}
+.commentButton {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+}
+.commentButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  position: relative;
+}
+
+.listsDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 220px;
+  background-color: #282c34;
+  border-radius: var(--border-radius);
+  border: 1px solid #555;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  z-index: 1000;
+  margin-top: 8px;
+}
+
+.listButton {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 5px;
+  background: none;
+  border: 1px solid #555;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.listButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.commentsSection {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+.commentItem {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+.commentForm {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+.commentForm input {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid #555;
+  border-radius: 5px;
+  padding: 8px;
+  color: white;
+}
+.commentForm button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.deleteCommentButton {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.deleteCommentButton:hover {
+  color: #ff4d4d;
+}
+
+.alreadyReviewedMessage {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.authorLink {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+}
+.authorLink:hover {
+  text-decoration: underline;
+}
+
+.reviewAuthor {
+  color: var(--primary-color);
+}
+
+.reviewRating {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--secondary-color);
+}
+
+.reviewComment {
+  margin: 10px 0;
+  font-style: italic;
+  color: #ffffff;
+}
+
+/* === MOBILE (fino a 768px) - Stili migliorati === */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 15px;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  .header {
+    background-size: cover;
+  }
+  .headerOverlay {
+    padding: 20px;
+  }
+  .headerContent {
+    gap: 15px;
+    padding: 0;
+  }
+  .poster {
+    width: 40%;
+    max-width: 150px;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+  .tagline {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+  .actionButton {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  .mainContent {
+    padding: 0;
+    margin: 20px 0;
+  }
+  .overviewSection h3,
+  .castSection h2,
+  .reviewsTitle {
+    font-size: 1.3rem;
+  }
+  .overview {
+    font-size: 1rem;
+    line-height: 1.7;
+    text-align: left;
+  }
+
+  /* RESPONSIVE PER IL FORM RECENSIONE */
+  .reviewFormSection {
+    margin: 20px 0;
+    padding: 15px;
+  }
+
+  /* La griglia infoSection ora usa auto-fill, quindi si adatta da sola, 
+     ma possiamo forzare 2 colonne su mobile per risparmiare spazio verticale */
+  .infoSection {
+    grid-template-columns: 1fr 1fr; 
+  }
+  .infoBox h4 {
+    font-size: 0.9rem;
+  }
+  .infoBox p {
+    font-size: 1.1rem;
+  }
+  .castGrid {
+    gap: 10px;
+  }
+  .actorCard {
+    min-width: 100px;
+    max-width: 100px;
+  }
+  .actorCard img {
+    height: 150px;
+  }
+  .actorCard strong,
+  .actorCard span {
+    font-size: 0.6rem;
+  }
+  .reviewsSection {
+    padding: 15px;
+    margin-top: 30px;
+  }
+  .reviewItem {
+    padding: 12px;
+  }
+  .commentForm input {
+    font-size: 0.7rem;
+  }
+}
+
+/* === MOBILE MOLTO PICCOLO (fino a 480px) - Ulteriori aggiustamenti === */
+@media (max-width: 480px) {
+  .headerOverlay {
+    padding: 15px;
+  }
+  .headerContent {
+    gap: 10px;
+  }
+  .poster {
+    width: 45%;
+    max-width: 120px;
+  }
+  .title {
+    font-size: 1.2rem;
+  }
+  .tagline {
+    font-size: 0.8rem;
+  }
+  .actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .actionButton {
+    width: 80%;
+    text-align: center;
+  }
+  .overview {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* RESPONSIVE MOBILE PICCOLO PER FORM RECENSIONE */
+  .reviewFormSection {
+    margin: 15px 0;
+    padding: 12px;
+  }
+
+  .infoBox h4 {
+    font-size: 0.8rem;
+  }
+  .infoBox p {
+    font-size: 1rem;
+  }
+
+  .movieCardWrapper {
+    width: 100px;
+  }
+
+  .recommendationsGrid :global(.card) {
+    --title-height: 8px;
+    height: calc(140px + var(--title-height)) !important;
+  }
+  .recommendationsGrid :global(.card img) {
+    height: 140px !important;
+  }
+  .recommendationsGrid :global(.card .title) {
+    height: var(--title-height) !important;
+    font-size: 0.5rem !important;
+    line-height: 1 !important;
+    padding: 0 4px !important;
+  }
+}

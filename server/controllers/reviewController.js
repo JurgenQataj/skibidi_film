@@ -6,13 +6,13 @@ const axios = require("axios");
 
 // Aggiungere una recensione
 exports.addReview = async (req, res) => {
-  const { tmdbId, rating, comment_text, is_spoiler } = req.body;
+  const { tmdbId, rating, comment_text, is_spoiler, mediaType = "movie" } = req.body;
   const userId = req.user.id;
 
   if (!tmdbId || rating === undefined) {
     return res
       .status(400)
-      .json({ message: "ID del film e valutazione sono obbligatori." });
+      .json({ message: "ID del contenuto e valutazione sono obbligatori." });
   }
 
   // VALIDAZIONE RATING
@@ -22,26 +22,34 @@ exports.addReview = async (req, res) => {
 
   try {
     // 1. Cerca il film nel DB locale
-    let movie = await Movie.findOne({ tmdb_id: tmdbId });
+    let movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
 
     // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno/generi), scaricali da TMDB
     if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year || !movie.genres || movie.genres.length === 0) {
-      console.log(`[INFO] Aggiornamento dati film ID ${tmdbId} da TMDB...`);
+      console.log(`[INFO] Aggiornamento dati ${mediaType} ID ${tmdbId} da TMDB...`);
       
-      const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`;
+      const tmdbUrl = mediaType === "tv" 
+        ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`
+        : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`;
       
       try {
         const tmdbResponse = await axios.get(tmdbUrl);
         const movieData = tmdbResponse.data;
 
         // Estrazione Anno
-        const releaseYear = movieData.release_date 
-          ? new Date(movieData.release_date).getFullYear() 
-          : null;
+        const releaseYear = mediaType === "tv"
+          ? (movieData.first_air_date ? new Date(movieData.first_air_date).getFullYear() : null)
+          : (movieData.release_date ? new Date(movieData.release_date).getFullYear() : null);
 
-        // Estrazione Regista (Director)
-        const directorData = movieData.credits?.crew?.find(c => c.job === "Director");
-        const director = directorData ? directorData.name : "Sconosciuto";
+        // Estrazione Regista (Director / Creator)
+        let director = "Sconosciuto";
+        if (mediaType === "tv") {
+          const creatorData = movieData.created_by && movieData.created_by.length > 0 ? movieData.created_by[0] : null;
+          director = creatorData ? creatorData.name : "Sconosciuto";
+        } else {
+          const directorData = movieData.credits?.crew?.find(c => c.job === "Director");
+          director = directorData ? directorData.name : "Sconosciuto";
+        }
 
         // Estrazione Cast (Top 5 attori)
         const cast = movieData.credits?.cast?.slice(0, 5).map(c => c.name) || [];
@@ -49,11 +57,14 @@ exports.addReview = async (req, res) => {
         // Estrazione Generi
         const genres = movieData.genres?.map(g => g.name) || [];
 
+        const title = mediaType === "tv" ? movieData.name : movieData.title;
+
         if (!movie) {
           // Creazione nuovo film
           movie = new Movie({
             tmdb_id: movieData.id,
-            title: movieData.title,
+            media_type: mediaType,
+            title: title,
             poster_path: movieData.poster_path,
             release_year: releaseYear,
             director: director,
@@ -69,6 +80,7 @@ exports.addReview = async (req, res) => {
           await movie.save();
         } else {
           // Aggiornamento film esistente (Self-healing)
+          movie.title = title;
           movie.release_year = releaseYear;
           movie.director = director;
           movie.cast = cast;
@@ -132,7 +144,8 @@ exports.addReview = async (req, res) => {
 // Ottenere le recensioni per un film
 exports.getReviewsForMovie = async (req, res) => {
   try {
-    const movie = await Movie.findOne({ tmdb_id: req.params.tmdbId });
+    const { mediaType = "movie" } = req.query;
+    const movie = await Movie.findOne({ tmdb_id: req.params.tmdbId, media_type: mediaType });
     if (!movie) {
       return res
         .status(200)
@@ -185,7 +198,8 @@ exports.getReviewsForMovie = async (req, res) => {
 // Controllare se l'utente ha già recensito
 exports.checkUserReviewStatus = async (req, res) => {
   try {
-    const movie = await Movie.findOne({ tmdb_id: req.params.tmdbId });
+    const { mediaType = "movie" } = req.query;
+    const movie = await Movie.findOne({ tmdb_id: req.params.tmdbId, media_type: mediaType });
     if (!movie) return res.json({ hasReviewed: false });
 
     const review = await Review.findOne({

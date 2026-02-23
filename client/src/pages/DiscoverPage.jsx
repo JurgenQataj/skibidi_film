@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./DiscoverPage.module.css";
 import UserCard from "../components/UserCard";
 import { SkeletonUserCard } from "../components/Skeleton";
+import GlobalChat from "../components/GlobalChat";
 
 const SKELETON_COUNT = 6;
 
@@ -31,20 +32,27 @@ function DiscoverPage() {
   }, []);
 
   return (
-    <div className={styles.pageContainer}>
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionIcon}>👑</span>
-          <h1 className={styles.title}>Più Seguiti</h1>
-          <div className={styles.divider} />
-        </div>
-        <div className={styles.gridContainer}>
-          {loading
-            ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
-            : mostFollowed.map((user) => <UserCard key={user._id} user={user} />)
-          }
-        </div>
-      </section>
+    <div className={styles.discoverLayout}>
+      {/* Colonna Sinistra: Chat Globale */}
+      <div className={styles.chatSection}>
+        <GlobalChat />
+      </div>
+
+      {/* Colonna Destra: Liste Utenti */}
+      <div className={styles.pageContainer}>
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}>👑</span>
+            <h1 className={styles.title}>Più Seguiti</h1>
+            <div className={styles.divider} />
+          </div>
+          <div className={styles.gridContainer}>
+            {loading
+              ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
+              : mostFollowed.map((user) => <UserCard key={user._id} user={user} />)
+            }
+          </div>
+        </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
@@ -60,6 +68,7 @@ function DiscoverPage() {
         </div>
       </section>
     </div>
+  </div>
   );
 }
 

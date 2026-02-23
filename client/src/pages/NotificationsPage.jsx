@@ -42,7 +42,7 @@ function NotificationsPage() {
           notification.targetReview.movie &&
           notification.targetReview.movie.tmdb_id
         ) {
-          return `/movie/${notification.targetReview.movie.tmdb_id}`;
+          return `/${notification.targetReview.movie.media_type === "tv" ? "tv" : "movie"}/${notification.targetReview.movie.tmdb_id}`;
         }
         return "/"; // Link di fallback se i dati sono corrotti
       default:

@@ -1,8 +1,20 @@
 .pageContainer {
   padding: 60px 40px;
   color: white;
-  max-width: 1100px;
+  max-width: 1400px; /* Allargato per contenere due colonne */
   margin: 0 auto;
+}
+
+.discoverLayout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.chatSection {
+  position: sticky;
+  top: 90px;
 }
 
 .section {
@@ -52,6 +64,15 @@
 @media (max-width: 768px) {
   .pageContainer {
     padding: 30px 20px;
+  }
+
+  .discoverLayout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .chatSection {
+    position: static;
   }
 
   .gridContainer {

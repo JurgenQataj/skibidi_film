@@ -151,8 +151,9 @@ function SearchPage() {
         ...(filters.sortBy && { sort_by: filters.sortBy }),
       });
 
+      const endpointPrefix = searchMode === "tv" ? "tv" : "movies";
       const response = await axios.get(
-        `${API_URL}/api/movies/discover?${params.toString()}`
+        `${API_URL}/api/${endpointPrefix}/discover?${params.toString()}`
       );
 
       const newResults = response.data.results || [];
@@ -191,9 +192,12 @@ function SearchPage() {
     setResults([]);
 
     try {
-      const endpoint = searchMode === "movie" 
-        ? `${API_URL}/api/movies/search?query=${encodeURIComponent(query)}`
-        : `${API_URL}/api/movies/search/person?query=${encodeURIComponent(query)}`;
+      let endpoint = `${API_URL}/api/movies/search?query=${encodeURIComponent(query)}`;
+      if (searchMode === "person") {
+        endpoint = `${API_URL}/api/movies/search/person?query=${encodeURIComponent(query)}`;
+      } else if (searchMode === "tv") {
+        endpoint = `${API_URL}/api/tv/search?query=${encodeURIComponent(query)}`;
+      }
 
       const response = await axios.get(endpoint);
       const searchResults = response.data.results || [];
@@ -232,7 +236,7 @@ function SearchPage() {
 
   // Sincronizza lo stato searchMode con l'URL (es. se usi tasti avanti/indietro o ricarichi)
   useEffect(() => {
-    if (modeParam && (modeParam === "movie" || modeParam === "person")) {
+    if (modeParam && (modeParam === "movie" || modeParam === "person" || modeParam === "tv")) {
       setSearchMode(modeParam);
     }
   }, [modeParam]);
@@ -261,9 +265,10 @@ function SearchPage() {
 
   // Gestione selezione da suggerimenti
   const handleMovieSelect = (item) => {
-    // item.title contiene il nome della persona grazie alla modifica nel backend
     if (searchMode === "person") {
       navigate(`/person/${encodeURIComponent(item.title)}`);
+    } else if (searchMode === "tv" || item.media_type === "tv") {
+      navigate(`/tv/${item.id}`);
     } else {
       navigate(`/movie/${item.id}`);
     }
@@ -334,11 +339,11 @@ function SearchPage() {
       {/* HERO SECTION - Compact */}
       <div className={styles.heroSection}>
         <div className={styles.searchBarWrapper}>
-           <SearchInput
+             <SearchInput
              onSearch={handleSearch}
              onMovieSelect={handleMovieSelect}
              preventNavigation={true}
-             placeholder={searchMode === "movie" ? "Cerca film..." : "Cerca persona..."}
+             placeholder={searchMode === "movie" ? "Cerca film..." : searchMode === "tv" ? "Cerca serie TV..." : "Cerca persona..."}
              mode={searchMode}
            />
         </div>
@@ -352,6 +357,12 @@ function SearchPage() {
                 Film
              </button>
              <button 
+                onClick={() => handleModeChange("tv")}
+                className={`${styles.modeButton} ${searchMode === "tv" ? styles.modeButtonActive : ""}`}
+             >
+                Serie TV
+             </button>
+             <button 
                 onClick={() => handleModeChange("person")}
                 className={`${styles.modeButton} ${searchMode === "person" ? styles.modeButtonActive : ""}`}
              >
@@ -360,7 +371,7 @@ function SearchPage() {
         </div>
 
         {/* Category Chips - Scrolls horizontally */}
-        {searchMode === "movie" && (
+        {searchMode !== "person" && (
             <div className={styles.chipsContainer}>
             {categories.map((cat) => (
                 <button
@@ -378,7 +389,7 @@ function SearchPage() {
       </div>
 
       {/* Advanced Filters Toggle & Apply Button */}
-      {searchMode === "movie" && (
+      {searchMode !== "person" && (
         <div className={styles.filterToggleBar}>
             <button 
                 className={styles.toggleFiltersBtn}
@@ -399,7 +410,7 @@ function SearchPage() {
       )}
 
       {/* Collapsible Filters Section */}
-      {showFilters && searchMode === "movie" && (
+      {showFilters && searchMode !== "person" && (
           <div className={`${styles.filtersSection} ${styles.slideDown}`}>
             <div className={styles.filtersGrid}>
                 {/* Ordinamento */}
@@ -525,7 +536,7 @@ function SearchPage() {
               
               <div className={searchMode === "person" ? styles.personList : styles.resultsGrid}>
                 {results.map((item, index) =>
-                  searchMode === "movie" ? (
+                  searchMode !== "person" ? (
                     <MovieCard
                         key={`${item.id}-${currentPage}-${index}`}
                         movie={item}

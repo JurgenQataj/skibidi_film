@@ -312,7 +312,7 @@ function ProfilePage() {
             <li 
               key={review._id} 
               className={styles.historyItem}
-              onClick={() => navigate(`/movie/${review.movie.tmdb_id}`)}
+              onClick={() => navigate(`/${review.movie.media_type === "tv" ? "tv" : "movie"}/${review.movie.tmdb_id}`)}
             >
               <span className={styles.historyNumber}>{index + 1}</span>
               <img
@@ -361,7 +361,8 @@ function ProfilePage() {
         </div>
       </Modal>
 
-      <div className={styles.pageContainer}>
+      <div className={styles.profileWrapper}>
+        <div className={styles.pageContainer}>
         {/* ── Header stile Instagram ── */}
         <header className={styles.profileHeader}>
           {/* Avatar */}
@@ -376,11 +377,15 @@ function ProfilePage() {
             {/* Username */}
             <h1 className={styles.username}>{profile.username}</h1>
 
-            {/* Stats: Film | Follower | Seguiti */}
+            {/* Stats: Film | Serie TV | Follower | Seguiti */}
             <div className={styles.statsContainer}>
               <div className={styles.statItem}>
                 <div className={styles.statValue}>{stats.moviesReviewed}</div>
                 <div className={styles.statLabel}>Film</div>
+              </div>
+              <div className={styles.statItem}>
+                <div className={styles.statValue}>{stats.tvShowsReviewed || 0}</div>
+                <div className={styles.statLabel}>Serie TV</div>
               </div>
               <div className={styles.statItemClickable} onClick={() => showModalWith("followers")}>
                 <div className={styles.statValue}>{stats.followersCount}</div>
@@ -454,7 +459,7 @@ function ProfilePage() {
             </div>
           )}
 
-          <h2 className={styles.sectionTitle}>Ultime Recensioni</h2>
+          <h2 className={styles.sectionTitle} style={{ marginTop: '20px' }}>Ultime Recensioni</h2>
           <div className={styles.reviewsGrid}>
             {loading ? (
               Array.from({ length: 12 }).map((_, i) => (
@@ -462,7 +467,7 @@ function ProfilePage() {
               ))
             ) : recentReviews.length > 0 ? (
               recentReviews.map((review) => (
-                <MovieCard key={review._id} movie={review.movie} />
+                <MovieCard key={review._id} movie={{...review.movie, media_type: review.movie.media_type || "movie"}} />
               ))
             ) : (
               <p>Questo utente non ha ancora recensito nessun film.</p>
@@ -476,6 +481,7 @@ function ProfilePage() {
             </div>
           )}
         </section>
+      </div>
       </div>
     </>
   );

@@ -99,6 +99,8 @@ const SearchInput = ({
       // Navigazione di default se non gestita dal genitore
       if (mode === "person") {
         navigate(`/person/${encodeURIComponent(movie.title)}`);
+      } else if (mode === "tv") {
+        navigate(`/tv/${movie.id}`);
       } else {
         navigate(`/movie/${movie.id}`);
       }

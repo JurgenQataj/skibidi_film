@@ -80,7 +80,7 @@ function Navbar() {
       case "new_reaction":
       case "new_comment":
         if (notification.targetReview?.movie?.tmdb_id) {
-          return `/movie/${notification.targetReview.movie.tmdb_id}`;
+          return `/${notification.targetReview.movie.media_type === "tv" ? "tv" : "movie"}/${notification.targetReview.movie.tmdb_id}`;
         }
         return "/";
       default: return "/";

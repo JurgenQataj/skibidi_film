@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import styles from "./TrendingRow.module.css";
+import styles from "./CustomTrendingRow.module.css";
 import MovieCard from "./MovieCard";
 import { SkeletonMovieCard } from "./Skeleton";
 
-const TrendingRow = ({ mediaType = "movie" }) => {
+const CustomTrendingRow = () => {
+  const [mediaType, setMediaType] = useState("movie"); // 'movie' o 'tv'
   const [timeWindow, setTimeWindow] = useState("day"); // 'day' o 'week'
-  const [movies, setMovies] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const scrollRef = useRef(null);
@@ -31,22 +32,41 @@ const TrendingRow = ({ mediaType = "movie" }) => {
         const API_URL = import.meta.env.VITE_API_URL || "";
         const endpointPrefix = mediaType === "tv" ? "tv" : "movies";
         const response = await axios.get(`${API_URL}/api/${endpointPrefix}/trending?timeWindow=${timeWindow}&_t=${Date.now()}`);
-        setMovies(response.data || []);
+        setItems(response.data || []);
       } catch (err) {
         console.error("Errore caricamento tendenze:", err);
-        setError("Impossibile caricare i film in tendenza.");
+        setError("Impossibile caricare i contenuti in tendenza.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchTrending();
-  }, [timeWindow]);
+  }, [mediaType, timeWindow]);
 
   return (
     <div className={styles.trendingRowContainer}>
       <div className={styles.header}>
-        <h2 className={styles.title}>{mediaType === "tv" ? "Serie TV in Tendenza" : "Film in Tendenza"}</h2>
+        {/* Switch di Sinistra (Film / Serie TV) */}
+        <div className={styles.toggleContainer}>
+          <button
+            className={`${styles.toggleButton} ${mediaType === "movie" ? styles.active : ""}`}
+            onClick={() => setMediaType("movie")}
+          >
+            Film
+          </button>
+          <button
+            className={`${styles.toggleButton} ${mediaType === "tv" ? styles.active : ""}`}
+            onClick={() => setMediaType("tv")}
+          >
+            Serie TV
+          </button>
+        </div>
+
+        {/* Testo Centrale */}
+        <h2 className={styles.title}>in tendenza</h2>
+
+        {/* Switch di Destra (Oggi / Questa Settimana) */}
         <div className={styles.toggleContainer}>
           <button
             className={`${styles.toggleButton} ${timeWindow === "day" ? styles.active : ""}`}
@@ -84,9 +104,9 @@ const TrendingRow = ({ mediaType = "movie" }) => {
           </button>
 
           <div className={styles.scrollContainer} ref={scrollRef}>
-            {movies.map((movie) => (
-              <div key={movie.id} className={styles.cardWrapper}>
-                <MovieCard movie={movie} />
+            {items.map((item) => (
+              <div key={item.id} className={styles.cardWrapper}>
+                <MovieCard movie={{ ...item, media_type: mediaType }} />
               </div>
             ))}
           </div>
@@ -104,4 +124,4 @@ const TrendingRow = ({ mediaType = "movie" }) => {
   );
 };
 
-export default TrendingRow;
+export default CustomTrendingRow;

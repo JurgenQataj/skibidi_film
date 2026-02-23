@@ -48,7 +48,7 @@ exports.deleteList = async (req, res) => {
 // Funzione per aggiungere un film a una lista
 exports.addMovieToList = async (req, res) => {
   const { listId } = req.params;
-  const { tmdbId } = req.body;
+  const { tmdbId, mediaType = "movie" } = req.body;
   try {
     const list = await MovieList.findOne({ _id: listId, user: req.user.id });
     if (!list)
@@ -56,14 +56,19 @@ exports.addMovieToList = async (req, res) => {
         .status(404)
         .json({ message: "Lista non trovata o non autorizzato." });
 
-    let movie = await Movie.findOne({ tmdb_id: tmdbId });
+    let movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
     if (!movie) {
-      const tmdbUrl = `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+      const tmdbUrl = mediaType === "tv"
+        ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
+        : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+      
       const tmdbResponse = await axios.get(tmdbUrl);
       const movieData = tmdbResponse.data;
+      
       movie = new Movie({
         tmdb_id: movieData.id,
-        title: movieData.title,
+        media_type: mediaType,
+        title: mediaType === "tv" ? movieData.name : movieData.title,
         poster_path: movieData.poster_path,
       });
       await movie.save();
@@ -87,6 +92,7 @@ exports.addMovieToList = async (req, res) => {
 // Funzione per rimuovere un film da una lista
 exports.removeMovieFromList = async (req, res) => {
   const { listId, tmdbId } = req.params;
+  const mediaType = req.query.mediaType || "movie";
   try {
     const list = await MovieList.findOne({ _id: listId, user: req.user.id });
     if (!list)
@@ -94,7 +100,7 @@ exports.removeMovieFromList = async (req, res) => {
         .status(404)
         .json({ message: "Lista non trovata o non autorizzato." });
 
-    const movie = await Movie.findOne({ tmdb_id: tmdbId });
+    const movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
     if (!movie) return res.status(404).json({ message: "Film non trovato." });
 
     // Rimuove il film dall'array

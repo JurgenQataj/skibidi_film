@@ -2,13 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import styles from "./MovieDetailPage.module.css";
+import styles from "./TvShowDetailPage.module.css";
 import AddReviewForm from "../components/AddReviewForm";
 import MovieCard from "../components/MovieCard";
 import EditReviewModal from "../components/EditReviewModal";
 import { SkeletonMovieCard } from "../components/Skeleton";
 
-function MovieDetailPage() {
+function TvShowDetailPage() {
   const { tmdbId } = useParams();
   const navigate = useNavigate();
 
@@ -48,18 +48,18 @@ function MovieDetailPage() {
       const userId = token ? jwtDecode(token).user.id : null;
       setLoggedInUserId(userId);
 
-      const moviePromise = axios.get(`${API_URL}/api/movies/${tmdbId}`);
+      const moviePromise = axios.get(`${API_URL}/api/tv/${tmdbId}`);
       const reviewsPromise = axios.get(
-        `${API_URL}/api/reviews/movie/${tmdbId}?mediaType=movie`
+        `${API_URL}/api/reviews/movie/${tmdbId}?mediaType=tv`
       );
       const promises = [moviePromise, reviewsPromise];
 
       if (userId) {
         promises.push(
-          axios.get(`${API_URL}/api/reviews/status/${tmdbId}?mediaType=movie`, { headers })
+          axios.get(`${API_URL}/api/reviews/status/${tmdbId}?mediaType=tv`, { headers })
         );
         promises.push(
-          axios.get(`${API_URL}/api/watchlist/status/${tmdbId}?mediaType=movie`, { headers })
+          axios.get(`${API_URL}/api/watchlist/status/${tmdbId}?mediaType=tv`, { headers })
         );
         promises.push(
           axios.get(`${API_URL}/api/users/${userId}/lists`, { headers })
@@ -115,9 +115,9 @@ function MovieDetailPage() {
     const config = { headers: { Authorization: `Bearer ${token}` } };
     try {
       if (isInWatchlist) {
-        await axios.delete(`${API_URL}/api/watchlist/${tmdbId}?mediaType=movie`, config);
+        await axios.delete(`${API_URL}/api/watchlist/${tmdbId}?mediaType=tv`, config);
       } else {
-        await axios.post(`${API_URL}/api/watchlist`, { tmdbId, mediaType: "movie" }, config);
+        await axios.post(`${API_URL}/api/watchlist`, { tmdbId, mediaType: "tv" }, config);
       }
       setIsInWatchlist(!isInWatchlist);
     } catch (error) {
@@ -130,10 +130,10 @@ function MovieDetailPage() {
     try {
       await axios.post(
         `${API_URL}/api/lists/${listId}/movies`,
-        { tmdbId, mediaType: "movie" },
+        { tmdbId, mediaType: "tv" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert(`Film aggiunto alla lista!`);
+      alert(`Serie TV aggiunta alla lista!`);
       setShowLists(false);
     } catch (error) {
       alert(
@@ -221,7 +221,7 @@ function MovieDetailPage() {
     </div>
   );
   if (error) return <p className={styles.loading}>{error}</p>;
-  if (!movie) return <p className={styles.loading}>Film non trovato.</p>;
+  if (!movie) return <p className={styles.loading}>Serie TV non trovata.</p>;
 
   const posterBaseUrl = "https://image.tmdb.org/t/p/";
   const formatCurrency = (num) =>
@@ -365,14 +365,14 @@ function MovieDetailPage() {
         {/* FORM RECENSIONE SUBITO DOPO LA TRAMA */}
         {loggedInUserId && !hasUserReviewed && (
           <div className={styles.reviewFormSection}>
-            <AddReviewForm tmdbId={tmdbId} onReviewAdded={fetchData} />
+            <AddReviewForm tmdbId={tmdbId} mediaType="tv" onReviewAdded={fetchData} />
           </div>
         )}
 
         {/* 🆕 SEZIONE INFO AGGIORNATA - Layout 2x5 */}
         <div className={styles.infoSection}>
           <div className={styles.infoBox}>
-            <h4>Regia</h4>
+            <h4>Regia/Creatore</h4>
              {/* LINK CLICCABILE PER REGISTA NEI BOX */}
             <p>
                {movie.director?.name ? (
@@ -388,11 +388,11 @@ function MovieDetailPage() {
             </p>
           </div>
           <div className={styles.infoBox}>
-            <h4>Durata</h4>
+            <h4>Durata Episodi</h4>
             <p>{formatRuntime(movie.runtime)}</p>
           </div>
           <div className={styles.infoBox}>
-            <h4>Data Uscita</h4>
+            <h4>Prima Messa In Onda</h4>
             <p>{formatReleaseDate(movie.release_date)}</p>
           </div>
           <div className={styles.infoBox}>
@@ -404,16 +404,16 @@ function MovieDetailPage() {
             <p>{formatGenres(movie.genres)}</p>
           </div>
           <div className={styles.infoBox}>
-            <h4>Produttore</h4>
-            <p>{movie.producer?.name || "Non disponibile"}</p>
+            <h4>Stato</h4>
+            <p>{movie.status || "Non disponibile"}</p>
           </div>
           <div className={styles.infoBox}>
-            <h4>Costo</h4>
-            <p>{formatCurrency(movie.budget)}</p>
+            <h4>Stagioni</h4>
+            <p>{movie.number_of_seasons || "N/A"}</p>
           </div>
           <div className={styles.infoBox}>
-            <h4>Botteghino</h4>
-            <p>{formatCurrency(movie.revenue)}</p>
+            <h4>Episodi</h4>
+            <p>{movie.number_of_episodes || "N/A"}</p>
           </div>
           <div className={styles.infoBox}>
             <h4>Lingua</h4>
@@ -504,7 +504,7 @@ function MovieDetailPage() {
 
         {recommendations.length > 0 && (
           <div className={styles.castSection}>
-            <h2>Film Consigliati</h2>
+            <h2>Serie TV Consigliate</h2>
             <div className={styles.recommendationsGrid}>
               {recommendations.map((rec) => (
                 <div key={rec.id} className={styles.movieCardWrapper}>
@@ -640,4 +640,4 @@ function MovieDetailPage() {
   );
 }
 
-export default MovieDetailPage;
+export default TvShowDetailPage;

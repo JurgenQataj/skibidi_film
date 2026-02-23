@@ -37,12 +37,14 @@ app.use(express.json());
 // --- ROTTE (invariate) ---
 app.use("/api/users", require("./routes/users"));
 app.use("/api/movies", require("./routes/movies"));
+app.use("/api/tv", require("./routes/tv")); // [NEW] TV Routes
 app.use("/api/reviews", require("./routes/reviews"));
 app.use("/api/lists", require("./routes/lists"));
 app.use("/api/watchlist", require("./routes/watchlist"));
 app.use("/api/comments", require("./routes/comments"));
 app.use("/api/reactions", require("./routes/reactions"));
 app.use("/api/notifications", require("./routes/notifications"));
+app.use("/api/chat", require("./routes/chatRoutes")); // [NEW] Chat Routes
 
 app.get("/", (req, res) => res.send("Skibidi Film API Running"));
 

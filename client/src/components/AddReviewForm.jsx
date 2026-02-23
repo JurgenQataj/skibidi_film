@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import styles from "./AddReviewForm.module.css";
 
-function AddReviewForm({ tmdbId, onReviewAdded }) {
+function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
   const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
@@ -24,6 +24,7 @@ function AddReviewForm({ tmdbId, onReviewAdded }) {
         `${API_URL}/api/reviews`,
         {
           tmdbId: tmdbId,
+          mediaType: mediaType,
           rating: parseFloat(rating),
           comment_text: comment,
         },

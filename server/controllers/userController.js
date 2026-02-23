@@ -228,7 +228,19 @@ exports.getUserStats = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
-    const moviesReviewed = await Review.countDocuments({ user: userId });
+    const reviews = await Review.find({ user: userId }).populate("movie", "media_type");
+    let moviesReviewed = 0;
+    let tvShowsReviewed = 0;
+
+    reviews.forEach(r => {
+      if (r.movie) {
+        if (r.movie.media_type === "tv") {
+          tvShowsReviewed++;
+        } else {
+          moviesReviewed++;
+        }
+      }
+    });
 
     const followersCount = user.followers ? user.followers.length : 0;
     const followingCount = user.following ? user.following.length : 0;
@@ -236,6 +248,7 @@ exports.getUserStats = async (req, res) => {
     res.json({
       username: user.username,
       moviesReviewed,
+      tvShowsReviewed,
       followersCount,
       followingCount,
     });
@@ -461,7 +474,7 @@ exports.getUserFeed = async (req, res) => {
 
     const reviews = await Review.find({ user: { $in: following } })
       .populate("user", "username avatar_url")
-      .populate("movie", "title poster_path tmdb_id")
+      .populate("movie", "title poster_path tmdb_id media_type")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -478,7 +491,7 @@ exports.getUserFeed = async (req, res) => {
 exports.getUserReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.params.userId })
-      .populate("movie", "tmdb_id title poster_path")
+      .populate("movie", "tmdb_id title poster_path media_type")
       .sort({ createdAt: -1 });
 
     res.json(reviews.filter((r) => r.movie));

@@ -88,7 +88,7 @@ function ListPage() {
               className={styles.cardWrapper}
               onClick={(e) => {
                 if (!e.target.closest("button")) {
-                  navigate(`/movie/${movie.tmdb_id}`);
+                  navigate(`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`);
                 }
               }}
             >

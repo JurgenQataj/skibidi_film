@@ -24,10 +24,13 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
     }
   };
 
+  const isTv = movie.media_type === "tv";
+  const linkPath = isTv ? `/tv/${movieId}` : `/movie/${movieId}`;
+
   return (
     // L'intera card rimane un link
-    <Link to={`/movie/${movieId}`} className={styles.cardLink}>
-      <div className={styles.card}>
+    <Link to={linkPath} className={styles.cardLink} data-movie-link>
+      <div className={styles.card} data-movie-card>
         {/* Il pulsante di eliminazione, ora posizionato correttamente */}
         {showDeleteButton && (
           <button onClick={handleDeleteClick} className={styles.deleteButton}>
@@ -37,8 +40,9 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
         <img
           src={posterPath ? `${posterBaseUrl}${posterPath}` : placeholderPoster}
           alt={`Locandina di ${movieTitle}`}
+          data-movie-img
         />
-        <div className={styles.title}>{movieTitle}</div>
+        <div className={styles.title} data-movie-title>{movieTitle}</div>
       </div>
     </Link>
   );
