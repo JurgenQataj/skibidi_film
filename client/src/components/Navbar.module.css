@@ -1,14 +1,18 @@
 .navbar {
-  background-color: rgba(10, 10, 10, 0.7);
+  background-color: rgba(15, 15, 20, 0.85);
   backdrop-filter: blur(20px);
-  padding: 0 40px;
+  -webkit-backdrop-filter: blur(20px);
+  padding: 0 30px;
   position: sticky;
-  top: 0;
-  width: 100%;
+  top: 15px; /* Floating style */
+  width: 95%;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 20px; /* Pill shape */
   z-index: 1000;
   box-sizing: border-box;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .navContent {
@@ -55,16 +59,17 @@
 .navLink {
   color: #ffffff !important;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
-  background: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: transparent;
   border: none;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 16px;
   position: relative;
 }
 
@@ -84,31 +89,32 @@
   transition: all 0.2s ease;
 }
 
-/* === HOVER/FOCUS: TUTTO VIOLA === */
+/* === HOVER/FOCUS === */
 .navLink:hover,
 .navLink:focus-visible {
-  color: #8a4baf !important;
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 10px rgba(138, 75, 175, 0.2);
+  color: #ffffff !important;
+  background-color: rgba(138, 75, 175, 0.9);
+  box-shadow: 0 4px 15px rgba(138, 75, 175, 0.4);
+  transform: translateY(-2px);
   outline: none;
 }
 
-/* Testo viola in hover */
+/* Testo hover */
 .navLink:hover span,
 .navLink:focus-visible span {
-  color: #8a4baf !important;
+  color: #ffffff !important;
 }
 
-/* Icone viola in hover */
+/* Icone hover */
 .navLink:hover svg,
 .navLink:hover i,
 .navLink:hover [data-icon],
 .navLink:focus-visible svg,
 .navLink:focus-visible i,
 .navLink:focus-visible [data-icon] {
-  color: #8a4baf !important;
-  fill: #8a4baf !important;
-  stroke: #8a4baf !important;
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 /* === LINK ATTIVO (se usi NavLink di React Router) === */
@@ -133,17 +139,14 @@
   position: relative;
 }
 
-/* Campanella identica alle altre icone - NESSUN background */
+/* Campanella identica alle altre icone */
 .notificationContainer .navLink {
-  background: none !important;
-  border: none !important;
-  padding: 8px 12px;
+  padding: 10px 16px;
 }
 
 .notificationContainer .navLink:hover,
 .notificationContainer .navLink:focus-visible {
-  background-color: rgba(138, 75, 175, 0.1);
-  border: none !important;
+  background-color: rgba(138, 75, 175, 0.9);
 }
 
 /* Badge conta notifiche */
@@ -321,7 +324,7 @@
     left: 0;
     width: 100%;
     /* Estende la barra anche nella safe area del notch */
-    height: calc(44px + env(safe-area-inset-top, 0px));
+    height: calc(40px + env(safe-area-inset-top, 0px)); /* -10% */
     padding-top: env(safe-area-inset-top, 0px);
     background-color: #0a0a0a;
     /* NO backdrop-filter: blur fa trasparire il gradiente rosso del body */
@@ -334,29 +337,33 @@
     align-items: center;
     gap: 8px;
     color: #e50914 !important;
-    font-size: 1.25rem;
+    font-size: 1.15rem; /* -10% */
     font-weight: 800;
     text-decoration: none;
     letter-spacing: 0.5px;
   }
 
   .mobileLogo img {
-    width: 36px; /* Aumentata del 30% (da 28px) */
-    height: 36px; /* Aumentata del 30% (da 28px) */
+    width: 32px; /* Aumentata ma ridotta post 10% shrink */
+    height: 32px;
     border-radius: 50%;
     object-fit: cover;
   }
 
   .navbar {
+    width: 100%;
     padding: 0;
+    margin: 0;
     position: fixed;
     top: auto;
     bottom: 0;
+    border-radius: 0;
     border-bottom: none;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    height: 60px;
+    height: 54px; /* -10% (da 60px) */
     background-color: #0a0a0a; /* OPACO: evita che il gradiente rosso del body trapeli */
+    box-shadow: none;
   }
 
   .navContent {
@@ -379,7 +386,7 @@
   }
 
   .navLink {
-    font-size: 1.25rem;
+    font-size: 1.15rem; /* -10% */
     padding: 0; /* Rimuove padding extra */
     height: 100%;
     display: flex;
@@ -387,6 +394,19 @@
     justify-content: center;
     border-radius: 0;
     flex: 1;
+  }
+  
+  .navLink:hover,
+  .navLink:focus-visible {
+    background-color: transparent !important;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .navLink:hover svg,
+  .navLink:focus-visible svg {
+    color: #8a4baf !important;
+    fill: #8a4baf !important;
   }
 
   /* Il contenitore della campanella deve ocupare lo stesso spazio degli altri link */
@@ -399,6 +419,7 @@
 
   .notificationContainer .navLink {
     width: 100%;
+    padding: 0;
   }
 
   .navLink span {
@@ -406,8 +427,12 @@
   }
 
   .notificationBadge {
-    top: 8px;
-    right: calc(50% - 15px);
+    top: 6px;
+    right: calc(50% - 14px);
+    width: 16px;
+    height: 16px;
+    font-size: 9px;
+    border-width: 1px;
   }
 
   .notificationDropdown {
@@ -421,12 +446,12 @@
 
 @media (max-width: 480px) {
   .navLink {
-    font-size: 1.35rem; /* Icone leggermente più grandi ma contenute */
+    font-size: 1.2rem; /* -10% */
   }
 
   .notificationBadge {
-    top: 8px;
-    right: calc(50% - 16px);
+    top: 6px;
+    right: calc(50% - 15px);
   }
 
   .notificationDropdown {

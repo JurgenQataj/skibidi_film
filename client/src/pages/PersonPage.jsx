@@ -9,6 +9,7 @@ function PersonPage() {
   const { name } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isBioExpanded, setIsBioExpanded] = useState(false);
   // Helper per inizializzare lo stato da localStorage
   const getInitialState = (key, defaultValue) => {
     const saved = localStorage.getItem(key);
@@ -129,10 +130,20 @@ function PersonPage() {
           {data.biography ? (
             <div className={styles.biographyContainer}>
               <h3 className={styles.biographyTitle}>Biografia</h3>
-              <p className={styles.biographyText}>{data.biography}</p>
+              <p className={`${styles.biographyText} ${!isBioExpanded ? styles.clampedBio : ""}`}>
+                {data.biography}
+              </p>
+              {data.biography.length > 400 && (
+                <button 
+                  className={styles.toggleBioButton}
+                  onClick={() => setIsBioExpanded(!isBioExpanded)}
+                >
+                  {isBioExpanded ? "Mostra meno" : "Leggi di più"}
+                </button>
+              )}
             </div>
           ) : (
-            <p className={styles.biographyText}>Nessuna biografia disponibile su TMDB.</p>
+            <p className={styles.biographyText}>Nessun biografia disponibile su TMDB.</p>
           )}
         </div>
       </div>

@@ -58,6 +58,36 @@
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.85);
   white-space: pre-line;
+  margin-bottom: 5px;
+}
+
+.clampedBio {
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.toggleBioButton {
+  background: none;
+  border: none;
+  color: var(--primary-color, #a862d2);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 5px;
+  text-decoration: none;
+  transition: color 0.2s;
+  display: block;
+  text-align: right;
+  width: 100%;
+}
+
+.toggleBioButton:hover {
+  text-decoration: underline;
+  color: #fff;
 }
 
 .section {
