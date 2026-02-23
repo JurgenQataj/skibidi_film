@@ -352,6 +352,30 @@
   text-align: left;
 }
 
+.editForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.editInput {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.editInput:focus {
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-color: rgba(168, 98, 210, 0.5);
+}
+
 .bioTextarea {
   width: 100%;
   min-height: 90px;
@@ -359,27 +383,74 @@
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 18px;
   box-sizing: border-box;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   resize: vertical;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .bioTextarea:focus {
   outline: none;
+  background-color: rgba(0, 0, 0, 0.5);
   border-color: rgba(168, 98, 210, 0.5);
+}
+
+.saveButton {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(168, 98, 210, 0.8), rgba(81, 26, 126, 0.9));
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 10px;
+  margin-bottom: 24px;
+}
+
+.saveButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 98, 210, 0.4);
+}
+
+.avatarToggleContainer {
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.avatarToggleBtn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.avatarToggleBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .avatarGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   gap: 10px;
-  margin-bottom: 18px;
   background: rgba(0, 0, 0, 0.15);
-  padding: 10px;
-  border-radius: 10px;
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .avatarOption {
@@ -402,21 +473,6 @@
   border-color: rgba(168, 98, 210, 0.5);
   transform: scale(1.08);
 }
-
-.saveButton {
-  width: 100%;
-  padding: 11px;
-  border: none;
-  border-radius: 10px;
-  background: rgba(168, 98, 210, 0.35);
-  color: white;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.saveButton:hover { background: rgba(168, 98, 210, 0.55); }
 
 .divider {
   border: none;
@@ -633,31 +689,7 @@
   .historyNumber { width: 20px; font-size: 0.75rem; }
   .historyPoster { width: 26px; height: 39px; }
 }
-
-@media (max-width: 480px) {
-  .reviewsGrid {
-    grid-template-columns: repeat(3, 100px) !important;
-    gap: 8px !important;
-  }
-
-  .reviewsGrid .card {
-    --title-height: 30px;
-    width: 100px !important;
-    height: calc(140px + var(--title-height)) !important;
-  }
-
-  .reviewsGrid .card img {
-    width: 100px !important;
-    height: 140px !important;
-  }
-
-  .reviewsGrid .card .title {
-    width: 100px !important;
-    height: var(--title-height) !important;
-    font-size: 0.55rem !important;
-  }
-}
-
+/* REMOVED 480px breakpoint because it conflicted with the responsive 1fr grid */
 /* ── S23 / iPhone SE (Very Narrow) ──────────── */
 @media (max-width: 395px) {
   .profileHeader {
@@ -709,5 +741,32 @@
     width: 38px;
     height: 38px;
     font-size: 1rem;
+  }
+
+  /* 10% smaller MovieCards for S23, responsive and padded */
+  .reviewsGrid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+    padding: 0 4px; /* Un po' di margine ai lati */
+  }
+
+  .reviewsGrid .card {
+    --title-height: 32px;
+    width: 100% !important;
+    max-width: 105px;
+    height: auto !important;
+    aspect-ratio: 2/3.5;
+  }
+
+  .reviewsGrid .card img {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 2/3 !important;
+  }
+
+  .reviewsGrid .card .title {
+    width: 100% !important;
+    height: var(--title-height) !important;
+    font-size: 0.58rem !important;
   }
 }

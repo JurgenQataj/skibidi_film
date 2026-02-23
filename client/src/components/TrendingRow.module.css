@@ -127,7 +127,8 @@
 
 .cardWrapper img {
   width: 120px !important;
-  height: 115px !important; /* 144px - 20% ≈ 115px */
+  height: auto !important; 
+  aspect-ratio: 2/3 !important;
   object-fit: cover !important;
 }
 
@@ -180,7 +181,8 @@
   }
   .cardWrapper img {
     width: 100px !important;
-    height: 120px !important; /* 150px - 20% */
+    height: auto !important; 
+    aspect-ratio: 2/3 !important;
   }
 }
 
@@ -195,6 +197,31 @@
   }
   .cardWrapper img {
     width: 90px !important;
-    height: 108px !important; /* 135px - 20% */
+    height: auto !important; 
+    aspect-ratio: 2/3 !important;
+  }
+}
+
+/* ── S23 / iPhone SE (Very Narrow) ──────────── */
+@media (max-width: 395px) {
+  .title {
+    font-size: 1.1rem; /* Prevent wrapping "In Tendenza" */
+  }
+  .toggleButton {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+  .cardWrapper {
+    flex: 0 0 81px; /* 10% smaller than 90px */
+    width: 81px;
+    max-width: 81px;
+  }
+  .cardWrapper > * {
+    max-width: 81px !important;
+  }
+  .cardWrapper img {
+    width: 81px !important;
+    height: auto !important; 
+    aspect-ratio: 2/3 !important; /* Perfect proportional scaling */
   }
 }

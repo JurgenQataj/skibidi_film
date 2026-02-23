@@ -97,7 +97,7 @@
 /* MEDIA QUERIES PER RESPONSIVE */
 @media (max-width: 768px) {
   .card img {
-    height: 150px !important; /* RESTA UGUALE SU MOBILE */
+    height: auto !important;
   }
 
   .title {
@@ -108,11 +108,18 @@
 
 @media (max-width: 480px) {
   .card img {
-    height: 120px !important; /* RESTA UGUALE SU MOBILE PICCOLO */
+    height: auto !important;
   }
 
   .title {
     font-size: 0.6rem;
     height: 35px;
+  }
+}
+
+@media (max-width: 395px) {
+  .title {
+    font-size: 0.55rem;
+    height: 32px;
   }
 }

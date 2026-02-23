@@ -64,6 +64,7 @@ function ProfilePage() {
   const [editAvatar, setEditAvatar] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editUsername, setEditUsername] = useState("");
+  const [showEditAvatars, setShowEditAvatars] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -238,23 +239,14 @@ function ProfilePage() {
         onClose={() => setIsEditModalOpen(false)}
         title="Modifica Profilo"
       >
-        <form onSubmit={handleProfileUpdate}>
+        <form onSubmit={handleProfileUpdate} className={styles.editForm}>
           <label className={styles.editLabel}>Username</label>
           <input
             type="text"
             value={editUsername}
             onChange={(e) => setEditUsername(e.target.value)}
             maxLength={10}
-            style={{
-              width: '100%',
-              padding: '8px',
-              marginBottom: '15px',
-              borderRadius: '4px',
-              border: '1px solid #333',
-              backgroundColor: '#222',
-              color: 'white',
-              boxSizing: 'border-box'
-            }}
+            className={styles.editInput}
             placeholder="Max 10 caratteri"
           />
 
@@ -263,16 +255,7 @@ function ProfilePage() {
             type="email"
             value={editEmail}
             onChange={(e) => setEditEmail(e.target.value)}
-            style={{
-              width: '100%', 
-              padding: '8px', 
-              marginBottom: '15px', 
-              borderRadius: '4px', 
-              border: '1px solid #333', 
-              backgroundColor: '#222', 
-              color: 'white',
-              boxSizing: 'border-box'
-            }}
+            className={styles.editInput}
             placeholder="Inserisci la tua email"
           />
 
@@ -283,19 +266,32 @@ function ProfilePage() {
             className={styles.bioTextarea}
             maxLength="150"
           />
-          <label className={styles.editLabel}>Scegli un Avatar Pokémon (HQ)</label>
-          <div className={styles.avatarGrid}>
-            {pokemonAvatars.map((url) => (
-              <img
-                key={url}
-                src={url}
-                alt="avatar Pokémon"
-                className={`${styles.avatarOption} ${editAvatar === url ? styles.selected : ""}`}
-                onClick={() => setEditAvatar(url)}
-              />
-            ))}
-          </div>
+
           <button type="submit" className={styles.saveButton}>Salva Modifiche</button>
+          
+          <div className={styles.avatarToggleContainer}>
+            <button 
+              type="button" 
+              className={styles.avatarToggleBtn}
+              onClick={() => setShowEditAvatars(!showEditAvatars)}
+            >
+              <span>Scegli un Avatar Pokémon (HQ)</span>
+              {showEditAvatars ? <FaChevronUp /> : <FaChevronDown />}
+            </button>
+            {showEditAvatars && (
+              <div className={styles.avatarGrid}>
+                {pokemonAvatars.map((url) => (
+                  <img
+                    key={url}
+                    src={url}
+                    alt="avatar Pokémon"
+                    className={`${styles.avatarOption} ${editAvatar === url ? styles.selected : ""}`}
+                    onClick={() => setEditAvatar(url)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </form>
         <hr className={styles.divider} />
         <div className={styles.dangerZone}>
