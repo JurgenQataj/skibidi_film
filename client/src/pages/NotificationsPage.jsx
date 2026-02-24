@@ -106,8 +106,42 @@ function NotificationsPage() {
     }
   };
 
-  const timeAgo = (date) =>
-    formatDistanceToNow(new Date(date), { addSuffix: true, locale: it });
+  const getNotificationSideElements = (notification) => {
+    if (!notification) return null;
+
+    if (notification.type === "new_follower") {
+      return (
+        <button 
+          className={styles.followBackButton} 
+          onClick={(e) => {
+            e.preventDefault(); 
+            // Here you could add follow-back logic
+          }}
+        >
+          Visualizza
+        </button>
+      );
+    }
+    
+    // For mentions or likes related to a review with a movie/tv
+    if (notification.targetReview?.movie?.poster_path) {
+      const posterBaseUrl = "https://image.tmdb.org/t/p/w92";
+      return (
+        <img 
+          src={`${posterBaseUrl}${notification.targetReview.movie.poster_path}`} 
+          className={styles.thumbnail}
+          alt="poster"
+        />
+      );
+    }
+
+    // Default or chat
+    return null;
+  };
+
+  const timeAgo = (date) => {
+    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: it });
+  };
 
   if (loading)
     return <p className={styles.statusText}>Caricamento notifiche...</p>;
@@ -143,6 +177,9 @@ function NotificationsPage() {
                   <span className={styles.timestamp}>
                     {timeAgo(notification.createdAt)}
                   </span>
+                </div>
+                <div className={styles.sideElement}>
+                  {getNotificationSideElements(notification)}
                 </div>
               </div>
             </Link>

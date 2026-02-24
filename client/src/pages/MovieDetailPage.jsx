@@ -435,7 +435,7 @@ function MovieDetailPage() {
           {movie.watch_providers && movie.watch_providers.flatrate && movie.watch_providers.flatrate.length > 0 && (
              <div className={styles.infoBox}>
                <h4>Dove Vederlo</h4>
-               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "5px" }}>
+               <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
                  {movie.watch_providers.flatrate.map((provider) => {
                    const logoRender = (
                      <img 
@@ -443,7 +443,7 @@ function MovieDetailPage() {
                         src={`https://image.tmdb.org/t/p/original${provider.logo_path}`} 
                         alt={provider.provider_name}
                         title={provider.provider_name}
-                        style={{ width: "32px", height: "32px", borderRadius: "8px", cursor: movie.watch_providers.link ? "pointer" : "default" }}
+                        style={{ width: "24px", height: "24px", borderRadius: "6px", cursor: movie.watch_providers.link ? "pointer" : "default" }}
                      />
                    );
                    return movie.watch_providers.link ? (

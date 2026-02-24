@@ -109,7 +109,7 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
         />
       </div>
       <div className={styles.inputGroup} style={{ position: "relative" }}>
-        <label>Commento (opzionale) Usa @ per taggare</label>
+        <label>Commento (opzionale)</label>
         {showMentionDropdown && mentionUsers.length > 0 && (
           <div className={styles.mentionDropdown}>
             {mentionUsers.map((u) => (
