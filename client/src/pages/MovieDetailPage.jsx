@@ -366,8 +366,8 @@ function MovieDetailPage() {
                   </button>
                   {showLists && (
                     <div className={styles.listsDropdown}>
-                      {customLists.length > 0 ? (
-                        customLists.map((list) => (
+                      {userLists.length > 0 ? (
+                        userLists.map((list) => (
                           <button
                             key={list._id}
                             onClick={() => handleAddToList(list._id)}

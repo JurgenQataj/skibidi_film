@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./DiscoverPage.module.css";
 import UserCard from "../components/UserCard";
-import { SkeletonUserCard } from "../components/Skeleton";
+import MovieCard from "../components/MovieCard";
+import { SkeletonUserCard, SkeletonMovieCard } from "../components/Skeleton";
 import GlobalChat from "../components/GlobalChat";
 
 const SKELETON_COUNT = 8;
@@ -10,18 +11,24 @@ const SKELETON_COUNT = 8;
 function DiscoverPage() {
   const [mostFollowed, setMostFollowed] = useState([]);
   const [newestUsers, setNewestUsers] = useState([]);
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [trendingTv, setTrendingTv] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const API_URL = import.meta.env.VITE_API_URL || "";
-        const [followedRes, newestRes] = await Promise.all([
+        const [followedRes, newestRes, moviesRes, tvRes] = await Promise.all([
           axios.get(`${API_URL}/api/users/most-followed`),
           axios.get(`${API_URL}/api/users/newest`),
+          axios.get(`${API_URL}/api/movies/trending?timeWindow=day`),
+          axios.get(`${API_URL}/api/tv/trending?timeWindow=day`),
         ]);
         setMostFollowed(followedRes.data);
         setNewestUsers(newestRes.data);
+        setTrendingMovies(moviesRes.data.slice(0, 10));
+        setTrendingTv(tvRes.data.slice(0, 10));
       } catch (error) {
         console.error("Errore nel caricamento degli utenti:", error);
       } finally {
@@ -34,39 +41,43 @@ function DiscoverPage() {
   return (
     <div className={styles.pageWrapper}>
       {/* CHAT IN CIMA */}
-      <div className={styles.chatSection}>
-        <GlobalChat />
-      </div>
+      <section className={styles.chatSection}>
+         <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}>💬</span>
+            <h2 className={styles.title}>Chat Globale</h2>
+         </div>
+         <GlobalChat />
+      </section>
 
-      {/* DUE COLONNE AFFIANCATE SOTTO */}
-      <div className={styles.usersGrid}>
-        {/* Più Seguiti */}
-        <section className={styles.userColumn}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}>👑</span>
-            <h2 className={styles.title}>Più Seguiti</h2>
-          </div>
-          <div className={styles.userList}>
-            {loading
-              ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
-              : mostFollowed.map((user) => <UserCard key={user._id} user={user} />)
-            }
-          </div>
-        </section>
+      {/* LISTA UTENTI IN VERTICALE */}
+      <div className={styles.verticalLists}>
+          {/* Più Seguiti */}
+          <section className={styles.userColumn}>
+            <div className={styles.sectionHeader}>
+              <span className={styles.sectionIcon}>👑</span>
+              <h2 className={styles.title}>Più Seguiti</h2>
+            </div>
+            <div className={styles.userList}>
+              {loading
+                ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
+                : mostFollowed.map((user) => <UserCard key={user._id} user={user} />)
+              }
+            </div>
+          </section>
 
-        {/* Nuovi Iscritti */}
-        <section className={styles.userColumn}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}>✨</span>
-            <h2 className={styles.title}>Nuovi Iscritti</h2>
-          </div>
-          <div className={styles.userList}>
-            {loading
-              ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
-              : newestUsers.map((user) => <UserCard key={user._id} user={user} />)
-            }
-          </div>
-        </section>
+          {/* Nuovi Iscritti */}
+          <section className={styles.userColumn}>
+            <div className={styles.sectionHeader}>
+              <span className={styles.sectionIcon}>✨</span>
+              <h2 className={styles.title}>Nuovi Iscritti</h2>
+            </div>
+            <div className={styles.userList}>
+              {loading
+                ? Array.from({ length: SKELETON_COUNT }).map((_, i) => <SkeletonUserCard key={i} />)
+                : newestUsers.map((user) => <UserCard key={user._id} user={user} />)
+              }
+            </div>
+          </section>
       </div>
     </div>
   );

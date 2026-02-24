@@ -264,6 +264,31 @@ function TvShowDetailPage() {
     return rating.toFixed(1);
   };
 
+  // Formatta case di produzione
+  const formatCompanies = (companies) => {
+    if (!companies || companies.length === 0) return "N/A";
+    return companies.slice(0, 2).map((c) => c.name).join(", ");
+  };
+
+  // Converte codice ISO 3166-1 in Emoji Bandiera
+  const getCountryFlagEmoji = (countryCode) => {
+    if (!countryCode) return "";
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt());
+    return String.fromCodePoint(...codePoints);
+  };
+
+  // Formatta paesi di produzione (con bandiere)
+  const formatCountriesWithFlags = (countries) => {
+    if (!countries || countries.length === 0) return "N/A";
+    return countries.map((c) => {
+      const flag = getCountryFlagEmoji(c.iso_3166_1);
+      return flag ? `${flag} ${c.name}` : c.name;
+    }).join(", ");
+  };
+
   // Trova il trailer principale
   const getMainTrailer = (videos) => {
     if (!videos || videos.length === 0) return null;
@@ -341,8 +366,8 @@ function TvShowDetailPage() {
                   </button>
                   {showLists && (
                     <div className={styles.listsDropdown}>
-                      {customLists.length > 0 ? (
-                        customLists.map((list) => (
+                      {userLists.length > 0 ? (
+                        userLists.map((list) => (
                           <button
                             key={list._id}
                             onClick={() => handleAddToList(list._id)}
@@ -421,6 +446,18 @@ function TvShowDetailPage() {
           <div className={styles.infoBox}>
             <h4>Episodi</h4>
             <p>{movie.number_of_episodes || "N/A"}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Produttore</h4>
+            <p>{movie.producer?.name || "Non disponibile"}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Studi</h4>
+            <p>{formatCompanies(movie.production_companies)}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Paese</h4>
+            <p>{formatCountriesWithFlags(movie.production_countries)}</p>
           </div>
           <div className={styles.infoBox}>
             <h4>Lingua</h4>

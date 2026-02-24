@@ -42,7 +42,10 @@ function WatchlistPage() {
       return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/api/watchlist/${tmdbId}`, {
+      const movieToRemove = watchlist.find(m => m.tmdb_id === tmdbId);
+      const mediaType = movieToRemove?.media_type || "movie";
+      
+      await axios.delete(`${API_URL}/api/watchlist/${tmdbId}?mediaType=${mediaType}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       // Aggiorna lo stato per rimuovere il film senza ricaricare la pagina

@@ -3,21 +3,41 @@ const Movie = require("../models/Movie");
 const axios = require("axios");
 
 const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
-  let movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
+  console.log(`[WATCHLIST] findOrCreateMovie: tmdbId=${tmdbId}, mediaType=${mediaType}`);
+  const numericId = Number(tmdbId);
+  
+  // Cerchiamo il film. 
+  // NOTA: Se l'indice è solo su tmdb_id, non possiamo avere due record con lo stesso tmdb_id ma mediaType diversi
+  let movie = await Movie.findOne({ tmdb_id: numericId });
+  
   if (!movie) {
+    console.log(`[WATCHLIST] Movie not found in DB, fetching from TMDB: ${numericId}`);
     const tmdbUrl = mediaType === "tv"
-      ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
-      : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+      ? `https://api.themoviedb.org/3/tv/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
+      : `https://api.themoviedb.org/3/movie/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
       
     const tmdbResponse = await axios.get(tmdbUrl);
     const movieData = tmdbResponse.data;
+    
     movie = new Movie({
       tmdb_id: movieData.id,
       media_type: mediaType,
       title: mediaType === "tv" ? movieData.name : movieData.title,
       poster_path: movieData.poster_path,
     });
-    await movie.save();
+
+    try {
+      await movie.save();
+      console.log(`[WATCHLIST] Movie saved to DB: ${movie.title}`);
+    } catch (saveError) {
+      // Se fallisce il salvataggio per duplicato (race condition), riproviamo a cercarlo
+      if (saveError.code === 11000) {
+        console.log(`[WATCHLIST] Race condition detected, fetching existing movie...`);
+        movie = await Movie.findOne({ tmdb_id: numericId });
+      } else {
+        throw saveError;
+      }
+    }
   }
   return movie;
 };
@@ -30,6 +50,7 @@ exports.addToWatchlist = async (req, res) => {
 
   try {
     const movie = await findOrCreateMovie(tmdbId, mediaType);
+    console.log(`[WATCHLIST] Adding movie ${movie._id} to user ${userId}`);
     await User.findByIdAndUpdate(userId, { $addToSet: { watchlist: movie._id } });
     res.status(200).json({ message: "Aggiunto alla watchlist." });
   } catch (error) {
