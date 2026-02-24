@@ -19,16 +19,22 @@
   width: 100%;
   min-height: 100%;
   /* Gradiente MOLTO più scuro per garantire leggibilità assoluta del testo */
-  background: linear-gradient(
-    to top, 
-    rgba(15, 15, 17, 1) 0%, 
-    rgba(15, 15, 17, 0.9) 30%, 
-    rgba(15, 15, 17, 0.7) 60%, 
-    rgba(15, 15, 17, 0.3) 100%
-  );
+  background: transparent;
   display: flex;
   align-items: flex-end;
   padding-top: 80px; /* Spazio per la Navbar in alto */
+}
+
+.collectionOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  /* Removed gradient to match netflix solid background */
+  background: transparent;
+  padding: 30px;
+  box-sizing: border-box;
 }
 
 .headerContent {

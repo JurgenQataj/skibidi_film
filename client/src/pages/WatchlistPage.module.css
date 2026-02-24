@@ -96,7 +96,7 @@
   font-size: 0.95rem !important;
   height: auto !important;
   min-height: 60px;
-  background: linear-gradient(to top, #151515 10%, rgba(21,21,21,0.8));
+  background: transparent;
 }
 
 .statusText {

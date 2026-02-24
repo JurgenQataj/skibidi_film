@@ -326,7 +326,7 @@
     /* Estende la barra anche nella safe area del notch */
     height: calc(40px + env(safe-area-inset-top, 0px)); /* -10% */
     padding-top: env(safe-area-inset-top, 0px);
-    background-color: #0a0a0a;
+    background-color: #0f0f12;
     /* NO backdrop-filter: blur fa trasparire il gradiente rosso del body */
     z-index: 1000;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -362,7 +362,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     height: 54px; /* -10% (da 60px) */
-    background-color: #0a0a0a; /* OPACO: evita che il gradiente rosso del body trapeli */
+    background-color: #0f0f12; /* OPACO: evita che il gradiente rosso del body trapeli */
     box-shadow: none;
   }
 

@@ -10,7 +10,7 @@
 /* Il colore scuro DEVE essere sull'elemento html (root):
    copre status bar area, overscroll, safe-area su Android/iOS */
 html {
-  background: #0a0110;
+  background: #0f0f12; /* Nero scuro, poco luminoso ma non nero assoluto */
 }
 
 body {
@@ -20,6 +20,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0a0110;
+  background-color: #0f0f12; /* Nero scuro, poco luminoso ma non nero assoluto */
 }
 

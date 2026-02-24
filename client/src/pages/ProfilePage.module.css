@@ -25,6 +25,7 @@
   color: white;
   position: relative;
   z-index: 2;
+  background: transparent;
 }
 
 @media (max-width: 768px) {
@@ -146,8 +147,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,7 +159,7 @@
 }
 
 .iconBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 
