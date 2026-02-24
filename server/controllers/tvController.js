@@ -155,6 +155,8 @@ exports.getTvDetails = async (req, res) => {
         flatrate: data["watch/providers"]?.results?.IT?.flatrate || [],
         link: data["watch/providers"]?.results?.IT?.link || null
       },
+      production_companies: data.production_companies || [], // [NUOVO]
+      production_countries: data.production_countries || [], // [NUOVO]
     });
   } catch (error) {
     if (error.response && error.response.status === 404) {
