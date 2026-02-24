@@ -63,9 +63,9 @@ function EditReviewModal({ review, onClose, onUpdate }) {
                 color: "white", outline: "none", fontSize: "1rem", fontFamily: "'Inter', system-ui, -apple-system, sans-serif", boxSizing: "border-box", transition: "all 0.2s ease"
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = "rgba(138, 75, 175, 0.8)";
+                e.target.style.borderColor = "rgba(200, 8, 18, 0.8)";
                 e.target.style.backgroundColor = "rgba(255, 255, 255, 0.08)";
-                e.target.style.boxShadow = "0 0 0 4px rgba(138, 75, 175, 0.15)";
+                e.target.style.boxShadow = "0 0 0 4px rgba(200, 8, 18, 0.15)";
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = "rgba(255, 255, 255, 0.06)";
@@ -86,9 +86,9 @@ function EditReviewModal({ review, onClose, onUpdate }) {
                 color: "white", outline: "none", resize:"vertical", fontSize: "1rem", fontFamily: "'Inter', system-ui, -apple-system, sans-serif", boxSizing: "border-box", minHeight: "80px", transition: "all 0.2s ease"
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = "rgba(138, 75, 175, 0.8)";
+                e.target.style.borderColor = "rgba(200, 8, 18, 0.8)";
                 e.target.style.backgroundColor = "rgba(255, 255, 255, 0.08)";
-                e.target.style.boxShadow = "0 0 0 4px rgba(138, 75, 175, 0.15)";
+                e.target.style.boxShadow = "0 0 0 4px rgba(200, 8, 18, 0.15)";
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = "rgba(255, 255, 255, 0.06)";
@@ -126,7 +126,7 @@ function EditReviewModal({ review, onClose, onUpdate }) {
                 if(!loading) {
                   e.target.style.opacity = "0.9";
                   e.target.style.transform = "translateY(-1px)";
-                  e.target.style.boxShadow = "0 4px 15px rgba(138, 75, 175, 0.4)";
+                  e.target.style.boxShadow = "0 4px 15px rgba(200, 8, 18, 0.4)";
                 }
               }}
               onMouseOut={(e) => {

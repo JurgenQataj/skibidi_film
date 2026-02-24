@@ -59,7 +59,7 @@
 
 .inputField:focus {
   outline: none;
-  border-bottom-color: var(--primary-color, #a862d2);
+  border-bottom-color: var(--primary-color, #e50914);
 }
 
 .inputField::placeholder {

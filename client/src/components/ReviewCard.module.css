@@ -99,7 +99,7 @@
 .ratingValue {
   color: #00e054; /* Letterboxd Green */
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .comment {
@@ -129,62 +129,43 @@
   flex: 1; /* Prende spazio e spinge a sinistra */
 }
 
-/* Nuovi contenitori strutturali */
-.centerAction {
-  flex: 1;
+.rightActionStack {
   display: flex;
-  justify-content: center; /* Tasti centrali */
-}
-
-.rightAction {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end; /* Likes a destra */
-}
-
-.reactions {
-  display: flex;
-  gap: 12px;
+  justify-content: flex-end;
   align-items: center;
-  flex-wrap: nowrap; /* Mai a capo numero e icona */
-  white-space: nowrap;
+  gap: 16px;
 }
 
-.reactions button {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #fff;
-  font-size: 1.05rem;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.reactions button:hover {
-  background: rgba(161, 0, 28, 0.15); /*--red-main con opacità*/
-  border-color: rgba(161, 0, 28, 0.3);
-  transform: translateY(-1px);
-}
-
-.commentToggle {
-  background: none;
+.instBtn {
+  background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 6px 12px;
-  border-radius: 20px;
+  color: #fff;
+  font-size: 1.3rem; /* Dimensione icona ridotta/standard IG */
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Spazio tra icona e numero */
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-  transition: color 0.2s, background-color 0.2s;
+  transition: opacity 0.2s, transform 0.2s;
+  font-weight: 600; /* Per i numeri */
+  user-select: none;
 }
 
-.commentToggle:hover {
+.instBtn span {
+  font-size: 1rem;
   color: #fff;
-  background-color: rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+}
+
+.instBtn:hover {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+.instBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Sezione Commenti */
@@ -251,9 +232,9 @@
 
 .commentForm input:focus {
   background-color: rgba(0, 0, 0, 0.5);
-  border-color: #511a7e; /*--violet-main*/
+  border-color: #8c050c; /*--violet-main*/
   outline: none;
-  box-shadow: 0 0 0 2px rgba(81, 26, 126, 0.2);
+  box-shadow: 0 0 0 2px rgba(140, 5, 12, 0.2);
 }
 
 .commentForm button {

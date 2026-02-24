@@ -93,8 +93,8 @@
 .navLink:hover,
 .navLink:focus-visible {
   color: #ffffff !important;
-  background-color: rgba(138, 75, 175, 0.9);
-  box-shadow: 0 4px 15px rgba(138, 75, 175, 0.4);
+  background-color: rgba(200, 8, 18, 0.9);
+  box-shadow: 0 4px 15px rgba(200, 8, 18, 0.4);
   transform: translateY(-2px);
   outline: none;
 }
@@ -119,19 +119,19 @@
 
 /* === LINK ATTIVO (se usi NavLink di React Router) === */
 .navLink.active {
-  color: #8a4baf !important;
+  color: #e50914 !important;
 }
 
 .navLink.active span {
-  color: #8a4baf !important;
+  color: #e50914 !important;
 }
 
 .navLink.active svg,
 .navLink.active i,
 .navLink.active [data-icon] {
-  color: #8a4baf !important;
-  fill: #8a4baf !important;
-  stroke: #8a4baf !important;
+  color: #e50914 !important;
+  fill: #e50914 !important;
+  stroke: #e50914 !important;
 }
 
 /* === CAMPANELLA NOTIFICHE - SENZA BACKGROUND === */
@@ -146,7 +146,7 @@
 
 .notificationContainer .navLink:hover,
 .notificationContainer .navLink:focus-visible {
-  background-color: rgba(138, 75, 175, 0.9);
+  background-color: rgba(200, 8, 18, 0.9);
 }
 
 /* Badge conta notifiche */
@@ -173,10 +173,10 @@
   top: 55px;
   right: -10px;
   width: 360px;
-  background-color: rgba(20, 20, 22, 0.95);
-  border: 1px solid rgba(138, 75, 175, 0.3);
+  background-color: #0f0f12;
+  border: 1px solid rgba(200, 8, 18, 0.3);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(138, 75, 175, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(200, 8, 18, 0.2);
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(20px);
@@ -207,7 +207,7 @@
 
 .dropdownUnread {
   font-size: 0.75rem;
-  background-color: var(--primary-color, #8a4baf);
+  background-color: var(--primary-color, #e50914);
   color: white;
   padding: 3px 8px;
   border-radius: 12px;
@@ -231,9 +231,9 @@
 .notificationItem {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
+  padding: 14px 20px;
   text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.2s ease;
   background-color: transparent;
   gap: 12px;
@@ -244,12 +244,12 @@
 }
 
 .notificationItem:hover {
-  background-color: rgba(138, 75, 175, 0.15);
+  background-color: rgba(200, 8, 18, 0.15);
 }
 
 .notificationItem.unread {
-  background-color: rgba(138, 75, 175, 0.08);
-  border-left: 3px solid var(--primary-color, #8a4baf);
+  background-color: rgba(200, 8, 18, 0.08);
+  border-left: 3px solid var(--primary-color, #e50914);
 }
 
 .dropdownAvatar {
@@ -303,7 +303,7 @@
 }
 
 .showAllLink:hover {
-  background-color: rgba(138, 75, 175, 0.2);
+  background-color: rgba(200, 8, 18, 0.2);
   color: #ffffff !important;
 }
 
@@ -405,8 +405,8 @@
 
   .navLink:hover svg,
   .navLink:focus-visible svg {
-    color: #8a4baf !important;
-    fill: #8a4baf !important;
+    color: #e50914 !important;
+    fill: #e50914 !important;
   }
 
   /* Il contenitore della campanella deve ocupare lo stesso spazio degli altri link */
@@ -440,7 +440,7 @@
     right: -20px;
     top: auto;
     bottom: calc(100% + 10px);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(138, 75, 175, 0.2);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(200, 8, 18, 0.2);
   }
 }
 

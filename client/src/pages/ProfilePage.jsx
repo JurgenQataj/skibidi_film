@@ -397,43 +397,37 @@ function ProfilePage() {
         <div className={styles.pageContainer}>
         {/* ── Header stile Instagram ── */}
         <header className={styles.profileHeader}>
-          {/* Avatar and Username on the same line */}
-          <div className={styles.nameAvatarRow}>
+          <div className={styles.instaTopSection}>
             <img
               src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
               alt="Avatar"
               className={styles.avatar}
             />
-            <h1 className={styles.username}>{profile.username}</h1>
-          </div>
-
-          {/* Right column */}
-          <div className={styles.profileRight}>
-
-            {/* Stats: Film | Serie TV | Follower | Seguiti */}
-            <div className={styles.statsContainer}>
-              <div className={styles.statItem}>
-                <div className={styles.statValue}>{stats.moviesReviewed}</div>
-                <div className={styles.statLabel}>Film</div>
-              </div>
-              <div className={styles.statItem}>
-                <div className={styles.statValue}>{stats.tvShowsReviewed || 0}</div>
-                <div className={styles.statLabel}>Serie TV</div>
-              </div>
-              <div className={styles.statItemClickable} onClick={() => showModalWith("followers")}>
-                <div className={styles.statValue}>{stats.followersCount}</div>
-                <div className={styles.statLabel}>Follower</div>
-              </div>
-              <div className={styles.statItemClickable} onClick={() => showModalWith("following")}>
-                <div className={styles.statValue}>{stats.followingCount}</div>
-                <div className={styles.statLabel}>Seguiti</div>
+            <div className={styles.rightInfoContainer}>
+              <h1 className={styles.username}>{profile.username}</h1>
+              <div className={styles.statsContainer}>
+                <div className={styles.statItemClickable} onClick={() => setIsHistoryModalOpen(true)}>
+                  <div className={styles.statValue}>{stats.moviesReviewed}</div>
+                  <div className={styles.statLabel}>Film</div>
+                </div>
+                <div className={styles.statItemClickable} onClick={() => setIsTvHistoryModalOpen(true)}>
+                  <div className={styles.statValue}>{stats.tvShowsReviewed || 0}</div>
+                  <div className={styles.statLabel}>Serie TV</div>
+                </div>
+                <div className={styles.statItemClickable} onClick={() => showModalWith("followers")}>
+                  <div className={styles.statValue}>{stats.followersCount}</div>
+                  <div className={styles.statLabel}>Follower</div>
+                </div>
+                <div className={styles.statItemClickable} onClick={() => showModalWith("following")}>
+                  <div className={styles.statValue}>{stats.followingCount}</div>
+                  <div className={styles.statLabel}>Seguiti</div>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Bio */}
+          <div className={styles.bioAndActions}>
             {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
-
-            {/* Actions row: button + Stats + Liste + Logout */}
             <div className={styles.actionsRow}>
               {loggedInUserId && (
                 isOwnProfile ? (
@@ -521,7 +515,6 @@ function ProfilePage() {
               <button 
                 onClick={() => setIsTvHistoryModalOpen(true)} 
                 className={styles.showAllButton}
-                style={{ background: 'linear-gradient(135deg, #1f253d, #2f3a61)' }}
               >
                 Cronologia Serie TV ({tvReviews.length})
               </button>

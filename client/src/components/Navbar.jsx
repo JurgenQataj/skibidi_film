@@ -15,7 +15,6 @@ import { it } from "date-fns/locale";
 
 function Navbar() {
   const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const token = localStorage.getItem("token");
   let userId = null;
@@ -50,8 +49,7 @@ function Navbar() {
   }, [token]);
 
   const handleBellClick = async () => {
-    setShowNotifications(!showNotifications);
-    if (!showNotifications && unreadCount > 0) {
+    if (unreadCount > 0) {
       try {
         const API_URL = import.meta.env.VITE_API_URL || "";
         const response = await axios.put(
@@ -135,55 +133,14 @@ function Navbar() {
           {userId && (
             <>
               <div className={styles.notificationContainer}>
-                <button onClick={handleBellClick} className={styles.navLink}>
+                <Link to="/notifications" onClick={handleBellClick} className={styles.navLink}>
                   <FaBell /> <span>Notifiche</span>
                   {unreadCount > 0 && (
                     <span className={styles.notificationBadge}>
                       {unreadCount}
                     </span>
                   )}
-                </button>
-                {showNotifications && (
-                  <div className={styles.notificationDropdown}>
-                    <div className={styles.dropdownHeader}>
-                      <span className={styles.dropdownTitle}>Notifiche</span>
-                      {unreadCount > 0 && <span className={styles.dropdownUnread}>{unreadCount} nuove</span>}
-                    </div>
-                    
-                    <div className={styles.dropdownBody}>
-                      {notifications.length > 0 ? (
-                        notifications.slice(0, 5).map((n) => (
-                          <Link 
-                            to={getNotificationLink(n)} 
-                            key={n._id} 
-                            className={`${styles.notificationItem} ${!n.read ? styles.unread : ""}`}
-                            onClick={() => setShowNotifications(false)}
-                          >
-                            <img 
-                              src={n.sender?.avatar_url || "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"} 
-                              alt="avatar" 
-                              className={styles.dropdownAvatar} 
-                            />
-                            <div className={styles.dropdownContent}>
-                              <p className={styles.dropdownText}>{getNotificationText(n)}</p>
-                              <span className={styles.dropdownTime}>{timeAgo(n.createdAt)}</span>
-                            </div>
-                          </Link>
-                        ))
-                      ) : (
-                        <div className={styles.emptyNotifications}>Nessuna notifica.</div>
-                      )}
-                    </div>
-
-                    <Link
-                      to="/notifications"
-                      onClick={() => setShowNotifications(false)}
-                      className={styles.showAllLink}
-                    >
-                      Mostra tutte le notifiche
-                    </Link>
-                  </div>
-                )}
+                </Link>
               </div>
               <Link to={`/profile/${userId}`} className={styles.navLink}>
                 <FaUser /> <span>Profilo</span>

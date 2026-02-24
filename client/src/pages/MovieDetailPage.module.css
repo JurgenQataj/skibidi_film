@@ -17,9 +17,9 @@
 }
 
 .headerOverlay {
-  background: transparent;
+  background: rgba(15, 15, 18, 0.5); /* Overlay scurito per contrasto vista la nitidezza totale */
   padding: 40px 20px;
-  backdrop-filter: blur(3px);
+  backdrop-filter: none; /* Sfondo completamente nitido senza blur */
 }
 
 .headerContent {
@@ -304,19 +304,43 @@
   padding-top: 10px;
 }
 
-.reactions {
+.instBtnGroup {
   display: flex;
-  gap: 8px;
+  justify-content: flex-start; /* Sposta asinistra sotto le review */
   align-items: center;
+  gap: 16px;
 }
 
-.reactions button {
-  background: none;
+.instBtn {
+  background: transparent;
   border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
+  color: #fff;
+  font-size: 1.3rem; 
+  display: flex;
+  align-items: center;
+  gap: 6px; 
   padding: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  font-weight: 600; 
+  user-select: none;
+}
+
+.instBtn span {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.instBtn:hover {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+.instBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .actionButton,
@@ -334,27 +358,47 @@
   background-color: var(--primary-color);
   color: white;
   padding: 10px 18px;
+  filter: brightness(0.85); /* 10-15% meno luminoso */
 }
 .actionButton:hover {
   opacity: 0.8;
+  filter: brightness(1); /* Torna luminoso al passaggio del mouse se si vuole, o resta com'è */
 }
+
+/* Modifica/Elimina premium */
+.editButton {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+.editButton:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
 .deleteButton {
-  background-color: transparent;
-  border: 1px solid #ff4d4d;
-  color: #ff4d4d;
+  background: rgba(255, 77, 77, 0.05) !important;
+  border: 1px solid rgba(255, 77, 77, 0.2) !important;
+  color: #ff4d4d !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
 }
 .deleteButton:hover {
-  background-color: #ff4d4d;
-  color: white;
+  background: rgba(255, 77, 77, 0.2) !important;
+  border-color: rgba(255, 77, 77, 0.5) !important;
+  color: #fff !important;
 }
-.commentButton {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ccc;
-}
-.commentButton:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-}
+
 
 .actions {
   display: flex;
@@ -443,30 +487,38 @@
   background: rgba(40, 30, 60, 0.5);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 30px;
+  padding: 10px 15px; /* Ridotto */
+  border-radius: 12px;
+  margin-bottom: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
 }
+.alreadyReviewedMessage h3 {
+  margin: 0;
+  font-size: 1rem;
+}
 
 .authorLink {
-  color: var(--primary-color);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .authorLink:hover {
-  text-decoration: underline;
+  color: #fff;
 }
 
 .reviewAuthor {
-  color: var(--primary-color);
+  color: inherit;
+  font-weight: 600;
 }
 
 .reviewRating {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: var(--secondary-color);
+  font-weight: 800;
+  font-size: 1rem;
+  color: #00e054; /* Stile homepage / letterboxd */
 }
 
 .reviewComment {

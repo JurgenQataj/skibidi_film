@@ -59,9 +59,9 @@
 
 .ratingInput:focus,
 .commentTextarea:focus {
-  border-color: rgba(138, 75, 175, 0.8);
+  border-color: rgba(200, 8, 18, 0.8);
   background-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 4px rgba(138, 75, 175, 0.15);
+  box-shadow: 0 0 0 4px rgba(200, 8, 18, 0.15);
   outline: none;
 }
 
@@ -89,7 +89,7 @@
 
 .submitButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(138, 75, 175, 0.4);
+  box-shadow: 0 4px 15px rgba(200, 8, 18, 0.4);
 }
 
 .error {

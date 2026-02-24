@@ -7,6 +7,7 @@ import AddReviewForm from "../components/AddReviewForm";
 import MovieCard from "../components/MovieCard";
 import EditReviewModal from "../components/EditReviewModal";
 import { SkeletonMovieCard } from "../components/Skeleton";
+import { FaRegHeart, FaHeart, FaRegComment } from "react-icons/fa";
 
 function TvShowDetailPage() {
   const { tmdbId } = useParams();
@@ -145,12 +146,18 @@ function TvShowDetailPage() {
   const handleReaction = async (reviewId, reactionType) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post(
+      const resp = await axios.post(
         `${API_URL}/api/reactions/reviews/${reviewId}`,
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchData();
+      // Aggiornamento locale per evitare balzi scroll
+      setSkibidiData((prev) => ({
+        ...prev,
+        reviews: prev.reviews.map((r) =>
+          r.id === reviewId ? { ...r, reactions: resp.data.reactions, user_reactions: resp.data.reactions } : r
+        ),
+      }));
     } catch (error) {
       alert("Errore durante l'invio della reazione.");
     }
@@ -518,7 +525,7 @@ function TvShowDetailPage() {
         <div className={styles.reviewsSection}>
           {loggedInUserId && hasUserReviewed && (
             <div className={styles.alreadyReviewedMessage}>
-              <h3>Hai già recensito questo film</h3>
+              <h3>Hai già recensito questa serie</h3>
             </div>
           )}
           <h2 className={styles.reviewsTitle}>
@@ -548,10 +555,6 @@ function TvShowDetailPage() {
                          <button
                           onClick={() => setEditingReview(review)}
                           className={styles.editButton}
-                          style={{
-                              background: "none", border: "1px solid #aaa", color: "#ccc",
-                              padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem"
-                          }}
                         >
                           Modifica
                         </button>
@@ -567,24 +570,32 @@ function TvShowDetailPage() {
                 </div>
                 <p className={styles.reviewComment}>{review.comment_text}</p>
                 <div className={styles.reviewActions}>
-                  <div className={styles.reactions}>
+                  <div className={styles.instBtnGroup}>
+                    {(() => {
+                      const rawReactions = review.user_reactions || [];
+                      const hasLoved = rawReactions.some(
+                        (r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love"
+                      );
+                      const reactionCount = review.reactions?.love || 0;
+                      return (
+                        <button
+                          onClick={() => handleReaction(review.id, "love")}
+                          title="Love"
+                          className={`${styles.instBtn} ${hasLoved ? styles.instBtnLiked : ""}`}
+                        >
+                          {hasLoved ? <FaHeart color="#e50914" /> : <FaRegHeart />}
+                          <span style={hasLoved ? { color: "#e50914" } : {}}>{reactionCount}</span>
+                        </button>
+                      );
+                    })()}
                     <button
-                      onClick={() => handleReaction(review.id, "love")}
-                      title="Love"
+                      onClick={() => toggleComments(review.id)}
+                      className={styles.instBtn}
                     >
-                      ❤️
+                      <FaRegComment />
+                      <span>{review.comment_count || 0}</span>
                     </button>
-                    <span>{review.reactions?.love || 0}</span>
                   </div>
-                  <button
-                    onClick={() => toggleComments(review.id)}
-                    className={styles.commentButton}
-                  >
-                    {activeComments.reviewId === review.id
-                      ? "Chiudi"
-                      : "Commenti"}{" "}
-                    ({review.comment_count || 0})
-                  </button>
                 </div>
                 {activeComments.reviewId === review.id && (
                   <div className={styles.commentsSection}>

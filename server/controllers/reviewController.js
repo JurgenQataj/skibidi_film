@@ -213,6 +213,7 @@ exports.getReviewsForMovie = async (req, res) => {
         acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
         return acc;
       }, {}) : {},
+      user_reactions: review.reactions || [],
       comment_count: review.comments ? review.comments.length : 0,
     }));
 

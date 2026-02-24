@@ -36,6 +36,7 @@ function PersonPage() {
   const decodedName = decodeURIComponent(name);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchData = async () => {
       setLoading(true);
       try {

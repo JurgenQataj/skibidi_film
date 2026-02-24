@@ -7,6 +7,7 @@ import AddReviewForm from "../components/AddReviewForm";
 import MovieCard from "../components/MovieCard";
 import EditReviewModal from "../components/EditReviewModal";
 import { SkeletonMovieCard } from "../components/Skeleton";
+import { FaRegHeart, FaHeart, FaRegComment } from "react-icons/fa";
 
 function MovieDetailPage() {
   const { tmdbId } = useParams();
@@ -145,12 +146,18 @@ function MovieDetailPage() {
   const handleReaction = async (reviewId, reactionType) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post(
+      const resp = await axios.post(
         `${API_URL}/api/reactions/reviews/${reviewId}`,
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchData();
+      // Aggiornamento locale per evitare il reload e balzi nello scroll
+      setSkibidiData((prev) => ({
+        ...prev,
+        reviews: prev.reviews.map((r) =>
+          r.id === reviewId ? { ...r, reactions: resp.data.reactions, user_reactions: resp.data.reactions } : r
+        ),
+      }));
     } catch (error) {
       alert("Errore durante l'invio della reazione.");
     }
@@ -249,6 +256,31 @@ function MovieDetailPage() {
       .slice(0, 3)
       .map((genre) => genre.name)
       .join(", ");
+  };
+
+  // Formatta case di produzione
+  const formatCompanies = (companies) => {
+    if (!companies || companies.length === 0) return "N/A";
+    return companies.slice(0, 2).map((c) => c.name).join(", "); // Mostra max 2 per non riempire troppo
+  };
+
+  // Converte codice ISO 3166-1 in Emoji Bandiera
+  const getCountryFlagEmoji = (countryCode) => {
+    if (!countryCode) return "";
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt());
+    return String.fromCodePoint(...codePoints);
+  };
+
+  // Formatta paesi di produzione (con bandiere)
+  const formatCountriesWithFlags = (countries) => {
+    if (!countries || countries.length === 0) return "N/A";
+    return countries.map((c) => {
+      const flag = getCountryFlagEmoji(c.iso_3166_1);
+      return flag ? `${flag} ${c.name}` : c.name;
+    }).join(", ");
   };
 
   // Formatta il rating TMDB
@@ -408,6 +440,14 @@ function MovieDetailPage() {
             <p>{movie.producer?.name || "Non disponibile"}</p>
           </div>
           <div className={styles.infoBox}>
+            <h4>Studi</h4>
+            <p>{formatCompanies(movie.production_companies)}</p>
+          </div>
+          <div className={styles.infoBox}>
+            <h4>Paese</h4>
+            <p>{formatCountriesWithFlags(movie.production_countries)}</p>
+          </div>
+          <div className={styles.infoBox}>
             <h4>Costo</h4>
             <p>{formatCurrency(movie.budget)}</p>
           </div>
@@ -548,10 +588,6 @@ function MovieDetailPage() {
                          <button
                           onClick={() => setEditingReview(review)}
                           className={styles.editButton}
-                          style={{
-                              background: "none", border: "1px solid #aaa", color: "#ccc",
-                              padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem"
-                          }}
                         >
                           Modifica
                         </button>
@@ -567,24 +603,32 @@ function MovieDetailPage() {
                 </div>
                 <p className={styles.reviewComment}>{review.comment_text}</p>
                 <div className={styles.reviewActions}>
-                  <div className={styles.reactions}>
+                  <div className={styles.instBtnGroup}>
+                    {(() => {
+                      const rawReactions = review.user_reactions || [];
+                      const hasLoved = rawReactions.some(
+                        (r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love"
+                      );
+                      const reactionCount = review.reactions?.love || 0;
+                      return (
+                        <button
+                          onClick={() => handleReaction(review.id, "love")}
+                          title="Love"
+                          className={`${styles.instBtn} ${hasLoved ? styles.instBtnLiked : ""}`}
+                        >
+                          {hasLoved ? <FaHeart color="#e50914" /> : <FaRegHeart />}
+                          <span style={hasLoved ? { color: "#e50914" } : {}}>{reactionCount}</span>
+                        </button>
+                      );
+                    })()}
                     <button
-                      onClick={() => handleReaction(review.id, "love")}
-                      title="Love"
+                      onClick={() => toggleComments(review.id)}
+                      className={styles.instBtn}
                     >
-                      ❤️
+                      <FaRegComment />
+                      <span>{review.comment_count || 0}</span>
                     </button>
-                    <span>{review.reactions?.love || 0}</span>
                   </div>
-                  <button
-                    onClick={() => toggleComments(review.id)}
-                    className={styles.commentButton}
-                  >
-                    {activeComments.reviewId === review.id
-                      ? "Chiudi"
-                      : "Commenti"}{" "}
-                    ({review.comment_count || 0})
-                  </button>
                 </div>
                 {activeComments.reviewId === review.id && (
                   <div className={styles.commentsSection}>

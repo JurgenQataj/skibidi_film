@@ -58,8 +58,8 @@
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(168, 98, 210, 0.3);
-  border-color: rgba(168, 98, 210, 0.5);
+  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.3);
+  border-color: rgba(229, 9, 20, 0.5);
 }
 
 .posterContainer {
@@ -116,7 +116,7 @@
 
 .barFill {
   height: 100%;
-  background: linear-gradient(90deg, #a862d2, #d72638);
+  background: linear-gradient(90deg, #e50914, #d72638);
   border-radius: 3px;
 }
 
@@ -139,8 +139,8 @@
 
 .syncButton {
   margin-top: 20px;
-  background: rgba(168, 98, 210, 0.25);
-  border: 1px solid rgba(168, 98, 210, 0.5);
+  background: rgba(229, 9, 20, 0.25);
+  border: 1px solid rgba(229, 9, 20, 0.5);
   color: white;
   padding: 10px 24px;
   border-radius: 25px;
@@ -152,9 +152,9 @@
 }
 
 .syncButton:hover {
-  background: rgba(168, 98, 210, 0.45);
+  background: rgba(229, 9, 20, 0.45);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(168, 98, 210, 0.3);
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
 }
 
 .syncButton:disabled {

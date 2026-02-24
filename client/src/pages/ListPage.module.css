@@ -43,7 +43,14 @@
 
 @media (max-width: 768px) {
   .moviesGrid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .moviesGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem; /* Margini più stretti per i display più piccoli in modo che non sbordino */
   }
 }

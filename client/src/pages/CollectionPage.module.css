@@ -87,7 +87,7 @@
   align-items: center;
   gap: 20px;
   font-size: 1.1rem;
-  color: var(--primary-color, #a862d2);
+  color: var(--primary-color, #e50914);
   font-weight: bold;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.9);
 }
@@ -98,7 +98,7 @@
   gap: 8px;
   cursor: pointer;
   background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(168, 98, 210, 0.4);
+  border: 1px solid rgba(229, 9, 20, 0.4);
   padding: 6px 14px;
   border-radius: 20px;
   transition: all 0.2s;
@@ -109,12 +109,12 @@
 }
 
 .unseenToggle:hover {
-  background: rgba(168, 98, 210, 0.3);
-  border-color: rgba(168, 98, 210, 0.7);
+  background: rgba(229, 9, 20, 0.3);
+  border-color: rgba(229, 9, 20, 0.7);
 }
 
 .unseenToggle input[type="checkbox"] {
-  accent-color: var(--primary-color, #a862d2);
+  accent-color: var(--primary-color, #e50914);
   cursor: pointer;
   width: 14px;
   height: 14px;
@@ -134,7 +134,7 @@
 .mainContent h2 {
   font-size: 2rem;
   margin-bottom: 30px;
-  border-bottom: 2px solid rgba(138, 75, 175, 0.3);
+  border-bottom: 2px solid rgba(200, 8, 18, 0.3);
   padding-bottom: 15px;
   display: inline-block;
 }

@@ -196,6 +196,8 @@ exports.getMovieDetails = async (req, res) => {
       videos: data.videos?.results || [],
       recommendations: data.recommendations?.results || [],
       collection: data.belongs_to_collection || null, // [NUOVO] Saga
+      production_companies: data.production_companies || [], // [NUOVO] Case di produzione
+      production_countries: data.production_countries || [], // [NUOVO] Paesi di produzione
       watch_providers: {
         flatrate: data["watch/providers"]?.results?.IT?.flatrate || [],
         link: data["watch/providers"]?.results?.IT?.link || null

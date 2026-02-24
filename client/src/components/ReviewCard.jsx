@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { FaRegHeart, FaHeart, FaRegComment } from "react-icons/fa";
 import axios from "axios";
 import styles from "./ReviewCard.module.css";
 import { formatDistanceToNow } from "date-fns";
@@ -183,14 +184,16 @@ function ReviewCard({ review, onInteraction }) {
 
   const { movie, user, rating, comment_text, createdAt } = review;
   const reactionCount =
-    review.reactions?.reduce(
-      (acc, r) => ({
-        ...acc,
-        [r.reaction_type]: (acc[r.reaction_type] || 0) + 1,
-      }),
-      {}
-    ).love || 0;
-  const commentCount = review.comments?.length || 0;
+    Array.isArray(review.reactions) ?
+    review.reactions.filter((r) => r.reaction_type === "love").length 
+    : (review.reactions?.love || 0);
+  
+  const rawReactions = review.user_reactions || (Array.isArray(review.reactions) ? review.reactions : []);
+  const hasLoved = rawReactions.some(
+    (r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love"
+  );
+
+  const commentCount = review.comments?.length || review.comment_count || 0;
 
   return (
     <div className={styles.card}>
@@ -247,26 +250,22 @@ function ReviewCard({ review, onInteraction }) {
           <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
 
           {token && (
-            <>
-              <div className={styles.centerAction}>
-                <button onClick={toggleComments} className={styles.commentToggle}>
-                  {comments.shown ? "Chiudi" : "Commenti"} ({commentCount})
-                </button>
-              </div>
+            <div className={styles.rightActionStack}>
+              <button
+                onClick={() => handleReaction("love")}
+                title="Love"
+                disabled={!loggedInUserId}
+                className={`${styles.instBtn} ${hasLoved ? styles.instBtnLiked : ""}`}
+              >
+                {hasLoved ? <FaHeart color="#e50914" /> : <FaRegHeart />}
+                <span style={hasLoved ? { color: "#e50914" } : {}}>{reactionCount}</span>
+              </button>
               
-              <div className={styles.rightAction}>
-                <div className={styles.reactions}>
-                  <button
-                    onClick={() => handleReaction("love")}
-                    title="Love"
-                    disabled={!loggedInUserId}
-                  >
-                    ❤️
-                  </button>
-                  <span>{reactionCount}</span>
-                </div>
-              </div>
-            </>
+              <button onClick={toggleComments} className={styles.instBtn}>
+                <FaRegComment />
+                <span>{commentCount}</span>
+              </button>
+            </div>
           )}
         </div>
 
