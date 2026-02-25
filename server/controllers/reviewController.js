@@ -51,8 +51,8 @@ exports.addReview = async (req, res) => {
       console.log(`[INFO] Aggiornamento dati ${mediaType} ID ${tmdbId} da TMDB...`);
       
       const tmdbUrl = mediaType === "tv" 
-        ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`
-        : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits`;
+        ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`
+        : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
       
       try {
         const tmdbResponse = await axios.get(tmdbUrl);
@@ -78,6 +78,14 @@ exports.addReview = async (req, res) => {
 
         // Estrazione Generi
         const genres = movieData.genres?.map(g => g.name) || [];
+
+        // Estrazione Parole Chiave
+        let keywords = [];
+        if (mediaType === "tv") {
+           keywords = movieData.keywords?.results?.map(k => k.name) || [];
+        } else {
+           keywords = movieData.keywords?.keywords?.map(k => k.name) || [];
+        }
 
         const title = mediaType === "tv" ? movieData.name : movieData.title;
 
@@ -123,7 +131,8 @@ exports.addReview = async (req, res) => {
             crew,
             runtime,
             production_countries,
-            original_language
+            original_language,
+            keywords
           });
           await movie.save();
         } else {
@@ -139,6 +148,7 @@ exports.addReview = async (req, res) => {
           movie.runtime = runtime;
           movie.production_countries = production_countries;
           movie.original_language = original_language;
+          movie.keywords = keywords;
 
           if (movieData.belongs_to_collection) {
             movie.collection_info = {

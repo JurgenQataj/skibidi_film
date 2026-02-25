@@ -38,6 +38,8 @@ function StatsPage() {
   const [geoTab, setGeoTab] = useState("countries"); // "countries" o "languages"
   const [countriesLimit, setCountriesLimit] = useState(10);
   const [languagesLimit, setLanguagesLimit] = useState(10);
+  const [keywordsLimit, setKeywordsLimit] = useState(10);
+  const [keywordTab, setKeywordTab] = useState("count"); // "count" o "rating"
 
   // Genera una lista di anni (dal corrente indietro fino al 1900)
   const years = Array.from(new Array(currentYear - 1900 + 1), (val, index) => currentYear - index);
@@ -61,6 +63,7 @@ function StatsPage() {
         setCrewLimit(10);
         setCountriesLimit(10);
         setLanguagesLimit(10);
+        setKeywordsLimit(10);
       } catch (error) {
         console.error("Errore stats:", error);
       } finally {
@@ -244,12 +247,12 @@ function StatsPage() {
                               <span>{genre.name}</span>
                               <span style={{ color: "#aaa" }}>{genre.count}</span>
                           </div>
-                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
+                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
                                <div style={{ 
                                    width: `${percent}%`, 
                                    background: "linear-gradient(90deg, #d72638, #8c050c)", 
                                    height: "100%", 
-                                   borderRadius: "4px" 
+                                   borderRadius: "6px" 
                                }} />
                           </div>
                        </div>
@@ -322,12 +325,12 @@ function StatsPage() {
                               <span>{decade.name}</span>
                               <span style={{ color: "#aaa" }}>{decade.count}</span>
                           </div>
-                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
+                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
                                <div style={{ 
                                    width: `${percent}%`, 
                                    background: "linear-gradient(90deg, #d72638, #8c050c)", 
                                    height: "100%", 
-                                   borderRadius: "4px" 
+                                   borderRadius: "6px" 
                                }} />
                           </div>
                        </div>
@@ -456,15 +459,15 @@ function StatsPage() {
             <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
               <button
                 onClick={() => setGeoTab("countries")}
-                style={{ border: "none", background: geoTab === "countries" ? "linear-gradient(90deg, #0077cc, #004a99)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+                style={{ border: "none", background: geoTab === "countries" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
               >
-                🌍 Paesi
+                Paesi
               </button>
               <button
                 onClick={() => setGeoTab("languages")}
-                style={{ border: "none", background: geoTab === "languages" ? "linear-gradient(90deg, #e07b00, #a85000)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+                style={{ border: "none", background: geoTab === "languages" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
               >
-                🗣️ Lingue
+                Lingue
               </button>
             </div>
           </div>
@@ -482,8 +485,8 @@ function StatsPage() {
                           <span>{item.name}</span>
                           <span style={{ color: "#aaa" }}>{item.count}</span>
                         </div>
-                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
-                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #0099ff, #0044cc)", height: "100%", borderRadius: "4px" }} />
+                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
+                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #d72638, #8c050c)", height: "100%", borderRadius: "6px" }} />
                         </div>
                       </div>
                     );
@@ -509,8 +512,8 @@ function StatsPage() {
                           <span>{item.name}</span>
                           <span style={{ color: "#aaa" }}>{item.count}</span>
                         </div>
-                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
-                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #ff8c00, #cc5500)", height: "100%", borderRadius: "4px" }} />
+                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
+                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #d72638, #8c050c)", height: "100%", borderRadius: "6px" }} />
                         </div>
                       </div>
                     );
@@ -524,6 +527,64 @@ function StatsPage() {
               )}
             </div>
           )}
+        </section>
+        
+        {/* --- NUOVA SEZIONE: TEMI E PAROLE CHIAVE --- */}
+        <section className={styles.statSection}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", flexWrap: "wrap", gap: "10px" }}>
+            <h2 style={{ margin: 0 }}>Temi & Parole Chiave®</h2>
+            <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
+              <button 
+                onClick={() => setKeywordTab("count")}
+                style={{ border: "none", background: keywordTab === "count" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s", fontSize: '0.8rem' }}
+              >
+                PIÙ VISTI
+              </button>
+              <button 
+                onClick={() => setKeywordTab("rating")}
+                style={{ border: "none", background: keywordTab === "rating" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s", fontSize: '0.8rem' }}
+              >
+                MEDIA VOTO
+              </button>
+            </div>
+          </div>
+
+          <ul className={styles.textList}>
+            {(() => {
+              const isCount = keywordTab === "count";
+              const currentList = isCount ? stats.topKeywords : stats.topKeywordsByRating;
+
+              if (!currentList || currentList.length === 0) {
+                 return <p className={styles.emptyMsg}>Nessun dato relativo ai temi disponibile.</p>;
+              }
+
+              return (
+                <>
+                  {currentList.slice(0, keywordsLimit).map((keyword, idx) => (
+                    <li key={idx} className={styles.textItem} style={{ alignItems: 'center' }}>
+                      <span className={styles.rank}>#{idx + 1}</span>
+                      <div className={styles.keywordPill}>
+                        {keyword.name}
+                      </div>
+                      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {isCount ? (
+                          <span className={styles.count}>{keyword.count} film</span>
+                        ) : (
+                          <>
+                            <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {keyword.avg}</span>
+                            <span style={{ color: '#aaa', fontSize: '0.8rem' }}>({keyword.count} film)</span>
+                          </>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                  {currentList.length > keywordsLimit && keywordsLimit < 30 && (
+                    <button className={styles.showMoreBtn} onClick={() => setKeywordsLimit(30)}>Mostra fino a 30</button>
+                  )}
+                </>
+              );
+            })()}
+          </ul>
         </section>
 
       </div>

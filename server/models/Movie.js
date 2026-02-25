@@ -23,7 +23,8 @@ const MovieSchema = new mongoose.Schema({
   crew: [{
     name: { type: String },
     job:  { type: String }
-  }]
+  }],
+  keywords: [{ type: String }] // [NEW] Array di parole chiave
 });
 
 MovieSchema.index({ tmdb_id: 1, media_type: 1 }, { unique: true });

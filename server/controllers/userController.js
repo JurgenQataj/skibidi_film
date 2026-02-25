@@ -508,6 +508,36 @@ exports.getUserAdvancedStats = async (req, res) => {
       .sort((a, b) => b.count - a.count)
       .slice(0, limit);
 
+    // -- TOP KEYWORDS (Temi) --
+    const keywordsStats = {};
+    validReviews.forEach((r) => {
+      if (r.movie.keywords && Array.isArray(r.movie.keywords)) {
+        r.movie.keywords.forEach(k => {
+          if (!keywordsStats[k]) {
+            keywordsStats[k] = { count: 0, sum: 0 };
+          }
+          keywordsStats[k].count += 1;
+          const rVal = Number(r.rating);
+          if (!isNaN(rVal)) keywordsStats[k].sum += rVal;
+        });
+      }
+    });
+
+    const allKeywordsData = Object.entries(keywordsStats).map(([name, data]) => ({
+      name,
+      count: data.count,
+      avg: data.count > 0 ? Number((data.sum / data.count).toFixed(1)) : 0
+    }));
+
+    const topKeywords = [...allKeywordsData]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 30);
+
+    const topKeywordsByRating = [...allKeywordsData]
+      .filter(k => k.count >= 1)
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, 30);
+
     res.json({
       username: user.username,
       topYear,     // Restituiamo la lista dell'anno selezionato
@@ -526,6 +556,8 @@ exports.getUserAdvancedStats = async (req, res) => {
 
       topCountries,
       topLanguages,
+      topKeywords,
+      topKeywordsByRating,
 
       // Global Counts
       totalFilms,
