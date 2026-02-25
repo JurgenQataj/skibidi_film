@@ -15,10 +15,15 @@ function StatsPage() {
   const backendLimit = 50; // Quanti dati richiedere al server in partenza
   
   // Limiti visualizzazione liste (partono da 10)
-  const [actorsLimit, setActorsLimit] = useState(10);
-  const [directorsLimit, setDirectorsLimit] = useState(10);
   const [genresLimit, setGenresLimit] = useState(10);
   const [genresRatingLimit, setGenresRatingLimit] = useState(10);
+  const [personTypeTab, setPersonTypeTab] = useState("actors"); // "actors" o "directors"
+  const [personMetricTab, setPersonMetricTab] = useState("count"); // "count" o "rating"
+  const [genreTab, setGenreTab] = useState("count"); // "count" o "rating"
+  // Limiti per la sezione persone unificata
+  const [actorsLimit, setActorsLimit] = useState(10);
+  const [directorsLimit, setDirectorsLimit] = useState(10);
+
 
   // Genera una lista di anni (dal corrente indietro fino al 1900)
   const years = Array.from(new Array(currentYear - 1900 + 1), (val, index) => currentYear - index);
@@ -100,126 +105,149 @@ function StatsPage() {
           </div>
         </section>
 
-        {/* Sezione 3: Attori più visti */}
+        {/* Sezione Unificata: Persone Preferite (Attori / Registi) */}
         <section className={styles.statSection}>
-          <h2>Attori preferiti</h2>
-          <ul className={styles.textList}>
-            {stats.topActors && stats.topActors.length > 0 ? (
-              <>
-                {stats.topActors.slice(0, actorsLimit).map((actor, idx) => (
-                  <li key={idx} className={styles.textItem}>
-                  <span className={styles.rank}>#{idx + 1}</span>
-                  <a href={`/person/${encodeURIComponent(actor.name)}`} className={styles.personLink} style={{textDecoration: 'none', color: 'inherit', flex: 1}}>
-                    <span className={styles.name} style={{fontWeight: 'bold', cursor: 'pointer',  transition: 'color 0.2s'}} 
-                          onMouseOver={e => e.currentTarget.style.color = '#ff00cc'} 
-                          onMouseOut={e => e.currentTarget.style.color = 'inherit'}>
-                        {actor.name}
-                    </span>
-                  </a>
-                  <span className={styles.count}>{actor.count} film</span>
-                </li>
-                ))}
-                {stats.topActors.length > actorsLimit && actorsLimit < 30 && (
-                  <button className={styles.showMoreBtn} onClick={() => setActorsLimit(30)}>Mostra fino a 30 attori</button>
-                )}
-              </>
-            ) : (
-              <p className={styles.emptyMsg}>Dati attori non disponibili.</p>
-            )}
-          </ul>
-        </section>
-
-        {/* Sezione 4: Registi più visti */}
-        <section className={styles.statSection}>
-          <h2>Registi preferiti</h2>
-          <ul className={styles.textList}>
-            {stats.topDirectors && stats.topDirectors.length > 0 ? (
-              <>
-                {stats.topDirectors.slice(0, directorsLimit).map((dir, idx) => (
-                  <li key={idx} className={styles.textItem}>
-                  <span className={styles.rank}>#{idx + 1}</span>
-                   <a href={`/person/${encodeURIComponent(dir.name)}`} className={styles.personLink} style={{textDecoration: 'none', color: 'inherit', flex: 1}}>
-                    <span className={styles.name} style={{fontWeight: 'bold', cursor: 'pointer', transition: 'color 0.2s'}}
-                           onMouseOver={e => e.currentTarget.style.color = '#ff00cc'} 
-                           onMouseOut={e => e.currentTarget.style.color = 'inherit'}>
-                        {dir.name}
-                    </span>
-                   </a>
-                  <span className={styles.count}>{dir.count} film</span>
-                </li>
-                ))}
-                {stats.topDirectors.length > directorsLimit && directorsLimit < 30 && (
-                  <button className={styles.showMoreBtn} onClick={() => setDirectorsLimit(30)}>Mostra fino a 30 registi</button>
-                )}
-              </>
-            ) : (
-              <p className={styles.emptyMsg}>Dati registi non disponibili.</p>
-            )}
-          </ul>
-        </section>
-
-        {/* Sezione 5: Top Generi [NEW] */}
-        <section className={styles.statSection}>
-          <h2>Generi Preferiti</h2>
-          <div className={styles.genreList}>
-            {stats.topGenres && stats.topGenres.length > 0 ? (
-              <>
-                {stats.topGenres.slice(0, genresLimit).map((genre, idx) => {
-                  // Calcola larghezza barra (max è il primo elemento)
-                const maxCount = stats.topGenres[0].count;
-                const percent = (genre.count / maxCount) * 100;
-                
-                return (
-                    <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                            <span>{genre.name}</span>
-                            <span style={{ color: "#aaa" }}>{genre.count}</span>
-                        </div>
-                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
-                             <div style={{ 
-                                 width: `${percent}%`, 
-                                 background: "linear-gradient(90deg, #ff00cc, #333399)", 
-                                 height: "100%", 
-                                 borderRadius: "4px" 
-                             }} />
-                        </div>
-                     </div>
-                  );
-                })}
-                {stats.topGenres.length > genresLimit && (
-                  <button className={styles.showMoreBtn} onClick={() => setGenresLimit(stats.topGenres.length)}>Mostra tutti i generi</button>
-                )}
-              </>
-            ) : (
-              <p className={styles.emptyMsg}>Dati generi non disponibili.</p>
-            )}
+          <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", marginBottom: "15px", flexWrap: "wrap", gap: "10px" }}>
+            
+            {/* Switch: Attori o Registi */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
+                <button 
+                  onClick={() => setPersonTypeTab("actors")}
+                  style={{ border: "none", background: personTypeTab === "actors" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+                >
+                  Attori
+                </button>
+                <button 
+                  onClick={() => setPersonTypeTab("directors")}
+                  style={{ border: "none", background: personTypeTab === "directors" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+                >
+                  Registi
+                </button>
+              </div>
+              <span style={{ fontSize: '1em', color: '#aaa' }}>preferiti</span>
+            </div>
           </div>
+
+          <ul className={styles.textList}>
+            {(() => {
+              // Determina la lista in base al tab selezionato
+              const isActors = personTypeTab === "actors";
+              const currentList = isActors ? stats.topActors : stats.topDirectors;
+              
+              const currentLimit = isActors ? actorsLimit : directorsLimit;
+              const setLimit = isActors ? setActorsLimit : setDirectorsLimit;
+              const personLabel = isActors ? "attori" : "registi";
+
+              if (!currentList || currentList.length === 0) {
+                 return <p className={styles.emptyMsg}>Dati {personLabel} non disponibili.</p>;
+              }
+
+              return (
+                <>
+                  {currentList.slice(0, currentLimit).map((person, idx) => (
+                    <li key={idx} className={styles.textItem} style={{ alignItems: 'center' }}>
+                      <span className={styles.rank}>#{idx + 1}</span>
+                      <a href={`/person/${encodeURIComponent(person.name)}`} className={styles.personLink} style={{textDecoration: 'none', color: 'inherit', flex: 1, display: 'flex', alignItems: 'center', gap: '6px'}}>
+                        <span className={styles.name} style={{fontWeight: 'bold', cursor: 'pointer',  transition: 'color 0.2s'}} 
+                              onMouseOver={e => e.currentTarget.style.color = '#ff00cc'} 
+                              onMouseOut={e => e.currentTarget.style.color = 'inherit'}>
+                            {person.name}
+                        </span>
+                        {person.profile_path && (
+                           <img src={`https://image.tmdb.org/t/p/w185${person.profile_path}`} alt={person.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                        )}
+                      </a>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className={styles.count}>{person.count} film</span>
+                      </div>
+                    </li>
+                  ))}
+                  {currentList.length > currentLimit && currentLimit < 30 && (
+                    <button className={styles.showMoreBtn} onClick={() => setLimit(30)}>Mostra fino a 30 {personLabel}</button>
+                  )}
+                </>
+              );
+            })()}
+          </ul>
         </section>
 
-        {/* Sezione 6: Top Generi per Voto [NEW] */}
-         <section className={styles.statSection}>
-          <h2>Migliori Generi (Media Voto)</h2>
-          <ul className={styles.textList}>
-            {stats.topGenresByRating && stats.topGenresByRating.length > 0 ? (
-              <>
-                {stats.topGenresByRating.slice(0, genresRatingLimit).map((genre, idx) => (
-                  <li key={idx} className={styles.textItem}>
-                  <span className={styles.rank}>#{idx + 1}</span>
-                  <span className={styles.name}>{genre.name}</span>
-                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {genre.avg}</span>
-                    <span style={{ color: '#aaa', fontSize: '0.9rem' }}>({genre.count} film)</span>
-                  </div>
-                </li>
-                ))}
-                {stats.topGenresByRating.length > genresRatingLimit && (
-                  <button className={styles.showMoreBtn} onClick={() => setGenresRatingLimit(stats.topGenresByRating.length)}>Mostra tutti i generi</button>
-                )}
-              </>
-            ) : (
-              <p className={styles.emptyMsg}>Dati insufficienti (servono almeno 2 film per genere).</p>
-            )}
-          </ul>
+        {/* Sezione Generi Aggregata (Media Voto e Più visti) */}
+        <section className={styles.statSection}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", flexWrap: "wrap", gap: "10px" }}>
+            <h2 style={{ margin: 0 }}>Generi</h2>
+            <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
+              <button 
+                onClick={() => setGenreTab("count")}
+                style={{ border: "none", background: genreTab === "count" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+              >
+                Più visti
+              </button>
+              <button 
+                onClick={() => setGenreTab("rating")}
+                style={{ border: "none", background: genreTab === "rating" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+              >
+                Media Voto
+              </button>
+            </div>
+          </div>
+
+          {genreTab === "count" ? (
+            <div className={styles.genreList}>
+              {stats.topGenres && stats.topGenres.length > 0 ? (
+                <>
+                  {stats.topGenres.slice(0, genresLimit).map((genre, idx) => {
+                    const maxCount = stats.topGenres[0].count;
+                    const percent = (genre.count / maxCount) * 100;
+                    
+                    return (
+                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                              <span>{genre.name}</span>
+                              <span style={{ color: "#aaa" }}>{genre.count}</span>
+                          </div>
+                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
+                               <div style={{ 
+                                   width: `${percent}%`, 
+                                   background: "linear-gradient(90deg, #d72638, #8c050c)", 
+                                   height: "100%", 
+                                   borderRadius: "4px" 
+                               }} />
+                          </div>
+                       </div>
+                    );
+                  })}
+                  {stats.topGenres.length > genresLimit && (
+                    <button className={styles.showMoreBtn} onClick={() => setGenresLimit(stats.topGenres.length)}>Mostra tutti i generi</button>
+                  )}
+                </>
+              ) : (
+                <p className={styles.emptyMsg}>Dati generi non disponibili.</p>
+              )}
+            </div>
+          ) : (
+            <ul className={styles.textList}>
+              {stats.topGenresByRating && stats.topGenresByRating.length > 0 ? (
+                <>
+                  {stats.topGenresByRating.slice(0, genresRatingLimit).map((genre, idx) => (
+                    <li key={idx} className={styles.textItem}>
+                      <span className={styles.rank}>#{idx + 1}</span>
+                      <span className={styles.name}>{genre.name}</span>
+                      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {genre.avg}</span>
+                        <span style={{ color: '#aaa', fontSize: '0.9rem' }}>({genre.count} film)</span>
+                      </div>
+                    </li>
+                  ))}
+                  {stats.topGenresByRating.length > genresRatingLimit && (
+                    <button className={styles.showMoreBtn} onClick={() => setGenresRatingLimit(stats.topGenresByRating.length)}>Mostra tutti i generi</button>
+                  )}
+                </>
+              ) : (
+                <p className={styles.emptyMsg}>Dati insufficienti (servono almeno 2 film per genere).</p>
+              )}
+            </ul>
+          )}
         </section>
       </div>
     </div>

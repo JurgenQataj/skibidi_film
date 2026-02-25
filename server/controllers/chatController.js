@@ -37,11 +37,13 @@ exports.postMessage = async (req, res) => {
       return res.status(400).json({ message: "Testo vuoto" });
     }
 
-    const mentionedIds = await extractMentions(text);
+    // Estrarre le mentions dal testo pulito
+    const content = text.trim();
+    const mentionedIds = await extractMentions(content);
 
     const newMessage = new GlobalMessage({
       user: req.user.id,
-      text: text.trim(),
+      text: content,
       mentions: mentionedIds,
     });
 

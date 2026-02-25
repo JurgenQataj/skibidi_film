@@ -97,12 +97,19 @@ const GlobalChat = () => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setNewMessage(value);
+    
+    // Find where the user is typing
     const cursor = e.target.selectionStart;
     const upToCursor = value.slice(0, cursor);
-    const atMatch = upToCursor.match(/@(\w*)$/);
+    
+    // Match `@` followed by any word characters at the end of the substring
+    // This allows `@` to be typed even if there's text before it.
+    const atMatch = upToCursor.match(/(?:^|\s)@(\w*)$/);
+    
     if (atMatch) {
       setMentionSearch(atMatch[1]);
-      setMentionPosition(upToCursor.lastIndexOf('@'));
+      // The exact position of the `@` symbol
+      setMentionPosition(cursor - atMatch[1].length - 1);
       setShowMentionDropdown(true);
     } else {
       setShowMentionDropdown(false);

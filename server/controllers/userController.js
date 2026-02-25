@@ -5,6 +5,7 @@ const Notification = require("../models/Notification");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const axios = require("axios");
 const SibApiV3Sdk = require("sib-api-v3-sdk");
 
 // Configurazione Brevo (una volta sola a livello di file)
@@ -361,13 +362,36 @@ exports.getUserAdvancedStats = async (req, res) => {
       .sort((a, b) => b.avg - a.avg)
       .slice(0, limit);
 
+    const fetchAvatars = async (list) => {
+      const TMDB_API_KEY = process.env.TMDB_API_KEY;
+      if (!TMDB_API_KEY) return list;
+
+      return Promise.all(
+        list.map(async (p) => {
+          try {
+            const url = `https://api.themoviedb.org/3/search/person?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(p.name)}`;
+            const response = await axios.get(url);
+            if (response.data.results && response.data.results.length > 0) {
+               p.profile_path = response.data.results[0].profile_path;
+            }
+          } catch(e) {
+             // Handle silently
+          }
+          return p;
+        })
+      );
+    };
+
+    const actorsWithImages = await fetchAvatars(topActors);
+    const directorsWithImages = await fetchAvatars(topDirectors);
+
     res.json({
       username: user.username,
       topYear,     // Restituiamo la lista dell'anno selezionato
       targetYear,  // Restituiamo l'anno per conferma
       topAllTime,
-      topActors,
-      topDirectors,
+      topActors: actorsWithImages,
+      topDirectors: directorsWithImages,
       topGenres,
       topGenresByRating // [NEW]
     });

@@ -37,7 +37,14 @@ exports.addReview = async (req, res) => {
 
   try {
     // 1. Cerca il film nel DB locale
-    let movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
+    const movieQuery = {
+      tmdb_id: tmdbId,
+      $or: [
+        { media_type: mediaType },
+        ...(mediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
+      ]
+    };
+    let movie = await Movie.findOne(movieQuery);
 
     // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno/generi), scaricali da TMDB
     if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year || !movie.genres || movie.genres.length === 0) {
@@ -178,7 +185,14 @@ exports.addReview = async (req, res) => {
 exports.getReviewsForMovie = async (req, res) => {
   try {
     const { mediaType = "movie" } = req.query;
-    const movie = await Movie.findOne({ tmdb_id: req.params.tmdbId, media_type: mediaType });
+    const movieQuery = {
+      tmdb_id: req.params.tmdbId,
+      $or: [
+        { media_type: mediaType },
+        ...(mediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
+      ]
+    };
+    const movie = await Movie.findOne(movieQuery);
     if (!movie) {
       return res
         .status(200)
@@ -233,7 +247,14 @@ exports.getReviewsForMovie = async (req, res) => {
 exports.checkUserReviewStatus = async (req, res) => {
   try {
     const { mediaType = "movie" } = req.query;
-    const movie = await Movie.findOne({ tmdb_id: req.params.tmdbId, media_type: mediaType });
+    const movieQuery = {
+      tmdb_id: req.params.tmdbId,
+      $or: [
+        { media_type: mediaType },
+        ...(mediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
+      ]
+    };
+    const movie = await Movie.findOne(movieQuery);
     if (!movie) return res.json({ hasReviewed: false });
 
     const review = await Review.findOne({

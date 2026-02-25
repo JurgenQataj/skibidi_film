@@ -263,15 +263,17 @@ function TvShowDetailPage() {
   // Formatta case di produzione
   const formatCompanies = (companies) => {
     if (!companies || companies.length === 0) return "N/A";
-    return companies.slice(0, 2).map((c) => (
-      <Link 
-        key={c.id} 
-        to={`/search?mode=tv&with_companies=${c.id}`} 
-        className={styles.personLink}
-      >
-        {c.name}
-      </Link>
-    )).reduce((prev, curr) => [prev, ", ", curr]);
+    return companies.slice(0, 2).map((c, index, arr) => (
+      <span key={c.id}>
+        <Link 
+          to={`/search?mode=tv&with_companies=${c.id}`} 
+          className={styles.personLink}
+        >
+          {c.name}
+        </Link>
+        {index < arr.length - 1 ? ", " : ""}
+      </span>
+    ));
   };
 
   // Converte codice ISO 3166-1 in Emoji Bandiera
@@ -287,18 +289,20 @@ function TvShowDetailPage() {
   // Formatta paesi di produzione (con bandiere)
   const formatCountriesWithFlags = (countries) => {
     if (!countries || countries.length === 0) return "N/A";
-    return countries.map((c, index) => {
+    return countries.map((c, index, arr) => {
       const flag = getCountryFlagEmoji(c.iso_3166_1);
       return (
-        <Link 
-          key={c.iso_3166_1} 
-          to={`/search?mode=tv&with_origin_country=${c.iso_3166_1}`} 
-          className={styles.personLink}
-        >
-          {flag ? `${flag} ${c.name}` : c.name}
-        </Link>
+        <span key={c.iso_3166_1}>
+          <Link 
+            to={`/search?mode=tv&with_origin_country=${c.iso_3166_1}`} 
+            className={styles.personLink}
+          >
+            {flag ? `${flag} ${c.name}` : c.name}
+          </Link>
+          {index < arr.length - 1 ? ", " : ""}
+        </span>
       );
-    }).reduce((prev, curr) => [prev, ", ", curr]);
+    });
   };
 
   // Trova il trailer principale
