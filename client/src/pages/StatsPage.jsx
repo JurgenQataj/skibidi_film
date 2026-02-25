@@ -24,6 +24,10 @@ function StatsPage() {
   const [actorsLimit, setActorsLimit] = useState(10);
   const [directorsLimit, setDirectorsLimit] = useState(10);
 
+  // Stato per la nuova sezione Crew e Dietro le Quinte
+  const [crewTypeTab, setCrewTypeTab] = useState("studios");
+  const [crewLimit, setCrewLimit] = useState(10);
+
 
   // Genera una lista di anni (dal corrente indietro fino al 1900)
   const years = Array.from(new Array(currentYear - 1900 + 1), (val, index) => currentYear - index);
@@ -42,6 +46,7 @@ function StatsPage() {
         setDirectorsLimit(10);
         setGenresLimit(10);
         setGenresRatingLimit(10);
+        setCrewLimit(10);
       } catch (error) {
         console.error("Errore stats:", error);
       } finally {
@@ -58,6 +63,25 @@ function StatsPage() {
     <div className={styles.container}>
       <h1 className={styles.pageTitle}>Stats di {stats.username}</h1>
 
+      <div className={styles.summaryGrid}>
+        <div className={styles.summaryItem}>
+          <div className={styles.summaryValue}>{stats.totalFilms?.toLocaleString('en-US') || 0}</div>
+          <div className={styles.summaryLabel}>Films</div>
+        </div>
+        <div className={styles.summaryItem}>
+          <div className={styles.summaryValue}>{stats.totalHours?.toLocaleString('en-US') || 0}</div>
+          <div className={styles.summaryLabel}>Hours</div>
+        </div>
+        <div className={styles.summaryItem}>
+          <div className={styles.summaryValue}>{stats.totalDirectors?.toLocaleString('en-US') || 0}</div>
+          <div className={styles.summaryLabel}>Directors</div>
+        </div>
+        <div className={styles.summaryItem}>
+          <div className={styles.summaryValue}>{stats.totalCountries?.toLocaleString('en-US') || 0}</div>
+          <div className={styles.summaryLabel}>Countries</div>
+        </div>
+      </div>
+
       <div className={styles.statsGrid}>
         {/* Sezione 1: Top 10 Film per Anno Selezionabile */}
         <section className={styles.statSection}>
@@ -66,7 +90,7 @@ function StatsPage() {
             <select 
               value={selectedYear} 
               onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className={styles.yearSelect}
+              className={styles.premiumSelect}
             >
               {years.map(year => (
                 <option key={year} value={year}>{year}</option>
@@ -248,6 +272,89 @@ function StatsPage() {
               )}
             </ul>
           )}
+        </section>
+
+        {/* --- NUOVA SEZIONE: TOP CREW & STUDIOS --- */}
+        <section className={styles.statSection}>
+          <div className={styles.sectionHeader}>
+            <h2>Dietro le Quinte</h2>
+            <select 
+              value={crewTypeTab} 
+              onChange={(e) => {
+                setCrewTypeTab(e.target.value);
+                setCrewLimit(10);
+              }}
+              className={styles.premiumSelect}
+            >
+              <option value="studios">Studi di Produzione</option>
+
+              <option value="" disabled>─ Effetti ─</option>
+              <option value="Special Effects">&nbsp;&nbsp;Special Effects</option>
+              <option value="Visual Effects Supervisor">&nbsp;&nbsp;Visual Effects Supervisor</option>
+              <option value="VFX Artist">&nbsp;&nbsp;VFX Artist</option>
+
+              <option value="" disabled>─ Suono e Musica ─</option>
+              <option value="Original Music Composer">&nbsp;&nbsp;Original Music Composer</option>
+              <option value="Sound Designer">&nbsp;&nbsp;Sound Designer</option>
+              <option value="Sound Mixer">&nbsp;&nbsp;Sound Mixer</option>
+              <option value="Original Song Writer">&nbsp;&nbsp;Original Song Writer</option>
+
+              <option value="" disabled>─ Produzione ─</option>
+              <option value="Producer">&nbsp;&nbsp;Producer</option>
+              <option value="Executive Producer">&nbsp;&nbsp;Executive Producer</option>
+
+              <option value="" disabled>─ Fotografia e Luci ─</option>
+              <option value="Director of Photography">&nbsp;&nbsp;Director of Photography</option>
+              <option value="Camera Operator">&nbsp;&nbsp;Camera Operator</option>
+              <option value="Lighting Technician">&nbsp;&nbsp;Lighting Technician</option>
+              <option value="Gaffer">&nbsp;&nbsp;Gaffer</option>
+
+              <option value="" disabled>─ Scenografia e Design ─</option>
+              <option value="Production Design">&nbsp;&nbsp;Production Design</option>
+              <option value="Art Direction">&nbsp;&nbsp;Art Direction</option>
+              <option value="Set Decoration">&nbsp;&nbsp;Set Decoration</option>
+
+              <option value="" disabled>─ Sceneggiatura ─</option>
+              <option value="Writer">&nbsp;&nbsp;Writer</option>
+              <option value="Screenplay">&nbsp;&nbsp;Screenplay</option>
+              <option value="Original Story">&nbsp;&nbsp;Original Story</option>
+              <option value="Characters">&nbsp;&nbsp;Characters</option>
+            </select>
+          </div>
+
+          <ul className={styles.textList}>
+            {(() => {
+              let currentCrewList = [];
+              if (crewTypeTab === "studios") {
+                 currentCrewList = stats.topStudios;
+              } else if (stats.topCrewByJob && stats.topCrewByJob[crewTypeTab]) {
+                 currentCrewList = stats.topCrewByJob[crewTypeTab];
+              }
+
+              if (!currentCrewList || currentCrewList.length === 0) {
+                 return <p className={styles.emptyMsg}>Nessun dato relativo a questa categoria da classificare.</p>;
+              }
+
+              return (
+                <>
+                  {currentCrewList.slice(0, crewLimit).map((item, idx) => (
+                    <li key={idx} className={styles.textItem} style={{ alignItems: 'center' }}>
+                      <span className={styles.rank}>#{idx + 1}</span>
+                      <span className={styles.name} style={{ flex: 1, paddingLeft: '8px' }}>
+                          {item.name}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className={styles.count}>{item.count} film</span>
+                      </div>
+                    </li>
+                  ))}
+                  {currentCrewList.length > crewLimit && crewLimit < 30 && (
+                    <button className={styles.showMoreBtn} onClick={() => setCrewLimit(30)}>Mostra fino a 30</button>
+                  )}
+                </>
+              );
+            })()}
+          </ul>
         </section>
       </div>
     </div>

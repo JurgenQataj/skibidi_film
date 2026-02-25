@@ -317,6 +317,30 @@ exports.getUserAdvancedStats = async (req, res) => {
     });
     const topDirectors = countOccurrences(allDirectors);
 
+    // -- NUOVE CLASSIFICHE CREW E STUDI --
+    let allStudios = [];
+    let crewJobsStats = {};
+
+    validReviews.forEach(r => {
+      if (r.movie.production_companies) {
+         allStudios = allStudios.concat(r.movie.production_companies);
+      }
+      if (r.movie.crew && Array.isArray(r.movie.crew)) {
+          r.movie.crew.forEach(c => {
+             if (!crewJobsStats[c.job]) crewJobsStats[c.job] = [];
+             crewJobsStats[c.job].push(c.name);
+          });
+      }
+    });
+
+    const topStudios = countOccurrences(allStudios);
+    
+    // Aggrega ogni job in un array di "top" contati
+    const topCrewByJob = {};
+    for (const job in crewJobsStats) {
+       topCrewByJob[job] = countOccurrences(crewJobsStats[job]);
+    }
+
     // 5 & 6. Statistiche Generi Unificate (Visti e Voto)
     const genreStats = {}; 
 
@@ -385,6 +409,25 @@ exports.getUserAdvancedStats = async (req, res) => {
     const actorsWithImages = await fetchAvatars(topActors);
     const directorsWithImages = await fetchAvatars(topDirectors);
 
+    // -- COUNT GLOBALI --
+    const totalFilms = validReviews.length;
+    
+    let totalRuntime = 0;
+    const countriesSet = new Set();
+
+    validReviews.forEach((r) => {
+      if (r.movie.runtime) {
+         totalRuntime += r.movie.runtime;
+      }
+      if (r.movie.production_countries && Array.isArray(r.movie.production_countries)) {
+        r.movie.production_countries.forEach(c => countriesSet.add(c));
+      }
+    });
+
+    const totalHours = Math.floor(totalRuntime / 60);
+    const totalCountries = countriesSet.size;
+    const totalDirectors = allDirectors.length ? new Set(allDirectors).size : 0;
+
     res.json({
       username: user.username,
       topYear,     // Restituiamo la lista dell'anno selezionato
@@ -393,7 +436,16 @@ exports.getUserAdvancedStats = async (req, res) => {
       topActors: actorsWithImages,
       topDirectors: directorsWithImages,
       topGenres,
-      topGenresByRating // [NEW]
+      topGenresByRating, // [NEW]
+      
+      topStudios,
+      topCrewByJob,
+
+      // Global Counts
+      totalFilms,
+      totalHours,
+      totalDirectors,
+      totalCountries
     });
 
 

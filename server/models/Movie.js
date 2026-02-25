@@ -15,7 +15,14 @@ const MovieSchema = new mongoose.Schema({
     name: String,
     poster_path: String,
     backdrop_path: String
-  }
+  },
+  runtime: { type: Number },
+  production_countries: [{ type: String }],
+  production_companies: [{ type: String }],
+  crew: [{
+    name: { type: String },
+    job:  { type: String }
+  }]
 });
 
 MovieSchema.index({ tmdb_id: 1, media_type: 1 }, { unique: true });

@@ -81,6 +81,26 @@ exports.addReview = async (req, res) => {
 
         const title = mediaType === "tv" ? movieData.name : movieData.title;
 
+        // Estrazione Crew per stats future
+        const fullCrew = movieData.credits?.crew || [];
+        const production_companies = movieData.production_companies?.map(c => c.name) || [];
+
+        const targetJobs = [
+          "Special Effects", "Visual Effects Supervisor", "VFX Artist",
+          "Original Music Composer", "Sound Designer", "Sound Mixer", "Original Song Writer",
+          "Producer", "Executive Producer",
+          "Director of Photography", "Camera Operator", "Lighting Technician", "Gaffer",
+          "Production Design", "Art Direction", "Set Decoration",
+          "Writer", "Screenplay", "Original Story", "Characters"
+        ];
+
+        const crew = fullCrew
+          .filter(c => targetJobs.includes(c.job))
+          .map(c => ({ name: c.name, job: c.job }));
+
+        const runtime = movieData.runtime || 0;
+        const production_countries = movieData.production_countries?.map(c => c.name) || [];
+
         if (!movie) {
           // Creazione nuovo film
           movie = new Movie({
@@ -98,6 +118,10 @@ exports.addReview = async (req, res) => {
               poster_path: movieData.belongs_to_collection.poster_path,
               backdrop_path: movieData.belongs_to_collection.backdrop_path
             } : null,
+            production_companies,
+            crew,
+            runtime,
+            production_countries
           });
           await movie.save();
         } else {
@@ -107,6 +131,12 @@ exports.addReview = async (req, res) => {
           movie.director = director;
           movie.cast = cast;
           movie.genres = genres;
+          
+          movie.production_companies = production_companies;
+          movie.crew = crew;
+          movie.runtime = runtime;
+          movie.production_countries = production_countries;
+
           if (movieData.belongs_to_collection) {
             movie.collection_info = {
               id: movieData.belongs_to_collection.id,
