@@ -17,6 +17,7 @@ const MovieSchema = new mongoose.Schema({
     backdrop_path: String
   },
   runtime: { type: Number },
+  original_language: { type: String },
   production_countries: [{ type: String }],
   production_companies: [{ type: String }],
   crew: [{

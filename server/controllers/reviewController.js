@@ -100,6 +100,7 @@ exports.addReview = async (req, res) => {
 
         const runtime = movieData.runtime || 0;
         const production_countries = movieData.production_countries?.map(c => c.name) || [];
+        const original_language = movieData.original_language || null;
 
         if (!movie) {
           // Creazione nuovo film
@@ -121,7 +122,8 @@ exports.addReview = async (req, res) => {
             production_companies,
             crew,
             runtime,
-            production_countries
+            production_countries,
+            original_language
           });
           await movie.save();
         } else {
@@ -136,6 +138,7 @@ exports.addReview = async (req, res) => {
           movie.crew = crew;
           movie.runtime = runtime;
           movie.production_countries = production_countries;
+          movie.original_language = original_language;
 
           if (movieData.belongs_to_collection) {
             movie.collection_info = {

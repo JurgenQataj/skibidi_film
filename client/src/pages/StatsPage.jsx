@@ -20,6 +20,12 @@ function StatsPage() {
   const [personTypeTab, setPersonTypeTab] = useState("actors"); // "actors" o "directors"
   const [personMetricTab, setPersonMetricTab] = useState("count"); // "count" o "rating"
   const [genreTab, setGenreTab] = useState("count"); // "count" o "rating"
+  
+  // Limiti Decenni
+  const [decadeTab, setDecadeTab] = useState("count"); // "count" o "rating"
+  const [decadesLimit, setDecadesLimit] = useState(10);
+  const [decadesRatingLimit, setDecadesRatingLimit] = useState(10);
+
   // Limiti per la sezione persone unificata
   const [actorsLimit, setActorsLimit] = useState(10);
   const [directorsLimit, setDirectorsLimit] = useState(10);
@@ -28,6 +34,10 @@ function StatsPage() {
   const [crewTypeTab, setCrewTypeTab] = useState("studios");
   const [crewLimit, setCrewLimit] = useState(10);
 
+  // Stato per la sezione Paesi / Lingue
+  const [geoTab, setGeoTab] = useState("countries"); // "countries" o "languages"
+  const [countriesLimit, setCountriesLimit] = useState(10);
+  const [languagesLimit, setLanguagesLimit] = useState(10);
 
   // Genera una lista di anni (dal corrente indietro fino al 1900)
   const years = Array.from(new Array(currentYear - 1900 + 1), (val, index) => currentYear - index);
@@ -46,7 +56,11 @@ function StatsPage() {
         setDirectorsLimit(10);
         setGenresLimit(10);
         setGenresRatingLimit(10);
+        setDecadesLimit(10);
+        setDecadesRatingLimit(10);
         setCrewLimit(10);
+        setCountriesLimit(10);
+        setLanguagesLimit(10);
       } catch (error) {
         console.error("Errore stats:", error);
       } finally {
@@ -274,6 +288,84 @@ function StatsPage() {
           )}
         </section>
 
+        {/* --- NUOVA SEZIONE: DECENNI --- */}
+        <section className={styles.statSection}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", flexWrap: "wrap", gap: "10px" }}>
+            <h2 style={{ margin: 0 }}>Decenni</h2>
+            <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
+              <button 
+                onClick={() => setDecadeTab("count")}
+                style={{ border: "none", background: decadeTab === "count" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+              >
+                Più visti
+              </button>
+              <button 
+                onClick={() => setDecadeTab("rating")}
+                style={{ border: "none", background: decadeTab === "rating" ? "linear-gradient(90deg, #d72638, #8c050c)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+              >
+                Media Voto
+              </button>
+            </div>
+          </div>
+
+          {decadeTab === "count" ? (
+            <div className={styles.genreList}>
+              {stats.topDecades && stats.topDecades.length > 0 ? (
+                <>
+                  {stats.topDecades.slice(0, decadesLimit).map((decade, idx) => {
+                    const maxCount = stats.topDecades[0].count;
+                    const percent = (decade.count / maxCount) * 100;
+                    
+                    return (
+                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                              <span>{decade.name}</span>
+                              <span style={{ color: "#aaa" }}>{decade.count}</span>
+                          </div>
+                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
+                               <div style={{ 
+                                   width: `${percent}%`, 
+                                   background: "linear-gradient(90deg, #d72638, #8c050c)", 
+                                   height: "100%", 
+                                   borderRadius: "4px" 
+                               }} />
+                          </div>
+                       </div>
+                    );
+                  })}
+                  {stats.topDecades.length > decadesLimit && (
+                    <button className={styles.showMoreBtn} onClick={() => setDecadesLimit(stats.topDecades.length)}>Mostra tutti i decenni</button>
+                  )}
+                </>
+              ) : (
+                <p className={styles.emptyMsg}>Dati decenni non disponibili.</p>
+              )}
+            </div>
+          ) : (
+            <ul className={styles.textList}>
+              {stats.topDecadesByRating && stats.topDecadesByRating.length > 0 ? (
+                <>
+                  {stats.topDecadesByRating.slice(0, decadesRatingLimit).map((decade, idx) => (
+                    <li key={idx} className={styles.textItem}>
+                      <span className={styles.rank}>#{idx + 1}</span>
+                      <span className={styles.name}>{decade.name}</span>
+                      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {decade.avg}</span>
+                        <span style={{ color: '#aaa', fontSize: '0.9rem' }}>({decade.count} film)</span>
+                      </div>
+                    </li>
+                  ))}
+                  {stats.topDecadesByRating.length > decadesRatingLimit && (
+                    <button className={styles.showMoreBtn} onClick={() => setDecadesRatingLimit(stats.topDecadesByRating.length)}>Mostra tutti i decenni</button>
+                  )}
+                </>
+              ) : (
+                <p className={styles.emptyMsg}>Dati insufficienti.</p>
+              )}
+            </ul>
+          )}
+        </section>
+
         {/* --- NUOVA SEZIONE: TOP CREW & STUDIOS --- */}
         <section className={styles.statSection}>
           <div className={styles.sectionHeader}>
@@ -356,6 +448,84 @@ function StatsPage() {
             })()}
           </ul>
         </section>
+
+        {/* --- SEZIONE: PAESI E LINGUE --- */}
+        <section className={styles.statSection}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", flexWrap: "wrap", gap: "10px" }}>
+            <h2 style={{ margin: 0 }}>Origini</h2>
+            <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
+              <button
+                onClick={() => setGeoTab("countries")}
+                style={{ border: "none", background: geoTab === "countries" ? "linear-gradient(90deg, #0077cc, #004a99)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+              >
+                🌍 Paesi
+              </button>
+              <button
+                onClick={() => setGeoTab("languages")}
+                style={{ border: "none", background: geoTab === "languages" ? "linear-gradient(90deg, #e07b00, #a85000)" : "transparent", color: "white", padding: "6px 14px", borderRadius: "16px", cursor: "pointer", fontWeight: "bold", transition: "all 0.2s" }}
+              >
+                🗣️ Lingue
+              </button>
+            </div>
+          </div>
+
+          {geoTab === "countries" ? (
+            <div className={styles.genreList}>
+              {stats.topCountries && stats.topCountries.length > 0 ? (
+                <>
+                  {stats.topCountries.slice(0, countriesLimit).map((item, idx) => {
+                    const maxCount = stats.topCountries[0].count;
+                    const percent = (item.count / maxCount) * 100;
+                    return (
+                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                          <span>{item.name}</span>
+                          <span style={{ color: "#aaa" }}>{item.count}</span>
+                        </div>
+                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
+                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #0099ff, #0044cc)", height: "100%", borderRadius: "4px" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {stats.topCountries.length > countriesLimit && (
+                    <button className={styles.showMoreBtn} onClick={() => setCountriesLimit(stats.topCountries.length)}>Mostra tutti i paesi</button>
+                  )}
+                </>
+              ) : (
+                <p className={styles.emptyMsg}>Dati paesi non disponibili.</p>
+              )}
+            </div>
+          ) : (
+            <div className={styles.genreList}>
+              {stats.topLanguages && stats.topLanguages.length > 0 ? (
+                <>
+                  {stats.topLanguages.slice(0, languagesLimit).map((item, idx) => {
+                    const maxCount = stats.topLanguages[0].count;
+                    const percent = (item.count / maxCount) * 100;
+                    return (
+                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                          <span>{item.name}</span>
+                          <span style={{ color: "#aaa" }}>{item.count}</span>
+                        </div>
+                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "4px", height: "8px" }}>
+                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #ff8c00, #cc5500)", height: "100%", borderRadius: "4px" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {stats.topLanguages.length > languagesLimit && (
+                    <button className={styles.showMoreBtn} onClick={() => setLanguagesLimit(stats.topLanguages.length)}>Mostra tutte le lingue</button>
+                  )}
+                </>
+              ) : (
+                <p className={styles.emptyMsg}>Dati lingue non disponibili.</p>
+              )}
+            </div>
+          )}
+        </section>
+
       </div>
     </div>
   );

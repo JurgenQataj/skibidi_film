@@ -386,6 +386,49 @@ exports.getUserAdvancedStats = async (req, res) => {
       .sort((a, b) => b.avg - a.avg)
       .slice(0, limit);
 
+    // 7. Statistiche Decenni Unificate
+    const decadeStats = {};
+    validReviews.forEach(r => {
+      if (r.movie && r.movie.release_year) {
+        // Calcola il decennio (es. 1995 -> 1990)
+        let decade = Math.floor(r.movie.release_year / 10) * 10;
+        let decadeName = `Anni '${String(decade).slice(2)}s`; // es. "Anni '90s" -> o meglio "Anni '90"
+        if (decade >= 2000) {
+           decadeName = `Anni ${decade}`;
+        } else {
+           decadeName = `Anni '${String(decade).slice(2)}`;
+        }
+
+        if (!decadeStats[decadeName]) {
+          decadeStats[decadeName] = { count: 0, sum: 0 };
+        }
+        
+        decadeStats[decadeName].count += 1;
+        
+        const ratingVal = Number(r.rating);
+        if (!isNaN(ratingVal)) {
+          decadeStats[decadeName].sum += ratingVal;
+        }
+      }
+    });
+
+    const allDecadesData = Object.entries(decadeStats).map(([name, data]) => ({
+      name,
+      count: data.count,
+      avg: data.count > 0 ? Number((data.sum / data.count).toFixed(1)) : 0
+    }));
+
+    // Top Decenni più visti
+    const topDecades = [...allDecadesData]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+    // Top Decenni per Voto
+    const topDecadesByRating = [...allDecadesData]
+      .filter(d => d.count >= 1) 
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, limit);
+
     const fetchAvatars = async (list) => {
       const TMDB_API_KEY = process.env.TMDB_API_KEY;
       if (!TMDB_API_KEY) return list;
@@ -428,6 +471,43 @@ exports.getUserAdvancedStats = async (req, res) => {
     const totalCountries = countriesSet.size;
     const totalDirectors = allDirectors.length ? new Set(allDirectors).size : 0;
 
+    // -- TOP PAESI (da production_countries) --
+    const countriesCount = {};
+    validReviews.forEach((r) => {
+      if (r.movie.production_countries && Array.isArray(r.movie.production_countries)) {
+        r.movie.production_countries.forEach(c => {
+          countriesCount[c] = (countriesCount[c] || 0) + 1;
+        });
+      }
+    });
+    const topCountries = Object.entries(countriesCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+    // -- TOP LINGUE (da original_language) --
+    const LANGUAGE_NAMES = {
+      en: "English", fr: "French", it: "Italian", de: "German", es: "Spanish",
+      ja: "Japanese", ko: "Korean", zh: "Chinese", pt: "Portuguese",
+      ru: "Russian", hi: "Hindi", ar: "Arabic", nl: "Dutch", sv: "Swedish",
+      da: "Danish", fi: "Finnish", nb: "Norwegian", tr: "Turkish", pl: "Polish",
+      cs: "Czech", hu: "Hungarian", ro: "Romanian", el: "Greek", he: "Hebrew",
+      th: "Thai", id: "Indonesian", vi: "Vietnamese", uk: "Ukrainian",
+      cn: "Cantonese", fa: "Persian", sr: "Serbian",
+    };
+    const langsCount = {};
+    validReviews.forEach((r) => {
+      if (r.movie.original_language) {
+        const code = r.movie.original_language;
+        const name = LANGUAGE_NAMES[code] || code.toUpperCase();
+        langsCount[name] = (langsCount[name] || 0) + 1;
+      }
+    });
+    const topLanguages = Object.entries(langsCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
     res.json({
       username: user.username,
       topYear,     // Restituiamo la lista dell'anno selezionato
@@ -438,8 +518,14 @@ exports.getUserAdvancedStats = async (req, res) => {
       topGenres,
       topGenresByRating, // [NEW]
       
+      topDecades,
+      topDecadesByRating,
+
       topStudios,
       topCrewByJob,
+
+      topCountries,
+      topLanguages,
 
       // Global Counts
       totalFilms,
