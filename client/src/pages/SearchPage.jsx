@@ -4,7 +4,7 @@ import axios from "axios";
 import styles from "./SearchPage.module.css";
 import MovieCard from "../components/MovieCard";
 import SearchInput from "../components/SearchInput";
-import { SkeletonMovieCard, SkeletonPersonRow } from "../components/Skeleton";
+import { SkeletonMovieCard, SkeletonPersonRow, SkeletonWithLogo } from "../components/Skeleton";
 import KeywordInput from "../components/KeywordInput";
 import CustomSelect from "../components/CustomSelect";
 
@@ -140,6 +140,8 @@ function SearchPage() {
         category: filters.category,
         page: page.toString(),
         ...(filters.genre && { genre: filters.genre }),
+        ...(searchParams.get("with_companies") && { with_companies: searchParams.get("with_companies") }),
+        ...(searchParams.get("with_origin_country") && { with_origin_country: searchParams.get("with_origin_country") }),
         ...(filters.releaseYear.from && {
           release_date_gte: `${filters.releaseYear.from}-01-01`,
         }),
@@ -537,15 +539,7 @@ function SearchPage() {
           </div>
       )}
 
-      {loading && (
-        <div className={searchMode === "person" ? styles.personList : styles.resultsGrid}>
-          {Array.from({ length: searchMode === "person" ? 6 : 12 }).map((_, i) =>
-            searchMode === "person"
-              ? <SkeletonPersonRow key={i} />
-              : <SkeletonMovieCard key={i} />
-          )}
-        </div>
-      )}
+      {loading && <SkeletonWithLogo />}
 
       {hasSearched && !loading && (
         <div className={styles.resultsSection}>

@@ -4,7 +4,8 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./WatchlistPage.module.css";
 import MovieCard from "../components/MovieCard";
-import { SkeletonMovieCard } from "../components/Skeleton";
+import { SkeletonMovieCard, SkeletonWithLogo } from "../components/Skeleton";
+import SkibidiRoulette from "../components/SkibidiRoulette";
 
 function WatchlistPage() {
   const [watchlist, setWatchlist] = useState([]);
@@ -55,13 +56,7 @@ function WatchlistPage() {
     }
   };
 
-  if (loading) return (
-    <div className={styles.pageContainer}>
-      <div className={styles.reviewsGrid}>
-        {Array.from({ length: 8 }).map((_, i) => <SkeletonMovieCard key={i} />)}
-      </div>
-    </div>
-  );
+  if (loading) return <SkeletonWithLogo />;
 
   return (
     <div className={styles.pageContainer}>
@@ -95,6 +90,8 @@ function WatchlistPage() {
           <p className={styles.statusText}>La tua watchlist è vuota.</p>
         )}
       </div>
+
+      <SkibidiRoulette watchlist={watchlist} />
     </div>
   );
 }

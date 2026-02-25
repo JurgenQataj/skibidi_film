@@ -258,7 +258,7 @@ function ReviewCard({ review, onInteraction }) {
                 className={`${styles.instBtn} ${hasLoved ? styles.instBtnLiked : ""}`}
               >
                 {hasLoved ? <FaHeart color="#e50914" /> : <FaRegHeart />}
-                <span style={hasLoved ? { color: "#e50914" } : {}}>{reactionCount}</span>
+                <span>{reactionCount}</span>
               </button>
               
               <button onClick={toggleComments} className={styles.instBtn}>

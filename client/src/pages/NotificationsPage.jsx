@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import styles from "./NotificationsPage.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
+import { SkeletonWithLogo } from "../components/Skeleton";
 
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -143,8 +144,7 @@ function NotificationsPage() {
     return formatDistanceToNow(new Date(date), { addSuffix: true, locale: it });
   };
 
-  if (loading)
-    return <p className={styles.statusText}>Caricamento notifiche...</p>;
+  if (loading) return <SkeletonWithLogo />;
 
   return (
     <div className={styles.pageContainer}>

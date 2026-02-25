@@ -5,6 +5,7 @@ import ReviewCard from "../components/ReviewCard";
 import { useAuth } from "../context/AuthContext";
 
 import CustomTrendingRow from "../components/CustomTrendingRow";
+import { SkeletonWithLogo } from "../components/Skeleton";
 
 function HomePage() {
   const { logout } = useAuth();
@@ -98,7 +99,11 @@ function HomePage() {
             />
           );
         })}
-        {loading && <p className={styles.feedStatus}>Caricamento...</p>}
+        {loading && (
+          <div style={{ marginTop: "40px" }}>
+            <SkeletonWithLogo />
+          </div>
+        )}
         {!hasMore && feed.length > 0 && (
           <p className={styles.feedStatus}>Hai raggiunto la fine del feed!</p>
         )}

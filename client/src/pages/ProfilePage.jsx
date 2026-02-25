@@ -9,7 +9,7 @@ import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
 import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
-import { SkeletonMovieCard } from "../components/Skeleton";
+import { SkeletonMovieCard, SkeletonUserCard, SkeletonListCard, SkeletonWithLogo } from "../components/Skeleton";
 
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
 const pokemonAvatars = [
@@ -202,15 +202,7 @@ function ProfilePage() {
     }
   };
 
-  if (loading) return (
-    <div className={styles.pageContainer}>
-      <div className={styles.reviewsGrid}>
-        {Array.from({ length: 12 }).map((_, i) => (
-          <SkeletonMovieCard key={i} />
-        ))}
-      </div>
-    </div>
-  );
+  if (loading) return <SkeletonWithLogo />;
   if (!profile || !stats) return <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>;
 
   const isOwnProfile = loggedInUserId === profile._id;

@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
 import styles from "./MyListsPage.module.css";
 import { FaPlus, FaTrash, FaFilm, FaBookmark, FaHourglassHalf } from "react-icons/fa";
-import { SkeletonListCard } from "../components/Skeleton";
+import { SkeletonListCard, SkeletonWithLogo } from "../components/Skeleton";
 
 function MyListsPage() {
   const [lists, setLists] = useState([]);
@@ -64,13 +64,7 @@ function MyListsPage() {
     }
   };
 
-  if (loading) return (
-    <div className={styles.pageContainer}>
-      <div className={styles.listsGrid}>
-        {Array.from({ length: 4 }).map((_, i) => <SkeletonListCard key={i} />)}
-      </div>
-    </div>
-  );
+  if (loading) return <SkeletonWithLogo />;
 
   const isWatchlist = (list) => list.id === "watchlist" || list._id === "watchlist";
 

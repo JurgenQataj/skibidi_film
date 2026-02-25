@@ -6,7 +6,7 @@ import styles from "./MovieDetailPage.module.css";
 import AddReviewForm from "../components/AddReviewForm";
 import MovieCard from "../components/MovieCard";
 import EditReviewModal from "../components/EditReviewModal";
-import { SkeletonMovieCard } from "../components/Skeleton";
+import { SkeletonMovieCard, SkeletonWithLogo } from "../components/Skeleton";
 import { FaRegHeart, FaHeart, FaRegComment } from "react-icons/fa";
 
 function MovieDetailPage() {
@@ -222,11 +222,7 @@ function MovieDetailPage() {
 
   const customLists = userLists.filter((list) => list.id !== "watchlist");
 
-  if (loading) return (
-    <div style={{ maxWidth: "900px", margin: "60px auto", padding: "0 30px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px,1fr))", gap: "15px" }}>
-      {Array.from({ length: 6 }).map((_, i) => <SkeletonMovieCard key={i} />)}
-    </div>
-  );
+  if (loading) return <SkeletonWithLogo />;
   if (error) return <p className={styles.loading}>{error}</p>;
   if (!movie) return <p className={styles.loading}>Film non trovato.</p>;
 
@@ -261,7 +257,15 @@ function MovieDetailPage() {
   // Formatta case di produzione
   const formatCompanies = (companies) => {
     if (!companies || companies.length === 0) return "N/A";
-    return companies.slice(0, 2).map((c) => c.name).join(", "); // Mostra max 2 per non riempire troppo
+    return companies.slice(0, 2).map((c) => (
+      <Link 
+        key={c.id} 
+        to={`/search?mode=movie&with_companies=${c.id}`} 
+        className={styles.personLink}
+      >
+        {c.name}
+      </Link>
+    )).reduce((prev, curr) => [prev, ", ", curr]);
   };
 
   // Converte codice ISO 3166-1 in Emoji Bandiera
@@ -277,10 +281,18 @@ function MovieDetailPage() {
   // Formatta paesi di produzione (con bandiere)
   const formatCountriesWithFlags = (countries) => {
     if (!countries || countries.length === 0) return "N/A";
-    return countries.map((c) => {
+    return countries.map((c, index) => {
       const flag = getCountryFlagEmoji(c.iso_3166_1);
-      return flag ? `${flag} ${c.name}` : c.name;
-    }).join(", ");
+      return (
+        <Link 
+          key={c.iso_3166_1} 
+          to={`/search?mode=movie&with_origin_country=${c.iso_3166_1}`} 
+          className={styles.personLink}
+        >
+          {flag ? `${flag} ${c.name}` : c.name}
+        </Link>
+      );
+    }).reduce((prev, curr) => [prev, ", ", curr]);
   };
 
   // Formatta il rating TMDB

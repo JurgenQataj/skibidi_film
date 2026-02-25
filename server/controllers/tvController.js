@@ -38,6 +38,8 @@ exports.discoverTv = async (req, res) => {
       vote_count_gte, // [NUOVO] Estrarre limite minimo voti
       with_original_language,
       with_keywords, // [NUOVO] Estrarre le keywords passate
+      with_companies,    // [NUOVO] Per gli studi/case di produzione
+      with_origin_country, // [NUOVO] Per il paese di produzione
       sort_by,
       page = 1,
     } = req.query;
@@ -62,13 +64,15 @@ exports.discoverTv = async (req, res) => {
     if (vote_count_gte) params["vote_count.gte"] = parseInt(vote_count_gte); // Assicura che sia numero
     if (with_original_language) params.with_original_language = with_original_language;
     if (with_keywords) params.with_keywords = with_keywords;
+    if (with_companies) params.with_companies = with_companies;
+    if (with_origin_country) params.with_origin_country = with_origin_country;
 
     // Se c'è una categoria specifica e non c'è un ordinamento manuale,
     // impostiamo il sort_by corretto per quella categoria quando usiamo discover
     if (category === "top_rated" && !sort_by) params.sort_by = "vote_average.desc";
 
     let fetchUrl = `${BASE_URL}${endpoint}`;
-    if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || (sort_by && sort_by !== "popularity.desc")) {
+    if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || with_companies || with_origin_country || (sort_by && sort_by !== "popularity.desc")) {
         fetchUrl = `${BASE_URL}/discover/tv`;
     }
 

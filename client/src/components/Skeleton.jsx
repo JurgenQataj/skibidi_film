@@ -15,6 +15,14 @@ const Skeleton = ({ style, className }) => (
 
 export default Skeleton;
 
+/** Skeleton con Logo centrato e animato */
+export const SkeletonWithLogo = () => (
+  <div className={styles.logoSkeleton}>
+    <img src="/icona3.png" alt="Loading..." className={styles.logoImg} />
+  </div>
+);
+
+
 /* ── Compositi pronti all'uso ──────────────── */
 
 /** Card film: proporzione 2:3 + barra titolo */
