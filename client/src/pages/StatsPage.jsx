@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./StatsPage.module.css";
 import MovieCard from "../components/MovieCard";
+import Skeleton, { SkeletonMovieCard, SkeletonListCard } from "../components/Skeleton";
 
 function StatsPage() {
   const { userId } = useParams();
@@ -73,7 +74,42 @@ function StatsPage() {
     fetchStats();
   }, [userId, API_URL, selectedYear]); // Rimosso statsLimit dalle dipendenze, ora è costante
 
-  if (loading) return <div className={styles.loading}>Caricamento Statistiche...</div>;
+  if (loading && !stats) {
+    return (
+      <div className={styles.container}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <Skeleton style={{ height: '40px', width: '250px', margin: '0 auto' }} />
+        </div>
+
+        <div className={styles.summaryGrid}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className={styles.summaryItem}>
+              <Skeleton style={{ height: '30px', width: '60px', marginBottom: '8px' }} />
+              <Skeleton style={{ height: '15px', width: '80px' }} />
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.statsGrid}>
+          {[1, 2, 3, 4].map(i => (
+            <section key={i} className={styles.statSection}>
+              <Skeleton style={{ height: '25px', width: '150px', marginBottom: '1.5rem' }} />
+              {i <= 2 ? (
+                <div className={styles.movieList}>
+                  {[1, 2, 3, 4, 5].map(j => <SkeletonMovieCard key={j} />)}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {[1, 2, 3, 4, 5].map(j => <SkeletonListCard key={j} />)}
+                </div>
+              )}
+            </section>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (!stats) return <div className={styles.error}>Impossibile caricare le statistiche.</div>;
 
   return (
@@ -200,7 +236,13 @@ function StatsPage() {
                         )}
                       </a>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span className={styles.count}>{person.count} film</span>
+                        <Link 
+                          to={`/profile/${userId}/history?filter=${isActors ? 'actor' : 'director'}&value=${encodeURIComponent(person.name)}`} 
+                          className={styles.count}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          {person.count} film
+                        </Link>
                       </div>
                     </li>
                   ))}
@@ -242,18 +284,21 @@ function StatsPage() {
                     const percent = (genre.count / maxCount) * 100;
                     
                     return (
-                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <div key={idx} className={styles.genreItem}>
+                          <div className={styles.genreItemHeader}>
                               <span>{genre.name}</span>
-                              <span style={{ color: "#aaa" }}>{genre.count}</span>
+                          <Link 
+                            to={`/profile/${userId}/history?filter=genre&value=${encodeURIComponent(genre.name)}`}
+                            className={styles.statLink}
+                          >
+                            {genre.count}
+                          </Link>
                           </div>
-                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
-                               <div style={{ 
-                                   width: `${percent}%`, 
-                                   background: "linear-gradient(90deg, #d72638, #8c050c)", 
-                                   height: "100%", 
-                                   borderRadius: "6px" 
-                               }} />
+                          <div className={styles.progressContainer}>
+                               <div 
+                                   className={styles.progressBar}
+                                   style={{ width: `${percent}%` }} 
+                               />
                           </div>
                        </div>
                     );
@@ -276,7 +321,13 @@ function StatsPage() {
                       <span className={styles.name}>{genre.name}</span>
                       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {genre.avg}</span>
-                        <span style={{ color: '#aaa', fontSize: '0.9rem' }}>({genre.count} film)</span>
+                        <Link 
+                          to={`/profile/${userId}/history?filter=genre&value=${encodeURIComponent(genre.name)}`}
+                          className={styles.statLink}
+                          style={{ fontSize: '0.9rem' }}
+                        >
+                          ({genre.count} film)
+                        </Link>
                       </div>
                     </li>
                   ))}
@@ -320,18 +371,21 @@ function StatsPage() {
                     const percent = (decade.count / maxCount) * 100;
                     
                     return (
-                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <div key={idx} className={styles.genreItem}>
+                          <div className={styles.genreItemHeader}>
                               <span>{decade.name}</span>
-                              <span style={{ color: "#aaa" }}>{decade.count}</span>
+                          <Link 
+                            to={`/profile/${userId}/history?filter=decade&value=${encodeURIComponent(decade.name)}`}
+                            className={styles.statLink}
+                          >
+                            {decade.count}
+                          </Link>
                           </div>
-                          <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
-                               <div style={{ 
-                                   width: `${percent}%`, 
-                                   background: "linear-gradient(90deg, #d72638, #8c050c)", 
-                                   height: "100%", 
-                                   borderRadius: "6px" 
-                               }} />
+                          <div className={styles.progressContainer}>
+                               <div 
+                                   className={styles.progressBar}
+                                   style={{ width: `${percent}%` }} 
+                               />
                           </div>
                        </div>
                     );
@@ -354,7 +408,13 @@ function StatsPage() {
                       <span className={styles.name}>{decade.name}</span>
                       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {decade.avg}</span>
-                        <span style={{ color: '#aaa', fontSize: '0.9rem' }}>({decade.count} film)</span>
+                        <Link 
+                          to={`/profile/${userId}/history?filter=decade&value=${encodeURIComponent(decade.name)}`}
+                          className={styles.statLink}
+                          style={{ fontSize: '0.9rem' }}
+                        >
+                          ({decade.count} film)
+                        </Link>
                       </div>
                     </li>
                   ))}
@@ -439,7 +499,13 @@ function StatsPage() {
                           {item.name}
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span className={styles.count}>{item.count} film</span>
+                        <Link 
+                          to={`/profile/${userId}/history?filter=${crewTypeTab === 'studios' ? 'studio' : 'crew'}&value=${encodeURIComponent(item.name)}${crewTypeTab !== 'studios' ? `&subValue=${encodeURIComponent(crewTypeTab)}` : ''}`}
+                          className={styles.count}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          {item.count} film
+                        </Link>
                       </div>
                     </li>
                   ))}
@@ -480,13 +546,18 @@ function StatsPage() {
                     const maxCount = stats.topCountries[0].count;
                     const percent = (item.count / maxCount) * 100;
                     return (
-                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <div key={idx} className={styles.genreItem}>
+                        <div className={styles.genreItemHeader}>
                           <span>{item.name}</span>
-                          <span style={{ color: "#aaa" }}>{item.count}</span>
+                          <Link 
+                            to={`/profile/${userId}/history?filter=country&value=${encodeURIComponent(item.name)}`}
+                            className={styles.statLink}
+                          >
+                            {item.count}
+                          </Link>
                         </div>
-                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
-                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #d72638, #8c050c)", height: "100%", borderRadius: "6px" }} />
+                        <div className={styles.progressContainer}>
+                          <div className={styles.progressBar} style={{ width: `${percent}%` }} />
                         </div>
                       </div>
                     );
@@ -507,13 +578,18 @@ function StatsPage() {
                     const maxCount = stats.topLanguages[0].count;
                     const percent = (item.count / maxCount) * 100;
                     return (
-                      <div key={idx} className={styles.genreItem} style={{ marginBottom: "12px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <div key={idx} className={styles.genreItem}>
+                        <div className={styles.genreItemHeader}>
                           <span>{item.name}</span>
-                          <span style={{ color: "#aaa" }}>{item.count}</span>
+                          <Link 
+                            to={`/profile/${userId}/history?filter=language&value=${encodeURIComponent(item.name)}`}
+                            className={styles.statLink}
+                          >
+                            {item.count}
+                          </Link>
                         </div>
-                        <div style={{ width: "100%", background: "rgba(255,255,255,0.1)", borderRadius: "6px", height: "8px", overflow: "hidden" }}>
-                          <div style={{ width: `${percent}%`, background: "linear-gradient(90deg, #d72638, #8c050c)", height: "100%", borderRadius: "6px" }} />
+                        <div className={styles.progressContainer}>
+                          <div className={styles.progressBar} style={{ width: `${percent}%` }} />
                         </div>
                       </div>
                     );
@@ -532,7 +608,7 @@ function StatsPage() {
         {/* --- NUOVA SEZIONE: TEMI E PAROLE CHIAVE --- */}
         <section className={styles.statSection}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", flexWrap: "wrap", gap: "10px" }}>
-            <h2 style={{ margin: 0 }}>Temi & Parole Chiave®</h2>
+            <h2 style={{ margin: 0 }}>Temi e parole chiave</h2>
             <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", borderRadius: "20px", padding: "4px" }}>
               <button 
                 onClick={() => setKeywordTab("count")}
@@ -568,11 +644,23 @@ function StatsPage() {
                       </div>
                       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         {isCount ? (
-                          <span className={styles.count}>{keyword.count} film</span>
+                          <Link 
+                            to={`/profile/${userId}/history?filter=keyword&value=${encodeURIComponent(keyword.name)}`}
+                            className={styles.count}
+                            style={{ textDecoration: 'none' }}
+                          >
+                            {keyword.count} film
+                          </Link>
                         ) : (
                           <>
                             <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '1.1rem' }}>★ {keyword.avg}</span>
-                            <span style={{ color: '#aaa', fontSize: '0.8rem' }}>({keyword.count} film)</span>
+                            <Link 
+                              to={`/profile/${userId}/history?filter=keyword&value=${encodeURIComponent(keyword.name)}`}
+                              className={styles.statLink}
+                              style={{ fontSize: '0.8rem' }}
+                            >
+                              ({keyword.count} film)
+                            </Link>
                           </>
                         )}
                       </div>

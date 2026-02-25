@@ -24,6 +24,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import StatsPage from "./pages/StatsPage"; // Import StatsPage
+import UserHistoryPage from "./pages/UserHistoryPage"; // [NEW] Import UserHistoryPage
 import PersonPage from "./pages/PersonPage";
 import CollectionPage from "./pages/CollectionPage"; // [NEW] Import CollectionPage
 import PartialCollectionsPage from "./pages/PartialCollectionsPage";
@@ -99,6 +100,7 @@ function App() {
           {/* Profilo e Statistiche */}
           <Route path="profile/:userId" element={<ProfilePage />} />
           <Route path="profile/:userId/stats" element={<StatsPage />} />
+          <Route path="profile/:userId/history" element={<UserHistoryPage />} />
           <Route path="person/:name" element={<PersonPage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
           <Route path="tv/:tmdbId" element={<TvShowDetailPage />} /> {/* [NEW] TV Route */}

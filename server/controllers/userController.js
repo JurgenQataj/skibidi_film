@@ -937,3 +937,91 @@ exports.syncUserCollections = async (userId) => {
     console.error('[SYNC] Errore syncUserCollections:', error);
   }
 };
+
+exports.getUserFilteredReviews = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { filter, value, subValue } = req.query;
+
+    const Review = require("../models/Review");
+    const reviews = await Review.find({ user: userId }).populate("movie");
+    const validReviews = reviews.filter(r => r.movie);
+
+    let filtered = [];
+
+    switch (filter) {
+      case "actor":
+        filtered = validReviews.filter(r => 
+          r.movie.cast && r.movie.cast.includes(value)
+        );
+        break;
+      case "director":
+        filtered = validReviews.filter(r => 
+          r.movie.director === value
+        );
+        break;
+      case "genre":
+        filtered = validReviews.filter(r => 
+          r.movie.genres && r.movie.genres.includes(value)
+        );
+        break;
+      case "decade":
+        let dStart;
+        if (value.startsWith("Anni '")) {
+          dStart = 1900 + parseInt(value.replace("Anni '", ""));
+        } else {
+          dStart = parseInt(value.replace("Anni ", ""));
+        }
+        filtered = validReviews.filter(r => {
+          if (!r.movie.release_year) return false;
+          const year = r.movie.release_year;
+          return year >= dStart && year < dStart + 10;
+        });
+        break;
+      case "studio":
+        filtered = validReviews.filter(r => 
+          r.movie.production_companies && r.movie.production_companies.includes(value)
+        );
+        break;
+      case "country":
+        filtered = validReviews.filter(r => 
+          r.movie.production_countries && r.movie.production_countries.includes(value)
+        );
+        break;
+      case "language":
+        const LANGUAGE_NAMES = {
+          en: "English", fr: "French", it: "Italian", de: "German", es: "Spanish",
+          ja: "Japanese", ko: "Korean", zh: "Chinese", pt: "Portuguese",
+          ru: "Russian", hi: "Hindi", ar: "Arabic", nl: "Dutch", sv: "Swedish",
+          da: "Danish", fi: "Finnish", nb: "Norwegian", tr: "Turkish", pl: "Polish",
+          cs: "Czech", hu: "Hungarian", ro: "Romanian", el: "Greek", he: "Hebrew",
+          th: "Thai", id: "Indonesian", vi: "Vietnamese", uk: "Ukrainian",
+          cn: "Cantonese", fa: "Persian", sr: "Serbian",
+        };
+        filtered = validReviews.filter(r => {
+          if (!r.movie.original_language) return false;
+          const code = r.movie.original_language;
+          const name = LANGUAGE_NAMES[code] || code.toUpperCase();
+          return name === value;
+        });
+        break;
+      case "keyword":
+        filtered = validReviews.filter(r => 
+          r.movie.keywords && r.movie.keywords.includes(value)
+        );
+        break;
+      case "crew":
+        filtered = validReviews.filter(r => 
+          r.movie.crew && r.movie.crew.some(c => c.job === subValue && c.name === value)
+        );
+        break;
+      default:
+        filtered = validReviews;
+    }
+
+    res.json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Errore server" });
+  }
+};

@@ -208,6 +208,26 @@
   border-radius: 4px;
 }
 
+.count:visited {
+  color: #007bff;
+}
+
+.statLink {
+  color: #aaa;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
+  transition: color 0.2s;
+}
+
+.statLink:hover {
+  color: #fff;
+}
+
+.statLink:visited {
+  color: #aaa;
+}
+
+
 .keywordPill {
   background-color: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.9);
@@ -237,11 +257,61 @@
 
 .genreItem {
   width: 100%;
+  margin-bottom: 12px;
+}
+
+.genreItemHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.progressContainer {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progressBar {
+  background: linear-gradient(90deg, #d72638, #8c050c);
+  height: 100%;
+  border-radius: 6px;
 }
 
 
-/* OTTIMIZZAZIONE MOBILE CARD FILM */
+/* OTTIMIZZAZIONE MOBILE CARD FILM E SEZIONI */
 @media (max-width: 768px) {
+  .container {
+    padding: 0.5rem 0.5rem 1rem 0.5rem;
+  }
+  .statsGrid {
+    gap: 1.5rem;
+  }
+  .statSection {
+    padding: 0.8rem;
+  }
+  .genreList {
+    gap: 8px;
+  }
+  .genreItem {
+    margin-bottom: 6px !important;
+  }
+  .genreItemHeader {
+    margin-bottom: 2px !important;
+  }
+  .genreItem span {
+    font-size: 0.85rem;
+  }
+  .progressContainer {
+    height: 5px !important;
+  }
+
+  .textItem {
+    padding: 0.4rem 0;
+    font-size: 0.85rem;
+  }
   .movieList {
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
@@ -251,6 +321,7 @@
   }
 }
 
+
 @media (max-width: 480px) {
   .movieList {
     grid-template-columns: repeat(5, 1fr);
@@ -259,7 +330,12 @@
   .movieList :global(.card img) {
     aspect-ratio: 2 / 2.55 !important; /* -15% di altezza */
   }
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem 1rem;
+  }
 }
+
 
 .showMoreBtn {
   display: block;
