@@ -10,7 +10,7 @@
 /* Il colore scuro DEVE essere sull'elemento html (root):
    copre status bar area, overscroll, safe-area su Android/iOS */
 html {
-  background: #0f0f12; /* Nero scuro, poco luminoso ma non nero assoluto */
+  background: #1a1a20; /* Leggermente meno cupo (~10% più chiaro) */
 }
 
 body {
@@ -20,7 +20,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0f0f12; /* Nero scuro, poco luminoso ma non nero assoluto */
+  background-color: #1a1a20; /* Leggermente meno cupo (~10% più chiaro) */
 }
 
 /* Rimuove il colore viola dai link visitati globalmente */

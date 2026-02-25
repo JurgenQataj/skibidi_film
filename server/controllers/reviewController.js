@@ -96,6 +96,7 @@ exports.addReview = async (req, res) => {
         const targetJobs = [
           "Special Effects", "Visual Effects Supervisor", "VFX Artist",
           "Original Music Composer", "Sound Designer", "Sound Mixer", "Original Song Writer",
+          "Songs", "Lyrics",
           "Producer", "Executive Producer",
           "Director of Photography", "Camera Operator", "Lighting Technician", "Gaffer",
           "Production Design", "Art Direction", "Set Decoration",
@@ -104,7 +105,11 @@ exports.addReview = async (req, res) => {
 
         const crew = fullCrew
           .filter(c => targetJobs.includes(c.job))
-          .map(c => ({ name: c.name, job: c.job }));
+          .map(c => {
+            let job = c.job;
+            if (job === "Songs" || job === "Lyrics") job = "Original Song Writer";
+            return { name: c.name, job: job };
+          });
 
         const runtime = movieData.runtime || 0;
         const production_countries = movieData.production_countries?.map(c => c.name) || [];
