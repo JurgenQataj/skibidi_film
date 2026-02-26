@@ -1,5 +1,5 @@
 .pageContainer {
-  padding: 40px 20px;
+  padding: 100px 20px 40px; /* Top padding per Navbar fixed */
   max-width: 1200px;
   margin: 0 auto;
   color: #fff;
@@ -171,6 +171,7 @@
 }
 
 @media (max-width: 768px) {
+  .pageContainer { padding: 20px; } /* Resetta padding 100px desktop */
   .titleArea h1 { font-size: 1.8rem; }
   .grid {
     grid-template-columns: repeat(3, 1fr);

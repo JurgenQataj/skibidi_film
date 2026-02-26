@@ -2,7 +2,7 @@
 
 /* Il container principale occupa tutta la viewport e ha scroll-snap */
 .container {
-  height: calc(100vh - 75px); /* altezza viewport meno la navbar desktop */
+  height: calc(100vh - 80px); /* altezza viewport meno la navbar desktop (80px) */
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
@@ -18,7 +18,7 @@
 .cardContainer {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  height: calc(100vh - 75px);
+  height: calc(100vh - 80px);
   position: relative;
   overflow: hidden;
 }
@@ -258,7 +258,7 @@
 
 /* === LOADING === */
 .loadingScreen {
-  height: calc(100vh - 75px);
+  height: calc(100vh - 80px);
   display: flex;
   flex-direction: column;
   align-items: center;

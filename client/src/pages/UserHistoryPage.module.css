@@ -1,7 +1,7 @@
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 100px 1rem 2rem; /* Top padding per Navbar fixed */
   color: #fff;
 }
 
@@ -127,6 +127,7 @@
 }
 
 @media (max-width: 600px) {
+  .container { padding: 20px 15px; } /* Resetta padding 100px desktop */
   .title { font-size: 1.4rem; }
   .historyPoster { width: 40px; height: 60px; }
   .historyTitle { font-size: 1rem; }

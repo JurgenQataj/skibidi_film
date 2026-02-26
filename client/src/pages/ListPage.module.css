@@ -1,5 +1,5 @@
 .pageContainer {
-  padding: 40px;
+  padding: 100px 40px 40px; /* Top padding per Navbar fixed */
   color: white;
   max-width: 1200px;
   margin: 0 auto;
@@ -42,6 +42,9 @@
 }
 
 @media (max-width: 768px) {
+  .pageContainer {
+    padding: 20px 15px; /* Resetta il 100px desktop */
+  }
   .moviesGrid {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;

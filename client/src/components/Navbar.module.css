@@ -3,16 +3,17 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding: 0 30px;
-  position: sticky;
-  top: 15px; /* Floating style */
-  width: 95%;
-  max-width: 1200px;
-  margin: 0 auto;
-  border-radius: 20px; /* Pill shape */
+  position: fixed; /* Fixed to top */
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: none; /* Occupy full width */
+  margin: 0;
+  border-radius: 0; /* Remove pill shape */
   z-index: 1000;
   box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .navContent {
@@ -21,7 +22,7 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  height: 60px;
+  height: 80px; /* Increased height from 60px */
 }
 
 /* === LOGO ROSSO NETFLIX === */

@@ -1,7 +1,7 @@
 .pageWrapper {
   max-width: 900px;
   margin: 0 auto;
-  padding: 40px 20px 80px;
+  padding: 100px 20px 80px; /* Top padding per Navbar fixed */
   display: flex;
   flex-direction: column;
   gap: 40px;
@@ -75,7 +75,7 @@
 @media (max-width: 640px) {
   .pageWrapper {
     gap: 30px;
-    padding: 20px 16px 60px;
+    padding: 20px 16px 60px; /* Resetta il padding 100px desktop */
   }
   
   .chatSection, .userColumn {

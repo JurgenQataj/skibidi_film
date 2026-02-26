@@ -22,7 +22,7 @@
   background: transparent;
   display: flex;
   align-items: flex-end;
-  padding-top: 80px; /* Spazio per la Navbar in alto */
+  padding-top: 100px; /* Spazio per la Navbar in alto (80px + 20px) */
 }
 
 .collectionOverlay {

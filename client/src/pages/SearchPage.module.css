@@ -1,8 +1,7 @@
-/* ── Container ─────────────────────────────── */
 .pageContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 40px; 
+  padding: 100px 40px 20px; /* Top padding per Navbar fixed */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -383,7 +382,7 @@
 
 /* ── Responsive ────────────────────────────── */
 @media (max-width: 768px) {
-  .pageContainer { padding: 10px 15px; gap: 16px; }
+  .pageContainer { padding: 10px 15px; gap: 16px; } /* Resetta il padding-top 100px desktop */
   
   .heroSection { 
     padding: 10px 0 16px; 

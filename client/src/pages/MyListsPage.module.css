@@ -1,5 +1,5 @@
 .pageContainer {
-  padding: 50px 40px;
+  padding: 100px 40px 50px; /* Top padding per Navbar fixed */
   color: white;
   max-width: 900px;
   margin: 0 auto;
@@ -228,7 +228,7 @@
 
 /* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
-  .pageContainer { padding: 30px 20px; }
+  .pageContainer { padding: 30px 20px; } /* Resetta il 100px desktop */
   .listsGrid { grid-template-columns: 1fr 1fr; gap: 12px; }
   .pageTitle { font-size: 1.4rem; }
 }

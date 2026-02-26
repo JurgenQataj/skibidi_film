@@ -2,7 +2,7 @@
 .pageContainer {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem 4rem; /* Più spazio dai bordi laterali su PC */
+  padding: 100px 4rem 2rem; /* Top padding per Navbar fixed */
   background-color: #0a0a0a;
   min-height: 100vh;
   color: #ffffff;
@@ -110,7 +110,7 @@
 /* Responsive Design - Allineato a ProfilePage per omogeneità */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 1.5rem 2rem; /* Più respiro anche su tablet/mobile */
+    padding: 1.5rem 2rem; /* Resetta il padding-top 100px desktop */
   }
   
   .title {

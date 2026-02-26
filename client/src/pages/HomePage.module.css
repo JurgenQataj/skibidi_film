@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 800px; /* Diamo una larghezza massima al contenuto */
   margin: 0 auto; /* Centriamo il contenitore */
-  padding: 10px;
+  padding: 100px 10px 10px; /* Top padding per Navbar (80px + 20px) */
   box-sizing: border-box;
 }
 
@@ -24,6 +24,6 @@
 /* --- Media Queries per il Mobile --- */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 10px 15px; /* Padding minimale per mobile */
+    padding: 10px 15px; /* Padding minimale per mobile, resetta il 100px desktop */
   }
 }

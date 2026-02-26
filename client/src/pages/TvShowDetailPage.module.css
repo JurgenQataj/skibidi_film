@@ -1,6 +1,6 @@
 .pageContainer {
   color: white;
-  padding-bottom: 30px;
+  padding: 100px 0 30px; /* Top padding per Navbar fixed */
 }
 
 .loading {
@@ -517,7 +517,7 @@
 /* === MOBILE (fino a 768px) - Stili migliorati === */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 15px;
+    padding: 15px; /* Resetta padding 100px desktop */
     max-width: 100vw;
     overflow-x: hidden;
     box-sizing: border-box;
