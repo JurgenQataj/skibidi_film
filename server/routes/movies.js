@@ -16,6 +16,7 @@ router.get("/admin/update-all-data", movieController.updateAllMoviesData);
 // DEVE stare PRIMA di /:tmdbId altrimenti viene letto come un ID film
 router.get("/person/:name", movieController.getMoviesByPerson);
 router.get("/collection/:id", movieController.getCollectionDetails);
+router.get("/horizon", movieController.getHorizonMovies); // [NEW] Skibidi Horizon
 
 // Rotta dettaglio film (deve essere l'ultima get con un parametro variabile)
 router.get("/:tmdbId", movieController.getMovieDetails);

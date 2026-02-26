@@ -7,6 +7,7 @@ import {
   FaUser,
   FaGlobe,
   FaBell,
+  FaPlayCircle,
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -128,6 +129,9 @@ function Navbar() {
           </Link>
           <Link to="/discover" className={styles.navLink}>
             <FaGlobe /> <span>Scopri</span>
+          </Link>
+          <Link to="/horizon" className={styles.navLink}>
+            <FaPlayCircle /> <span>Horizon</span>
           </Link>
 
           {userId && (

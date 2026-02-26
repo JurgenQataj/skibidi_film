@@ -1,0 +1,341 @@
+/* === SKIBIDI HORIZON — TikTok-style Vertical Scroll === */
+
+/* Il container principale occupa tutta la viewport e ha scroll-snap */
+.container {
+  height: calc(100vh - 75px); /* altezza viewport meno la navbar desktop */
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  background: #000;
+  scrollbar-width: none; /* Firefox */
+}
+
+.container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Ogni card snap occupa 100% del container */
+.cardContainer {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: calc(100vh - 75px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* === CARD === */
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+/* === VIDEO BACKGROUND === */
+.videoWrapper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.videoIframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* YouTube aspect ratio trick: lascia che il video copra tutto */
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border: none;
+  pointer-events: none; /* evita che l'utente possa cliccare sull'iframe per sbaglio */
+  object-fit: cover;
+}
+
+/* Poster fallback visibile mentre il video carica */
+.posterFallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: opacity 0.5s ease;
+}
+
+.posterFallback.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* === OVERLAY GRADIENTE === */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.45) 40%,
+    rgba(0, 0, 0, 0.1) 70%,
+    transparent 100%
+  );
+}
+
+/* === INFO BAR (in basso a sinistra) === */
+.infoBar {
+  position: absolute;
+  bottom: 100px;
+  left: 0;
+  right: 80px; /* evita overlap con i pulsanti azione */
+  z-index: 3;
+  padding: 0 20px 20px 24px;
+}
+
+.metaBadges {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+}
+
+.movieTitle {
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+  letter-spacing: -0.3px;
+}
+
+.overview {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+}
+
+.overviewExpanded {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+
+.moreBtn {
+  margin-top: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.moreBtn:hover {
+  color: #fff;
+}
+
+/* === PULSANTI AZIONE (a destra) === */
+.actions {
+  position: absolute;
+  right: 16px;
+  bottom: 120px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.actionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 50px;
+  padding: 14px 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  min-width: 56px;
+  color: #fff;
+  font-family: inherit;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.actionBtn:active {
+  transform: scale(0.95);
+}
+
+.actionBtnActive {
+  background: rgba(229, 9, 20, 0.35);
+  border-color: rgba(229, 9, 20, 0.6);
+  box-shadow: 0 0 20px rgba(229, 9, 20, 0.4);
+}
+
+.actionBtnActive:hover {
+  background: rgba(229, 9, 20, 0.5);
+}
+
+.actionIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.actionLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* === BRAND TAG (in alto a sinistra) === */
+.brandTag {
+  position: absolute;
+  top: 70px;
+  left: 20px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.brandIcon {
+  font-size: 0.9rem;
+}
+
+/* === LOADING === */
+.loadingScreen {
+  height: calc(100vh - 75px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #050508;
+  gap: 18px;
+}
+
+.loadingText {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(229, 9, 20, 0.3);
+  border-top-color: #e50914;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingMoreIndicator {
+  scroll-snap-align: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+/* === MOBILE === */
+@media (max-width: 768px) {
+  .container,
+  .cardContainer {
+    /* Mobile: navbar è in basso (54px) + topbar (40px) */
+    height: calc(100svh - 94px);
+  }
+
+  .loadingScreen {
+    height: calc(100svh - 94px);
+  }
+
+  .brandTag {
+    top: 8px;
+    left: 12px;
+    font-size: 0.68rem;
+    padding: 4px 10px;
+  }
+
+  .infoBar {
+    bottom: 80px;
+    right: 72px;
+    padding: 0 12px 16px 16px;
+  }
+
+  .movieTitle {
+    font-size: 1.25rem;
+  }
+
+  .overview {
+    font-size: 0.82rem;
+    -webkit-line-clamp: 2;
+  line-clamp: 2;
+  }
+
+  .actions {
+    right: 8px;
+    bottom: 90px;
+    gap: 14px;
+  }
+
+  .actionBtn {
+    padding: 10px 8px;
+    min-width: 48px;
+  }
+
+  .actionIcon {
+    font-size: 1.3rem;
+  }
+
+  .actionLabel {
+    font-size: 0.6rem;
+  }
+}

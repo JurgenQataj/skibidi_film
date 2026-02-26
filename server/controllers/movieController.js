@@ -529,3 +529,77 @@ exports.updateAllMoviesData = async (req, res) => {
     res.status(500).json({ message: "Errore del server." });
   }
 };
+
+// --- SKIBIDI HORIZON: Film con trailer YouTube per lo scroll verticale ---
+exports.getHorizonMovies = async (req, res) => {
+  try {
+    const page = Math.min(Math.max(parseInt(req.query.page) || 1, 1), 5);
+
+    // Fetcha film trending della settimana (page 1-5 per varietà)
+    const trendingUrl = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT&page=${page}`;
+    const trendingRes = await axios.get(trendingUrl);
+    const movies = trendingRes.data.results || [];
+
+    // Per ogni film, recupera i video in parallelo (max 15 film per velocità)
+    const moviesSlice = movies.slice(0, 15);
+    const videoRequests = moviesSlice.map((m) =>
+      axios
+        .get(`${BASE_URL}/movie/${m.id}/videos?api_key=${API_KEY}&language=it-IT`)
+        .catch(() => ({ data: { results: [] } }))
+    );
+    const videoResults = await Promise.all(videoRequests);
+
+    const horizonMovies = [];
+    for (let i = 0; i < moviesSlice.length; i++) {
+      const m = moviesSlice[i];
+      const videos = videoResults[i].data.results || [];
+
+      // Prova trailer italiano, altrimenti inglese
+      let trailer = videos.find(
+        (v) => v.site === "YouTube" && v.type === "Trailer" && v.official
+      );
+      if (!trailer) {
+        trailer = videos.find((v) => v.site === "YouTube" && v.type === "Trailer");
+      }
+      if (!trailer) {
+        trailer = videos.find((v) => v.site === "YouTube" && (v.type === "Teaser" || v.type === "Clip"));
+      }
+
+      // Se nessun video trovato in italiano, prova in inglese
+      if (!trailer) {
+        try {
+          const enVideosRes = await axios.get(
+            `${BASE_URL}/movie/${m.id}/videos?api_key=${API_KEY}&language=en-US`
+          );
+          const enVideos = enVideosRes.data.results || [];
+          trailer = enVideos.find((v) => v.site === "YouTube" && v.type === "Trailer");
+          if (!trailer) trailer = enVideos.find((v) => v.site === "YouTube");
+        } catch (_) {}
+      }
+
+      if (!trailer) continue; // Salta film senza video
+
+      horizonMovies.push({
+        id: m.id,
+        title: m.title,
+        overview: m.overview,
+        poster_path: m.poster_path,
+        backdrop_path: m.backdrop_path,
+        release_date: m.release_date,
+        vote_average: m.vote_average,
+        vote_count: m.vote_count,
+        genre_ids: m.genre_ids,
+        trailer_key: trailer.key,
+      });
+    }
+
+    res.json({
+      page,
+      results: horizonMovies,
+      has_more: page < 5,
+    });
+  } catch (error) {
+    console.error("Errore getHorizonMovies:", error.message);
+    res.status(500).json({ message: "Errore del server." });
+  }
+};
