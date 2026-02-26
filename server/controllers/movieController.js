@@ -162,6 +162,7 @@ exports.discoverMovies = async (req, res) => {
 exports.getMovieDetails = async (req, res) => {
   const { tmdbId } = req.params;
   if (!/^\d+$/.test(tmdbId)) {
+    console.log(`[MOVIES] Rejecting invalid tmdbId: ${tmdbId}`);
     return res.status(400).json({ message: "ID del film non valido." });
   }
 
@@ -534,6 +535,7 @@ exports.updateAllMoviesData = async (req, res) => {
 exports.getHorizonMovies = async (req, res) => {
   try {
     const page = Math.min(Math.max(parseInt(req.query.page) || 1, 1), 5);
+    console.log(`[HORIZON] Fetching page: ${page}`);
 
     // Fetcha film trending della settimana (page 1-5 per varietà)
     const trendingUrl = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT&page=${page}`;

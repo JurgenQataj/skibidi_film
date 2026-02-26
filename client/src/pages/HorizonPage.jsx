@@ -40,7 +40,7 @@ function HorizonCard({ movie, isActive }) {
     if (!iframe) return;
     if (isActive) {
       // Forza ricarica dell'iframe per avviare il video
-      const src = `https://www.youtube.com/embed/${movie.trailer_key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${movie.trailer_key}&rel=0&modestbranding=1&playsinline=1`;
+      const src = `https://www.youtube.com/embed/${movie.trailer_key}?autoplay=1&mute=0&controls=0&loop=1&playlist=${movie.trailer_key}&rel=0&modestbranding=1&playsinline=1`;
       if (iframe.src !== src) {
         iframe.src = src;
       }
@@ -64,7 +64,7 @@ function HorizonCard({ movie, isActive }) {
         await axios.post(
           `${API_URL}/api/watchlist`,
           {
-            tmdb_id: movie.id,
+            tmdbId: movie.id,
             title: movie.title,
             poster_path: movie.poster_path,
             media_type: "movie",

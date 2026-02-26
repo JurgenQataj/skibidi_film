@@ -39,19 +39,28 @@
   width: 100%;
   height: 100%;
   z-index: 0;
+  overflow: hidden;
 }
 
+/*
+  Tecnica responsive per iframe 16:9 su schermi verticali:
+  - L'iframe viene dimensionato al 100% della larghezza
+  - L'altezza minima è impostata a 56.25vw (rapporto 16:9)
+  - Su mobile portrait (più alto che largo), scaliamo l'iframe
+    per farlo coprire l'intera altezza, evitando bande nere (letterbox)
+*/
 .videoIframe {
   position: absolute;
   top: 50%;
   left: 50%;
-  /* YouTube aspect ratio trick: lascia che il video copra tutto */
+  /* Copertura desktop: larghezza piena, altezza 16:9 */
   width: 100%;
-  height: 100%;
+  height: 56.25vw; /* 16:9 rispetto alla larghezza */
+  min-height: 100%;
+  min-width: 177.78vh; /* 16:9 rispetto all'altezza */
   transform: translate(-50%, -50%);
   border: none;
-  pointer-events: none; /* evita che l'utente possa cliccare sull'iframe per sbaglio */
-  object-fit: cover;
+  pointer-events: none;
 }
 
 /* Poster fallback visibile mentre il video carica */
@@ -285,7 +294,7 @@
   padding: 40px;
 }
 
-/* === MOBILE === */
+/* === MOBILE (≤ 768px) === */
 @media (max-width: 768px) {
   .container,
   .cardContainer {
@@ -295,6 +304,25 @@
 
   .loadingScreen {
     height: calc(100svh - 94px);
+  }
+
+  /*
+    Su mobile portrait, il viewport è più alto che largo.
+    Il calcolo min-width: 177.78vh garantisce che l'iframe
+    sia abbastanza largo da coprire l'intera altezza in 16:9.
+    Qui lo sovrascriviamo con le dimensioni basate su svh
+    per tenere conto della UI del browser mobile.
+  */
+  .videoIframe {
+    /* Adattiamo alla larghezza per evitare tagli ai bordi (formato 16:9 su schermo portrait) */
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    min-width: unset;
+    min-height: unset;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .brandTag {
@@ -317,7 +345,7 @@
   .overview {
     font-size: 0.82rem;
     -webkit-line-clamp: 2;
-  line-clamp: 2;
+    line-clamp: 2;
   }
 
   .actions {
@@ -337,5 +365,23 @@
 
   .actionLabel {
     font-size: 0.6rem;
+  }
+}
+
+/* === FIX SPECIFICO PER SAMSUNG A52, S23 E ALTRI DISPOSITIVI PORTRAIT STRETTI === */
+@media (max-width: 480px) {
+  .videoIframe {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    /* Garantiamo che rimanga centrato verticalmente */
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .infoBar {
+    /* Alziamo leggermente le info se il video è centrato */
+    bottom: 90px;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
   }
 }
