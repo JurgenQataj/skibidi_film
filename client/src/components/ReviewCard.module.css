@@ -405,6 +405,9 @@
   flex-direction: column;
   margin-bottom: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box; /* Prevent padding from adding to 100% width */
+  max-width: 100%;
+  overflow: hidden; /* Ensure content doesn't break the layout */
 }
 
 .adminPostHeader {
@@ -439,6 +442,8 @@
 
 .adminPostBody {
   margin-bottom: 12px;
+  word-wrap: break-word; /* Ensure long words break safely */
+  overflow-wrap: break-word;
 }
 
 .adminPostBody .comment {
@@ -453,6 +458,10 @@
     border-left: none;
     border-right: none;
     border-radius: 0;
+    width: 100vw; /* Occupy full viewport width */
+    margin-left: calc(-50vw + 50%); /* Negative margin hack to break out of container padding */
+    margin-right: calc(-50vw + 50%);
+    box-sizing: border-box;
   }
   
   .adminPostHeader {
