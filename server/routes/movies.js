@@ -1,14 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const movieController = require("../controllers/movieController");
+const smartSearchController = require("../controllers/smartSearchController");
 
 router.get("/horizon", movieController.getHorizonMovies); // [NEW] Skibidi Horizon
 router.get("/keywords/search", movieController.searchKeywords);
+router.get("/smart-search", smartSearchController.smartSearch); // [NEW] Ricerca Intelligente
 router.get("/search", movieController.searchMovies);
 router.get("/discover", movieController.discoverMovies);
 router.get("/suggestions", movieController.getMovieSuggestions);
 router.get("/trending", movieController.getTrendingMovies);
 router.get("/top-rated", movieController.getTopRatedMovies);
+
 
 // Rotta Admin per aggiornamento
 router.get("/admin/update-all-data", movieController.updateAllMoviesData);

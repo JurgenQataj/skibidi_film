@@ -11,7 +11,7 @@ function SkibidiRoulette({ watchlist }) {
   const navigate = useNavigate();
 
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
-  const placeholderPoster = "https://via.placeholder.com/500x750.png?text=Skibidi+Roulette";
+  const placeholderPoster = "https://placehold.co/300x450/1a1a2e/666?text=No+Image";
 
   // Prevent scrolling when modal is open
   useEffect(() => {

@@ -72,7 +72,7 @@ function CollectionPage() {
               src={
                 collection.poster_path
                   ? `${posterBaseUrl}w400${collection.poster_path}`
-                  : "https://via.placeholder.com/400x600.png?text=No+Image"
+                  : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
               }
               alt={`Locandina di ${collection.name}`}
               className={styles.poster}

@@ -421,3 +421,298 @@
     gap: 6px !important;
   }
 }
+
+/* ════════════════════════════════════════════
+   SMART SEARCH (AI)
+════════════════════════════════════════════ */
+
+/* ── AI toggle button ── */
+.aiToggleBtn {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}
+
+.aiToggleActive {
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+
+.aiToggleActive::after {
+  width: 100% !important;
+  background: linear-gradient(90deg, #7c3aed, #e50914) !important;
+}
+
+/* ── Smart textarea box ── */
+.smartSearchBox {
+  width: 100%;
+  max-width: 700px;
+  animation: slideDown 0.2s ease;
+  position: relative;
+}
+
+.smartInputWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+
+.smartInputWrapper:focus-within {
+  border-color: rgba(124, 58, 237, 0.5);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+}
+
+.smartIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.75;
+}
+
+.smartTextarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: none;
+  min-height: 44px;
+}
+
+.smartTextarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+
+.smartSearchBtn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #e50914);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.15s;
+  margin-top: 2px;
+}
+
+.smartSearchBtn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.08);
+}
+
+.smartSearchBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.smartSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.smartHint {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin: 6px 0 0 52px;
+  font-style: italic;
+}
+
+/* ── Info button ── */
+.smartInfoBtn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  margin-top: 3px;
+  line-height: 1;
+}
+
+.smartInfoBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Info popup ── */
+.smartInfoPopup {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: rgba(12, 12, 20, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 18px 20px 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+  animation: slideDown 0.18s ease;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.smartInfoPopup::-webkit-scrollbar { width: 4px; }
+.smartInfoPopup::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.smartInfoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.smartInfoTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.smartInfoClose {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.5);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.smartInfoClose:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.smartInfoSection {
+  margin-bottom: 16px;
+}
+
+.smartInfoSection:last-child { margin-bottom: 0; }
+
+.smartInfoCat {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px 0;
+}
+
+.smartInfoExamples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.smartInfoExample {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  text-align: left;
+}
+
+.smartInfoExample:hover {
+  background: rgba(124, 58, 237, 0.2);
+  border-color: rgba(124, 58, 237, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .smartInfoPopup {
+    left: -10px;
+    right: -10px;
+    border-radius: 12px;
+    max-height: 60vh;
+  }
+}
+
+/* ── Explanation row ── */
+.explanationRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(124, 58, 237, 0.06);
+  border-left: 3px solid rgba(124, 58, 237, 0.5);
+  border-radius: 0 10px 10px 0;
+  animation: slideDown 0.2s ease;
+}
+
+.explanationLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.entityTag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.tagGenre  { background: rgba(229, 9, 20, 0.18);  color: #ff6b6b; border: 1px solid rgba(229,9,20,0.3); }
+.tagPerson { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+.tagYear   { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+.tagRating { background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+.tagLang   { background: rgba(124, 58, 237, 0.18); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.3); }
+.tagSort   { background: rgba(6, 182, 212, 0.15);  color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .smartHint { margin-left: 0; }
+  .smartSearchBox { max-width: 100%; }
+  .explanationRow { font-size: 0.68rem; }
+}

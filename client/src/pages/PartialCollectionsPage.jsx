@@ -94,7 +94,7 @@ function PartialCollectionsPage() {
             <Link key={p.id} to={`/collection/${p.id}`} className={styles.card}>
               <div className={styles.posterContainer}>
                 <img 
-                  src={p.poster_path ? `${posterBaseUrl}${p.poster_path}` : "https://via.placeholder.com/300x450.png?text=No+Image"} 
+                  src={p.poster_path ? `${posterBaseUrl}${p.poster_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"} 
                   alt={p.name} 
                   className={styles.poster}
                 />

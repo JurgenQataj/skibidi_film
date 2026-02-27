@@ -121,7 +121,7 @@ function PersonPage() {
           src={
             data.profile_path
               ? `https://image.tmdb.org/t/p/w500${data.profile_path}`
-              : "https://via.placeholder.com/342x513?text=No+Photo"
+              : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
           }
           alt={data.personName}
           className={styles.personImage}

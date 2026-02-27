@@ -337,7 +337,7 @@ function MovieDetailPage() {
               src={
                 movie.poster_path
                   ? `${posterBaseUrl}w500${movie.poster_path}`
-                  : "https://via.placeholder.com/500x750.png?text=No+Image"
+                  : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
               }
               alt={`Locandina di ${movie.title}`}
               className={styles.poster}
@@ -541,7 +541,7 @@ function MovieDetailPage() {
                   src={
                     actor.profile_path
                       ? `${posterBaseUrl}w342${actor.profile_path}`
-                      : "https://via.placeholder.com/342x513.png?text=No+Image"
+                      : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
                   }
                   alt={actor.name}
                 />

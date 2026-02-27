@@ -5,7 +5,7 @@ import styles from "./MovieCard.module.css";
 const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
   const placeholderPoster =
-    "https://via.placeholder.com/200x300.png?text=No+Image";
+    "https://placehold.co/300x450/1a1a2e/666?text=No+Image";
 
   if (!movie) {
     return null;

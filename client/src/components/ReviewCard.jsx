@@ -37,7 +37,7 @@ function ReviewCard({ review, onInteraction }) {
 
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
   const placeholderPoster =
-    "https://via.placeholder.com/200x300.png?text=No+Image";
+    "https://placehold.co/300x450/1a1a2e/666?text=No+Image";
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   useEffect(() => {

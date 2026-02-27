@@ -30,9 +30,71 @@ function SearchPage() {
     return getInitialState("search_mode", "movie");
   });
   const navigate = useNavigate();
-  const ignoreFilterChange = useRef(false); // Per evitare conflitti tra ricerca e filtri
+  const ignoreFilterChange = useRef(false);
   const isInitialMountFilter = useRef(true);
   const isInitialMountMode = useRef(true);
+
+  // ── Smart Search ───────────────────────────────────
+  const [smartMode, setSmartMode] = useState(() => getInitialState("smart_mode", false));
+  const [smartQuery, setSmartQuery] = useState(() => getInitialState("smart_query", ""));
+  const [smartExplanation, setSmartExplanation] = useState(() => getInitialState("smart_explanation", ""));
+  const [smartParsed, setSmartParsed] = useState(() => getInitialState("smart_parsed", null));
+  const [showSmartInfo, setShowSmartInfo] = useState(false);
+  const smartTextareaRef = useRef(null);
+  const smartInfoRef = useRef(null);
+
+  // Chiudi popup con Escape o click fuori
+  useEffect(() => {
+    if (!showSmartInfo) return;
+    const onKey = (e) => { if (e.key === "Escape") setShowSmartInfo(false); };
+    const onOutside = (e) => {
+      if (smartInfoRef.current && !smartInfoRef.current.contains(e.target)) setShowSmartInfo(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onOutside);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onOutside);
+    };
+  }, [showSmartInfo]);
+
+  const performSmartSearch = async (query, page = 1, append = false) => {
+    if (!query || query.trim().length < 3) return;
+    // Pulisce l'URL per evitare che al ritorno dalla pagina del film
+    // il queryParam scateni una ricerca classica sovrascrivendo i risultati
+    if (!append) setSearchParams({});
+    if (!append) {
+      setLoading(true);
+      setResults([]);
+      setSmartExplanation("");
+      setSmartParsed(null);
+    } else {
+      setLoadingMore(true);
+    }
+    setHasSearched(true);
+    try {
+      const res = await axios.get(
+        `${API_URL}/api/movies/smart-search?q=${encodeURIComponent(query)}&page=${page}`
+      );
+      const data = res.data;
+      if (append) {
+        setResults((prev) => [...prev, ...(data.results || [])]);
+      } else {
+        setResults(data.results || []);
+      }
+      setTotalPages(data.total_pages || 1);
+      setHasMore(page < (data.total_pages || 1));
+      setCurrentPage(page);
+      setSmartExplanation(data.explanation || "");
+      setSmartParsed(data.parsed || null);
+    } catch (err) {
+      console.error("Smart search error:", err);
+      if (!append) setResults([]);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   // Stati per i filtri
   const [filters, setFilters] = useState(() => getInitialState("search_filters", {
@@ -46,7 +108,7 @@ function SearchPage() {
     sortBy: "",
   }));
 
-  // Salva in sessionStorage ad ogni modifica
+  // Salva in sessionStorage ad ogni modifica (incluso smart search)
   useEffect(() => {
     sessionStorage.setItem("search_results", JSON.stringify(results));
     sessionStorage.setItem("search_hasSearched", JSON.stringify(hasSearched));
@@ -55,7 +117,11 @@ function SearchPage() {
     sessionStorage.setItem("search_hasMore", JSON.stringify(hasMore));
     sessionStorage.setItem("search_mode", JSON.stringify(searchMode));
     sessionStorage.setItem("search_filters", JSON.stringify(filters));
-  }, [results, hasSearched, currentPage, totalPages, hasMore, searchMode, filters]);
+    sessionStorage.setItem("smart_mode", JSON.stringify(smartMode));
+    sessionStorage.setItem("smart_query", JSON.stringify(smartQuery));
+    sessionStorage.setItem("smart_explanation", JSON.stringify(smartExplanation));
+    sessionStorage.setItem("smart_parsed", JSON.stringify(smartParsed));
+  }, [results, hasSearched, currentPage, totalPages, hasMore, searchMode, filters, smartMode, smartQuery, smartExplanation, smartParsed]);
 
   // Lista generi come richiesta
   const genres = [
@@ -111,12 +177,11 @@ function SearchPage() {
       isInitialMountFilter.current = false;
       return;
     }
-
+    if (smartMode) return; // Smart mode gestisce i propri risultati
     if (ignoreFilterChange.current) {
       ignoreFilterChange.current = false;
       return;
     }
-
     if (hasSearched) {
       setCurrentPage(1);
       setResults([]);
@@ -235,6 +300,10 @@ function SearchPage() {
 
   // Effetto per gestire la ricerca da URL (es. arrivo dalla Home)
   useEffect(() => {
+    // Se siamo in smart mode con risultati già caricati (ripristinati da sessionStorage),
+    // non fare nulla: i risultati sono già visibili
+    if (smartMode && hasSearched && results.length > 0) return;
+
     if (queryParam) {
       handleSearch(queryParam);
     } else if (!hasSearched) {
@@ -264,7 +333,7 @@ function SearchPage() {
       isInitialMountMode.current = false;
       return;
     }
-
+    if (smartMode) return; // Smart mode gestisce i propri risultati
     if (queryParam) {
       handleSearch(queryParam);
     } else {
@@ -332,7 +401,11 @@ function SearchPage() {
   // Carica altri risultati
   const handleLoadMore = () => {
     if (hasMore && !loadingMore) {
-      performSearch(currentPage + 1, false);
+      if (smartMode && smartQuery) {
+        performSmartSearch(smartQuery, currentPage + 1, true);
+      } else {
+        performSearch(currentPage + 1, false);
+      }
     }
   };
 
@@ -362,25 +435,137 @@ function SearchPage() {
         <div className={styles.modeToggle}>
              <button 
                 onClick={() => handleModeChange("movie")}
-                className={`${styles.modeButton} ${searchMode === "movie" ? styles.modeButtonActive : ""}`}
+                className={`${styles.modeButton} ${searchMode === "movie" && !smartMode ? styles.modeButtonActive : ""}`}
              >
                 Film
              </button>
              <button 
                 onClick={() => handleModeChange("tv")}
-                className={`${styles.modeButton} ${searchMode === "tv" ? styles.modeButtonActive : ""}`}
+                className={`${styles.modeButton} ${searchMode === "tv" && !smartMode ? styles.modeButtonActive : ""}`}
              >
                 Serie TV
              </button>
              <button 
                 onClick={() => handleModeChange("person")}
-                className={`${styles.modeButton} ${searchMode === "person" ? styles.modeButtonActive : ""}`}
+                className={`${styles.modeButton} ${searchMode === "person" && !smartMode ? styles.modeButtonActive : ""}`}
              >
                 Persone
              </button>
+             {/* AI Toggle */}
+             <button
+               className={`${styles.modeButton} ${styles.aiToggleBtn} ${smartMode ? styles.aiToggleActive : ""}`}
+               onClick={() => {
+                 setSmartMode((v) => !v);
+                 setResults([]);
+                 setHasSearched(false);
+                 setSmartExplanation("");
+                 setSmartParsed(null);
+                 setSmartQuery("");
+                 setTimeout(() => smartTextareaRef.current?.focus(), 100);
+               }}
+               title="Ricerca in linguaggio naturale"
+             >
+               🤖 AI
+             </button>
         </div>
 
-        {/* Category Chips - Scrolls horizontally */}
+        {/* Smart Search Textarea */}
+        {smartMode && (
+          <div className={styles.smartSearchBox}>
+            <div className={styles.smartInputWrapper}>
+              <span className={styles.smartIcon}>🤖</span>
+              <textarea
+                ref={smartTextareaRef}
+                className={styles.smartTextarea}
+                placeholder="Descrivi il film che vuoi vedere (premi ⓘ per info dei prompt)"
+                value={smartQuery}
+                rows={2}
+                onChange={(e) => setSmartQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    performSmartSearch(smartQuery);
+                  }
+                }}
+              />
+              {/* Info button */}
+              <button
+                className={styles.smartInfoBtn}
+                onClick={() => setShowSmartInfo((v) => !v)}
+                aria-label="Esempi di ricerca"
+                title="Esempi di ricerca"
+              >
+                ⓘ
+              </button>
+              <button
+                className={styles.smartSearchBtn}
+                onClick={() => performSmartSearch(smartQuery)}
+                disabled={smartQuery.trim().length < 3 || loading}
+                aria-label="Cerca"
+              >
+                {loading ? <span className={styles.smartSpinner} /> : "→"}
+              </button>
+            </div>
+
+
+            {/* Info popup */}
+            {showSmartInfo && (
+              <div className={styles.smartInfoPopup} ref={smartInfoRef}>
+                <div className={styles.smartInfoHeader}>
+                  <span className={styles.smartInfoTitle}>💡 Cosa puoi chiedere</span>
+                  <button className={styles.smartInfoClose} onClick={() => setShowSmartInfo(false)}>✕</button>
+                </div>
+                {[
+                  {
+                    category: "🎭 Genere",
+                    examples: ["film commedia"],
+                  },
+                  {
+                    category: "👤 Attore / Regista",
+                    examples: ["film con Nicholas Cage"],
+                  },
+                  {
+                    category: "📅 Anno / Decennio",
+                    examples: ["film anni 90", "film anni 2000", "film anni 2010", "film anni 2020"],
+                  },
+                  {
+                    category: "🔝 Ordinamento",
+                    examples: ["i film più votati", "i film più popolari"],
+                  },
+                  {
+                    category: "🌐 Lingua",
+                    examples: ["film drammatici italiani"],
+                  },
+                  {
+                    category: "✨ Combinati",
+                    examples: ["film più votati fantasy con Emma Stone in inglese degli anni 2010"],
+                  },
+                ].map((section) => (
+                  <div key={section.category} className={styles.smartInfoSection}>
+                    <p className={styles.smartInfoCat}>{section.category}</p>
+                    <div className={styles.smartInfoExamples}>
+                      {section.examples.map((ex) => (
+                        <button
+                          key={ex}
+                          className={styles.smartInfoExample}
+                          onClick={() => {
+                            setSmartQuery(ex);
+                            setShowSmartInfo(false);
+                            smartTextareaRef.current?.focus();
+                          }}
+                        >
+                          {ex}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Category Chips - solo in modalità classica */}
         {searchMode !== "person" && (
             <div className={styles.chipsContainer}>
             {categories.map((cat) => (
@@ -541,6 +726,34 @@ function SearchPage() {
 
       {loading && <SkeletonWithLogo />}
 
+      {/* Explanation badges — smart mode */}
+      {smartMode && smartParsed && !loading && hasSearched && (
+        <div className={styles.explanationRow}>
+          <span className={styles.explanationLabel}>Ho cercato:</span>
+          {smartParsed.sortLabel && (
+            <span className={`${styles.entityTag} ${styles.tagSort}`}>🔝 {smartParsed.sortLabel}</span>
+          )}
+          {smartParsed.genres?.map((g) => (
+            <span key={g.id} className={`${styles.entityTag} ${styles.tagGenre}`}>{g.name}</span>
+          ))}
+          {smartParsed.persons?.map((p) => (
+            <span key={p.id} className={`${styles.entityTag} ${styles.tagPerson}`}>👤 {p.name}</span>
+          ))}
+          {smartParsed.year && (
+            <span className={`${styles.entityTag} ${styles.tagYear}`}>
+              📅 {smartParsed.year.from === smartParsed.year.to ? smartParsed.year.from : `${smartParsed.year.from}–${smartParsed.year.to}`}
+            </span>
+          )}
+          {smartParsed.minRating > 0 && (
+            <span className={`${styles.entityTag} ${styles.tagRating}`}>⭐ ≥{smartParsed.minRating}</span>
+          )}
+          {smartParsed.language && (
+            <span className={`${styles.entityTag} ${styles.tagLang}`}>🌐 {smartParsed.language.toUpperCase()}</span>
+          )}
+        </div>
+      )}
+
+
       {hasSearched && !loading && (
         <div className={styles.resultsSection}>
           {results.length > 0 ? (
@@ -557,7 +770,7 @@ function SearchPage() {
                   ) : (
                     <div key={item.id} className={styles.personRow} onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}>
                         <img
-                            src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://via.placeholder.com/185x278?text=No+Img"}
+                            src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"}
                             alt={item.name}
                             className={styles.personRowImg}
                         />
