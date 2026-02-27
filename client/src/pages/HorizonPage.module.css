@@ -385,3 +385,318 @@
     padding-bottom: env(safe-area-inset-bottom, 20px);
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   HORIZON CUSTOMIZER
+═══════════════════════════════════════════════════════ */
+
+/* ── Trigger button (floating top-right) ── */
+.customizerTrigger {
+  position: fixed;
+  top: 90px; /* sotto la navbar */
+  right: 16px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.customizerTrigger:hover {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.customizerTriggerActive {
+  border-color: #e50914;
+  box-shadow: 0 0 16px rgba(229, 9, 20, 0.45);
+}
+
+/* Badge puntino rosso */
+.filterDot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #e50914;
+  border-radius: 50%;
+  border: 1.5px solid #000;
+}
+
+/* ── Pannello ── */
+.customizerPanel {
+  position: fixed;
+  top: 80px;
+  right: 0;
+  width: min(380px, 100vw);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  z-index: 99;
+  background: rgba(10, 10, 16, 0.97);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom-left-radius: 20px;
+  padding: 20px 18px 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: -8px 4px 40px rgba(0, 0, 0, 0.7);
+  animation: slideInRight 0.22s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.customizerPanel::-webkit-scrollbar { width: 4px; }
+.customizerPanel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.customizerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.customizerTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.2px;
+}
+
+.customizerClose {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.customizerClose:hover { background: rgba(255,255,255,0.18); }
+
+/* ── Sezioni ── */
+.customizerSection {
+  margin-bottom: 22px;
+}
+
+.customizerLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0 0 10px 0;
+}
+
+/* Decenni */
+.decadeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.decadeChip {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.decadeChip:hover {
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+}
+
+/* Anno input */
+.yearInputRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.yearInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.88rem;
+  padding: 9px 36px 9px 12px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.yearInput:focus {
+  border-color: rgba(229, 9, 20, 0.6);
+}
+.yearInput::placeholder { color: rgba(255,255,255,0.3); }
+/* rimuovi frecce del number input */
+.yearInput::-webkit-outer-spin-button,
+.yearInput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.yearInput[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+.clearInputBtn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.clearInputBtn:hover { color: #fff; }
+
+/* Generi */
+.genreGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.genreChip {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.76rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.genreChip:hover {
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+}
+
+/* Chip selezionato (sia genere che decennio) */
+.chipSelected {
+  background: #e50914 !important;
+  border-color: #e50914 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 10px rgba(229, 9, 20, 0.4);
+}
+
+/* Footer */
+.customizerFooter {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.resetFiltersBtn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.75);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 11px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+  width: 100%;
+}
+.resetFiltersBtn:hover {
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+}
+
+/* ── Anno: feedback visivo ── */
+.yearInputTyping {
+  border-color: rgba(229, 9, 20, 0.55) !important;
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.12);
+}
+
+.yearSpinner {
+  position: absolute;
+  right: 12px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(229, 9, 20, 0.3);
+  border-top-color: #e50914;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.yearHint {
+  margin: 6px 0 0 0;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+}
+
+.yearConfirm {
+  margin: 6px 0 0 0;
+  font-size: 0.75rem;
+  color: rgba(80, 210, 120, 0.9);
+  font-weight: 500;
+}
+
+/* Pulsante reset nella schermata vuota */
+.resetBtn {
+  margin-top: 10px;
+  background: #e50914;
+  border: none;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+.resetBtn:hover { background: #c0020f; }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .customizerTrigger {
+    top: 8px;  /* sopra le card, sotto la top-bar mobile */
+    right: 8px;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+
+  .customizerPanel {
+    top: 0;
+    width: 100vw;
+    border-bottom-left-radius: 20px;
+    border-left: none;
+    border-top: none;
+    max-height: 80vh;
+  }
+}

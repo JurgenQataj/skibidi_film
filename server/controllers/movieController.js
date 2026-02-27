@@ -534,71 +534,105 @@ exports.updateAllMoviesData = async (req, res) => {
 // --- SKIBIDI HORIZON: Film con trailer YouTube per lo scroll verticale ---
 exports.getHorizonMovies = async (req, res) => {
   try {
-    const page = Math.min(Math.max(parseInt(req.query.page) || 1, 1), 5);
-    console.log(`[HORIZON] Fetching page: ${page}`);
+    const page = Math.min(Math.max(parseInt(req.query.page) || 1, 1), 10);
+    const year = req.query.year ? parseInt(req.query.year) : null;
+    const genreId = req.query.genreId ? req.query.genreId : null;
+    const hasFilters = !!(year || genreId);
 
-    // Fetcha film trending della settimana (page 1-5 per varietà)
-    const trendingUrl = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT&page=${page}`;
-    const trendingRes = await axios.get(trendingUrl);
-    const movies = trendingRes.data.results || [];
+    console.log(`[HORIZON] page=${page} year=${year} genreId=${genreId}`);
 
-    // Per ogni film, recupera i video in parallelo (max 15 film per velocità)
-    const moviesSlice = movies.slice(0, 15);
-    const videoRequests = moviesSlice.map((m) =>
-      axios
-        .get(`${BASE_URL}/movie/${m.id}/videos?api_key=${API_KEY}&language=it-IT`)
-        .catch(() => ({ data: { results: [] } }))
-    );
-    const videoResults = await Promise.all(videoRequests);
+    // Helper: scarica lista film per una pagina (trending o discover)
+    const fetchMoviePage = async (p) => {
+      if (hasFilters) {
+        const params = {
+          api_key: API_KEY,
+          language: "it-IT",
+          sort_by: "popularity.desc",
+          "vote_count.gte": 50, // soglia bassa per anni vecchi
+          page: p,
+        };
+        if (year) {
+          params["primary_release_date.gte"] = `${year}-01-01`;
+          params["primary_release_date.lte"] = `${year}-12-31`;
+        }
+        if (genreId) params.with_genres = genreId;
+        const r = await axios.get(`${BASE_URL}/discover/movie`, { params });
+        return { results: r.data.results || [], totalPages: r.data.total_pages || 1 };
+      } else {
+        const r = await axios.get(
+          `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT&page=${p}`
+        );
+        return { results: r.data.results || [], totalPages: 5 };
+      }
+    };
 
+    // Helper: trova il trailer di un film (IT poi EN)
+    const findTrailer = async (movieId) => {
+      try {
+        const itRes = await axios.get(
+          `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=it-IT`
+        );
+        const itV = itRes.data.results || [];
+        let t = itV.find((v) => v.site === "YouTube" && v.type === "Trailer" && v.official);
+        if (!t) t = itV.find((v) => v.site === "YouTube" && v.type === "Trailer");
+        if (!t) t = itV.find((v) => v.site === "YouTube" && (v.type === "Teaser" || v.type === "Clip"));
+        if (t) return t;
+
+        const enRes = await axios.get(
+          `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`
+        );
+        const enV = enRes.data.results || [];
+        t = enV.find((v) => v.site === "YouTube" && v.type === "Trailer");
+        if (!t) t = enV.find((v) => v.site === "YouTube");
+        return t || null;
+      } catch (_) {
+        return null;
+      }
+    };
+
+    const TARGET = 8;       // quanti film con trailer vogliamo
+    const MAX_PAGES = 4;    // quante pagine TMDB proviamo al massimo
     const horizonMovies = [];
-    for (let i = 0; i < moviesSlice.length; i++) {
-      const m = moviesSlice[i];
-      const videos = videoResults[i].data.results || [];
+    const seenIds = new Set();
+    let tmdbPage = page;
+    let pagesAttempted = 0;
 
-      // Prova trailer italiano, altrimenti inglese
-      let trailer = videos.find(
-        (v) => v.site === "YouTube" && v.type === "Trailer" && v.official
-      );
-      if (!trailer) {
-        trailer = videos.find((v) => v.site === "YouTube" && v.type === "Trailer");
+    while (horizonMovies.length < TARGET && pagesAttempted < MAX_PAGES) {
+      const { results, totalPages } = await fetchMoviePage(tmdbPage);
+      pagesAttempted++;
+
+      const batch = results.filter((m) => !seenIds.has(m.id));
+      batch.forEach((m) => seenIds.add(m.id));
+
+      // Fetch trailer di tutto il batch in parallelo
+      const trailers = await Promise.all(batch.map((m) => findTrailer(m.id)));
+
+      for (let i = 0; i < batch.length; i++) {
+        if (horizonMovies.length >= TARGET) break;
+        if (!trailers[i]) continue;
+        const m = batch[i];
+        horizonMovies.push({
+          id: m.id,
+          title: m.title,
+          overview: m.overview,
+          poster_path: m.poster_path,
+          backdrop_path: m.backdrop_path,
+          release_date: m.release_date,
+          vote_average: m.vote_average,
+          vote_count: m.vote_count,
+          genre_ids: m.genre_ids,
+          trailer_key: trailers[i].key,
+        });
       }
-      if (!trailer) {
-        trailer = videos.find((v) => v.site === "YouTube" && (v.type === "Teaser" || v.type === "Clip"));
-      }
 
-      // Se nessun video trovato in italiano, prova in inglese
-      if (!trailer) {
-        try {
-          const enVideosRes = await axios.get(
-            `${BASE_URL}/movie/${m.id}/videos?api_key=${API_KEY}&language=en-US`
-          );
-          const enVideos = enVideosRes.data.results || [];
-          trailer = enVideos.find((v) => v.site === "YouTube" && v.type === "Trailer");
-          if (!trailer) trailer = enVideos.find((v) => v.site === "YouTube");
-        } catch (_) {}
-      }
-
-      if (!trailer) continue; // Salta film senza video
-
-      horizonMovies.push({
-        id: m.id,
-        title: m.title,
-        overview: m.overview,
-        poster_path: m.poster_path,
-        backdrop_path: m.backdrop_path,
-        release_date: m.release_date,
-        vote_average: m.vote_average,
-        vote_count: m.vote_count,
-        genre_ids: m.genre_ids,
-        trailer_key: trailer.key,
-      });
+      if (tmdbPage >= totalPages) break;
+      tmdbPage++;
     }
 
     res.json({
       page,
       results: horizonMovies,
-      has_more: page < 5,
+      has_more: hasFilters ? page < 10 : page < 5,
     });
   } catch (error) {
     console.error("Errore getHorizonMovies:", error.message);
