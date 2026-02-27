@@ -453,33 +453,31 @@
 
 @media (max-width: 600px) {
   .adminPostCard {
-    padding: 14px;
+    padding: 12px;
     border-radius: 10px;
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-    width: 100vw; /* Occupy full viewport width */
-    margin-left: calc(-50vw + 50%); /* Negative margin hack to break out of container padding */
-    margin-right: calc(-50vw + 50%);
     box-sizing: border-box;
+    width: 100%;
   }
-  
+
   .adminPostHeader {
-    flex-direction: column;
-    align-items: stretch; /* Allinea a sinistra su mobile */
-    gap: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center; /* keep them aligned in center vertically */
+    gap: 8px;
   }
   
   .adminPostHeaderTopLayer {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* keep on the left */
     align-items: center;
-    width: 100%;
+    gap: 12px;
+    width: 100%; /* span full width on small screens so they move to their own line if needed, but flex-wrap handles this. */
   }
 
   .userInfoWrapper {
     justify-content: space-between;
     width: 100%;
+    margin-top: 5px !important;
   }
 
   .adminPostBody .comment {

@@ -42,6 +42,71 @@
   margin-bottom: 0;
   padding-bottom: 8px; /* Ridotto del 40% */
   border-bottom: none; /* Riga rimossa */
+  position: relative; /* Per posizionare il bottone impostazioni alto-destra */
+}
+
+/* ── Menu Impostazioni Profilo (3 punti) ── */
+.profileSettingsContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.profileSettingsBtn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.profileSettingsBtn:hover {
+  color: #e50914;
+}
+
+.settingsDropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: #0f0f12;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  width: 180px;
+  overflow: hidden;
+  z-index: 20;
+  animation: slideDown 0.2s ease-out;
+}
+
+.dropdownMenuItem {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dropdownMenuItem:last-child {
+  border-bottom: none;
+}
+
+.dropdownMenuItem:hover {
+  background-color: rgba(229, 9, 20, 0.15);
+  color: #fff;
 }
 
 .instaTopSection {

@@ -8,7 +8,7 @@ import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
-import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
+import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt, FaEllipsisH } from "react-icons/fa";
 import { SkeletonMovieCard, SkeletonUserCard, SkeletonListCard, SkeletonWithLogo } from "../components/Skeleton";
 
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
@@ -47,10 +47,14 @@ function ProfilePage() {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isTvHistoryModalOpen, setIsTvHistoryModalOpen] = useState(false);
   const [isListsModalOpen, setIsListsModalOpen] = useState(false);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAllBadges, setShowAllBadges] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Chiudi menu se si clicca fuori (semplificato con onClick sul container principale)
+  const closeSettingsMenu = () => setIsSettingsMenuOpen(false);
 
   // Resize listener
   useEffect(() => {
@@ -385,10 +389,38 @@ function ProfilePage() {
         </div>
       </Modal>
 
-      <div className={styles.profileWrapper}>
+      <div className={styles.profileWrapper} onClick={closeSettingsMenu}>
         <div className={styles.pageContainer}>
         {/* ── Header stile Instagram ── */}
         <header className={styles.profileHeader}>
+          {isOwnProfile && (
+            <div className={styles.profileSettingsContainer}>
+              <button 
+                className={styles.profileSettingsBtn} 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsSettingsMenuOpen(!isSettingsMenuOpen);
+                }}
+                aria-label="Opzioni Profilo"
+              >
+                <FaEllipsisH />
+              </button>
+              
+              {isSettingsMenuOpen && (
+                <div className={styles.settingsDropdownMenu}>
+                  <button onClick={() => { /* Placeholder for future feature */ setIsSettingsMenuOpen(false); }} className={styles.dropdownMenuItem}>
+                    ⚙️ Impostazioni
+                  </button>
+                  <button onClick={() => { /* Placeholder for future feature */ setIsSettingsMenuOpen(false); }} className={styles.dropdownMenuItem}>
+                    🎯 Obiettivi
+                  </button>
+                  <button onClick={() => { /* Placeholder for future feature */ setIsSettingsMenuOpen(false); }} className={styles.dropdownMenuItem}>
+                    💾 Salvati
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <div className={styles.instaTopSection}>
             <img
               src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
