@@ -174,6 +174,7 @@ function HorizonPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef(null);
   const cardRefs = useRef([]);
+  const initialized = useRef(false); // true dopo il primo fetch completato
 
   // ── Filtri ────────────────────────────────────────────
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -192,12 +193,21 @@ function HorizonPage() {
 
   const hasActiveFilters = !!(selectedGenre || selectedYear);
 
+  const yearInputMounted = useRef(false); // salta il primo mount
+
   // ── Auto-apply anno con debounce 700ms ────────────────
   useEffect(() => {
+    // Al primo mount yearInput === selectedYear → nessun cambiamento reale, salta
+    if (!yearInputMounted.current) {
+      yearInputMounted.current = true;
+      return;
+    }
+
     const y = yearInput.trim();
     const yearNum = parseInt(y);
     const valid = y === "" || (!isNaN(yearNum) && yearNum >= 1900 && yearNum <= CURRENT_YEAR && y.length === 4);
     if (!valid) return; // non triggerare per anni parziali (es. "19", "200")
+    if (y === selectedYear) return; // nessuna vera modifica
 
     setYearTyping(true);
     const timer = setTimeout(() => {
@@ -262,6 +272,7 @@ function HorizonPage() {
         const data = res.data;
         setMovies((prev) => pageNum === 1 ? data.results : [...prev, ...data.results]);
         setHasMore(data.has_more);
+        initialized.current = true; // primo fetch completato
       } catch (e) {
         console.error("Horizon fetch error:", e);
       } finally {
@@ -309,7 +320,7 @@ function HorizonPage() {
   }, [movies, hasMore, loadingMore]);
 
   // ── Render ────────────────────────────────────────────
-  if (loading) {
+  if (loading || (movies.length === 0 && !initialized.current)) {
     return (
       <div className={styles.loadingScreen}>
         <div className={styles.loadingSpinner} />

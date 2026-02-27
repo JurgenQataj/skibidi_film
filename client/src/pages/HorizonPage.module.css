@@ -684,19 +684,35 @@
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .customizerTrigger {
-    top: 8px;  /* sopra le card, sotto la top-bar mobile */
-    right: 8px;
-    width: 38px;
-    height: 38px;
+    top: 70px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
     font-size: 1rem;
+    z-index: 1000;
   }
 
   .customizerPanel {
     top: 0;
-    width: 100vw;
-    border-bottom-left-radius: 20px;
-    border-left: none;
-    border-top: none;
+    left: 0;          /* ancorato a sinistra */
+    right: 0;         /* ancorato a destra → larghezza piena senza overflow */
+    width: 100%;      /* mai più largo dello schermo */
     max-height: 80vh;
+    border-radius: 0 0 20px 20px;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    padding: 16px 14px 20px;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .genreGrid {
+    gap: 5px;
+  }
+
+  .genreChip {
+    font-size: 0.72rem;
+    padding: 4px 10px;
   }
 }
