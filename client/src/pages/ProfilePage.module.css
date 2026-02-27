@@ -45,7 +45,7 @@
   position: relative; /* Per posizionare il bottone impostazioni alto-destra */
 }
 
-/* ── Menu Impostazioni Profilo (3 punti) ── */
+/* ── Menu Impostazioni Profilo (Hamburger / 3 punti) ── */
 .profileSettingsContainer {
   position: absolute;
   top: 0;
@@ -57,7 +57,7 @@
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 1.4rem;
+  font-size: 1.8rem; /* Ingrandita leggermente l'icona FiMenu per bilanciarla visivamente */
   cursor: pointer;
   padding: 8px;
   display: flex;
@@ -75,13 +75,13 @@
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background-color: #0f0f12;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #0a0a0c; /* Sfondo quasi nero, premium scuro */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Bordo lievissimo */
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
-  width: 180px;
+  width: 250px; /* Più largo per accogliere icone e testo */
   overflow: hidden;
   z-index: 20;
   animation: slideDown 0.2s ease-out;
@@ -91,13 +91,15 @@
   background: transparent;
   border: none;
   color: #fff;
-  padding: 14px 16px;
+  padding: 16px 20px; /* Più respiro in stile app native */
+  display: flex;
+  align-items: center;
   text-align: left;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s ease;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06); /* Riga divisoria sottile */
 }
 
 .dropdownMenuItem:last-child {
@@ -105,8 +107,23 @@
 }
 
 .dropdownMenuItem:hover {
-  background-color: rgba(229, 9, 20, 0.15);
-  color: #fff;
+  background-color: rgba(255, 255, 255, 0.05); /* Highlight delicato grigio chiaro */
+}
+
+.menuIcon {
+  font-size: 1.4rem;
+  margin-right: 16px;
+  opacity: 0.9;
+}
+
+.menuText {
+  flex-grow: 1;
+  letter-spacing: 0.3px;
+}
+
+.menuChevron {
+  font-size: 1.2rem;
+  opacity: 0.5; /* Più sbiadito in stile iOS/Instagram */
 }
 
 .instaTopSection {

@@ -29,6 +29,7 @@ import PersonPage from "./pages/PersonPage";
 import CollectionPage from "./pages/CollectionPage"; // [NEW] Import CollectionPage
 import PartialCollectionsPage from "./pages/PartialCollectionsPage";
 import HorizonPage from "./pages/HorizonPage"; // [NEW] Skibidi Horizon
+import GoalsPage from "./pages/GoalsPage";
 
 // Import Componenti
 import Navbar from "./components/Navbar";
@@ -102,6 +103,7 @@ function App() {
           {/* Profilo e Statistiche */}
           <Route path="profile/:userId" element={<ProfilePage />} />
           <Route path="profile/:userId/stats" element={<StatsPage />} />
+          <Route path="profile/:userId/goals" element={<GoalsPage />} />
           <Route path="profile/:userId/history" element={<UserHistoryPage />} />
           <Route path="person/:name" element={<PersonPage />} />
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />

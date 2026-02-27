@@ -1,0 +1,442 @@
+/* ── Global scrollbar hide ──────────────────── */
+:global(body) {
+  overflow-x: hidden;
+}
+
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  padding: 100px 40px 60px;
+  max-width: 700px;
+  margin: 0 auto;
+  color: white;
+  background: transparent;
+  box-sizing: border-box; /* Prevent mobile horizontal overflow */
+}
+
+@media (max-width: 768px) {
+  .pageWrapper {
+    padding: 20px 20px 80px; /* Reduced top padding to move header higher */
+  }
+
+  /* Responsive per la modale con le locandine */
+  .largeModalContent {
+    width: 95%;
+    padding: 16px;
+    max-height: 90vh;
+  }
+
+  .largeModalHeader h2 {
+    font-size: 1.2rem;
+  }
+
+  .moviesGrid {
+    grid-template-columns: repeat(3, 1fr); /* 3 poster per riga su mobile */
+    gap: 8px;
+    padding-right: 4px;
+    padding-bottom: 16px;
+  }
+  
+  .movieRating {
+    font-size: 0.7rem;
+    padding: 2px 4px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.backButton, .addGoalBtn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.backButton:hover, .addGoalBtn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* ── Content ── */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loader {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #e50914;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── Empty State ── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 60px;
+  color: #999;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  color: #555;
+}
+
+.createFirstBtn {
+  margin-top: 24px;
+  background: #e50914;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.createFirstBtn:hover {
+  background: #b20710;
+}
+
+/* ── Goals List ── */
+.goalsList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.goalCard {
+  background-color: #0f0f12;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.goalCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.goalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.goalTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #fff;
+}
+
+.goalSubtitle {
+  font-size: 0.95rem;
+  color: #aaa;
+  margin: 0;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.deleteBtn:hover {
+  color: #e50914;
+}
+
+/* ── Progress Bar ── */
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progressBarBg {
+  flex-grow: 1;
+  height: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e50914, #ff4b2b);
+  border-radius: 6px;
+  transition: width 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+.progressBarFill.completed {
+  background: linear-gradient(90deg, #1db954, #1ed760); /* Verde Spotify/Success se completato */
+}
+
+.progressText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  min-width: 48px;
+  text-align: right;
+}
+
+.completedMessage {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: #1db954;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Modal ── */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: #0f0f12;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+  text-align: center;
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modalContent h2 {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+}
+
+.modalDesc {
+  color: #999;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.goalInput, .goalSelect {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.goalSelect {
+  font-size: 1.2rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.goalInput:focus, .goalSelect:focus {
+  border-color: #e50914;
+}
+
+.errorText {
+  color: #e50914;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+}
+
+.cancelBtn, .confirmBtn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.confirmBtn {
+  background: #e50914;
+  color: #fff;
+}
+
+.confirmBtn:hover {
+  background: #b20710;
+}
+
+/* ── Large Modal for Movies Grid ── */
+.largeModalContent {
+  background: #0f0f12;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.largeModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+}
+
+.largeModalHeader h2 {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-weight: bold;
+}
+
+.closeBtn:hover {
+  color: #fff;
+}
+
+.moviesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 8px;
+  padding-bottom: 24px;
+}
+
+.moviesGrid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.moviesGrid::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.movieItem {
+  position: relative;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  background-color: #222;
+}
+
+.movieItem:hover {
+  transform: scale(1.05);
+}
+
+.moviePoster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  display: block;
+}
+
+.movieRating {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffd700;
+}

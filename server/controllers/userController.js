@@ -3,6 +3,7 @@ const Review = require("../models/Review");
 const MovieList = require("../models/MovieList");
 const Notification = require("../models/Notification");
 const Post = require("../models/Post");
+const Goal = require("../models/Goal");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -595,6 +596,95 @@ exports.followUser = async (req, res) => {
     res.json({ message: "Seguito!" });
   } catch (error) {
     res.status(500).json({ message: "Errore server" });
+  }
+};
+// --- OBIETTIVI (GOALS) ---
+
+exports.createGoal = async (req, res) => {
+  try {
+    const { title, targetFrequency, year } = req.body;
+    
+    // Controlla se l'utente ha già un obiettivo per quell'anno (opzionale, ma consigliato per evitare spam)
+    const existingGoal = await Goal.findOne({ user: req.user.id, year });
+    if (existingGoal) {
+      return res.status(400).json({ message: `Hai già un obiettivo impostato per il ${year}.` });
+    }
+
+    const goal = new Goal({
+      user: req.user.id,
+      title: title || "Film da guardare",
+      targetFrequency,
+      year: year || new Date().getFullYear()
+    });
+
+    await goal.save();
+    res.status(201).json(goal);
+  } catch (error) {
+    console.error("Errore creazione goal:", error);
+    res.status(500).json({ message: "Errore server nella creazione dell'obiettivo." });
+  }
+};
+
+exports.getUserGoals = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const goals = await Goal.find({ user: userId }).sort({ year: -1 });
+
+    // Per ogni goal, calcoliamo i film visti in quell'anno
+    const goalsWithProgress = await Promise.all(goals.map(async (goal) => {
+      // Trova le recensioni (solo film, non tv) di questo utente fatte nell'anno del goal
+      // Attenzione: usiamo la data in cui ha *registrato* la recensione
+      const startDate = new Date(`${goal.year}-01-01T00:00:00Z`);
+      const endDate = new Date(`${goal.year}-12-31T23:59:59Z`);
+
+      // Count solo Reviews che hanno un reference a un movie e non sono post
+      const reviewsThisYear = await Review.find({
+        user: userId,
+        isPost: { $ne: true },
+        createdAt: { $gte: startDate, $lte: endDate }
+      }).populate('movie');
+      
+      const watchedReviews = reviewsThisYear.filter(r => r.movie && r.movie.media_type !== "tv");
+      const moviesWatchedThisYear = watchedReviews.length;
+      
+      // Mappa i dati dei film visti per mostrarli nel frontend (id, titolo, poster, voto)
+      const watchedMoviesList = watchedReviews.map(r => ({
+        reviewId: r._id,
+        movieId: r.movie.tmdb_id,
+        title: r.movie.title,
+        poster_path: r.movie.poster_path,
+        rating: r.rating,
+        dateWatched: r.createdAt
+      }));
+
+      return {
+        ...goal._doc,
+        currentCount: moviesWatchedThisYear,
+        watchedMovies: watchedMoviesList
+      };
+    }));
+
+    res.json(goalsWithProgress);
+  } catch (error) {
+    console.error("Errore recupero goals:", error);
+    res.status(500).json({ message: "Errore server nel recupero degli obiettivi." });
+  }
+};
+
+exports.deleteGoal = async (req, res) => {
+  try {
+    const goal = await Goal.findById(req.params.id);
+    if (!goal) return res.status(404).json({ message: "Obiettivo non trovato." });
+
+    if (goal.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: "Non autorizzato." });
+    }
+
+    await goal.deleteOne();
+    res.json({ message: "Obiettivo rimosso." });
+  } catch (error) {
+    console.error("Errore eliminazione goal:", error);
+    res.status(500).json({ message: "Errore server nell'eliminazione dell'obiettivo." });
   }
 };
 

@@ -8,7 +8,8 @@ import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 
-import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt, FaEllipsisH } from "react-icons/fa";
+import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
+import { FiMenu, FiSettings, FiTarget, FiBookmark, FiChevronRight } from "react-icons/fi";
 import { SkeletonMovieCard, SkeletonUserCard, SkeletonListCard, SkeletonWithLogo } from "../components/Skeleton";
 
 // 100 Pokémon: starter base e finale + migliori finali per ogni generazione
@@ -403,19 +404,28 @@ function ProfilePage() {
                 }}
                 aria-label="Opzioni Profilo"
               >
-                <FaEllipsisH />
+                <FiMenu />
               </button>
               
               {isSettingsMenuOpen && (
                 <div className={styles.settingsDropdownMenu}>
-                  <button onClick={() => { /* Placeholder for future feature */ setIsSettingsMenuOpen(false); }} className={styles.dropdownMenuItem}>
-                    ⚙️ Impostazioni
+                  <button onClick={() => { setIsSettingsMenuOpen(false); /* Placeholder */ }} className={styles.dropdownMenuItem}>
+                    <FiSettings className={styles.menuIcon} />
+                    <span className={styles.menuText}>Impostazioni</span>
+                    <FiChevronRight className={styles.menuChevron} />
                   </button>
-                  <button onClick={() => { /* Placeholder for future feature */ setIsSettingsMenuOpen(false); }} className={styles.dropdownMenuItem}>
-                    🎯 Obiettivi
+                  <button onClick={() => { 
+                    setIsSettingsMenuOpen(false); 
+                    navigate(`/profile/${userId}/goals`); 
+                  }} className={styles.dropdownMenuItem}>
+                    <FiTarget className={styles.menuIcon} />
+                    <span className={styles.menuText}>Obiettivi</span>
+                    <FiChevronRight className={styles.menuChevron} />
                   </button>
-                  <button onClick={() => { /* Placeholder for future feature */ setIsSettingsMenuOpen(false); }} className={styles.dropdownMenuItem}>
-                    💾 Salvati
+                  <button onClick={() => { setIsSettingsMenuOpen(false); /* Placeholder */ }} className={styles.dropdownMenuItem}>
+                    <FiBookmark className={styles.menuIcon} />
+                    <span className={styles.menuText}>Salvati</span>
+                    <FiChevronRight className={styles.menuChevron} />
                   </button>
                 </div>
               )}

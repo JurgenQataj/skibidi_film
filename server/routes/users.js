@@ -41,4 +41,9 @@ router.get("/:userId/reviews", userController.getUserReviews);
 router.get("/:userId/lists", userController.getUserLists);
 router.get("/:userId/filtered-history", userController.getUserFilteredReviews);
 
+// --- Goals ---
+router.post("/goals", protect, userController.createGoal);
+router.get("/:userId/goals", userController.getUserGoals);
+router.delete("/goals/:id", protect, userController.deleteGoal);
+
 module.exports = router;
