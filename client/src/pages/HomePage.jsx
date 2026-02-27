@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import styles from "./HomePage.module.css";
 import ReviewCard from "../components/ReviewCard";
+import AdminPostCreator from "../components/AdminPostCreator";
 import { useAuth } from "../context/AuthContext";
 
 import CustomTrendingRow from "../components/CustomTrendingRow";
@@ -82,6 +83,9 @@ function HomePage() {
     <div className={styles.pageContainer}>
 
       <CustomTrendingRow />
+
+      <AdminPostCreator onPostCreated={() => fetchFeed(true)} />
+
       <div className={styles.feedContainer}>
         {feed.map((review, index) => {
           if (feed.length === index + 1) {

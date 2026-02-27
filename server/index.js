@@ -52,6 +52,7 @@ app.use("/api/comments", require("./routes/comments"));
 app.use("/api/reactions", require("./routes/reactions"));
 app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/chat", require("./routes/chatRoutes")); // [NEW] Chat Routes
+app.use("/api/posts", require("./routes/posts")); // [NEW] Admin Posts
 
 app.get("/", (req, res) => res.send("Skibidi Film API Running"));
 

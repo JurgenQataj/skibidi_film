@@ -393,8 +393,93 @@
     font-size: 0.85rem;
   }
 
-  .reactions button {
-    font-size: 0.75rem;
-    padding: 2px 6px;
+}
+
+/* --- ADMIN POST STYLES --- */
+.adminPostCard {
+  background: rgba(18, 18, 28, 0.6);
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.adminPostHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap; /* Permette all'header di andare a capo su schermi stretti */
+  gap: 8px;
+}
+
+.adminBadge {
+  background: #e50914;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.adminPinnedText {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.adminPostBody {
+  margin-bottom: 12px;
+}
+
+.adminPostBody .comment {
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .adminPostCard {
+    padding: 14px;
+    border-radius: 10px;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+  
+  .adminPostHeader {
+    flex-direction: column;
+    align-items: stretch; /* Allinea a sinistra su mobile */
+    gap: 12px;
+  }
+  
+  .adminPostHeaderTopLayer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .userInfoWrapper {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (max-width: 395px) {
+  .adminBadge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+  .adminPinnedText {
+    font-size: 0.7rem;
   }
 }

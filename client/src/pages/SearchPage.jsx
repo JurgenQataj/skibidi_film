@@ -477,7 +477,7 @@ function SearchPage() {
               <textarea
                 ref={smartTextareaRef}
                 className={styles.smartTextarea}
-                placeholder="Descrivi il film che vuoi vedere (premi ⓘ per info dei prompt)"
+                placeholder="(ⓘ per tipi di prompt)"
                 value={smartQuery}
                 rows={2}
                 onChange={(e) => setSmartQuery(e.target.value)}

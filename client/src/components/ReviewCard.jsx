@@ -17,7 +17,11 @@ function renderText(text) {
 }
 
 function ReviewCard({ review, onInteraction }) {
-  if (!review || !review.movie || !review.user || !review.movie.tmdb_id) {
+  if (!review || !review.user) {
+    return null;
+  }
+  
+  if (!review.isPost && (!review.movie || !review.movie.tmdb_id)) {
     return null;
   }
 
@@ -170,6 +174,18 @@ function ReviewCard({ review, onInteraction }) {
     }
   };
 
+  const handleDeletePost = async () => {
+    if (!window.confirm("Sei sicuro di voler eliminare questo annuncio?")) return;
+    try {
+      await axios.delete(`${API_URL}/api/posts/${review._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (onInteraction) onInteraction();
+    } catch (err) {
+      alert("Errore durante l'eliminazione dell'annuncio.");
+    }
+  };
+
   // Il resto del componente rimane invariato...
   const timeAgo = (date) => {
     try {
@@ -182,7 +198,13 @@ function ReviewCard({ review, onInteraction }) {
     }
   };
 
-  const { movie, user, rating, comment_text, createdAt } = review;
+  const { user, createdAt } = review;
+  const isPost = review.isPost;
+  
+  const movie = isPost ? null : review.movie;
+  const rating = isPost ? null : review.rating;
+  const comment_text = isPost ? review.text : review.comment_text; 
+
   const reactionCount =
     Array.isArray(review.reactions) ?
     review.reactions.filter((r) => r.reaction_type === "love").length 
@@ -195,6 +217,54 @@ function ReviewCard({ review, onInteraction }) {
 
   const commentCount = review.comments?.length || review.comment_count || 0;
 
+  // --- RENDERING PER ANNUNCI ADMIN ---
+  if (isPost) {
+    return (
+      <div className={`${styles.card} ${styles.adminPostCard}`}>
+        <div className={styles.adminPostHeader}>
+          <div className={styles.adminPostHeaderTopLayer}>
+            <span className={styles.adminBadge}>ADMIN</span>
+            <span className={styles.adminPinnedText}>📌 Pinnato per 7 giorni</span>
+          </div>
+          
+          <div className={styles.userInfoWrapper} style={{ marginTop: "4px", width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Link to={`/profile/${user._id}`} className={styles.authorLink} style={{ fontSize: "0.95rem" }}>
+              {user.username || "Admin"}
+            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <img
+                src={
+                  user.avatar_url ||
+                  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"
+                }
+                alt="avatar"
+                className={styles.userAvatar}
+              />
+              {loggedInUserId === user._id && (
+                <button
+                  onClick={handleDeletePost}
+                  className={styles.deleteCommentButton}
+                  title="Elimina annuncio"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className={styles.adminPostBody}>
+          {comment_text && <p className={styles.comment}>{renderText(comment_text)}</p>}
+        </div>
+        
+        <div className={styles.footerRow}>
+          <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- RENDERING CLASSICO PER RECENSIONI FILM/TV ---
   return (
     <div className={styles.card}>
       <div className={styles.leftColumn}>

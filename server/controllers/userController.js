@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Review = require("../models/Review");
 const MovieList = require("../models/MovieList");
 const Notification = require("../models/Notification");
+const Post = require("../models/Post");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -675,7 +676,25 @@ exports.getUserFeed = async (req, res) => {
 
     const validReviews = reviews.filter((r) => r.user && r.movie);
 
-    res.json(validReviews);
+    let finalFeed = validReviews;
+
+    // Se siamo alla prima pagina, uniamo anche i Post (Annunci admin attivi)
+    if (page === 1) {
+      const activePosts = await Post.find({ expiresAt: { $gt: Date.now() } })
+        .populate("user", "username avatar_url")
+        .sort({ createdAt: -1 });
+
+      // Mappiamo i post per dare loro una struttura uniformemente gestibile dal frontend
+      const formattedPosts = activePosts.map((post) => ({
+        ...post.toObject(),
+        isPost: true,
+      }));
+
+      // Inseriamo i post admin SOPRA alle recensioni
+      finalFeed = [...formattedPosts, ...validReviews];
+    }
+
+    res.json(finalFeed);
   } catch (error) {
     console.error("Errore Feed:", error);
     res.status(500).json({ message: "Errore server." });
