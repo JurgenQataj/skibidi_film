@@ -526,7 +526,7 @@ function SearchPage() {
                   },
                   {
                     category: "📅 Anno / Decennio",
-                    examples: ["film anni 90", "film anni 2000", "film anni 2010", "film anni 2020"],
+                    examples: ["film anni 90", "film anni 2000", "film anni 2010"],
                   },
                   {
                     category: "🔝 Ordinamento",

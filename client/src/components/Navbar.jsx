@@ -8,6 +8,7 @@ import {
   FaGlobe,
   FaBell,
   FaPlayCircle,
+  FaBars,
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
