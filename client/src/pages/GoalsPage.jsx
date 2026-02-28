@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import MovieCard from "../components/MovieCard";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { jwtDecode } from "jwt-decode";
@@ -215,14 +216,16 @@ function GoalsPage() {
             {viewingGoal.watchedMovies && viewingGoal.watchedMovies.length > 0 ? (
               <div className={styles.moviesGrid}>
                 {viewingGoal.watchedMovies.map((movie, index) => (
-                  <div key={index} className={styles.movieItem} onClick={() => navigate(`/movie/${movie.movieId}`)}>
-                    <img 
-                      src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
-                      alt={movie.title} 
-                      className={styles.moviePoster} 
-                    />
-                    <div className={styles.movieRating}>★ {movie.rating}</div>
-                  </div>
+                  <MovieCard 
+                    key={index} 
+                    movie={{
+                      tmdb_id: movie.movieId,
+                      title: movie.title,
+                      poster_path: movie.poster_path, // Fallback gestito in MovieCard
+                      vote_average: movie.rating,
+                      media_type: "movie" // Forziamo a movie per default, come in ProfilePage (se non è noto)
+                    }} 
+                  />
                 ))}
               </div>
             ) : (

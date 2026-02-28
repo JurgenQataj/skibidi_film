@@ -31,15 +31,70 @@
   }
 
   .moviesGrid {
-    grid-template-columns: repeat(3, 1fr); /* 3 poster per riga su mobile */
-    gap: 8px;
-    padding-right: 4px;
-    padding-bottom: 16px;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    grid-auto-rows: unset;
   }
-  
-  .movieRating {
-    font-size: 0.7rem;
-    padding: 2px 4px;
+
+  .moviesGrid .card {
+    --title-height: 28px;
+    width: 100% !important;
+    max-width: 90px;
+    height: calc(120px + var(--title-height)) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1c1e21 !important;
+  }
+
+  .moviesGrid .card img {
+    width: 100% !important;
+    height: 120px !important;
+    object-fit: cover !important;
+    background-color: #1c1e21 !important;
+  }
+
+  .moviesGrid .card .title {
+    width: 100% !important;
+    height: var(--title-height) !important;
+    font-size: 0.55rem !important;
+    line-height: 1.1 !important;
+    text-align: center;
+    white-space: normal !important;
+    overflow: hidden;
+    padding: 2px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 395px) {
+  .moviesGrid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+    padding: 0 4px; /* Un po' di margine ai lati */
+  }
+
+  .moviesGrid .card {
+    --title-height: 26px;
+    width: 100% !important;
+    max-width: 80px;
+    height: auto !important;
+    aspect-ratio: 2/3.5;
+  }
+
+  .moviesGrid .card img {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 2/3 !important;
+  }
+
+  .moviesGrid .card .title {
+    width: 100% !important;
+    height: var(--title-height) !important;
+    font-size: 0.5rem !important;
   }
 }
 
@@ -392,8 +447,11 @@
 
 .moviesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(6, 1fr); /* 6 per riga esatti su PC */
+  gap: 15px;
+  justify-items: stretch;
+  align-items: stretch; /* Colonne alla medesima altezza in ogni fila */
+  width: 100%;
   overflow-y: auto;
   padding-right: 8px;
   padding-bottom: 24px;
@@ -408,35 +466,33 @@
   border-radius: 4px;
 }
 
-.movieItem {
-  position: relative;
-  cursor: pointer;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.2s;
-  background-color: #222;
+.moviesGrid .card {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 
-.movieItem:hover {
-  transform: scale(1.05);
-}
-
-.moviePoster {
-  width: 100%;
+.moviesGrid .card img {
+  width: 100% !important;
+  height: auto !important;
   aspect-ratio: 2/3;
-  object-fit: cover;
-  display: block;
+  object-fit: cover !important;
+  object-position: center !important;
+  background-color: #1c1e21 !important;
+  flex-shrink: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.movieRating {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #ffd700;
+.moviesGrid .card .title {
+  width: 100% !important;
+  padding: 5px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
