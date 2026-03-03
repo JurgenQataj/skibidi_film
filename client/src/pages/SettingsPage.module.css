@@ -1,0 +1,664 @@
+/* ─── Settings Page – Premium Redesign ─── */
+
+/* ── Page Shell ── */
+.pageWrapper {
+  min-height: 100vh;
+  background: #0a0a0c;
+  color: #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding-top: 80px; /* navbar height */
+  box-sizing: border-box;
+}
+
+/* ── Page Header (mobile only) ── */
+.pageHeader {
+  display: none;
+  padding: 24px 20px 0;
+}
+.pageHeaderTitle {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 40%, #888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+/* ── Main Layout ── */
+.layout {
+  display: flex;
+  flex: 1;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 32px 40px;
+  gap: 28px;
+  box-sizing: border-box;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 104px;
+  align-self: flex-start;
+}
+
+.sidebarHeader {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #555;
+  padding: 0 12px 8px;
+}
+
+.navBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: #777;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease, color 0.2s ease;
+  position: relative;
+}
+
+.navBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ccc;
+}
+
+.navBtnIcon {
+  font-size: 1.05rem;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.navBtn.active {
+  background: rgba(216, 27, 96, 0.12);
+  color: #e91e63;
+  font-weight: 600;
+}
+
+.navBtn.active .navBtnIcon {
+  opacity: 1;
+}
+
+.activePill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: #e91e63;
+  border-radius: 0 4px 4px 0;
+}
+
+.sidebarDivider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 10px 0;
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: #e53935;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+.logoutBtn:hover {
+  background: rgba(229, 57, 53, 0.1);
+}
+
+/* ── Content Panel ── */
+.contentPanel {
+  flex: 1;
+  min-width: 0;
+  animation: fadeSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section Header ── */
+.sectionHeader {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.025em;
+}
+
+.sectionDesc {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Cards ── */
+.card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.card:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Setting Row (label + input) ── */
+.settingRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.settingRow:last-child {
+  margin-bottom: 0;
+}
+
+.settingLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Inputs ── */
+.inputField {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-size: 0.97rem;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.inputField::placeholder {
+  color: #444;
+}
+
+.inputField:focus {
+  border-color: rgba(233, 30, 99, 0.5);
+  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+}
+
+.selectField {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 14px center;
+  background-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 13px 40px 13px 16px;
+  border-radius: 12px;
+  font-size: 0.97rem;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.selectField:focus {
+  border-color: rgba(233, 30, 99, 0.5);
+  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+}
+
+.selectField option {
+  background-color: #1a1a1e;
+  color: #fff;
+}
+
+/* ── Avatar Row ── */
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d81b60, #ff4081);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(216, 27, 96, 0.4);
+}
+
+.avatarInfo {
+  flex: 1;
+}
+
+.avatarInfo p {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* ── Toggle Row ── */
+.toggleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.toggleRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.toggleRow:first-child {
+  padding-top: 0;
+}
+
+.toggleInfo {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.toggleInfo h4 {
+  margin: 0 0 4px;
+  color: #ddd;
+  font-weight: 600;
+  font-size: 0.97rem;
+}
+
+.toggleInfo p {
+  margin: 0;
+  color: #555;
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+/* ── Toggle Switch ── */
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 27px;
+  flex-shrink: 0;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.1);
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 34px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 21px;
+  width: 21px;
+  left: 2px;
+  bottom: 2px;
+  background: #888;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+input:checked + .slider {
+  background: #e91e63;
+  border-color: #e91e63;
+}
+
+input:checked + .slider::before {
+  transform: translateX(21px);
+  background: #fff;
+}
+
+/* ── Buttons ── */
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #d81b60 0%, #ff4081 100%);
+  color: #fff;
+  border: none;
+  padding: 13px 26px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(216, 27, 96, 0.45);
+}
+
+.primaryBtn:active {
+  transform: translateY(0);
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #bbb;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.secondaryBtn:hover {
+  background: rgba(255, 255, 255, 0.11);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dangerCard {
+  background: rgba(229, 57, 53, 0.05);
+  border: 1px solid rgba(229, 57, 53, 0.15);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 16px;
+}
+
+.dangerTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e53935;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 6px;
+}
+
+.dangerDesc {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.dangerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: #e53935;
+  border: 1px solid rgba(229, 57, 53, 0.35);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.dangerBtn:hover {
+  background: rgba(229, 57, 53, 0.1);
+  border-color: rgba(229, 57, 53, 0.5);
+}
+
+/* ── Button Row ── */
+.btnRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* ── Data buttons (full-width) ── */
+.dataBtn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 18px 20px;
+  color: #bbb;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.dataBtn:last-child { margin-bottom: 0; }
+
+.dataBtn:hover {
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  border-color: rgba(255,255,255,0.12);
+  transform: translateX(3px);
+}
+
+.dataBtnIcon {
+  font-size: 1.2rem;
+  opacity: 0.7;
+}
+
+.dataBtnText {
+  flex: 1;
+}
+
+.dataBtnLabel {
+  display: block;
+  font-weight: 600;
+  color: #ddd;
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+}
+
+.dataBtnSub {
+  display: block;
+  font-size: 0.78rem;
+  color: #555;
+  font-weight: 400;
+}
+
+
+/* ── Not-Logged Fallback ── */
+.notLogged {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 1rem;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE – Mobile
+   ══════════════════════════════════════ */
+@media (max-width: 768px) {
+  .pageWrapper {
+    padding-top: 0;
+    padding-bottom: 70px; /* space for bottom tab bar */
+  }
+
+  /* Show mobile header */
+  .pageHeader {
+    display: block;
+    padding: 16px 16px 0;
+  }
+
+  .layout {
+    flex-direction: column;
+    padding: 12px 16px 24px;
+    gap: 16px;
+  }
+
+  /* Sidebar becomes horizontal scrollable pill bar */
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 0;
+    position: static;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  /* Hide desktop-only sidebar elements */
+  .sidebarHeader,
+  .sidebarDivider,
+  .logoutBtn {
+    display: none;
+  }
+
+  .navBtn {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 10px 16px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    gap: 7px;
+    font-size: 0.88rem;
+    color: #888;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .navBtn:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .navBtn.active {
+    background: #e91e63;
+    color: #fff;
+    border-color: #e91e63;
+  }
+
+  .activePill { display: none; }
+
+  .navBtnLabel {
+    display: inline;
+  }
+
+  /* Content panel */
+  .contentPanel {
+    width: 100%;
+  }
+
+  .sectionTitle {
+    font-size: 1.25rem;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .dangerCard {
+    padding: 18px;
+  }
+
+  /* Avatar */
+  .avatarRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  /* Buttons full-width on mobile */
+  .btnRow {
+    flex-direction: column;
+  }
+
+  .primaryBtn,
+  .secondaryBtn,
+  .dangerBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .layout {
+    padding: 10px 12px 20px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .sectionTitle {
+    font-size: 1.15rem;
+  }
+}

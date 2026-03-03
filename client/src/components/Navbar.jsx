@@ -45,7 +45,7 @@ function Navbar() {
       }
     };
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000);
+    const interval = setInterval(fetchNotifications, 15000);
     return () => clearInterval(interval);
   }, [token]);
 
@@ -78,6 +78,8 @@ function Navbar() {
       case "new_follower": return `/profile/${notification.sender._id}`;
       case "new_reaction":
       case "new_comment":
+      case "thread_comment":
+      case "comment_mention":
         if (notification.targetReview?.movie?.tmdb_id) {
           return `/${notification.targetReview.movie.media_type === "tv" ? "tv" : "movie"}/${notification.targetReview.movie.tmdb_id}`;
         }
@@ -88,6 +90,7 @@ function Navbar() {
     }
   };
 
+
   const getNotificationText = (notification) => {
     if (!notification || !notification.sender) return "Nuova notifica";
     switch (notification.type) {
@@ -97,6 +100,10 @@ function Navbar() {
         return <span><strong>{notification.sender.username}</strong> ha messo like alla tua recensione</span>;
       case "new_comment":
         return <span><strong>{notification.sender.username}</strong> ha commentato la tua recensione</span>;
+      case "thread_comment":
+        return <span><strong>{notification.sender.username}</strong> ha commentato un post che hai commentato</span>;
+      case "comment_mention":
+        return <span><strong>{notification.sender.username}</strong> ti ha menzionato in un commento</span>;
       case "chat_mention":
         return <span><strong>{notification.sender.username}</strong> ti ha menzionato nella chat globale</span>;
       default:
@@ -140,8 +147,8 @@ function Navbar() {
                 <Link to="/notifications" onClick={handleBellClick} className={styles.navLink}>
                   <FaBell /> <span>Notifiche</span>
                   {unreadCount > 0 && (
-                    <span className={styles.notificationBadge}>
-                      {unreadCount}
+                    <span className={`${styles.notificationBadge} ${styles.notificationBadgePulse}`}>
+                      {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                   )}
                 </Link>

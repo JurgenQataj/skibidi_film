@@ -31,6 +31,7 @@ import PartialCollectionsPage from "./pages/PartialCollectionsPage";
 import HorizonPage from "./pages/HorizonPage"; // [NEW] Skibidi Horizon
 import GoalsPage from "./pages/GoalsPage";
 
+
 // Import Componenti
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -109,6 +110,7 @@ function App() {
           <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
           <Route path="tv/:tmdbId" element={<TvShowDetailPage />} /> {/* [NEW] TV Route */}
           <Route path="collection/:id" element={<CollectionPage />} />
+
         </Route>
       </Routes>
     </Router>

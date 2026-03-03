@@ -409,7 +409,10 @@ function ProfilePage() {
               
               {isSettingsMenuOpen && (
                 <div className={styles.settingsDropdownMenu}>
-                  <button onClick={() => { setIsSettingsMenuOpen(false); /* Placeholder */ }} className={styles.dropdownMenuItem}>
+                  <button onClick={() => { 
+                    setIsSettingsMenuOpen(false); 
+                    navigate('/settings'); 
+                  }} className={styles.dropdownMenuItem}>
                     <FiSettings className={styles.menuIcon} />
                     <span className={styles.menuText}>Impostazioni</span>
                     <FiChevronRight className={styles.menuChevron} />
