@@ -152,6 +152,28 @@
   width: 100%;
 }
 
+/* Campanella notifiche — nascosta su desktop */
+.mobileBell {
+  display: none;
+}
+
+.mobileBellBadge {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: #e50914;
+  color: #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 1.5px solid rgba(10, 10, 10, 0.9);
+}
+
 @media (min-width: 768px) {
   .header {
     padding: 0;
@@ -195,6 +217,29 @@
     width: 75px !important;
     height: auto !important; 
     aspect-ratio: 2/3 !important;
+  }
+
+  /* Campanella mobile — visibile */
+  .mobileBell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.05rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+    margin-left: 8px;
+  }
+
+  .mobileBell:active {
+    background: rgba(229, 9, 20, 0.25);
   }
 }
 

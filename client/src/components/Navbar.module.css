@@ -324,24 +324,55 @@
   display: none;
 }
 
+/* Campanella nella topbar mobile */
+.mobileBellLink {
+  display: none;
+}
+
 /* === MEDIA QUERIES === */
 @media (max-width: 768px) {
   /* Mostra la topbar solo su mobile */
   .mobileTopbar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    /* Estende la barra anche nella safe area del notch */
-    height: calc(40px + env(safe-area-inset-top, 0px)); /* -10% */
+    height: calc(40px + env(safe-area-inset-top, 0px));
     padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 16px;
+    padding-right: 16px;
+    box-sizing: border-box;
     background-color: #0f0f12;
-    /* NO backdrop-filter: blur fa trasparire il gradiente rosso del body */
     z-index: 1000;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Campanella in alto a destra nella topbar */
+  .mobileBellLink {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: #ffffff;
+    font-size: 1.15rem;
+    text-decoration: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+  }
+
+  .mobileBellLink:hover,
+  .mobileBellLink:active {
+    background: rgba(229, 9, 20, 0.25);
+  }
+
+  /* Nascondi la campanella dalla bottom navbar su mobile */
+  .mobileHideNotif {
+    display: none !important;
   }
 
   .mobileLogo {
@@ -445,6 +476,12 @@
     height: 16px;
     font-size: 9px;
     border-width: 1px;
+  }
+
+  /* Badge nella campanella della topbar — rimane top-right del bottone */
+  .mobileBellLink .notificationBadge {
+    top: 0px;
+    right: 0px;
   }
 
   .notificationDropdown {

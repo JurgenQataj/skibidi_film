@@ -46,7 +46,7 @@ function AdminPostCreator({ onPostCreated }) {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>📢 Crea Annuncio Admin (Visibile a tutti per 7gg)</h3>
+      <h3 className={styles.title}>📢 Crea Annuncio Admin (7days)</h3>
       <form onSubmit={handleSubmit} className={styles.form}>
         <textarea
           className={styles.textarea}

@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaBell } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import styles from "./CustomTrendingRow.module.css";
 import MovieCard from "./MovieCard";
 import { SkeletonMovieCard } from "./Skeleton";
+
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 const CustomTrendingRow = () => {
   const [mediaType, setMediaType] = useState("movie"); // 'movie' o 'tv'
@@ -12,6 +15,41 @@ const CustomTrendingRow = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const scrollRef = useRef(null);
+
+  // Notifiche — utilizzate per la campanella mobile
+  const [unreadCount, setUnreadCount] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const fetchUnread = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/notifications`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUnreadCount((res.data || []).filter((n) => !n.read).length);
+      } catch {}
+    };
+
+    fetchUnread();
+    const id = setInterval(fetchUnread, 15000);
+    return () => clearInterval(id);
+  }, []);
+
+  const handleBellClick = async () => {
+    const token = localStorage.getItem("token");
+    if (token && unreadCount > 0) {
+      try {
+        await axios.put(`${API_URL}/api/notifications/read`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUnreadCount(0);
+      } catch {}
+    }
+    navigate("/notifications");
+  };
 
   const handleScroll = (direction) => {
     if (scrollRef.current) {
@@ -29,9 +67,10 @@ const CustomTrendingRow = () => {
       setLoading(true);
       setError(null);
       try {
-        const API_URL = import.meta.env.VITE_API_URL || "";
         const endpointPrefix = mediaType === "tv" ? "tv" : "movies";
-        const response = await axios.get(`${API_URL}/api/${endpointPrefix}/trending?timeWindow=${timeWindow}&_t=${Date.now()}`);
+        const response = await axios.get(
+          `${API_URL}/api/${endpointPrefix}/trending?timeWindow=${timeWindow}&_t=${Date.now()}`
+        );
         setItems(response.data || []);
       } catch (err) {
         console.error("Errore caricamento tendenze:", err);
@@ -81,6 +120,20 @@ const CustomTrendingRow = () => {
             Questa settimana
           </button>
         </div>
+
+        {/* Campanella notifiche — solo mobile, a destra dello switch */}
+        <button
+          className={styles.mobileBell}
+          onClick={handleBellClick}
+          aria-label="Notifiche"
+        >
+          <FaBell />
+          {unreadCount > 0 && (
+            <span className={styles.mobileBellBadge}>
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </button>
       </div>
 
       {loading ? (

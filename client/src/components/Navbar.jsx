@@ -143,7 +143,7 @@ function Navbar() {
 
           {userId && (
             <>
-              <div className={styles.notificationContainer}>
+              <div className={`${styles.notificationContainer} ${styles.mobileHideNotif}`}>
                 <Link to="/notifications" onClick={handleBellClick} className={styles.navLink}>
                   <FaBell /> <span>Notifiche</span>
                   {unreadCount > 0 && (
