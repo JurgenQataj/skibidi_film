@@ -1,155 +1,8 @@
-.rouletteContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 30px 20px;
-  background: rgba(18, 18, 28, 0.95);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  max-width: 400px;
-  width: 100%;
-  margin: 0 auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  position: relative;
-  overflow: hidden;
-}
+/* ──────────────────────────────────────────────
+   SKIBIDI ROULETTE — Casino Wheel
+────────────────────────────────────────────── */
 
-.title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 20px;
-  text-align: center;
-  background: linear-gradient(90deg, #d72638, #8c050c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.slotMachine {
-  width: 100%;
-  height: 350px;
-  border-radius: 12px;
-  background: #000;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
-  margin-bottom: 20px;
-}
-
-.posterWrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.1s ease-in-out;
-}
-
-.posterWrapper.active {
-  opacity: 1;
-}
-
-.posterImg {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: blur(2px) saturate(1.5);
-  transition: filter 0.3s;
-}
-
-.posterWrapper.winner .posterImg {
-  filter: blur(0) saturate(1);
-}
-
-.movieInfo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
-  padding: 30px 15px 15px;
-  text-align: center;
-  transform: translateY(100%);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.posterWrapper.winner .movieInfo {
-  transform: translateY(0);
-}
-
-.movieTitle {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.spinBtn {
-  background: linear-gradient(135deg, #d72638 0%, #a1001c 100%);
-  color: white;
-  border: none;
-  padding: 14px 30px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 15px rgba(215, 38, 56, 0.4);
-  width: 100%;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.spinBtn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(215, 38, 56, 0.6);
-}
-
-.spinBtn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.spinBtn:disabled {
-  background: #555;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: scale(0.98);
-}
-
-.watchBtn {
-  margin-top: 15px;
-  background: #fff;
-  color: #12121c;
-  border: none;
-  padding: 12px 24px;
-  font-size: 1rem;
-  font-weight: 700;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.watchBtn:hover {
-  background: #e0e0e0;
-  transform: translateY(-2px);
-}
-
+/* Floating trigger button */
 .openRouletteBtn {
   position: fixed;
   bottom: 30px;
@@ -169,56 +22,218 @@
   z-index: 100;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+.openRouletteBtn:hover { transform: scale(1.12) rotate(18deg); }
 
-.openRouletteBtn:hover {
-  transform: scale(1.1) rotate(15deg);
-}
-
+/* Overlay */
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
-  animation: fadeIn 0.3s ease-out;
+  padding: 16px;
+  animation: fadeIn 0.25s ease-out;
 }
 
+/* Modal container */
+.rouletteContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 24px 18px;
+  background: rgba(14, 14, 20, 0.97);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  max-width: 600px; /* Ingrandito per dare spazio alle locandine */
+  width: 100%;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 80px rgba(229, 9, 20, 0.15);
+  max-height: 96svh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.rouletteContainer::-webkit-scrollbar { display: none; }
+
+/* Title */
+.title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #FFD700;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  letter-spacing: 0.5px;
+}
+
+/* Canvas wrapper + pointer */
+.pointerWrap {
+  position: relative;
+  width: min(420px, 100%);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.2), 0 8px 32px rgba(0,0,0,0.6);
+}
+
+/* Pointer triangle at top-center */
+.pointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 22px solid #FFD700;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+/* Spin button */
+.spinBtn {
+  background: linear-gradient(135deg, #d72638 0%, #a1001c 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(215, 38, 56, 0.4);
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.spinBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(215, 38, 56, 0.65);
+}
+.spinBtn:disabled {
+  background: #333;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Winner card */
+.winnerCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: rgba(255, 215, 0, 0.06);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  padding: 12px 14px;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.winnerPoster {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.winnerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.winnerLabel {
+  font-size: 0.72rem;
+  color: #FFD700;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.winnerTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watchBtn {
+  background: #e50914;
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+}
+.watchBtn:hover { background: #c0020f; transform: translateY(-1px); }
+
+/* Close button */
 .closeBtn {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 1.8rem;
+  top: 14px;
+  right: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.3rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   cursor: pointer;
   line-height: 1;
-  transition: color 0.2s;
-  z-index: 10;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+.closeBtn:hover { color: #fff; background: rgba(229, 9, 20, 0.3); }
 
-.closeBtn:hover {
-  color: #fff;
-}
-
+/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; backdrop-filter: blur(0); }
-  to { opacity: 1; backdrop-filter: blur(5px); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.88) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .openRouletteBtn {
-    bottom: 80px; /* Sopra la bottom bar */
-    right: 20px;
-    width: 60px;
-    height: 60px;
+    bottom: 84px;
+    right: 18px;
+    width: 58px;
+    height: 58px;
     font-size: 1.5rem;
   }
+
+  .title { font-size: 1.25rem; }
+  .spinBtn { font-size: 0.95rem; padding: 12px 20px; }
 }
