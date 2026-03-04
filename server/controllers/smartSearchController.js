@@ -295,14 +295,38 @@ function parseQuery(text) {
   // Rendiamo CASE-INSENSITIVE e accettiamo particelle ("di", "de", "del", "van", "von", "le", "la")
   const PARTICLES = new Set(["di", "de", "del", "della", "van", "von", "le", "la", "el", "da", "dos", "du", "lo"]);
 
+  // ── Safe patterns (no ReDoS) ──────────────────────────────────────────────
+  // The old form  [\w\s''\\-\.]{3,40}?  caused catastrophic backtracking:
+  // the \s inside the repeating class overlaps with the \s+ in the trailing
+  // boundary alternation, producing exponential backtrack paths.
+  //
+  // Fix: split the name into  WORD (\s WORD){0,4}  so each segment is
+  // matched atomically and spaces cannot be re-consumed by the boundary.
+  // The overall length is still bounded to ~5 words (≤ 40 chars in practice)
+  // and the 200-char input cap in smartSearch() is an additional hard guard.
+  const NAME_RE = /[\w''\-\.]+(?:\s[\w''\-\.]+){0,4}/;
+  const STOP_RE = /(?:in|il|la|e|nel|del|degli|che)/;
+
+  // Build each prefix pattern by interpolating the safe name/stop sub-patterns.
+  // We use the RegExp constructor so we can compose them from string fragments.
+  function makePersonPattern(prefixSrc) {
+    // Equivalent to:  /\b<prefix>\s+(<NAME>)(?:\s+(?:<STOP>)\b|$)/gi
+    return new RegExp(
+      `\\b${prefixSrc}\\s+` +
+      `([\\w''\\-.]+(?:\\s[\\w''\\-.]+){0,4})` +
+      `(?=\\s+(?:${STOP_RE.source})\\b|\\s*$)`,
+      "gi"
+    );
+  }
+
   const personPrefixPatterns = [
-    /\bcon\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del|degli|che)\b|$)/gi,
-    /\bregia\s+di\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bdiretto\s+da\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\binterpretato\s+da\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bprotagonista\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bstars?\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bfeaturin[g]?\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
+    makePersonPattern("con"),
+    makePersonPattern("regia\\s+di"),
+    makePersonPattern("diretto\\s+da"),
+    makePersonPattern("interpretato\\s+da"),
+    makePersonPattern("protagonista"),
+    makePersonPattern("stars?"),
+    makePersonPattern("featurin[g]?"),
   ];
 
   const rawPersonCandidates = new Set();
