@@ -6,9 +6,21 @@ import { FaDice, FaPlay } from "react-icons/fa";
 const POSTER_BASE = "https://image.tmdb.org/t/p/w300";
 const SLOT_COUNT = 36; // A full roulette wheel
 
+/**
+ * Cryptographically secure drop-in replacement for Math.random().
+ * Uses the browser Web Crypto API (available in all modern browsers).
+ * Returns a float in [0, 1) — identical contract to Math.random().
+ */
+function cryptoRandom() {
+  const buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  // Divide by 2^32 to get a value in [0, 1)
+  return buf[0] / 0x100000000;
+}
+
 // Helper to pick random items
 function shuffleAndPick(arr, n) {
-  const copy = [...arr].sort(() => Math.random() - 0.5);
+  const copy = [...arr].sort(() => cryptoRandom() - 0.5);
   const result = [];
   for (let i = 0; i < n; i++) result.push(copy[i % copy.length]);
   return result;
@@ -300,7 +312,7 @@ function SkibidiRoulette({ watchlist }) {
     setSlots(freshSlots);
 
     // 1. Scegliamo un vincitore matematicamente PRIMA dell'animazione
-    const winnerIdx = Math.floor(Math.random() * SLOT_COUNT);
+    const winnerIdx = Math.floor(cryptoRandom() * SLOT_COUNT);
     const winningMovie = freshSlots[winnerIdx];
     
     // 2. Calcoliamo di quanto ruoteranno gli oggetti visivi
@@ -309,8 +321,8 @@ function SkibidiRoulette({ watchlist }) {
     const sliceAngle = (Math.PI * 2) / SLOT_COUNT;
     
     // 3. Posizioniamo la pallina in un punto randomico sul tabellone finale
-    const finalBallAngle = Math.random() * Math.PI * 2;
-    const randOffsetInSlice = (Math.random() * 0.7 + 0.15) * sliceAngle; 
+    const finalBallAngle = cryptoRandom() * Math.PI * 2;
+    const randOffsetInSlice = (cryptoRandom() * 0.7 + 0.15) * sliceAngle;
     const currentWheelA = pxRef.current.wheelAngle || 0;
     
     // 4. Calcoliamo la direzione in cui dovrà *fermarsi* la ruota 
@@ -321,7 +333,7 @@ function SkibidiRoulette({ watchlist }) {
       ...pxRef.current,
       activeSlots: freshSlots,
       startTime: 0,
-      duration: 6000 + Math.random() * 1000, 
+      duration: 6000 + cryptoRandom() * 1000,
       startWheelAngle: currentWheelA,
       totalWheelRot: extraWheelSpins + (normalizeAngle(targetWheelAngle) - normalizeAngle(currentWheelA)),
       startBallAngle: pxRef.current.ballAngle || 0,
