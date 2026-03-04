@@ -234,7 +234,7 @@
 /* === BRAND TAG (in alto a sinistra) === */
 .brandTag {
   position: absolute;
-  top: 70px;
+  top: 96px; /* Spostata più in basso su PC (sotto la navbar da 80px) */
   left: 20px;
   z-index: 4;
   display: flex;
@@ -296,14 +296,20 @@
 
 /* === MOBILE (≤ 768px) === */
 @media (max-width: 768px) {
+  .container {
+    /* Cancella il padding di default del layout base */
+    margin-top: -54px;
+  }
+
   .container,
   .cardContainer {
-    /* Mobile: navbar è in basso (54px) + topbar (40px) */
-    height: calc(100svh - 94px);
+    /* Mobile: navbar è in basso (54px), non c'è più topbar (0px) */
+    height: calc(100svh - 54px);
   }
 
   .loadingScreen {
-    height: calc(100svh - 94px);
+    height: calc(100svh - 54px);
+    margin-top: -54px;
   }
 
   /*
@@ -326,7 +332,8 @@
   }
 
   .brandTag {
-    top: 8px;
+    /* Spostata più in basso su mobile (sotto la mobileTopbar trasparente) */
+    top: calc(64px + env(safe-area-inset-top, 0px)); 
     left: 12px;
     font-size: 0.68rem;
     padding: 4px 10px;
@@ -684,7 +691,7 @@
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .customizerTrigger {
-    top: 70px;
+    top: calc(12px + env(safe-area-inset-top, 0px));
     right: 12px;
     width: 40px;
     height: 40px;
@@ -693,7 +700,7 @@
   }
 
   .customizerPanel {
-    top: 0;
+    top: calc(60px + env(safe-area-inset-top, 0px)); /* appena sotto il trigger */
     left: 0;          /* ancorato a sinistra */
     right: 0;         /* ancorato a destra → larghezza piena senza overflow */
     width: 100%;      /* mai più largo dello schermo */

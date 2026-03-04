@@ -46,20 +46,18 @@ function RatingGamePage() {
 
   return (
     <div className={styles.page}>
-      {/* Back button */}
-      <button className={styles.backBtn} onClick={() => navigate(-1)}>
-        <FaArrowLeft />
-      </button>
-
-      {/* Header */}
+      {/* Header with Back Button and Original Title */}
       <div className={styles.header}>
-        <div className={styles.headerBadge}>
-          <FaGamepad /> <span>Mini Game</span>
+        <div className={styles.titleRow}>
+          <button className={styles.backBtn} onClick={() => navigate(-1)}>
+            <FaArrowLeft />
+          </button>
+          <div className={styles.titleContent}>
+            <h1 className={styles.title}>
+              The <span className={styles.titleHighlight}>Rating</span> Game
+            </h1>
+          </div>
         </div>
-        <h1 className={styles.title}>
-          The <span className={styles.titleHighlight}>Rating</span> Game
-        </h1>
-        <p className={styles.subtitle}>scegli il più alto · batti il tuo streak</p>
       </div>
 
       {/* Personal Stats */}

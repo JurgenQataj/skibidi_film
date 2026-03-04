@@ -14,9 +14,15 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
+import { useLocation } from "react-router-dom";
 
 function Navbar() {
   const [notifications, setNotifications] = useState([]);
+  const location = useLocation();
+
+  const isImmersivePage = 
+    location.pathname.startsWith('/horizon') || 
+    location.pathname.startsWith('/rating-game');
 
   const token = localStorage.getItem("token");
   let userId = null;
@@ -115,7 +121,7 @@ function Navbar() {
   return (
     <>
       {/* Mobile Topbar con Logo (visibile solo su mobile) */}
-      <div className={styles.mobileTopbar}>
+      <div className={`${styles.mobileTopbar} ${isImmersivePage ? styles.immersiveTopbar : ""}`}>
         <Link to="/" className={styles.mobileLogo}>
           <img src="/icona3.png" alt="logo" className={styles.logoImg} />
           Skibidi Film

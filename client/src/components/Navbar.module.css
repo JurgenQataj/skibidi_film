@@ -347,7 +347,12 @@
     box-sizing: border-box;
     background-color: #0f0f12;
     z-index: 1000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: none;
+  }
+
+  .immersiveTopbar {
+    background: transparent !important;
+    background-color: transparent !important;
   }
 
   /* Campanella in alto a destra nella topbar */
