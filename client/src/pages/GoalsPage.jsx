@@ -14,7 +14,7 @@ function GoalsPage() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [viewingGoal, setViewingGoal] = useState(null); // Modal for watched movies
+  const [viewingGoal, setViewingGoal] = useState(null); 
   const [newGoalValue, setNewGoalValue] = useState(100);
   
   const defaultYear = new Date().getFullYear();
@@ -25,7 +25,7 @@ function GoalsPage() {
   if (token) {
     try {
       const decoded = jwtDecode(token);
-      loggedInUserId = decoded.user?.id || decoded.id; // Dipende dal payload del backend
+      loggedInUserId = decoded.user?.id || decoded.id; 
     } catch (err) {
       console.error("Token non valido", err);
     }
