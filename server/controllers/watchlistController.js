@@ -65,7 +65,7 @@ exports.removeFromWatchlist = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
+    const movie = await Movie.findOne({ tmdb_id: Number(tmdbId), media_type: String(mediaType) });
     if (!movie) return res.status(200).json({ message: "Non presente." });
 
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });
@@ -93,7 +93,7 @@ exports.getWatchlistStatus = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const movie = await Movie.findOne({ tmdb_id: tmdbId, media_type: mediaType });
+    const movie = await Movie.findOne({ tmdb_id: Number(tmdbId), media_type: String(mediaType) });
     if (!movie) return res.json({ isInWatchlist: false });
 
     const user = await User.findById(userId);

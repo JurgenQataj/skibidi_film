@@ -37,11 +37,13 @@ exports.addReview = async (req, res) => {
 
   try {
     // 1. Cerca il film nel DB locale
+    const safeTmdbId = Number(tmdbId);
+    const safeMediaType = String(mediaType);
     const movieQuery = {
-      tmdb_id: tmdbId,
+      tmdb_id: safeTmdbId,
       $or: [
-        { media_type: mediaType },
-        ...(mediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
+        { media_type: safeMediaType },
+        ...(safeMediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
       ]
     };
     let movie = await Movie.findOne(movieQuery);
@@ -233,11 +235,13 @@ exports.addReview = async (req, res) => {
 exports.getReviewsForMovie = async (req, res) => {
   try {
     const { mediaType = "movie" } = req.query;
+    const safeTmdbId = Number(req.params.tmdbId);
+    const safeMediaType = String(mediaType);
     const movieQuery = {
-      tmdb_id: req.params.tmdbId,
+      tmdb_id: safeTmdbId,
       $or: [
-        { media_type: mediaType },
-        ...(mediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
+        { media_type: safeMediaType },
+        ...(safeMediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
       ]
     };
     const movie = await Movie.findOne(movieQuery);
@@ -295,11 +299,13 @@ exports.getReviewsForMovie = async (req, res) => {
 exports.checkUserReviewStatus = async (req, res) => {
   try {
     const { mediaType = "movie" } = req.query;
+    const safeTmdbId = Number(req.params.tmdbId);
+    const safeMediaType = String(mediaType);
     const movieQuery = {
-      tmdb_id: req.params.tmdbId,
+      tmdb_id: safeTmdbId,
       $or: [
-        { media_type: mediaType },
-        ...(mediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
+        { media_type: safeMediaType },
+        ...(safeMediaType === "movie" ? [{ media_type: { $exists: false } }] : [])
       ]
     };
     const movie = await Movie.findOne(movieQuery);

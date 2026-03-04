@@ -85,7 +85,7 @@ router.post("/score", protect, async (req, res) => {
     // Only update if new score is higher
     const existing = await RatingGameScore.findOne({
       user: req.user.id,
-      mode,
+      mode: String(mode),
     });
     if (existing) {
       if (score > existing.score) {
@@ -96,8 +96,8 @@ router.post("/score", protect, async (req, res) => {
     }
     const newScore = await RatingGameScore.create({
       user: req.user.id,
-      mode,
-      score,
+      mode: String(mode),
+      score: Number(score),
     });
     res.json(newScore);
   } catch (err) {
@@ -113,7 +113,7 @@ router.get("/leaderboard", async (req, res) => {
     if (!["rating", "boxoffice"].includes(mode)) {
       return res.status(400).json({ error: "Invalid mode" });
     }
-    const scores = await RatingGameScore.find({ mode })
+    const scores = await RatingGameScore.find({ mode: String(mode) })
       .sort({ score: -1 })
       .limit(20)
       .populate("user", "username avatar_url");

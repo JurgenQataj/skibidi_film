@@ -85,7 +85,7 @@ exports.forgotPassword = async (req, res) => {
   console.log(`[DEBUG] Richiesta Password Dimenticata per: ${email}`);
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: String(email) });
     if (!user) {
       console.log(`[DEBUG] Utente non trovato.`);
       return res.status(404).json({ message: "Email non trovata." });
@@ -143,7 +143,7 @@ exports.resetPassword = async (req, res) => {
   const { password } = req.body;
   try {
     const user = await User.findOne({
-      resetPasswordToken: token,
+      resetPasswordToken: String(token),
       resetPasswordExpires: { $gt: Date.now() },
     });
 
@@ -178,7 +178,7 @@ exports.updateUserProfile = async (req, res) => {
     const { bio, avatar_url, email, username } = req.body;
     
     if (email) {
-      const emailExists = await User.findOne({ email, _id: { $ne: req.user.id } });
+      const emailExists = await User.findOne({ email: String(email), _id: { $ne: req.user.id } });
       if (emailExists) return res.status(400).json({ message: "Email già in uso." });
     }
 
@@ -186,7 +186,7 @@ exports.updateUserProfile = async (req, res) => {
       if (username.length > 10) {
         return res.status(400).json({ message: "Il nome utente non può superare i 10 caratteri." });
       }
-      const usernameExists = await User.findOne({ username, _id: { $ne: req.user.id } });
+      const usernameExists = await User.findOne({ username: String(username), _id: { $ne: req.user.id } });
       if (usernameExists) return res.status(400).json({ message: "Username già in uso." });
     }
 
@@ -231,7 +231,7 @@ exports.getUserStats = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
-    const reviews = await Review.find({ user: userId }).populate("movie", "media_type");
+    const reviews = await Review.find({ user: String(userId) }).populate("movie", "media_type");
     let moviesReviewed = 0;
     let tvShowsReviewed = 0;
 
@@ -273,7 +273,7 @@ exports.getUserAdvancedStats = async (req, res) => {
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
     // Otteniamo tutte le recensioni popolate con i dati del film
-    const reviews = await Review.find({ user: userId }).populate("movie");
+    const reviews = await Review.find({ user: String(userId) }).populate("movie");
 
     // Filtra recensioni valide (dove il film esiste ancora e NON è una serie tv)
     const validReviews = reviews.filter(r => r.movie && r.movie.media_type !== "tv");
@@ -589,7 +589,7 @@ exports.followUser = async (req, res) => {
     });
 
     await Notification.create({
-      recipient: req.params.userId,
+      recipient: String(req.params.userId),
       sender: req.user.id,
       type: "new_follower",
     });
@@ -605,7 +605,7 @@ exports.createGoal = async (req, res) => {
     const { title, targetFrequency, year } = req.body;
     
     // Controlla se l'utente ha già un obiettivo per quell'anno (opzionale, ma consigliato per evitare spam)
-    const existingGoal = await Goal.findOne({ user: req.user.id, year });
+    const existingGoal = await Goal.findOne({ user: req.user.id, year: Number(year) });
     if (existingGoal) {
       return res.status(400).json({ message: `Hai già un obiettivo impostato per il ${year}.` });
     }
@@ -628,7 +628,7 @@ exports.createGoal = async (req, res) => {
 exports.getUserGoals = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const goals = await Goal.find({ user: userId }).sort({ year: -1 });
+    const goals = await Goal.find({ user: String(userId) }).sort({ year: -1 });
 
     // Per ogni goal, calcoliamo i film visti in quell'anno
     const goalsWithProgress = await Promise.all(goals.map(async (goal) => {
@@ -793,7 +793,7 @@ exports.getUserFeed = async (req, res) => {
 
 exports.getUserReviews = async (req, res) => {
   try {
-    const reviews = await Review.find({ user: req.params.userId })
+    const reviews = await Review.find({ user: String(req.params.userId) })
       .populate("movie", "tmdb_id title poster_path media_type")
       .sort({ createdAt: -1 });
 
@@ -805,7 +805,7 @@ exports.getUserReviews = async (req, res) => {
 
 exports.getUserLists = async (req, res) => {
   try {
-    const lists = await MovieList.find({ user: req.params.userId }).sort({
+    const lists = await MovieList.find({ user: String(req.params.userId) }).sort({
       createdAt: -1,
     });
 
@@ -1053,7 +1053,7 @@ exports.getUserFilteredReviews = async (req, res) => {
     const { filter, value, subValue } = req.query;
 
     const Review = require("../models/Review");
-    const reviews = await Review.find({ user: userId }).populate("movie");
+    const reviews = await Review.find({ user: String(userId) }).populate("movie");
     const validReviews = reviews.filter(r => r.movie);
 
     let filtered = [];
