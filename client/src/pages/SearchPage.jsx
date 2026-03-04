@@ -768,7 +768,14 @@ function SearchPage() {
                         movie={item}
                     />
                   ) : (
-                    <div key={item.id} className={styles.personRow} onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}>
+                    <div 
+                      key={item.id} 
+                      className={styles.personRow} 
+                      onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/person/${encodeURIComponent(item.name)}`); }}
+                      tabIndex={0}
+                      role="button"
+                    >
                         <img
                             src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"}
                             alt={item.name}

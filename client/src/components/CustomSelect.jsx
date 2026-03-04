@@ -31,6 +31,9 @@ const CustomSelect = ({ options, value, onChange, placeholder = "Seleziona..." }
       <div 
         className={`${styles.selectHeader} ${isOpen ? styles.open : ''}`} 
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsOpen(!isOpen); }}
+        tabIndex={0}
+        role="button"
       >
         <span>{displayValue}</span>
         <span className={`${styles.arrow} ${isOpen ? styles.arrowUp : ''}`}>▼</span>
@@ -46,6 +49,10 @@ const CustomSelect = ({ options, value, onChange, placeholder = "Seleziona..." }
                 key={optValue} 
                 className={`${styles.optionItem} ${value === optValue ? styles.selected : ''}`}
                 onClick={() => handleSelect(optValue)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSelect(optValue); }}
+                tabIndex={0}
+                role="option"
+                aria-selected={value === optValue}
               >
                 {optLabel}
               </li>

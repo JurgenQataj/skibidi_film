@@ -110,7 +110,9 @@ function EditReviewModal({ review, onClose, onUpdate }) {
                 fontSize: "1rem", fontWeight: "500"
               }}
               onMouseOver={(e) => e.target.style.background = "rgba(255, 255, 255, 0.15)"}
+              onFocus={(e) => e.target.style.background = "rgba(255, 255, 255, 0.15)"}
               onMouseOut={(e) => e.target.style.background = "rgba(255, 255, 255, 0.1)"}
+              onBlur={(e) => e.target.style.background = "rgba(255, 255, 255, 0.1)"}
             >
               Annulla
             </button>
@@ -129,7 +131,21 @@ function EditReviewModal({ review, onClose, onUpdate }) {
                   e.target.style.boxShadow = "0 4px 15px rgba(200, 8, 18, 0.4)";
                 }
               }}
+              onFocus={(e) => {
+                if(!loading) {
+                  e.target.style.opacity = "0.9";
+                  e.target.style.transform = "translateY(-1px)";
+                  e.target.style.boxShadow = "0 4px 15px rgba(200, 8, 18, 0.4)";
+                }
+              }}
               onMouseOut={(e) => {
+                if(!loading) {
+                  e.target.style.opacity = "1";
+                  e.target.style.transform = "none";
+                  e.target.style.boxShadow = "none";
+                }
+              }}
+              onBlur={(e) => {
                 if(!loading) {
                   e.target.style.opacity = "1";
                   e.target.style.transform = "none";

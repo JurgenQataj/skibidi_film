@@ -124,7 +124,14 @@ function GoalsPage() {
               const isCompleted = goal.currentCount >= goal.targetFrequency;
 
               return (
-                <div key={goal._id} className={styles.goalCard} onClick={() => setViewingGoal(goal)}>
+                <div 
+                  key={goal._id} 
+                  className={styles.goalCard} 
+                  onClick={() => setViewingGoal(goal)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setViewingGoal(goal); }}
+                  tabIndex={0}
+                  role="button"
+                >
                   <div className={styles.goalHeader}>
                     <div>
                       <h2 className={styles.goalTitle}>{goal.title} {goal.year}</h2>
@@ -162,8 +169,20 @@ function GoalsPage() {
 
       {/* MODALE CREAZIONE */}
       {isModalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div 
+          className={styles.modalOverlay} 
+          onClick={() => setIsModalOpen(false)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setIsModalOpen(false); }}
+          tabIndex={0}
+          role="button"
+        >
+          <div 
+            className={styles.modalContent} 
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
+            tabIndex={0}
+            role="dialog"
+          >
             <h2>Imposta l'Obiettivo</h2>
             <p className={styles.modalDesc}>Scegli un anno e quanti film vuoi guardare.</p>
             
@@ -201,8 +220,20 @@ function GoalsPage() {
 
       {/* MODALE VISUALIZZAZIONE FILM VISTI */}
       {viewingGoal && (
-        <div className={styles.modalOverlay} onClick={() => setViewingGoal(null)}>
-          <div className={styles.largeModalContent} onClick={(e) => e.stopPropagation()}>
+        <div 
+          className={styles.modalOverlay} 
+          onClick={() => setViewingGoal(null)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setViewingGoal(null); }}
+          tabIndex={0}
+          role="button"
+        >
+          <div 
+            className={styles.largeModalContent} 
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
+            tabIndex={0}
+            role="dialog"
+          >
             <header className={styles.largeModalHeader}>
               <div>
                 <h2>{viewingGoal.title} {viewingGoal.year}</h2>

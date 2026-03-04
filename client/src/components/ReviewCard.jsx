@@ -17,14 +17,6 @@ function renderText(text) {
 }
 
 function ReviewCard({ review, onInteraction }) {
-  if (!review || !review.user) {
-    return null;
-  }
-  
-  if (!review.isPost && (!review.movie || !review.movie.tmdb_id)) {
-    return null;
-  }
-
   const [comments, setComments] = useState({ shown: false, list: [] });
   const [commentText, setCommentText] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -197,6 +189,14 @@ function ReviewCard({ review, onInteraction }) {
       return "";
     }
   };
+
+  if (!review || !review.user) {
+    return null;
+  }
+  
+  if (!review.isPost && (!review.movie || !review.movie.tmdb_id)) {
+    return null;
+  }
 
   const { user, createdAt } = review;
   const isPost = review.isPost;

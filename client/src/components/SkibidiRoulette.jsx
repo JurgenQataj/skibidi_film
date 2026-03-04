@@ -369,8 +369,20 @@ function SkibidiRoulette({ watchlist }) {
       </button>
 
       {isOpen && (
-        <div className={styles.modalOverlay} onClick={() => !isSpinning && setIsOpen(false)}>
-          <div className={styles.rouletteContainer} onClick={(e) => e.stopPropagation()}>
+        <div 
+          className={styles.modalOverlay} 
+          onClick={() => !isSpinning && setIsOpen(false)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { !isSpinning && setIsOpen(false); } }}
+          tabIndex={0}
+          role="button"
+        >
+          <div 
+            className={styles.rouletteContainer} 
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
+            tabIndex={0}
+            role="dialog"
+          >
             <button className={styles.closeBtn} onClick={() => !isSpinning && setIsOpen(false)}>
               &times;
             </button>

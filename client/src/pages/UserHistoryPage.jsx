@@ -86,6 +86,9 @@ function UserHistoryPage() {
               key={review._id} 
               className={styles.historyItem}
               onClick={() => navigate(`/movie/${review.movie.tmdb_id}`)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/movie/${review.movie.tmdb_id}`); }}
+              tabIndex={0}
+              role="button"
             >
               <span className={styles.historyNumber}>{index + 1}</span>
               <img

@@ -98,6 +98,9 @@ const KeywordInput = ({ selectedKeywords, onChange }) => {
               key={keyword.id}
               className={styles.suggestionItem}
               onClick={() => handleSelectKeyword(keyword)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSelectKeyword(keyword); }}
+              tabIndex={0}
+              role="button"
             >
               {keyword.name}
             </li>

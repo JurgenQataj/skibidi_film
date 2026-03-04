@@ -315,6 +315,9 @@ function ProfilePage() {
               key={review._id} 
               className={styles.historyItem}
               onClick={() => navigate(`/movie/${review.movie.tmdb_id}`)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/movie/${review.movie.tmdb_id}`); }}
+              tabIndex={0}
+              role="button"
             >
               <span className={styles.historyNumber}>{index + 1}</span>
               <img
@@ -342,6 +345,9 @@ function ProfilePage() {
               key={review._id} 
               className={styles.historyItem}
               onClick={() => navigate(`/tv/${review.movie.tmdb_id}`)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/tv/${review.movie.tmdb_id}`); }}
+              tabIndex={0}
+              role="button"
             >
               <span className={styles.historyNumber}>{index + 1}</span>
               <img
@@ -390,7 +396,7 @@ function ProfilePage() {
         </div>
       </Modal>
 
-      <div className={styles.profileWrapper} onClick={closeSettingsMenu}>
+      <div className={styles.profileWrapper} onClick={closeSettingsMenu} role="presentation" onKeyDown={(e) => { if (e.key === 'Escape') closeSettingsMenu(); }}>
         <div className={styles.pageContainer}>
         {/* ── Header stile Instagram ── */}
         <header className={styles.profileHeader}>
@@ -443,19 +449,19 @@ function ProfilePage() {
             <div className={styles.rightInfoContainer}>
               <h1 className={styles.username}>{profile.username}</h1>
               <div className={styles.statsContainer}>
-                <div className={styles.statItemClickable} onClick={() => setIsHistoryModalOpen(true)}>
+                <div className={styles.statItemClickable} onClick={() => setIsHistoryModalOpen(true)} onKeyDown={(e) => e.key === 'Enter' && setIsHistoryModalOpen(true)} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.moviesReviewed}</div>
                   <div className={styles.statLabel}>Film</div>
                 </div>
-                <div className={styles.statItemClickable} onClick={() => setIsTvHistoryModalOpen(true)}>
+                <div className={styles.statItemClickable} onClick={() => setIsTvHistoryModalOpen(true)} onKeyDown={(e) => e.key === 'Enter' && setIsTvHistoryModalOpen(true)} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.tvShowsReviewed || 0}</div>
                   <div className={styles.statLabel}>Serie TV</div>
                 </div>
-                <div className={styles.statItemClickable} onClick={() => showModalWith("followers")}>
+                <div className={styles.statItemClickable} onClick={() => showModalWith("followers")} onKeyDown={(e) => e.key === 'Enter' && showModalWith("followers")} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.followersCount}</div>
                   <div className={styles.statLabel}>Follower</div>
                 </div>
-                <div className={styles.statItemClickable} onClick={() => showModalWith("following")}>
+                <div className={styles.statItemClickable} onClick={() => showModalWith("following")} onKeyDown={(e) => e.key === 'Enter' && showModalWith("following")} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.followingCount}</div>
                   <div className={styles.statLabel}>Seguiti</div>
                 </div>
@@ -475,16 +481,18 @@ function ProfilePage() {
                   </button>
                 )
               )}
-              <div className={styles.iconBtn} onClick={() => navigate(`/profile/${userId}/stats`)} title="Stats">
+              <div className={styles.iconBtn} onClick={() => navigate(`/profile/${userId}/stats`)} onKeyDown={(e) => e.key === 'Enter' && navigate(`/profile/${userId}/stats`)} tabIndex={0} role="button" title="Stats">
                 <FaChartBar />
               </div>
-              <div className={styles.iconBtn} onClick={() => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true)} title="Liste">
+              <div className={styles.iconBtn} onClick={() => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true)} onKeyDown={(e) => e.key === 'Enter' && (isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true))} tabIndex={0} role="button" title="Liste">
                 <FaListUl />
               </div>
               {isOwnProfile && (
                 <div
                   className={styles.iconBtn}
                   onClick={() => { logout(); navigate("/login"); }}
+                  onKeyDown={(e) => e.key === 'Enter' && (() => { logout(); navigate("/login"); })()}
+                  tabIndex={0} role="button"
                   title="Logout"
                   style={{ color: '#e50914' }}
                 >

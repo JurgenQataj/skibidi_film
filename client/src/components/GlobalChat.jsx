@@ -264,6 +264,9 @@ const GlobalChat = () => {
                       onMouseEnter={() => setHoveredMsg(msg._id)}
                       onMouseLeave={() => setHoveredMsg(null)}
                       onClick={() => setSelectedMsg((prev) => prev === msg._id ? null : msg._id)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedMsg((prev) => prev === msg._id ? null : msg._id); }}
+                      tabIndex={0}
+                      role="button"
                     >
                       {/* Avatar: solo sull'ultimo msg di ogni gruppo altrui */}
                       {!isOwn ? (
