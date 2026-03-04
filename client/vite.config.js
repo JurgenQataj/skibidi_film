@@ -50,8 +50,12 @@ export default defineConfig(({ command }) => {
       https: true,
       proxy: {
         "/api": {
-          target: "http://0.0.0.0:5000",
+          // HTTPS target: the local Express server must also be reachable over HTTPS
+          // (either via a reverse proxy like Caddy/nginx, or by setting VITE_API_TARGET
+          // to http://... in a .env.local to override for plain-HTTP local backends).
+          target: process.env.VITE_API_TARGET ?? "https://0.0.0.0:5000",
           changeOrigin: true,
+          // Allow self-signed / untrusted certs on the local backend
           secure: false,
         },
       },
@@ -59,8 +63,10 @@ export default defineConfig(({ command }) => {
     preview: {
       proxy: {
         "/api": {
-          target: "http://localhost:5000",
+          target: process.env.VITE_API_TARGET ?? "https://localhost:5000",
           changeOrigin: true,
+          // Allow self-signed / untrusted certs on the local backend
+          secure: false,
         },
       },
     },
