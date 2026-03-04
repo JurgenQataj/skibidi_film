@@ -1,81 +1,182 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import styles from "./RatingGamePage.module.css";
-import { FaStar, FaDollarSign, FaTrophy } from "react-icons/fa";
+import { FaStar, FaDollarSign, FaTrophy, FaGamepad, FaMedal, FaArrowLeft } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
+
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 function RatingGamePage() {
   const navigate = useNavigate();
+  const [myScores, setMyScores] = useState({ rating: 0, boxoffice: 0 });
+  const [activeTab, setActiveTab] = useState("rating");
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [lbLoading, setLbLoading] = useState(true);
+  const [lbError, setLbError] = useState(false);
+
+  const token = localStorage.getItem("token");
+  let userId = null;
+  try { if (token) userId = jwtDecode(token).user.id; } catch {}
+
+  // Load personal scores
+  useEffect(() => {
+    if (!token) return;
+    axios
+      .get(`${API_URL}/api/rating-game/my-scores`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((r) => setMyScores(r.data))
+      .catch(() => {});
+  }, [token]);
+
+  // Load leaderboard when tab changes
+  useEffect(() => {
+    setLbLoading(true);
+    setLbError(false);
+    axios
+      .get(`${API_URL}/api/rating-game/leaderboard`, { params: { mode: activeTab } })
+      .then((r) => setLeaderboard(r.data))
+      .catch(() => { setLeaderboard([]); setLbError(true); })
+      .finally(() => setLbLoading(false));
+  }, [activeTab]);
+
+  const rankEmojis = ["🥇", "🥈", "🥉"];
+  const rankColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
 
   return (
     <div className={styles.page}>
-      {/* Hero Section */}
-      <div className={styles.hero}>
+      {/* Back button */}
+      <button className={styles.backBtn} onClick={() => navigate(-1)}>
+        <FaArrowLeft />
+      </button>
+
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.headerBadge}>
+          <FaGamepad /> <span>Mini Game</span>
+        </div>
         <h1 className={styles.title}>
-          The<br />
-          <span className={styles.titleHighlight}>Rating</span><br />
-          Game
+          The <span className={styles.titleHighlight}>Rating</span> Game
         </h1>
-        <p className={styles.subtitle}>
-          scegli il più alto. batti il tuo streak.
-        </p>
+        <p className={styles.subtitle}>scegli il più alto · batti il tuo streak</p>
       </div>
 
-      {/* Mode Cards */}
-      <div className={styles.modesSection}>
-        <h2 className={styles.sectionLabel}>Scegli la modalità</h2>
-        <div className={styles.modeCards}>
-          {/* Play Rating */}
-          <button
-            className={`${styles.modeCard} ${styles.ratingCard}`}
-            onClick={() => navigate("/rating-game/play?mode=rating")}
-          >
-            <div className={styles.modeIcon}>
-              <FaStar />
+      {/* Personal Stats */}
+      {userId && (
+        <div className={styles.statsRow}>
+          <div className={styles.statCard}>
+            <FaStar className={styles.statIconRed} />
+            <div>
+              <p className={styles.statLabel}>Best Rating</p>
+              <p className={styles.statValue}>{myScores.rating}</p>
             </div>
-            <div className={styles.modeInfo}>
-              <h3 className={styles.modeName}>Play Rating</h3>
-              <p className={styles.modeDesc}>
-                Quale film ha il voto più alto su TMDB?
-              </p>
+          </div>
+          <div className={styles.statCard}>
+            <FaDollarSign className={styles.statIconGreen} />
+            <div>
+              <p className={styles.statLabel}>Best Box Office</p>
+              <p className={styles.statValue}>{myScores.boxoffice}</p>
             </div>
-            <div className={styles.modeArrow}>›</div>
-          </button>
+          </div>
+        </div>
+      )}
 
-          {/* Play Box Office */}
+      {/* Play Buttons */}
+      <div className={styles.playSection}>
+        <button
+          className={`${styles.playBtn} ${styles.ratingBtn}`}
+          onClick={() => navigate("/rating-game/play?mode=rating")}
+        >
+          <div className={styles.playBtnIcon}><FaStar /></div>
+          <div className={styles.playBtnText}>
+            <span className={styles.playBtnTitle}>Play Rating</span>
+            <span className={styles.playBtnDesc}>Quale film ha il voto più alto?</span>
+          </div>
+          <span className={styles.playArrow}>›</span>
+        </button>
+
+        <button
+          className={`${styles.playBtn} ${styles.boxofficeBtn}`}
+          onClick={() => navigate("/rating-game/play?mode=boxoffice")}
+        >
+          <div className={styles.playBtnIcon}><FaDollarSign /></div>
+          <div className={styles.playBtnText}>
+            <span className={styles.playBtnTitle}>Play Box Office</span>
+            <span className={styles.playBtnDesc}>Quale film ha incassato di più?</span>
+          </div>
+          <span className={styles.playArrow}>›</span>
+        </button>
+      </div>
+
+      {/* Leaderboard */}
+      <div className={styles.leaderboardSection}>
+        <div className={styles.lbHeader}>
+          <FaTrophy className={styles.lbTitleIcon} />
+          <h2 className={styles.lbTitle}>Classifica</h2>
+        </div>
+
+        <div className={styles.tabs}>
           <button
-            className={`${styles.modeCard} ${styles.boxofficeCard}`}
-            onClick={() => navigate("/rating-game/play?mode=boxoffice")}
+            className={`${styles.tab} ${activeTab === "rating" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("rating")}
           >
-            <div className={styles.modeIcon}>
-              <FaDollarSign />
-            </div>
-            <div className={styles.modeInfo}>
-              <h3 className={styles.modeName}>Play Box Office</h3>
-              <p className={styles.modeDesc}>
-                Quale film ha incassato di più al botteghino?
-              </p>
-            </div>
-            <div className={styles.modeArrow}>›</div>
+            <FaStar /> Rating
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === "boxoffice" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("boxoffice")}
+          >
+            <FaDollarSign /> Box Office
           </button>
         </div>
-      </div>
 
-      {/* How to play */}
-      <div className={styles.howTo}>
-        <div className={styles.howToCard}>
-          <FaTrophy className={styles.howToIcon} />
-          <p className={styles.howToText}>
-            Scegli tra <strong>2 film</strong> quello con il valore più alto.
-            Batti il tuo <strong>streak</strong> e mettiti alla prova!
-          </p>
+        <div className={styles.lbList}>
+          {lbLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className={`${styles.lbRow} ${styles.lbSkeleton}`} />
+            ))
+          ) : lbError ? (
+            <div className={styles.lbEmpty}>
+              <p>Errore nel caricare la classifica.</p>
+            </div>
+          ) : leaderboard.length === 0 ? (
+            <div className={styles.lbEmpty}>
+              <FaMedal className={styles.lbEmptyIcon} />
+              <p>Nessun punteggio ancora. Gioca per primo!</p>
+            </div>
+          ) : (
+            leaderboard.map((entry, i) => (
+              <div
+                key={entry._id}
+                className={`${styles.lbRow} ${entry.user?._id === userId ? styles.lbRowMe : ""}`}
+              >
+                <span
+                  className={styles.lbRank}
+                  style={{ color: rankColors[i] || "rgba(255,255,255,0.35)" }}
+                >
+                  {i < 3 ? rankEmojis[i] : `#${i + 1}`}
+                </span>
+                <img
+                  src={
+                    entry.user?.avatar_url ||
+                    `https://api.dicebear.com/7.x/initials/svg?seed=${entry.user?.username}&backgroundColor=1a1a2e`
+                  }
+                  alt={entry.user?.username}
+                  className={styles.lbAvatar}
+                />
+                <span className={styles.lbUsername}>@{entry.user?.username}</span>
+                <span className={styles.lbScore}>{entry.score}</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
       {/* Footer */}
       <footer className={styles.footer}>
         <p className={styles.poweredBy}>
-          Powered by{" "}
-          <span className={styles.brand}>Skibidi Film</span>
+          Powered by <span className={styles.brand}>Skibidi Film</span>
         </p>
       </footer>
     </div>
