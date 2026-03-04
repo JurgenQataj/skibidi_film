@@ -50,25 +50,31 @@ exports.addMovieToList = async (req, res) => {
   const { listId } = req.params;
   const { tmdbId, mediaType = "movie" } = req.body;
   try {
+    if (!tmdbId || !/^\d+$/.test(String(tmdbId))) {
+      return res.status(400).json({ message: "ID del contenuto non valido." });
+    }
+    const safeTmdbId = parseInt(tmdbId, 10);
+    const safeMediaType = mediaType === "tv" ? "tv" : "movie";
+
     const list = await MovieList.findOne({ _id: String(listId), user: req.user.id });
     if (!list)
       return res
         .status(404)
         .json({ message: "Lista non trovata o non autorizzato." });
 
-    let movie = await Movie.findOne({ tmdb_id: Number(tmdbId), media_type: String(mediaType) });
+    let movie = await Movie.findOne({ tmdb_id: safeTmdbId, media_type: safeMediaType });
     if (!movie) {
-      const tmdbUrl = mediaType === "tv"
-        ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
-        : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+      const tmdbUrl = safeMediaType === "tv"
+        ? `https://api.themoviedb.org/3/tv/${safeTmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
+        : `https://api.themoviedb.org/3/movie/${safeTmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
       
       const tmdbResponse = await axios.get(tmdbUrl);
       const movieData = tmdbResponse.data;
       
       movie = new Movie({
         tmdb_id: movieData.id,
-        media_type: mediaType,
-        title: mediaType === "tv" ? movieData.name : movieData.title,
+        media_type: safeMediaType,
+        title: safeMediaType === "tv" ? movieData.name : movieData.title,
         poster_path: movieData.poster_path,
       });
       await movie.save();
