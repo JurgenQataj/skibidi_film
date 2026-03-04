@@ -535,6 +535,59 @@ exports.updateAllMoviesData = async (req, res) => {
   }
 };
 
+// Helper: trova il trailer di un film (IT poi EN)
+const findHorizonTrailer = async (movieId) => {
+  const pickBest = (videos) => {
+    const yt = videos.filter((v) => v.site === "YouTube");
+    return yt.find((v) => v.type === "Trailer" && v.official)
+      || yt.find((v) => v.type === "Trailer")
+      || yt.find((v) => v.type === "Teaser" || v.type === "Clip")
+      || null;
+  };
+  try {
+    const itRes = await axios.get(
+      `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=it-IT`
+    );
+    const itPick = pickBest(itRes.data.results || []);
+    if (itPick) return itPick;
+
+    const enRes = await axios.get(
+      `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`
+    );
+    const enV = enRes.data.results || [];
+    return enV.find((v) => v.site === "YouTube" && v.type === "Trailer")
+      || enV.find((v) => v.site === "YouTube")
+      || null;
+  } catch (_) {
+    return null;
+  }
+};
+
+// Helper: scarica lista film per una pagina (trending o discover)
+const fetchHorizonMoviePage = async (p, hasFilters, year, genreId) => {
+  if (hasFilters) {
+    const params = {
+      api_key: API_KEY,
+      language: "it-IT",
+      sort_by: "popularity.desc",
+      "vote_count.gte": 50, // soglia bassa per anni vecchi
+      page: p,
+    };
+    if (year) {
+      params["primary_release_date.gte"] = `${year}-01-01`;
+      params["primary_release_date.lte"] = `${year}-12-31`;
+    }
+    if (genreId) params.with_genres = genreId;
+    const r = await axios.get(`${BASE_URL}/discover/movie`, { params });
+    return { results: r.data.results || [], totalPages: r.data.total_pages || 1 };
+  } else {
+    const r = await axios.get(
+      `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT&page=${p}`
+    );
+    return { results: r.data.results || [], totalPages: 5 };
+  }
+};
+
 // --- SKIBIDI HORIZON: Film con trailer YouTube per lo scroll verticale ---
 exports.getHorizonMovies = async (req, res) => {
   try {
@@ -544,60 +597,6 @@ exports.getHorizonMovies = async (req, res) => {
     const hasFilters = !!(year || genreId);
 
 
-
-    // Helper: scarica lista film per una pagina (trending o discover)
-    const fetchMoviePage = async (p) => {
-      if (hasFilters) {
-        const params = {
-          api_key: API_KEY,
-          language: "it-IT",
-          sort_by: "popularity.desc",
-          "vote_count.gte": 50, // soglia bassa per anni vecchi
-          page: p,
-        };
-        if (year) {
-          params["primary_release_date.gte"] = `${year}-01-01`;
-          params["primary_release_date.lte"] = `${year}-12-31`;
-        }
-        if (genreId) params.with_genres = genreId;
-        const r = await axios.get(`${BASE_URL}/discover/movie`, { params });
-        return { results: r.data.results || [], totalPages: r.data.total_pages || 1 };
-      } else {
-        const r = await axios.get(
-          `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=it-IT&page=${p}`
-        );
-        return { results: r.data.results || [], totalPages: 5 };
-      }
-    };
-
-    // Helper: trova il trailer di un film (IT poi EN)
-    const findTrailer = async (movieId) => {
-      const pickBest = (videos) => {
-        const yt = videos.filter((v) => v.site === "YouTube");
-        return yt.find((v) => v.type === "Trailer" && v.official)
-          || yt.find((v) => v.type === "Trailer")
-          || yt.find((v) => v.type === "Teaser" || v.type === "Clip")
-          || null;
-      };
-      try {
-        const itRes = await axios.get(
-          `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=it-IT`
-        );
-        const itPick = pickBest(itRes.data.results || []);
-        if (itPick) return itPick;
-
-        const enRes = await axios.get(
-          `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`
-        );
-        const enV = enRes.data.results || [];
-        return enV.find((v) => v.site === "YouTube" && v.type === "Trailer")
-          || enV.find((v) => v.site === "YouTube")
-          || null;
-      } catch (_) {
-        return null;
-      }
-    };
-
     const TARGET = 8;       // quanti film con trailer vogliamo
     const MAX_PAGES = 4;    // quante pagine TMDB proviamo al massimo
     const horizonMovies = [];
@@ -606,14 +605,14 @@ exports.getHorizonMovies = async (req, res) => {
     let pagesAttempted = 0;
 
     while (horizonMovies.length < TARGET && pagesAttempted < MAX_PAGES) {
-      const { results, totalPages } = await fetchMoviePage(tmdbPage);
+      const { results, totalPages } = await fetchHorizonMoviePage(tmdbPage, hasFilters, year, genreId);
       pagesAttempted++;
 
       const batch = results.filter((m) => !seenIds.has(m.id));
       batch.forEach((m) => seenIds.add(m.id));
 
       // Fetch trailer di tutto il batch in parallelo
-      const trailers = await Promise.all(batch.map((m) => findTrailer(m.id)));
+      const trailers = await Promise.all(batch.map((m) => findHorizonTrailer(m.id)));
 
       for (let i = 0; i < batch.length; i++) {
         if (horizonMovies.length >= TARGET) break;

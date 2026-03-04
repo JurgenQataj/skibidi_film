@@ -34,6 +34,106 @@ const pokemonAvatars = [
   "906.png", "909.png", "912.png", "920.png", "925.png", "930.png", "937.png", "943.png", "954.png", "968.png", "977.png", "981.png", "990.png", "1010.png", "1025.png",
 ].map((n) => `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${n}`);
 
+function useProfileActions({
+  profile, setProfile, userId, isFollowing, setIsFollowing,
+  setStats, setModalData, setEditBio, setEditAvatar,
+  setEditEmail, setEditUsername, setIsEditModalOpen,
+  logout, navigate, API_URL
+}) {
+  const handleFollowToggle = async () => {
+    const token = localStorage.getItem("token");
+    const endpoint = isFollowing ? "unfollow" : "follow";
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+    const url = `${API_URL}/api/users/${userId}/${endpoint}`;
+    try {
+      if (isFollowing) {
+        await axios.delete(url, config);
+      } else {
+        await axios.post(url, {}, config);
+      }
+      setIsFollowing((prev) => !prev);
+      setStats((prevStats) => ({
+        ...prevStats,
+        followersCount: prevStats.followersCount + (isFollowing ? -1 : 1),
+      }));
+    } catch (error) {
+      alert(`Errore durante l'operazione di ${endpoint}`);
+    }
+  };
+
+  const showModalWith = async (type) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/users/${userId}/${type}`);
+      setModalData({
+        isOpen: true,
+        title: type === "followers" ? "Follower" : "Seguiti",
+        content: response.data,
+      });
+    } catch (error) {
+      alert(`Errore nel caricamento di ${type}`);
+    }
+  };
+
+  const handleOpenEditModal = () => {
+    setEditBio(profile.bio || "");
+    setEditAvatar(profile.avatar_url || "");
+    setEditEmail(profile.email || "");
+    setEditUsername(profile.username || "");
+    setIsEditModalOpen(true);
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      const updatedProfile = await axios.put(
+        `${API_URL}/api/users/profile`,
+        { 
+          bio: editBio, 
+          avatar_url: editAvatar,
+          email: editEmail,
+          username: editUsername
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setProfile(updatedProfile.data);
+      setIsEditModalOpen(false);
+      alert("Profilo aggiornato!");
+    } catch (error) {
+      alert(error.response?.data?.message || "Errore durante l'aggiornamento.");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmation = window.prompt(
+      "Questa azione è irreversibile. Per confermare, scrivi il tuo username:"
+    );
+    if (confirmation === profile.username) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`${API_URL}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        alert("Account eliminato con successo.");
+        logout();
+        navigate("/login");
+      } catch (error) {
+        alert("Errore durante l'eliminazione dell'account.");
+      }
+    } else if (confirmation !== null) {
+      alert("Username non corretto. Eliminazione annullata.");
+    }
+  };
+
+  return {
+    handleFollowToggle,
+    showModalWith,
+    handleOpenEditModal,
+    handleProfileUpdate,
+    handleDeleteAccount
+  };
+}
+
 function ProfilePage() {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -119,26 +219,18 @@ function ProfilePage() {
     fetchData();
   }, [userId, API_URL, location.key]);
 
-  const handleFollowToggle = async () => {
-    const token = localStorage.getItem("token");
-    const endpoint = isFollowing ? "unfollow" : "follow";
-    const config = { headers: { Authorization: `Bearer ${token}` } };
-    const url = `${API_URL}/api/users/${userId}/${endpoint}`;
-    try {
-      if (isFollowing) {
-        await axios.delete(url, config);
-      } else {
-        await axios.post(url, {}, config);
-      }
-      setIsFollowing((prev) => !prev);
-      setStats((prevStats) => ({
-        ...prevStats,
-        followersCount: prevStats.followersCount + (isFollowing ? -1 : 1),
-      }));
-    } catch (error) {
-      alert(`Errore durante l'operazione di ${endpoint}`);
-    }
-  };
+  const {
+    handleFollowToggle,
+    showModalWith,
+    handleOpenEditModal,
+    handleProfileUpdate,
+    handleDeleteAccount
+  } = useProfileActions({
+    profile, setProfile, userId, isFollowing, setIsFollowing,
+    setStats, setModalData, setEditBio, setEditAvatar,
+    setEditEmail, setEditUsername, setIsEditModalOpen,
+    logout, navigate, API_URL
+  });
 
   const handleNavToSettings = () => { setIsSettingsMenuOpen(false); navigate('/settings'); };
   const handleNavToGoals   = () => { setIsSettingsMenuOpen(false); navigate(`/profile/${userId}/goals`); };
@@ -146,70 +238,6 @@ function ProfilePage() {
   const handleLogout       = () => { logout(); navigate("/login"); };
   const handleListsClick   = () => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true);
   const makeStatKeyDown    = (fn) => (e) => { if (e.key === 'Enter') fn(); };
-
-  const showModalWith = async (type) => {
-    try {
-      const response = await axios.get(`${API_URL}/api/users/${userId}/${type}`);
-      setModalData({
-        isOpen: true,
-        title: type === "followers" ? "Follower" : "Seguiti",
-        content: response.data,
-      });
-    } catch (error) {
-      alert(`Errore nel caricamento di ${type}`);
-    }
-  };
-
-  const handleOpenEditModal = () => {
-    setEditBio(profile.bio || "");
-    setEditAvatar(profile.avatar_url || "");
-    setEditEmail(profile.email || "");
-    setEditUsername(profile.username || "");
-    setIsEditModalOpen(true);
-  };
-
-  const handleProfileUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      const updatedProfile = await axios.put(
-        `${API_URL}/api/users/profile`,
-        { 
-          bio: editBio, 
-          avatar_url: editAvatar,
-          email: editEmail,
-          username: editUsername
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProfile(updatedProfile.data);
-      setIsEditModalOpen(false);
-      alert("Profilo aggiornato!");
-    } catch (error) {
-      alert(error.response?.data?.message || "Errore durante l'aggiornamento.");
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    const confirmation = window.prompt(
-      "Questa azione è irreversibile. Per confermare, scrivi il tuo username:"
-    );
-    if (confirmation === profile.username) {
-      try {
-        const token = localStorage.getItem("token");
-        await axios.delete(`${API_URL}/api/users/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        alert("Account eliminato con successo.");
-        logout();
-        navigate("/login");
-      } catch (error) {
-        alert("Errore durante l'eliminazione dell'account.");
-      }
-    } else if (confirmation !== null) {
-      alert("Username non corretto. Eliminazione annullata.");
-    }
-  };
 
   if (loading) return <SkeletonWithLogo />;
   if (!profile || !stats) return <p style={{ color: "white", textAlign: "center" }}>Utente non trovato.</p>;

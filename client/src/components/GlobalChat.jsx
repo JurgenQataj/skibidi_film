@@ -15,6 +15,97 @@ function renderText(text) {
   );
 }
 
+// ── MessageBubble ────────────────────────────────────────────────────────────
+// Extracted to module level so that msgs.map() stays ≤ 3 levels deep.
+// All per-message logic lives here at function level 1.
+function getBubbleRadiusClass(isSingle, isFirst, isLast, styles) {
+  if (isSingle) return '';
+  if (isFirst)  return styles.bubbleFirst;
+  if (isLast)   return styles.bubbleLast;
+  return styles.bubbleMiddle;
+}
+
+function MessageBubble({ msg, mi, groupLength, isOwn, user, hoveredMsg, selectedMsg, deletingId, setHoveredMsg, setSelectedMsg, handleLike, handleDelete, styles }) {
+  const isFirst   = mi === 0;
+  const isLast    = mi === groupLength - 1;
+  const isSingle  = groupLength === 1;
+  const likeCount = (msg.likes || []).length;
+  const isLiked   = user && (msg.likes || []).some(
+    (id) => (id._id || id).toString() === user.id
+  );
+  const isDeleting  = deletingId === msg._id;
+  const radiusClass = getBubbleRadiusClass(isSingle, isFirst, isLast, styles);
+
+  const toggleSelected = () =>
+    setSelectedMsg((prev) => (prev === msg._id ? null : msg._id));
+  const handleRowKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') toggleSelected();
+  };
+
+  return (
+    <div
+      key={msg._id}
+      className={`${styles.messageRow} ${isOwn ? styles.ownRow : ''} ${isDeleting ? styles.deleting : ''}`}
+      onMouseEnter={() => setHoveredMsg(msg._id)}
+      onMouseLeave={() => setHoveredMsg(null)}
+      onClick={toggleSelected}
+      onKeyDown={handleRowKeyDown}
+      tabIndex={0}
+      role="button"
+    >
+      {/* Avatar: solo sull'ultimo msg di ogni gruppo altrui */}
+      {!isOwn ? (
+        isLast || isSingle ? (
+          <img
+            src={msg.user?.avatar_url || 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png'}
+            alt="avatar"
+            className={styles.messageAvatar}
+          />
+        ) : (
+          <div className={styles.avatarSpace} />
+        )
+      ) : null}
+
+      {/* Bolla */}
+      <div className={styles.bubbleWrap}>
+        <div className={`${styles.bubble} ${isOwn ? styles.ownBubble : styles.otherBubble} ${radiusClass}`}>
+          <p className={styles.messageText}>{renderText(msg.text)}</p>
+        </div>
+
+        {/* Meta (ora, like, spunta) — solo sull'ultimo del gruppo */}
+        {(isLast || isSingle) && (
+          <div className={styles.bubbleMeta}>
+            {likeCount > 0 && <span className={styles.likeCount}>❤️ {likeCount}</span>}
+            <span className={styles.messageTime}>
+              {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+            {isOwn && <span className={styles.readTick}>✓✓</span>}
+          </div>
+        )}
+      </div>
+
+      {/* Azioni hover/tap — inline accanto alla bolla */}
+      {user && (hoveredMsg === msg._id || selectedMsg === msg._id) && !msg._optimistic && (
+        <div className={styles.messageActions}>
+          <button
+            className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
+            onClick={(e) => { e.stopPropagation(); handleLike(msg._id); }}
+            title="Like"
+          >❤️</button>
+          {isOwn && (
+            <button
+              className={`${styles.actionBtn} ${styles.deleteBtn}`}
+              onClick={(e) => { e.stopPropagation(); handleDelete(msg._id); }}
+              title="Elimina"
+            >🗑️</button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 // Raggruppa messaggi consecutivi dello stesso autore
 function groupMessages(messages) {
   const groups = [];
@@ -241,93 +332,24 @@ const GlobalChat = () => {
                   </div>
                 )}
 
-                {group.msgs.map((msg, mi) => {
-                  const isFirst = mi === 0;
-                  const isLast = mi === group.msgs.length - 1;
-                  const isSingle = group.msgs.length === 1;
-                  const likeCount = (msg.likes || []).length;
-                  const isLiked = user && (msg.likes || []).some(
-                    (id) => (id._id || id).toString() === user.id
-                  );
-                  const isDeleting = deletingId === msg._id;
-
-                  // Radius class for stacking effect
-                  const getBubbleRadiusClass = () => {
-                    if (isSingle) return '';
-                    if (isFirst) return styles.bubbleFirst;
-                    if (isLast) return styles.bubbleLast;
-                    return styles.bubbleMiddle;
-                  };
-                  const radiusClass = getBubbleRadiusClass();
-
-                  const toggleSelected = () =>
-                    setSelectedMsg((prev) => (prev === msg._id ? null : msg._id));
-                  const handleRowKeyDown = (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') toggleSelected();
-                  };
-
-                  return (
-                    <div
-                      key={msg._id}
-                      className={`${styles.messageRow} ${isOwn ? styles.ownRow : ''} ${isDeleting ? styles.deleting : ''}`}
-                      onMouseEnter={() => setHoveredMsg(msg._id)}
-                      onMouseLeave={() => setHoveredMsg(null)}
-                      onClick={toggleSelected}
-                      onKeyDown={handleRowKeyDown}
-                      tabIndex={0}
-                      role="button"
-                    >
-                      {/* Avatar: solo sull'ultimo msg di ogni gruppo altrui */}
-                      {!isOwn ? (
-                        isLast || isSingle ? (
-                          <img
-                            src={msg.user?.avatar_url || 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png'}
-                            alt="avatar"
-                            className={styles.messageAvatar}
-                          />
-                        ) : (
-                          <div className={styles.avatarSpace} />
-                        )
-                      ) : null}
-
-                      {/* Bolla */}
-                      <div className={styles.bubbleWrap}>
-                        <div className={`${styles.bubble} ${isOwn ? styles.ownBubble : styles.otherBubble} ${radiusClass}`}>
-                          <p className={styles.messageText}>{renderText(msg.text)}</p>
-                        </div>
-
-                        {/* Meta (ora, like, spunta) — solo sull'ultimo del gruppo */}
-                        {(isLast || isSingle) && (
-                          <div className={styles.bubbleMeta}>
-                            {likeCount > 0 && <span className={styles.likeCount}>❤️ {likeCount}</span>}
-                            <span className={styles.messageTime}>
-                              {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            {isOwn && <span className={styles.readTick}>✓✓</span>}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Azioni hover/tap — inline accanto alla bolla */}
-                      {user && (hoveredMsg === msg._id || selectedMsg === msg._id) && !msg._optimistic && (
-                        <div className={styles.messageActions}>
-                          <button
-                            className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
-                            onClick={(e) => { e.stopPropagation(); handleLike(msg._id); }}
-                            title="Like"
-                          >❤️</button>
-                          {isOwn && (
-                            <button
-                              className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                              onClick={(e) => { e.stopPropagation(); handleDelete(msg._id); }}
-                              title="Elimina"
-                            >🗑️</button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                {group.msgs.map((msg, mi) => (
+                  <MessageBubble
+                    key={msg._id}
+                    msg={msg}
+                    mi={mi}
+                    groupLength={group.msgs.length}
+                    isOwn={isOwn}
+                    user={user}
+                    hoveredMsg={hoveredMsg}
+                    selectedMsg={selectedMsg}
+                    deletingId={deletingId}
+                    setHoveredMsg={setHoveredMsg}
+                    setSelectedMsg={setSelectedMsg}
+                    handleLike={handleLike}
+                    handleDelete={handleDelete}
+                    styles={styles}
+                  />
+                ))}
               </div>
             );
           })

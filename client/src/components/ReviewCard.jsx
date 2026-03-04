@@ -16,6 +16,127 @@ function renderText(text) {
   );
 }
 
+function useReviewInteractions({ review, onInteraction, token, API_URL, comments, setComments, commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment }) {
+  const handleReaction = async (reactionType) => {
+    if (!token) return;
+    try {
+      await axios.post(
+        `${API_URL}/api/reactions/reviews/${review._id}`,
+        { reaction_type: reactionType },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (onInteraction) onInteraction();
+    } catch (error) {
+      console.error("Errore reazione:", error);
+      alert(error.response?.data?.message || "Errore");
+    }
+  };
+
+  const fetchCommentList = async () => {
+    const response = await axios.get(
+      `${API_URL}/api/comments/review/${review._id}`
+    );
+    return response.data || [];
+  };
+
+  const toggleComments = async () => {
+    if (comments.shown) {
+      setComments({ shown: false, list: [] });
+      return;
+    }
+    try {
+      const list = await fetchCommentList();
+      setComments({ shown: true, list });
+    } catch (error) {
+      console.error("Errore caricamento commenti:", error);
+    }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return alert("Il commento non può essere vuoto.");
+    if (!token) return alert("Devi essere loggato per commentare.");
+
+    setIsSubmittingComment(true);
+    const payload = { comment_text: commentText.trim() };
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/comments/review/${review._id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setCommentText("");
+      setComments({ shown: true, list: response.data || [] });
+      if (onInteraction) onInteraction();
+    } catch (error) {
+      const msg = error.response?.data?.message || "Errore nell'invio del commento.";
+      alert(msg);
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Sei sicuro di voler eliminare questo commento?"))
+      return;
+
+    setIsDeletingComment(commentId);
+    try {
+      await axios.delete(
+        `${API_URL}/api/comments/review/${review._id}/comment/${commentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const response = await axios.get(
+        `${API_URL}/api/comments/review/${review._id}`
+      );
+      setComments({ shown: true, list: response.data || [] });
+      if (onInteraction) onInteraction();
+    } catch (error) {
+      const msg = error.response?.data?.message || "Errore durante l'eliminazione.";
+      alert(msg);
+    } finally {
+      setIsDeletingComment(null);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!window.confirm("Sei sicuro di voler eliminare questo annuncio?")) return;
+    try {
+      await axios.delete(`${API_URL}/api/posts/${review._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (onInteraction) onInteraction();
+    } catch (err) {
+      alert("Errore durante l'eliminazione dell'annuncio.");
+    }
+  };
+
+  const timeAgo = (date) => {
+    try {
+      return formatDistanceToNow(new Date(date), {
+        addSuffix: true,
+        locale: it,
+      });
+    } catch (error) {
+      return "";
+    }
+  };
+
+  return {
+    handleReaction,
+    toggleComments,
+    handleAddComment,
+    handleDeleteComment,
+    handleDeletePost,
+    timeAgo
+  };
+}
+
 function ReviewCard({ review, onInteraction }) {
   const [comments, setComments] = useState({ shown: false, list: [] });
   const [commentText, setCommentText] = useState("");
@@ -82,118 +203,17 @@ function ReviewCard({ review, onInteraction }) {
     inputRef.current?.focus();
   };
 
-  const handleReaction = async (reactionType) => {
-    if (!token) return;
-    try {
-      await axios.post(
-        `${API_URL}/api/reactions/reviews/${review._id}`,
-        { reaction_type: reactionType },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (onInteraction) onInteraction();
-    } catch (error) {
-      console.error("Errore reazione:", error);
-      alert(error.response?.data?.message || "Errore");
-    }
-  };
-
-  const fetchCommentList = async () => {
-    const response = await axios.get(
-      `${API_URL}/api/comments/review/${review._id}`
-    );
-    return response.data || [];
-  };
-
-  const toggleComments = async () => {
-    if (comments.shown) {
-      setComments({ shown: false, list: [] });
-      return;
-    }
-    try {
-      const list = await fetchCommentList();
-      setComments({ shown: true, list });
-    } catch (error) {
-      console.error("Errore caricamento commenti:", error);
-    }
-  };
-
-  const handleAddComment = async (e) => {
-    e.preventDefault();
-    if (!commentText.trim()) return alert("Il commento non può essere vuoto.");
-    if (!token) return alert("Devi essere loggato per commentare.");
-
-    setIsSubmittingComment(true);
-    const payload = { comment_text: commentText.trim() };
-    try {
-      const response = await axios.post(
-        `${API_URL}/api/comments/review/${review._id}`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setCommentText("");
-      setComments({ shown: true, list: response.data || [] });
-      if (onInteraction) onInteraction();
-    } catch (error) {
-      const msg =
-        error.response?.data?.message || "Errore nell'invio del commento.";
-      alert(msg);
-    } finally {
-      setIsSubmittingComment(false);
-    }
-  };
-
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo commento?"))
-      return;
-
-    setIsDeletingComment(commentId);
-    try {
-      await axios.delete(
-        `${API_URL}/api/comments/review/${review._id}/comment/${commentId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const response = await axios.get(
-        `${API_URL}/api/comments/review/${review._id}`
-      );
-      setComments({ shown: true, list: response.data || [] });
-      if (onInteraction) onInteraction();
-    } catch (error) {
-      const msg =
-        error.response?.data?.message || "Errore durante l'eliminazione.";
-      alert(msg);
-    } finally {
-      setIsDeletingComment(null);
-    }
-  };
-
-  const handleDeletePost = async () => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo annuncio?")) return;
-    try {
-      await axios.delete(`${API_URL}/api/posts/${review._id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (onInteraction) onInteraction();
-    } catch (err) {
-      alert("Errore durante l'eliminazione dell'annuncio.");
-    }
-  };
-
-  // Il resto del componente rimane invariato...
-  const timeAgo = (date) => {
-    try {
-      return formatDistanceToNow(new Date(date), {
-        addSuffix: true,
-        locale: it,
-      });
-    } catch (error) {
-      return "";
-    }
-  };
+  const {
+    handleReaction,
+    toggleComments,
+    handleAddComment,
+    handleDeleteComment,
+    handleDeletePost,
+    timeAgo
+  } = useReviewInteractions({
+    review, onInteraction, token, API_URL, comments, setComments,
+    commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment
+  });
 
   if (!review || !review.user) {
     return null;

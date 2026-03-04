@@ -14,6 +14,102 @@ const getInitialState = (key, defaultValue) => {
   return saved !== null ? JSON.parse(saved) : defaultValue;
 };
 
+// Extracted search logic to reduce SearchPage cognitive complexity
+function useSearchHandlers({
+  API_URL, setSearchParams, setLoading, setResults, setSmartExplanation, setSmartParsed,
+  setLoadingMore, setHasSearched, setTotalPages, setHasMore, setCurrentPage, searchMode
+}) {
+  const performSmartSearch = async (query, page = 1, append = false) => {
+    if (!query || query.trim().length < 3) return;
+    if (!append) setSearchParams({});
+    if (!append) {
+      setLoading(true);
+      setResults([]);
+      setSmartExplanation("");
+      setSmartParsed(null);
+    } else {
+      setLoadingMore(true);
+    }
+    setHasSearched(true);
+    try {
+      const res = await axios.get(
+        `${API_URL}/api/movies/smart-search?q=${encodeURIComponent(query)}&page=${page}`
+      );
+      const data = res.data;
+      if (append) {
+        setResults((prev) => [...prev, ...(data.results || [])]);
+      } else {
+        setResults(data.results || []);
+      }
+      setTotalPages(data.total_pages || 1);
+      setHasMore(page < (data.total_pages || 1));
+      setCurrentPage(page);
+      setSmartExplanation(data.explanation || "");
+      setSmartParsed(data.parsed || null);
+    } catch (err) {
+      console.error("Smart search error:", err);
+      if (!append) setResults([]);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const buildSearchParams = (page, filters, currentSearchParams) => {
+    const p = new URLSearchParams({
+      category: filters.category,
+      page: page.toString(),
+    });
+    if (filters.genre)                       p.set('genre', filters.genre);
+    if (currentSearchParams.get('with_companies'))  p.set('with_companies', currentSearchParams.get('with_companies'));
+    if (currentSearchParams.get('with_origin_country')) p.set('with_origin_country', currentSearchParams.get('with_origin_country'));
+    if (filters.releaseYear.from)            p.set('release_date_gte', `${filters.releaseYear.from}-01-01`);
+    if (filters.releaseYear.to)              p.set('release_date_lte', `${filters.releaseYear.to}-12-31`);
+    if (filters.minRating > 0)               p.set('vote_average_gte', filters.minRating.toString());
+    if (filters.minVoteCount > 0)            p.set('vote_count_gte', filters.minVoteCount.toString());
+    if (filters.language)                    p.set('with_original_language', filters.language);
+    if (filters.keywords.length > 0)         p.set('with_keywords', filters.keywords.map(k => k.id).join(','));
+    if (filters.sortBy)                      p.set('sort_by', filters.sortBy);
+    return p;
+  };
+
+  const performSearch = async (page, filters, currentSearchParams, isNewSearch = false) => {
+    if (isNewSearch) {
+      setLoading(true);
+      setResults([]);
+    } else {
+      setLoadingMore(true);
+    }
+
+    try {
+      const params = buildSearchParams(page, filters, currentSearchParams);
+      const endpointPrefix = searchMode === "tv" ? "tv" : "movies";
+      const response = await axios.get(
+        `${API_URL}/api/${endpointPrefix}/discover?${params.toString()}`
+      );
+
+      const newResults = response.data.results || [];
+      if (isNewSearch) {
+        setResults(newResults);
+      } else {
+        setResults((prev) => [...prev, ...newResults]);
+      }
+
+      setTotalPages(response.data.total_pages || 0);
+      setHasMore(page < (response.data.total_pages || 0));
+      setCurrentPage(page);
+    } catch (error) {
+      console.error("*** FRONTEND ERROR ***", error);
+      if (isNewSearch) setResults([]);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  return { performSmartSearch, buildSearchParams, performSearch };
+}
+
 function SearchPage() {
   const [results, setResults] = useState(() => getInitialState("search_results", []));
   const [loading, setLoading] = useState(false);
@@ -58,44 +154,12 @@ function SearchPage() {
     };
   }, [showSmartInfo]);
 
-  const performSmartSearch = async (query, page = 1, append = false) => {
-    if (!query || query.trim().length < 3) return;
-    // Pulisce l'URL per evitare che al ritorno dalla pagina del film
-    // il queryParam scateni una ricerca classica sovrascrivendo i risultati
-    if (!append) setSearchParams({});
-    if (!append) {
-      setLoading(true);
-      setResults([]);
-      setSmartExplanation("");
-      setSmartParsed(null);
-    } else {
-      setLoadingMore(true);
-    }
-    setHasSearched(true);
-    try {
-      const res = await axios.get(
-        `${API_URL}/api/movies/smart-search?q=${encodeURIComponent(query)}&page=${page}`
-      );
-      const data = res.data;
-      if (append) {
-        setResults((prev) => [...prev, ...(data.results || [])]);
-      } else {
-        setResults(data.results || []);
-      }
-      setTotalPages(data.total_pages || 1);
-      setHasMore(page < (data.total_pages || 1));
-      setCurrentPage(page);
-      setSmartExplanation(data.explanation || "");
-      setSmartParsed(data.parsed || null);
-    } catch (err) {
-      console.error("Smart search error:", err);
-      if (!append) setResults([]);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
+  const API_URL = import.meta.env.VITE_API_URL || "";
 
+  const { performSmartSearch, performSearch } = useSearchHandlers({
+    API_URL, setSearchParams, setLoading, setResults, setSmartExplanation, setSmartParsed,
+    setLoadingMore, setHasSearched, setTotalPages, setHasMore, setCurrentPage, searchMode
+  });
   // Stati per i filtri
   const [filters, setFilters] = useState(() => getInitialState("search_filters", {
     category: "popular",
@@ -169,7 +233,6 @@ function SearchPage() {
     { value: "release_date.asc", name: "Data Rilascio Crescente" },
   ];
 
-  const API_URL = import.meta.env.VITE_API_URL || "";
 
   // Reset quando cambiano i filtri
   useEffect(() => {
@@ -185,64 +248,12 @@ function SearchPage() {
     if (hasSearched) {
       setCurrentPage(1);
       setResults([]);
-      performSearch(1, true);
+      performSearch(1, filters, searchParams, true);
     }
   }, [filters]);
 
   const [showFilters, setShowFilters] = useState(false);
 
-  // Gestione ricerca con filtri
-  const buildSearchParams = (page, filters, searchParams) => {
-    const p = new URLSearchParams({
-      category: filters.category,
-      page: page.toString(),
-    });
-    if (filters.genre)                       p.set('genre', filters.genre);
-    if (searchParams.get('with_companies'))  p.set('with_companies', searchParams.get('with_companies'));
-    if (searchParams.get('with_origin_country')) p.set('with_origin_country', searchParams.get('with_origin_country'));
-    if (filters.releaseYear.from)            p.set('release_date_gte', `${filters.releaseYear.from}-01-01`);
-    if (filters.releaseYear.to)              p.set('release_date_lte', `${filters.releaseYear.to}-12-31`);
-    if (filters.minRating > 0)               p.set('vote_average_gte', filters.minRating.toString());
-    if (filters.minVoteCount > 0)            p.set('vote_count_gte', filters.minVoteCount.toString());
-    if (filters.language)                    p.set('with_original_language', filters.language);
-    if (filters.keywords.length > 0)         p.set('with_keywords', filters.keywords.map(k => k.id).join(','));
-    if (filters.sortBy)                      p.set('sort_by', filters.sortBy);
-    return p;
-  };
-
-  const performSearch = async (page = 1, isNewSearch = false) => {
-    if (isNewSearch) {
-      setLoading(true);
-      setResults([]);
-    } else {
-      setLoadingMore(true);
-    }
-
-    try {
-      const params = buildSearchParams(page, filters, searchParams);
-      const endpointPrefix = searchMode === "tv" ? "tv" : "movies";
-      const response = await axios.get(
-        `${API_URL}/api/${endpointPrefix}/discover?${params.toString()}`
-      );
-
-      const newResults = response.data.results || [];
-      if (isNewSearch) {
-        setResults(newResults);
-      } else {
-        setResults((prev) => [...prev, ...newResults]);
-      }
-
-      setTotalPages(response.data.total_pages || 0);
-      setHasMore(page < (response.data.total_pages || 0));
-      setCurrentPage(page);
-    } catch (error) {
-      console.error("*** FRONTEND ERROR ***", error);
-      if (isNewSearch) setResults([]);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
 
   // Gestione ricerca tramite SearchInput (ricerca testuale)
   const handleSearch = async (query) => {

@@ -84,6 +84,57 @@ async function sendMentionNotifications(comment_text, reviewId, userId) {
   }
 }
 
+async function syncMovieFromTMDB(movie, safeTmdbId, safeMediaType) {
+  const needsFetch = !movie || !movie.director || !movie.cast ||
+    movie.cast.length === 0 || !movie.release_year ||
+    !movie.genres || movie.genres.length === 0;
+
+  if (!needsFetch) return movie;
+
+  const tmdbBase = `https://api.themoviedb.org/3`;
+  const tmdbPath = safeMediaType === "tv"
+    ? `${tmdbBase}/tv/${safeTmdbId}`
+    : `${tmdbBase}/movie/${safeTmdbId}`;
+  const tmdbUrl = `${tmdbPath}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
+
+  try {
+    const { data: movieData } = await axios.get(tmdbUrl);
+    const fields = extractMovieFields(movieData, safeMediaType);
+
+    if (!movie) {
+      movie = new Movie({
+        tmdb_id: fields.tmdb_id, media_type: safeMediaType,
+        title: fields.title,       poster_path: fields.poster_path,
+        release_year: fields.releaseYear, director: fields.director,
+        cast: fields.cast,         genres: fields.genres,
+        collection_info: fields.collection_info,
+        production_companies: fields.production_companies,
+        crew: fields.crew,         runtime: fields.runtime,
+        production_countries: fields.production_countries,
+        original_language: fields.original_language,
+        keywords: fields.keywords,
+      });
+      await movie.save();
+    } else {
+      Object.assign(movie, {
+        title: fields.title,           release_year: fields.releaseYear,
+        director: fields.director,     cast: fields.cast,
+        genres: fields.genres,         production_companies: fields.production_companies,
+        crew: fields.crew,             runtime: fields.runtime,
+        production_countries: fields.production_countries,
+        original_language: fields.original_language,
+        keywords: fields.keywords,     collection_info: fields.collection_info,
+      });
+      await movie.save();
+    }
+  } catch (apiError) {
+    console.error("Errore TMDB durante il salvataggio film:", apiError.message);
+    if (!movie) throw new Error("Impossibile recuperare i dati del film.");
+  }
+
+  return movie;
+}
+
 // Aggiungere una recensione
 exports.addReview = async (req, res) => {
   const { tmdbId, rating, comment_text, is_spoiler, mediaType = "movie" } = req.body;
@@ -107,52 +158,10 @@ exports.addReview = async (req, res) => {
     let movie = await Movie.findOne(movieQuery);
 
     // 2. Fetch/heal from TMDB if needed
-    const needsFetch = !movie || !movie.director || !movie.cast ||
-      movie.cast.length === 0 || !movie.release_year ||
-      !movie.genres || movie.genres.length === 0;
-
-    if (needsFetch) {
-      const tmdbBase = `https://api.themoviedb.org/3`;
-      const tmdbPath = safeMediaType === "tv"
-        ? `${tmdbBase}/tv/${safeTmdbId}`
-        : `${tmdbBase}/movie/${safeTmdbId}`;
-      const tmdbUrl = `${tmdbPath}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
-
-      try {
-        const { data: movieData } = await axios.get(tmdbUrl);
-        const fields = extractMovieFields(movieData, safeMediaType);
-
-        if (!movie) {
-          movie = new Movie({
-            tmdb_id: fields.tmdb_id, media_type: safeMediaType,
-            title: fields.title,       poster_path: fields.poster_path,
-            release_year: fields.releaseYear, director: fields.director,
-            cast: fields.cast,         genres: fields.genres,
-            collection_info: fields.collection_info,
-            production_companies: fields.production_companies,
-            crew: fields.crew,         runtime: fields.runtime,
-            production_countries: fields.production_countries,
-            original_language: fields.original_language,
-            keywords: fields.keywords,
-          });
-          await movie.save();
-        } else {
-          Object.assign(movie, {
-            title: fields.title,           release_year: fields.releaseYear,
-            director: fields.director,     cast: fields.cast,
-            genres: fields.genres,         production_companies: fields.production_companies,
-            crew: fields.crew,             runtime: fields.runtime,
-            production_countries: fields.production_countries,
-            original_language: fields.original_language,
-            keywords: fields.keywords,     collection_info: fields.collection_info,
-          });
-          await movie.save();
-        }
-      } catch (apiError) {
-        console.error("Errore TMDB durante il salvataggio film:", apiError.message);
-        if (!movie)
-          return res.status(502).json({ message: "Impossibile recuperare i dati del film." });
-      }
+    try {
+      movie = await syncMovieFromTMDB(movie, safeTmdbId, safeMediaType);
+    } catch (e) {
+      return res.status(502).json({ message: e.message });
     }
 
     // 3. Check duplicate review
