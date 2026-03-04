@@ -49,20 +49,21 @@ exports.deleteList = async (req, res) => {
 exports.addMovieToList = async (req, res) => {
   const { listId } = req.params;
   const { tmdbId, mediaType = "movie" } = req.body;
-  try {
-    if (!tmdbId || !/^\d+$/.test(String(tmdbId))) {
-      return res.status(400).json({ message: "ID del contenuto non valido." });
-    }
-    const safeTmdbId = parseInt(tmdbId, 10);
-    const safeMediaType = mediaType === "tv" ? "tv" : "movie";
 
+  if (!/^\d+$/.test(String(tmdbId))) {
+    return res.status(400).json({ message: "ID non valido." });
+  }
+  const safeMediaType = mediaType === "tv" ? "tv" : "movie";
+  const safeTmdbId = encodeURIComponent(tmdbId);
+
+  try {
     const list = await MovieList.findOne({ _id: String(listId), user: req.user.id });
     if (!list)
       return res
         .status(404)
         .json({ message: "Lista non trovata o non autorizzato." });
 
-    let movie = await Movie.findOne({ tmdb_id: safeTmdbId, media_type: safeMediaType });
+    let movie = await Movie.findOne({ tmdb_id: Number(tmdbId), media_type: safeMediaType });
     if (!movie) {
       const tmdbUrl = safeMediaType === "tv"
         ? `https://api.themoviedb.org/3/tv/${safeTmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
