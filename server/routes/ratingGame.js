@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const crypto = require("crypto"); // Node built-in CSPRNG — replaces Math.random()
 const { protect } = require("../middleware/authMiddleware");
 const RatingGameScore = require("../models/RatingGameScore");
 const User = require("../models/User");
@@ -11,7 +12,8 @@ const TMDB_BASE = "https://api.themoviedb.org/3";
 const TOTAL_PAGES = 100;
 
 async function getRandomMovie(excludeId = null) {
-  const randomPage = Math.floor(Math.random() * TOTAL_PAGES) + 1;
+  // crypto.randomInt(min, max) is a CSPRNG (OS entropy pool) — replaces Math.random()
+  const randomPage = crypto.randomInt(1, TOTAL_PAGES + 1);
   const res = await axios.get(`${TMDB_BASE}/movie/popular`, {
     params: { api_key: TMDB_API_KEY, language: "it-IT", page: randomPage },
   });
@@ -19,7 +21,7 @@ async function getRandomMovie(excludeId = null) {
     (m) => m.vote_count >= 1000 && m.id !== excludeId && m.poster_path
   );
   if (movies.length === 0) {
-    const fallbackPage = Math.floor(Math.random() * 50) + 1;
+    const fallbackPage = crypto.randomInt(1, 51);
     const fallback = await axios.get(`${TMDB_BASE}/movie/popular`, {
       params: { api_key: TMDB_API_KEY, language: "it-IT", page: fallbackPage },
     });
@@ -28,7 +30,7 @@ async function getRandomMovie(excludeId = null) {
     );
   }
   if (movies.length === 0) throw new Error("No valid movies found");
-  return movies[Math.floor(Math.random() * movies.length)];
+  return movies[crypto.randomInt(0, movies.length)];
 }
 
 // GET /api/rating-game/pair?mode=rating|boxoffice&exclude=id1,id2

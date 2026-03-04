@@ -6,6 +6,8 @@ const connectDB = require("./config/database");
 connectDB();
 
 const app = express();
+// Disable X-Powered-By header — prevents Express version disclosure (Sonar S5699)
+app.disable("x-powered-by");
 
 // Warn early if TMDB_API_KEY is missing
 if (!process.env.TMDB_API_KEY) {
