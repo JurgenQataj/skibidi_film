@@ -3,13 +3,14 @@ import axios from "axios";
 import styles from "./HomePage.module.css";
 import ReviewCard from "../components/ReviewCard";
 import AdminPostCreator from "../components/AdminPostCreator";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/useAuthStore";
+import { subscribeUserToPush } from "../utils/pushNotifications";
 
 import CustomTrendingRow from "../components/CustomTrendingRow";
 import { SkeletonWithLogo } from "../components/Skeleton";
 
 function HomePage() {
-  const { logout } = useAuth();
+  const { logout } = useAuthStore();
   const [feed, setFeed] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -71,6 +72,20 @@ function HomePage() {
 
   useEffect(() => {
     fetchFeed(true);
+
+    // Richiedi permesso notifiche push
+    const token = localStorage.getItem("token");
+    if (token && "Notification" in window) {
+      if (Notification.permission === "default") {
+         Notification.requestPermission().then(permission => {
+           if (permission === "granted") {
+              subscribeUserToPush(token);
+           }
+         });
+      } else if (Notification.permission === "granted") {
+         subscribeUserToPush(token);
+      }
+    }
   }, []);
 
   useEffect(() => {

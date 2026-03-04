@@ -1,9 +1,9 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import useAuthStore from "../store/useAuthStore";
 
 function ProtectedRoute({ children }) {
-  const { token } = useAuth();
+  const { token } = useAuthStore();
 
   if (!token) {
     // Se non c'è il token, reindirizza l'utente alla pagina di login

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/useAuthStore";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "../components/LoginPage.module.css";
 
@@ -9,7 +9,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {

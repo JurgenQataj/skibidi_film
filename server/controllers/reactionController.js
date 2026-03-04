@@ -38,6 +38,34 @@ exports.addOrUpdateReaction = async (req, res) => {
         targetReview: review._id,
       });
       await notification.save();
+
+      // Invia notifica Push all'autore della review
+      try {
+        const PushSubscription = require("../models/PushSubscription");
+        const webpush = require("web-push");
+        const User = require("../models/User");
+
+        const subs = await PushSubscription.find({ user: review.user });
+        if (subs.length > 0) {
+          const reactor = await User.findById(userId).select("username");
+          const payload = JSON.stringify({
+            title: "Nuova Reazione!",
+            body: `${reactor.username} ha reagito alla tua recensione.`,
+            url: `/`
+          });
+          
+          for (let sub of subs) {
+            await webpush.sendNotification(
+              { endpoint: sub.endpoint, keys: sub.keys },
+              payload
+            ).catch(async err => {
+              if (err.statusCode === 410) await sub.deleteOne();
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Errore Push Reaction:", err);
+      }
     }
 
     res.json(review);

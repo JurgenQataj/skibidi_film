@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/useAuthStore";
 import { jwtDecode } from "jwt-decode";
 import styles from "./GoalsPage.module.css";
 import { FiTarget, FiPlus, FiArrowLeft, FiTrash2 } from "react-icons/fi";
@@ -10,7 +10,7 @@ import { FiTarget, FiPlus, FiArrowLeft, FiTrash2 } from "react-icons/fi";
 function GoalsPage() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token } = useAuthStore();
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

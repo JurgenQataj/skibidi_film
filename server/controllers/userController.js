@@ -584,6 +584,36 @@ exports.followUser = async (req, res) => {
       sender: req.user.id,
       type: "new_follower",
     });
+    // Push Notification for new follower
+    try {
+      const PushSubscription = require("../models/PushSubscription");
+      const webpush = require("web-push");
+
+      const subs = await PushSubscription.find({ user: req.params.userId });
+      
+      if (subs.length > 0) {
+        const follower = await User.findById(req.user.id).select("username");
+        const payload = JSON.stringify({
+          title: "Nuovo Follower!",
+          body: `${follower.username} ha iniziato a seguirti.`,
+          url: `/profile/${req.user.id}`
+        });
+
+        for (let sub of subs) {
+          await webpush.sendNotification(
+            { endpoint: sub.endpoint, keys: sub.keys },
+            payload
+          ).catch(async err => {
+            if (err.statusCode === 410) {
+              await sub.deleteOne();
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Push Notification Error (follow):", e);
+    }
+    
     res.json({ message: "Seguito!" });
   } catch (error) {
     res.status(500).json({ message: "Errore server" });

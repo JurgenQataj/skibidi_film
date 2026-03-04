@@ -6,7 +6,7 @@ import MovieCard from "../components/MovieCard";
 import UserCard from "../components/UserCard";
 import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/useAuthStore";
 
 import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
 import { FiMenu, FiSettings, FiTarget, FiBookmark, FiChevronRight } from "react-icons/fi";
@@ -138,7 +138,7 @@ function ProfilePage() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout } = useAuthStore();
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
   const [reviews, setReviews] = useState([]);

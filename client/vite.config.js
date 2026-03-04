@@ -9,10 +9,13 @@ export default defineConfig(({ command }) => {
       react(),
       basicSsl(),
       VitePWA({
-        registerType: 'prompt',
+        registerType: 'autoUpdate', // Cambiato per auto-aggiornare il SW
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
         devOptions: {
-          enabled: false
+          enabled: true // Abilitato in dev per testare le notifiche
+        },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg}']
         },
         manifest: {
           name: 'Skibidi Film',

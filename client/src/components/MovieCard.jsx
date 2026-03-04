@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
+import { motion } from "framer-motion"; // Aggiunto import per animazioni
 
 const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
@@ -31,7 +32,15 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
   return (
     // L'intera card rimane un link
     <Link to={linkPath} className={styles.cardLink} data-movie-link>
-      <div className={styles.card} data-movie-card>
+      <motion.div 
+        className={styles.card} 
+        data-movie-card
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.05, y: -5 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
         {/* Il pulsante di eliminazione, ora posizionato correttamente */}
         {showDeleteButton && (
           <button onClick={handleDeleteClick} className={styles.deleteButton}>
@@ -49,7 +58,7 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
           </div>
         )}
         <div className={styles.title} data-movie-title>{movieTitle}</div>
-      </div>
+      </motion.div>
     </Link>
   );
 };

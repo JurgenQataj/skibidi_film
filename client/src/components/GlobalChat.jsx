@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import useAuthStore from "../store/useAuthStore";
 import { jwtDecode } from 'jwt-decode';
 import styles from './GlobalChat.module.css';
 
@@ -123,7 +123,7 @@ function groupMessages(messages) {
 }
 
 const GlobalChat = () => {
-  const { token } = useAuth();
+  const { token } = useAuthStore();
   let user = null;
   if (token) { try { user = jwtDecode(token).user; } catch (e) {} }
 

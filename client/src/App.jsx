@@ -5,7 +5,7 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+import useAuthStore from "./store/useAuthStore";
 import { useState } from "react";
 
 // Import Pagine
@@ -41,20 +41,43 @@ import UpdatePrompt from "./components/UpdatePrompt";
 import SplashScreen from "./components/SplashScreen";
 import "./App.css";
 
+import { useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+
+// Modifica MainLayout per accettare location e gestire l'animazione
+function AnimatedLayout() {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -15 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="page-transition-wrapper"
+      >
+        <Outlet />
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 // Layout per le pagine protette che mostra la Navbar
 function MainLayout() {
   return (
     <div>
       <Navbar />
       <main>
-        <Outlet />
+        <AnimatedLayout />
       </main>
     </div>
   );
 }
 
 function App() {
-  const { token } = useAuth();
+  const { token } = useAuthStore();
   // Mostra splash solo al primo accesso della sessione
   const [showSplash, setShowSplash] = useState(
     () => !sessionStorage.getItem('splashShown')

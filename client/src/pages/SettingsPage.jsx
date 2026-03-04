@@ -8,7 +8,7 @@ import {
   HiOutlineCloudDownload,
 } from "react-icons/hi";
 import styles from "./SettingsPage.module.css";
-import { useAuth } from "../context/AuthContext";
+import useAuthStore from "../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
 /* ── Tabs config ── */
@@ -38,7 +38,7 @@ function ToggleRow({ title, description, checked, onChange }) {
 
 /* ── Main Component ── */
 function SettingsPage() {
-  const { token, logout, user } = useAuth();
+  const { token, logout, user } = useAuthStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
 

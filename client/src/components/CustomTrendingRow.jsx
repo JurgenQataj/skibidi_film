@@ -6,7 +6,24 @@ import styles from "./CustomTrendingRow.module.css";
 import MovieCard from "./MovieCard";
 import { SkeletonMovieCard } from "./Skeleton";
 
+import { motion } from "framer-motion"; // Aggiunto import per animazioni
+
 const API_URL = import.meta.env.VITE_API_URL || "";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 const CustomTrendingRow = () => {
   const [mediaType, setMediaType] = useState("movie"); // 'movie' o 'tv'
@@ -156,13 +173,20 @@ const CustomTrendingRow = () => {
             <FaChevronLeft size={24} />
           </button>
 
-          <div className={styles.scrollContainer} ref={scrollRef}>
+          <motion.div 
+            className={styles.scrollContainer} 
+            ref={scrollRef}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            key={`${mediaType}-${timeWindow}`} // Re-trigger animation on key change
+          >
             {items.map((item) => (
-              <div key={item.id} className={styles.cardWrapper}>
+              <motion.div key={item.id} className={styles.cardWrapper} variants={itemVariants}>
                 <MovieCard movie={{ ...item, media_type: mediaType }} />
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <button
             className={`${styles.navButton} ${styles.right}`}
