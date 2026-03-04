@@ -46,7 +46,6 @@ exports.searchKeywords = async (req, res) => {
     return res.status(400).json({ message: "Per favore, fornisci una parola chiave per la ricerca." });
   }
   try {
-    console.log(`🔍 SEARCH KEYWORDS QUERY: ${searchQuery}`);
     const url = `${BASE_URL}/search/keyword?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&page=1`;
     const response = await axios.get(url);
     res.json(response.data);
@@ -162,11 +161,11 @@ exports.discoverMovies = async (req, res) => {
 exports.getMovieDetails = async (req, res) => {
   const { tmdbId } = req.params;
   if (!/^\d+$/.test(tmdbId)) {
-    console.log(`[MOVIES] Rejecting invalid tmdbId: ${tmdbId}`);
     return res.status(400).json({ message: "ID del film non valido." });
   }
+  const safeTmdbId = parseInt(tmdbId, 10);
 
-  const url = `${BASE_URL}/movie/${tmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos,watch/providers`;
+  const url = `${BASE_URL}/movie/${safeTmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos,watch/providers`;
   try {
     const response = await axios.get(url);
     const data = response.data;
@@ -539,7 +538,7 @@ exports.getHorizonMovies = async (req, res) => {
     const genreId = req.query.genreId ? req.query.genreId : null;
     const hasFilters = !!(year || genreId);
 
-    console.log(`[HORIZON] page=${page} year=${year} genreId=${genreId}`);
+
 
     // Helper: scarica lista film per una pagina (trending o discover)
     const fetchMoviePage = async (p) => {

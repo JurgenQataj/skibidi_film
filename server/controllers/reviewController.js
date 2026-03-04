@@ -50,24 +50,22 @@ exports.addReview = async (req, res) => {
 
     // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno/generi), scaricali da TMDB
     if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year || !movie.genres || movie.genres.length === 0) {
-      console.log(`[INFO] Aggiornamento dati ${mediaType} ID ${tmdbId} da TMDB...`);
-      
-      const tmdbUrl = mediaType === "tv" 
-        ? `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`
-        : `https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
+      const tmdbUrl = safeMediaType === "tv" 
+        ? `https://api.themoviedb.org/3/tv/${safeTmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`
+        : `https://api.themoviedb.org/3/movie/${safeTmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
       
       try {
         const tmdbResponse = await axios.get(tmdbUrl);
         const movieData = tmdbResponse.data;
 
         // Estrazione Anno
-        const releaseYear = mediaType === "tv"
+        const releaseYear = safeMediaType === "tv"
           ? (movieData.first_air_date ? new Date(movieData.first_air_date).getFullYear() : null)
           : (movieData.release_date ? new Date(movieData.release_date).getFullYear() : null);
 
         // Estrazione Regista (Director / Creator)
         let director = "Sconosciuto";
-        if (mediaType === "tv") {
+        if (safeMediaType === "tv") {
           const creatorData = movieData.created_by && movieData.created_by.length > 0 ? movieData.created_by[0] : null;
           director = creatorData ? creatorData.name : "Sconosciuto";
         } else {
@@ -83,13 +81,13 @@ exports.addReview = async (req, res) => {
 
         // Estrazione Parole Chiave
         let keywords = [];
-        if (mediaType === "tv") {
+        if (safeMediaType === "tv") {
            keywords = movieData.keywords?.results?.map(k => k.name) || [];
         } else {
            keywords = movieData.keywords?.keywords?.map(k => k.name) || [];
         }
 
-        const title = mediaType === "tv" ? movieData.name : movieData.title;
+        const title = safeMediaType === "tv" ? movieData.name : movieData.title;
 
         // Estrazione Crew per stats future
         const fullCrew = movieData.credits?.crew || [];
@@ -121,7 +119,7 @@ exports.addReview = async (req, res) => {
           // Creazione nuovo film
           movie = new Movie({
             tmdb_id: movieData.id,
-            media_type: mediaType,
+            media_type: safeMediaType,
             title: title,
             poster_path: movieData.poster_path,
             release_year: releaseYear,

@@ -3,7 +3,6 @@ const Movie = require("../models/Movie");
 const axios = require("axios");
 
 const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
-  console.log(`[WATCHLIST] findOrCreateMovie: tmdbId=${tmdbId}, mediaType=${mediaType}`);
   const numericId = Number(tmdbId);
   
   // Cerchiamo il film. 
@@ -11,7 +10,6 @@ const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
   let movie = await Movie.findOne({ tmdb_id: numericId });
   
   if (!movie) {
-    console.log(`[WATCHLIST] Movie not found in DB, fetching from TMDB: ${numericId}`);
     const tmdbUrl = mediaType === "tv"
       ? `https://api.themoviedb.org/3/tv/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
       : `https://api.themoviedb.org/3/movie/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;

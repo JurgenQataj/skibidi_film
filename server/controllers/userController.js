@@ -81,13 +81,10 @@ exports.loginUser = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
-  
-  console.log(`[DEBUG] Richiesta Password Dimenticata per: ${email}`);
 
   try {
     const user = await User.findOne({ email: String(email) });
     if (!user) {
-      console.log(`[DEBUG] Utente non trovato.`);
       return res.status(404).json({ message: "Email non trovata." });
     }
 
@@ -96,16 +93,12 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 ora
     await user.save();
 
-    console.log(`[DEBUG] Token salvato. Invio email con Brevo (sib-api-v3-sdk)...`);
-
     const frontendUrl =
       process.env.NODE_ENV === "production"
         ? "https://skibidi-film.vercel.app"
         : "http://localhost:5173";
 
     const resetUrl = `${frontendUrl}/reset-password/${token}`;
-
-    console.log(`[DEBUG] Tento invio a ${user.email}...`);
 
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     // Usa la tua email Brevo verificata come sender o una generica se configurata
@@ -127,13 +120,11 @@ exports.forgotPassword = async (req, res) => {
       </div>
     `;
 
-    const result = await emailApi.sendTransacEmail(sendSmtpEmail);
+    await emailApi.sendTransacEmail(sendSmtpEmail);
 
-    console.log(`✅ [DEBUG] EMAIL INVIATA! RISPOSTA: ${JSON.stringify(result)}`);
     res.json({ message: "Email di recupero inviata!" });
   } catch (error) {
-    console.error("🔥 [DEBUG] ERRORE BREVO:", error);
-    console.error("🔥 [DEBUG] DETTAGLI:", error?.response?.text || error.message);
+    console.error("Errore invio email Brevo:", error?.response?.text || error.message);
     res.status(500).json({ message: "Errore invio email." });
   }
 };

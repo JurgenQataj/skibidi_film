@@ -103,11 +103,12 @@ exports.discoverTv = async (req, res) => {
 
 exports.getTvDetails = async (req, res) => {
   const { tmdbId } = req.params;
-  if (isNaN(tmdbId)) {
+  if (!/^\d+$/.test(tmdbId)) {
     return res.status(400).json({ message: "ID della serie tv non valido." });
   }
+  const safeTmdbId = parseInt(tmdbId, 10);
 
-  const url = `${BASE_URL}/tv/${tmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos,watch/providers`;
+  const url = `${BASE_URL}/tv/${safeTmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos,watch/providers`;
   
   try {
     const response = await axios.get(url);
