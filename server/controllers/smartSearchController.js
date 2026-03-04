@@ -296,13 +296,13 @@ function parseQuery(text) {
   const PARTICLES = new Set(["di", "de", "del", "della", "van", "von", "le", "la", "el", "da", "dos", "du", "lo"]);
 
   const personPrefixPatterns = [
-    /\bcon\s+(.{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del|degli|che)\b|$)/gi,
-    /\bregia\s+di\s+(.{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bdiretto\s+da\s+(.{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\binterpretato\s+da\s+(.{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bprotagonista\s+(.{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bstars?\s+(.{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
-    /\bfeaturin[g]?\s+(.{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
+    /\bcon\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del|degli|che)\b|$)/gi,
+    /\bregia\s+di\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
+    /\bdiretto\s+da\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
+    /\binterpretato\s+da\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
+    /\bprotagonista\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
+    /\bstars?\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
+    /\bfeaturin[g]?\s+([\w\s''\-\.]{3,40}?)(?:\s+(?:in|il|la|e\s|nel|del)\b|$)/gi,
   ];
 
   const rawPersonCandidates = new Set();
@@ -404,13 +404,12 @@ exports.smartSearch = async (req, res) => {
     if (!q || q.trim().length < 3) {
       return res.status(400).json({ message: "Query troppo corta." });
     }
+    // Hard cap to prevent ReDoS on very long inputs
+    const safeQ = q.slice(0, 200);
 
-    const parsed = parseQuery(q);
-    console.log("[SMART SEARCH] Parsed:", JSON.stringify(parsed, null, 2));
+    const parsed = parseQuery(safeQ);
 
-    // Risolvi nomi persone → ID TMDB in parallelo
     const resolvedPersons = await resolvePersonIds(parsed.personCandidates);
-    console.log("[SMART SEARCH] Persons resolved:", resolvedPersons.map((p) => p.name));
 
     const endpointType = parsed.mediaType === "tv" ? "tv" : "movie";
 
@@ -473,7 +472,7 @@ exports.smartSearch = async (req, res) => {
     } else {
       // Nessun filtro riconosciuto → cerca per titolo
       const searchRes = await axios.get(`${BASE_URL}/search/${endpointType}`, {
-        params: { api_key: API_KEY, language: "it-IT", query: q, page },
+        params: { api_key: API_KEY, language: "it-IT", query: safeQ, page },
       });
       results = searchRes.data.results || [];
       totalPages = searchRes.data.total_pages || 1;
