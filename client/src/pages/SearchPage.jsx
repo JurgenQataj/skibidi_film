@@ -312,7 +312,7 @@ function SearchPage() {
       handleSearch(queryParam);
     } else if (!hasSearched) {
       // Se non c'è query nell'URL e non ho cercato nulla, mostro i popolari
-      performSearch(1, true);
+      performSearch(1, filters, searchParams, true);
     }
   }, [queryParam]);
 
@@ -326,6 +326,7 @@ function SearchPage() {
   // Funzione per cambiare modalità e aggiornare l'URL
   const handleModeChange = (newMode) => {
     setSearchMode(newMode);
+    setSmartMode(false);
     if (queryParam) {
       setSearchParams({ query: queryParam, mode: newMode });
     }
@@ -380,7 +381,7 @@ function SearchPage() {
     setHasSearched(true);
     setCurrentPage(1);
     setResults([]);
-    performSearch(1, true);
+    performSearch(1, filters, searchParams, true);
     setShowFilters(false); // Chiude i filtri dopo l'applicazione
   };
 
@@ -408,7 +409,7 @@ function SearchPage() {
       if (smartMode && smartQuery) {
         performSmartSearch(smartQuery, currentPage + 1, true);
       } else {
-        performSearch(currentPage + 1, false);
+        performSearch(currentPage + 1, filters, searchParams, false);
       }
     }
   };

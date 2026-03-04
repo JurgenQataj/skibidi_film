@@ -339,7 +339,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
           {media.watch_providers?.flatrate?.length > 0 && (
             <div className={styles.infoBox}>
               <h4>Dove Vederlo</h4>
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "5px" }}>
+              <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginTop: "2px" }}>
                 {media.watch_providers.flatrate.map((provider) => {
                   const logoRender = (
                     <img
@@ -348,9 +348,9 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
                       alt={provider.provider_name}
                       title={provider.provider_name}
                       style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "8px",
+                        width: "24px",
+                        height: "24px",
+                        borderRadius: "6px",
                         cursor: media.watch_providers.link ? "pointer" : "default",
                       }}
                     />
