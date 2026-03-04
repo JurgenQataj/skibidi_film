@@ -15,7 +15,8 @@ export default defineConfig(({ command }) => {
           enabled: true // Abilitato in dev per testare le notifiche
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+          globPatterns: command === 'serve' ? [] : ['**/*.{js,css,html,ico,png,svg}'],
+          globIgnores: ['**/icona1.png', '**/icona2.png']
         },
         manifest: {
           name: 'Skibidi Film',
