@@ -30,6 +30,8 @@ import CollectionPage from "./pages/CollectionPage"; // [NEW] Import CollectionP
 import PartialCollectionsPage from "./pages/PartialCollectionsPage";
 import HorizonPage from "./pages/HorizonPage"; // [NEW] Skibidi Horizon
 import GoalsPage from "./pages/GoalsPage";
+import RatingGamePage from "./pages/RatingGamePage";
+import RatingGamePlay from "./pages/RatingGamePlay";
 
 
 // Import Componenti
@@ -100,6 +102,8 @@ function App() {
           <Route path="list/:listId" element={<ListPage />} />
           <Route path="partial-collections" element={<PartialCollectionsPage />} />
           <Route path="horizon" element={<HorizonPage />} /> {/* [NEW] Skibidi Horizon */}
+          <Route path="rating-game" element={<RatingGamePage />} />
+          <Route path="rating-game/play" element={<RatingGamePlay />} />
           
           {/* Profilo e Statistiche */}
           <Route path="profile/:userId" element={<ProfilePage />} />

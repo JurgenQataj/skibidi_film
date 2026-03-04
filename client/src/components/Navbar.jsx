@@ -8,6 +8,7 @@ import {
   FaGlobe,
   FaBell,
   FaPlayCircle,
+  FaGamepad,
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -139,6 +140,9 @@ function Navbar() {
           </Link>
           <Link to="/horizon" className={styles.navLink}>
             <FaPlayCircle /> <span>Horizon</span>
+          </Link>
+          <Link to="/rating-game" className={styles.navLink}>
+            <FaGamepad /> <span>Rating Game</span>
           </Link>
 
           {userId && (
