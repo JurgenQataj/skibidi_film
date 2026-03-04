@@ -113,6 +113,7 @@
   box-sizing: border-box;
   max-width: 900px;
   min-height: 0;
+  margin-top: 8vh;       /* Spinge tutto il blocco (card e VS) più in basso nello schermo */
 }
 
 /* ---- VS Center ---- */
@@ -122,7 +123,7 @@
   justify-content: center;
   padding: 0 6px;
   z-index: 3;
-  padding-top: 28px; /* nudge VS down relative to card tops */
+  margin-top: 15%; /* Spinge il VS un po' più in basso rispetto al centro perfetto */
 }
 
 .vsText {
@@ -244,7 +245,7 @@
 
 /* Tap hint icon — top center */
 .tapHint {
-  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(6px);
   border: 1px solid rgba(255,255,255,0.12);
@@ -375,7 +376,12 @@
 .menuBtn:hover { background: rgba(255,255,255,0.13); }
 
 /* ---- Footer ---- */
-.footer { margin-top: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom,0px)); text-align: center; }
+.footer {
+  margin-top: auto;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom,0px));
+  text-align: center;
+  width: 100%;
+}
 .poweredBy { font-size: 0.72rem; color: rgba(255,255,255,0.16); font-style: italic; margin: 0; }
 .brand { color: #e50914; font-weight: 700; font-style: normal; }
 .errorMsg { color: rgba(255,255,255,0.3); text-align: center; margin-top: 40px; font-size: 0.9rem; }
@@ -394,12 +400,12 @@
     padding: 6px 8px 8px;
   }
 
-  /* Keep 2:3 poster ratio but cap at 220px tall.
-     Each card is ~47% of viewport width → at max-height 220px
-     it's about 147px wide, still perfectly proportional. */
+  /* Keep 2:3 poster ratio but cap at 250px tall.
+     Each card is ~47% of viewport width → at max-height 250px
+     it's about 166px wide, proportioned for A52/S23. */
   .movieCard {
     aspect-ratio: 2/3;
-    max-height: 220px;
+    max-height: 250px;
     width: auto;   /* shrink width to honour max-height + aspect-ratio */
     justify-self: stretch; /* still fill the grid cell */
   }
@@ -415,12 +421,12 @@
 
   /* result bar needs bottom-nav gap */
   .resultBar {
-    margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 60px);
+    margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
   }
 
-  /* raise footer above bottom nav */
+  /* Alza il footer su mobile ancora di più per renderlo ben visibile sopra eventuali UI di sistema */
   .footer {
-    margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
+    padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -428,6 +434,11 @@
    DESKTOP
    ============================================== */
 @media (min-width: 1024px) {
+  .page { 
+    padding-top: 80px; /* Spinge la pagina sotto la Navbar fissa del sito */
+    padding-bottom: 40px; 
+  }
+
   /* Desktop navbar is 80px tall — push sticky topBar below it */
   .topBar {
     top: 80px;
@@ -435,8 +446,9 @@
   }
 
   .arena {
-    max-width: 820px;
+    max-width: 600px; /* Riduce notevolmente la larghezza delle card su PC */
     padding: 12px 24px 16px;
+    gap: 16px; /* Aggiunge respiro tra poster e il VS centrale su PC */
   }
 
   /* Moderate card height on desktop: 2/3 → 2/2.5 */

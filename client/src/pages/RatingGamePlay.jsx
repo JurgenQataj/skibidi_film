@@ -96,6 +96,8 @@ function RatingGamePlay() {
           localStorage.setItem(`ratingGame_hs_${mode}`, newStreak);
           submitScore(newStreak);
         }
+        // Auto-procede dopo 1.8 secondi
+        setTimeout(() => fetchPair(usedIds), 1800);
       } else {
         setResult("wrong");
         submitScore(streak);
@@ -231,9 +233,7 @@ function RatingGamePlay() {
             <span className={styles.resultText}>Corretto!</span>
             {streak > 1 && <span className={styles.streakBonus}>🔥 ×{streak}</span>}
           </div>
-          <button className={styles.nextBtn} onClick={() => fetchPair(usedIds)}>
-            Avanti →
-          </button>
+          {/* Pulsante 'Avanti' rimosso, ora procede in automatico */}
         </div>
       )}
       {revealed && result === "wrong" && (
