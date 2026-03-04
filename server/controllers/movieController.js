@@ -90,68 +90,73 @@ exports.searchPerson = async (req, res) => {
   }
 };
 
+// ── Helpers for discoverMovies ───────────────────────────────────────────────
+function buildDiscoverParams(query, API_KEY) {
+  const {
+    genre, release_date_gte, release_date_lte, vote_average_gte,
+    vote_count_gte, with_original_language, with_keywords,
+    with_companies, with_origin_country, sort_by, page = 1,
+    category = "popular",
+  } = query;
+
+  const params = {
+    api_key: API_KEY,
+    language: "it-IT",
+    page,
+    sort_by: sort_by || "popularity.desc",
+    region: "IT",
+  };
+
+  if (genre)                    params.with_genres = genre;
+  if (release_date_gte)         params["primary_release_date.gte"] = release_date_gte;
+  if (release_date_lte)         params["primary_release_date.lte"] = release_date_lte;
+  if (vote_average_gte)         params["vote_average.gte"] = vote_average_gte;
+  if (vote_count_gte)           params["vote_count.gte"] = parseInt(vote_count_gte);
+  if (with_original_language)   params.with_original_language = with_original_language;
+  if (with_keywords)            params.with_keywords = with_keywords;
+  if (with_companies)           params.with_companies = with_companies;
+  if (with_origin_country)      params.with_origin_country = with_origin_country;
+  if (category === "top_rated" && !sort_by)  params.sort_by = "vote_average.desc";
+  if (category === "upcoming"  && !sort_by)  params.sort_by = "primary_release_date.desc";
+
+  return params;
+}
+
+function resolveDiscoverUrl(BASE_URL, defaultEndpoint, query) {
+  const { genre, release_date_gte, release_date_lte, vote_average_gte,
+    vote_count_gte, with_original_language, with_keywords,
+    with_companies, with_origin_country, sort_by } = query;
+  const needsDiscover = genre || release_date_gte || release_date_lte ||
+    vote_average_gte || vote_count_gte || with_original_language ||
+    with_keywords || with_companies || with_origin_country ||
+    (sort_by && sort_by !== "popularity.desc");
+  return needsDiscover ? `${BASE_URL}/discover/movie` : `${BASE_URL}${defaultEndpoint}`;
+}
+
 exports.discoverMovies = async (req, res) => {
   try {
     const {
       category = "popular",
-      genre,
-      release_date_gte,
-      release_date_lte,
-      vote_average_gte,
-      vote_count_gte, // [NUOVO] Estrarre limite minimo voti
-      with_original_language,
-      with_keywords, // [NUOVO] Estrarre le keywords passate
-      with_companies,    // [NUOVO] Per gli studi/case di produzione
-      with_origin_country, // [NUOVO] Per il paese di produzione
-      sort_by,
-      page = 1,
     } = req.query;
 
     let endpoint = "/movie/popular";
-    if (category === "top_rated") endpoint = "/movie/top_rated";
+    if (category === "top_rated")  endpoint = "/movie/top_rated";
     if (category === "now_playing") endpoint = "/movie/now_playing";
-    if (category === "upcoming") endpoint = "/movie/upcoming";
+    if (category === "upcoming")   endpoint = "/movie/upcoming";
 
-    const params = {
-      api_key: API_KEY,
-      language: "it-IT",
-      page: page,
-      sort_by: sort_by || "popularity.desc",
-      region: "IT"
-    };
-
-    if (genre) params.with_genres = genre;
-    if (release_date_gte) params["primary_release_date.gte"] = release_date_gte;
-    if (release_date_lte) params["primary_release_date.lte"] = release_date_lte;
-    if (vote_average_gte) params["vote_average.gte"] = vote_average_gte;
-    if (vote_count_gte) params["vote_count.gte"] = parseInt(vote_count_gte); // Assicura che sia un numero
-    if (with_original_language) params.with_original_language = with_original_language;
-    if (with_keywords) params.with_keywords = with_keywords;
-    if (with_companies) params.with_companies = with_companies;
-    if (with_origin_country) params.with_origin_country = with_origin_country;
-
-    // Se c'è una categoria specifica (es. top_rated) e non c'è un ordinamento manuale,
-    // impostiamo il sort_by corretto per quella categoria quando usiamo discover
-    if (category === "top_rated" && !sort_by) params.sort_by = "vote_average.desc";
-    if (category === "upcoming" && !sort_by) params.sort_by = "primary_release_date.desc";
-
-    let fetchUrl = `${BASE_URL}${endpoint}`;
-    if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || with_companies || with_origin_country || (sort_by && sort_by !== "popularity.desc")) {
-        // [MODIFICA] Se c'è un qualsiasi filtro, forza l'uso di discover/movie
-        fetchUrl = `${BASE_URL}/discover/movie`;
-    }
+    const params = buildDiscoverParams(req.query, API_KEY);
+    const fetchUrl = resolveDiscoverUrl(BASE_URL, endpoint, req.query);
 
     console.log(`🔍 DISCOVER MOVIES URL: ${fetchUrl} | Params:`, { ...params, api_key: "HIDDEN" });
 
     const response = await axios.get(fetchUrl, { params });
-    
-    return res.json({
-        results: response.data.results,
-        total_pages: response.data.total_pages,
-        total_results: response.data.total_results,
-        page: parseInt(page),
-    });
 
+    return res.json({
+      results: response.data.results,
+      total_pages: response.data.total_pages,
+      total_results: response.data.total_results,
+      page: parseInt(req.query.page || 1),
+    });
   } catch (error) {
     console.error("ERRORE DISCOVER:", error);
     res.status(500).json({ message: "Errore durante la ricerca.", error: error.message });
@@ -567,23 +572,27 @@ exports.getHorizonMovies = async (req, res) => {
 
     // Helper: trova il trailer di un film (IT poi EN)
     const findTrailer = async (movieId) => {
+      const pickBest = (videos) => {
+        const yt = videos.filter((v) => v.site === "YouTube");
+        return yt.find((v) => v.type === "Trailer" && v.official)
+          || yt.find((v) => v.type === "Trailer")
+          || yt.find((v) => v.type === "Teaser" || v.type === "Clip")
+          || null;
+      };
       try {
         const itRes = await axios.get(
           `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=it-IT`
         );
-        const itV = itRes.data.results || [];
-        let t = itV.find((v) => v.site === "YouTube" && v.type === "Trailer" && v.official);
-        if (!t) t = itV.find((v) => v.site === "YouTube" && v.type === "Trailer");
-        if (!t) t = itV.find((v) => v.site === "YouTube" && (v.type === "Teaser" || v.type === "Clip"));
-        if (t) return t;
+        const itPick = pickBest(itRes.data.results || []);
+        if (itPick) return itPick;
 
         const enRes = await axios.get(
           `${BASE_URL}/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`
         );
         const enV = enRes.data.results || [];
-        t = enV.find((v) => v.site === "YouTube" && v.type === "Trailer");
-        if (!t) t = enV.find((v) => v.site === "YouTube");
-        return t || null;
+        return enV.find((v) => v.site === "YouTube" && v.type === "Trailer")
+          || enV.find((v) => v.site === "YouTube")
+          || null;
       } catch (_) {
         return null;
       }

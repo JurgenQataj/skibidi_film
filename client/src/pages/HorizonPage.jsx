@@ -300,18 +300,17 @@ function HorizonPage() {
   useEffect(() => {
     if (movies.length === 0) return;
 
+    const handleIntersection = (entry) => {
+      if (!entry.isIntersecting) return;
+      const idx = parseInt(entry.target.dataset.index, 10);
+      setActiveIndex(idx);
+      if (idx >= movies.length - 2 && hasMore && !loadingMore) {
+        setPage((p) => p + 1);
+      }
+    };
+
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const idx = parseInt(entry.target.dataset.index, 10);
-            setActiveIndex(idx);
-            if (idx >= movies.length - 2 && hasMore && !loadingMore) {
-              setPage((p) => p + 1);
-            }
-          }
-        });
-      },
+      (entries) => entries.forEach(handleIntersection),
       { root: containerRef.current, threshold: 0.7 }
     );
 

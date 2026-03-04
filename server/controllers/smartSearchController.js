@@ -190,131 +190,118 @@ function normalize(text) {
 }
 
 // ────────────────────────────────────────────────────────────────
-//  PARSER PRINCIPALE
+//  HELPER: decade / year extraction
 // ────────────────────────────────────────────────────────────────
-function parseQuery(text) {
-  const lower = normalize(text);
-
-  const result = {
-    personCandidates: [],   // stringhe candidate come nome persona
-    genreIds: [],
-    minRating: 0,
-    language: null,
-    yearFrom: null,
-    yearTo: null,
-    sortBy: "popularity.desc",  // default
-    mediaType: "movie",
-    rawText: text,
-    sortExplicit: false,        // se l'utente ha esplicitamente chiesto un ordinamento
-  };
-
-  // 1. Tipo di media
-  if (/\b(serie\s*tv|telefilm|show|sitcom)\b/.test(lower)) result.mediaType = "tv";
-  else if (/\b(film|cinema|pellicola|movie)\b/.test(lower)) result.mediaType = "movie";
-
-  // 2. Ordinamento (scelto esplicitamente → sovrascrive default)
-  for (const [phrase, sort] of Object.entries(SORT_KEYWORDS)) {
-    if (lower.includes(phrase)) {
-      result.sortBy = sort;
-      result.sortExplicit = true;
-      break;
-    }
+function matchesDecadeWord(text, word) {
+  const w = normalize(word);
+  let startIdx = 0;
+  while (true) {
+    const idx = text.indexOf(w, startIdx);
+    if (idx < 0) return false;
+    const after = text[idx + w.length];
+    if (/\d$/.test(w) && after && /\d/.test(after)) { startIdx = idx + 1; continue; }
+    return true;
   }
+}
 
-  // 3. Generi da keyword map (tutti i match trovati)
-  const foundGenreIds = new Set();
-  for (const [word, ids] of Object.entries(KEYWORD_TO_GENRES)) {
-    if (lower.includes(word)) ids.forEach((id) => foundGenreIds.add(id));
-  }
-  result.genreIds = [...foundGenreIds];
-
-  // 4. Qualità / voto minimo
-  for (const [word, rating] of Object.entries(QUALITY_WORDS)) {
-    if (lower.includes(word)) result.minRating = Math.max(result.minRating, rating);
-  }
-
-  // 5. Lingua
-  for (const [word, code] of Object.entries(LANGUAGE_MAP)) {
-    if (lower.includes(word)) { result.language = code; break; }
-  }
-
-  // 6. Decenni — usa match con word-boundary per evitare che "anni 20" 
-  //    venga trovato dentro "anni 2010", "anni 2000", ecc.
-  function matchesDecadeWord(text, word) {
-    const w = normalize(word);
-    let startIdx = 0;
-    while (true) {
-      const idx = text.indexOf(w, startIdx);
-      if (idx < 0) return false;
-      const after = text[idx + w.length];
-      // Se la parola termina con una cifra, il char successivo NON deve essere una cifra
-      if (/\d$/.test(w) && after && /\d/.test(after)) {
-        startIdx = idx + 1; // prova posizione successiva
-        continue;
-      }
-      return true;
-    }
-  }
-
-  let foundDecade = false;
-  // Processa prima le entry con parole più lunghe (più specifiche) per evitare match parziali
+function extractDecadeAndYear(lower) {
   const sortedDecades = [...DECADE_MAP].sort(
     (a, b) => Math.max(...b.words.map((w) => w.length)) - Math.max(...a.words.map((w) => w.length))
   );
   for (const decade of sortedDecades) {
     for (const w of decade.words) {
       if (matchesDecadeWord(lower, w)) {
-        result.yearFrom = decade.from;
-        result.yearTo = decade.to;
-        foundDecade = true;
-        break;
-      }
-    }
-    if (foundDecade) break;
-  }
-
-  // Anni con pattern "del XXXX", "nel XXXX" o anno grezzo a 4 cifre
-  if (!foundDecade) {
-    const yearExplicit = lower.match(/(?:del|nel|del|anno|intorno al|nel|circa il)\s+(1[89]\d{2}|20[012]\d)/);
-    if (yearExplicit) {
-      const y = parseInt(yearExplicit[1]);
-      result.yearFrom = y;
-      result.yearTo = y;
-    } else {
-      const rawYear = lower.match(/\b(1[89]\d{2}|20[012]\d)\b/);
-      if (rawYear) {
-        const y = parseInt(rawYear[1]);
-        result.yearFrom = y;
-        result.yearTo = y;
+        return { yearFrom: decade.from, yearTo: decade.to };
       }
     }
   }
+  // Explicit year
+  const yearExplicit = lower.match(/(?:del|nel|del|anno|intorno al|nel|circa il)\s+(1[89]\d{2}|20[012]\d)/);
+  if (yearExplicit) {
+    const y = parseInt(yearExplicit[1]);
+    return { yearFrom: y, yearTo: y };
+  }
+  const rawYear = lower.match(/\b(1[89]\d{2}|20[012]\d)\b/);
+  if (rawYear) {
+    const y = parseInt(rawYear[1]);
+    return { yearFrom: y, yearTo: y };
+  }
+  return { yearFrom: null, yearTo: null };
+}
 
-  // 7. Estrai nomi di persone (molto più flessibile)
-  // Pattern A: "con NOME", "regia di NOME", "diretto da NOME", "interpretato da NOME", "starring NOME", "di NOME"
-  // Rendiamo CASE-INSENSITIVE e accettiamo particelle ("di", "de", "del", "van", "von", "le", "la")
-  const PARTICLES = new Set(["di", "de", "del", "della", "van", "von", "le", "la", "el", "da", "dos", "du", "lo"]);
+// ────────────────────────────────────────────────────────────────
+//  HELPER: person candidate extraction
+// ────────────────────────────────────────────────────────────────
+const PARTICLES = new Set(["di", "de", "del", "della", "van", "von", "le", "la", "el", "da", "dos", "du", "lo"]);
 
-  // ── Safe patterns (no ReDoS) ──────────────────────────────────────────────
-  // The old form  [\w\s''\\-\.]{3,40}?  caused catastrophic backtracking:
-  // the \s inside the repeating class overlaps with the \s+ in the trailing
-  // boundary alternation, producing exponential backtrack paths.
+/**
+ * Truncate a string at the first occurrence of a sentence-ending punctuation
+ * character ( , ; . ! ? ).  Replaces /[,;.!?].*$/ which is vulnerable to
+ * super-linear backtracking: the unanchored .*$ retries from every position.
+ *
+ * This implementation scans once with String.indexOf — O(n), no backtracking.
+ */
+function truncateAtPunctuation(str) {
+  const PUNCTS = [",", ";", ".", "!", "?"];
+  let firstIdx = str.length; // default: no punctuation found → keep whole string
+  for (const ch of PUNCTS) {
+    const idx = str.indexOf(ch);
+    if (idx !== -1 && idx < firstIdx) firstIdx = idx;
+  }
+  return str.slice(0, firstIdx);
+}
+
+function extractPersonCandidates(text, lower) {
+  // ── ReDoS-safe implementation ─────────────────────────────────────────────
   //
-  // Fix: split the name into  WORD (\s WORD){0,4}  so each segment is
-  // matched atomically and spaces cannot be re-consumed by the boundary.
-  // The overall length is still bounded to ~5 words (≤ 40 chars in practice)
-  // and the 200-char input cap in smartSearch() is an additional hard guard.
-  const NAME_RE = /[\w''\-\.]+(?:\s[\w''\-\.]+){0,4}/;
-  const STOP_RE = /(?:in|il|la|e|nel|del|degli|che)/;
+  // WHY the previous version was still vulnerable:
+  //   ([\\w''\\-.]+(?:\\s[\\w''\\-.]+){0,4})(?=\\s+(?:stop-words)\\b|\\s*$)
+  //
+  //   The \\s inside the repeated capture group and the \\s+ at the start of
+  //   the lookahead both consume spaces.  When the lookahead fails (no
+  //   stop-word and no end-of-string), the engine backtracks through every
+  //   partition of the space-separated tokens — O(2^n) worst-case.
+  //
+  //   The \\s*$ branch is also quadratic when used unanchored: the engine
+  //   tries every tail of the string looking for all-spaces.
+  //
+  // FIX — "make the regex infallible" (Sonar recommended strategy):
+  //   • Remove the failing trailing lookahead from the regex entirely.
+  //   • The capture group now always succeeds → no backtracking source.
+  //   • Stop-word boundary logic moves to trimToStopWord(), a linear O(n)
+  //     post-processing function that splits on a single space and scans once.
 
-  // Build each prefix pattern by interpolating the safe name/stop sub-patterns.
-  // We use the RegExp constructor so we can compose them from string fragments.
+  const STOP_WORD_SET = new Set([
+    "in", "il", "la", "e", "nel", "del", "degli", "che",
+    "con", "per", "da", "su", "tra", "fra", "una", "uno", "di",
+  ]);
+
+  /**
+   * Trim a captured name string to the first stop-word token.
+   * Replaces the removed lookahead. Runs in O(k) where k = token count.
+   */
+  function trimToStopWord(raw) {
+    const tokens = raw.split(" ");
+    const stopIdx = tokens.findIndex((t) => STOP_WORD_SET.has(t.toLowerCase()));
+    return (stopIdx <= 0 ? tokens : tokens.slice(0, stopIdx)).join(" ").trim();
+  }
+
+  /**
+   * Build a safe person-prefix pattern (NO trailing lookahead).
+   *
+   * Capture group:
+   *   [\\w''\\-.]+            — first name token (no space, no ambiguity)
+   *   (?:\\s[\\w''\\-.]+){0,3}  — up to 3 more tokens, each preceded by
+   *                            exactly ONE \\s (not \\s+), so there is only
+   *                            ONE way to match each repetition →
+   *                            no backtracking path exists.
+   *
+   * Bounded to {0,3} (4 tokens max) as an additional hard guard.
+   */
   function makePersonPattern(prefixSrc) {
-    // Equivalent to:  /\b<prefix>\s+(<NAME>)(?:\s+(?:<STOP>)\b|$)/gi
     return new RegExp(
       `\\b${prefixSrc}\\s+` +
-      `([\\w''\\-.]+(?:\\s[\\w''\\-.]+){0,4})` +
-      `(?=\\s+(?:${STOP_RE.source})\\b|\\s*$)`,
+      `([\\w''\\-.]+(?:\\s[\\w''\\-.]+){0,3})`,
       "gi"
     );
   }
@@ -330,30 +317,127 @@ function parseQuery(text) {
   ];
 
   const rawPersonCandidates = new Set();
-  for (const pattern of personPrefixPatterns) {
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      const raw = match[1].trim().replace(/[,;.!?].*$/, ""); // tronca a punteggiatura
-      if (raw.length >= 3 && raw.split(/\s+/).length >= 1) {
-        rawPersonCandidates.add(raw);
+
+  const addCandidate = (raw) => {
+    const trimmed = trimToStopWord(truncateAtPunctuation(raw.trim()));
+    if (trimmed.length >= 3) rawPersonCandidates.add(trimmed);
+  };
+
+  const runPatterns = (src) => {
+    for (const pattern of personPrefixPatterns) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(src)) !== null) {
+        addCandidate(match[1]);
       }
     }
-  }
+  };
 
-  // Anche match case-insensitive nella versione normalizzata
+  runPatterns(text);
+
+  // Also run on normalised lowercase copy, then re-title-case
   for (const pattern of personPrefixPatterns) {
+    pattern.lastIndex = 0;
     let match;
     while ((match = pattern.exec(lower)) !== null) {
-      const raw = match[1].trim().replace(/[,;.!?].*$/, "");
-      // Riconverti a titolo case
-      const titled = raw.split(/\s+/).map((w) =>
+      const trimmed = trimToStopWord(truncateAtPunctuation(match[1].trim()));
+      if (trimmed.length < 3) continue;
+      const titled = trimmed.split(" ").map((w) =>
         PARTICLES.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)
       ).join(" ");
-      if (titled.length >= 3) rawPersonCandidates.add(titled);
+      rawPersonCandidates.add(titled);
     }
   }
 
-  result.personCandidates = [...rawPersonCandidates];
+  return [...rawPersonCandidates];
+}
+
+// ────────────────────────────────────────────────────────────────
+//  HELPER: build TMDB discover params from parsed query
+// ────────────────────────────────────────────────────────────────
+function buildSmartDiscoverParams(API_KEY, parsed, resolvedPersons, page, endpointType) {
+  const params = {
+    api_key: API_KEY,
+    language: "it-IT",
+    sort_by: parsed.sortBy,
+    "vote_count.gte": resolvedPersons.length > 0 ? 50 : 100,
+    page,
+  };
+
+  if (parsed.genreIds.length > 0)
+    params.with_genres = [...new Set(parsed.genreIds)].slice(0, 2).join("|");
+
+  if (resolvedPersons.length > 0) {
+    const ids = resolvedPersons.map((p) => p.id).join(",");
+    if (endpointType === "movie") params.with_cast   = ids;
+    else                          params.with_people = ids;
+  }
+
+  if (parsed.yearFrom) {
+    const dateField = endpointType === "tv" ? "first_air_date" : "primary_release_date";
+    params[`${dateField}.gte`] = `${parsed.yearFrom}-01-01`;
+    params[`${dateField}.lte`] = `${parsed.yearTo || parsed.yearFrom}-12-31`;
+  }
+
+  if (parsed.minRating > 0)  params["vote_average.gte"] = parsed.minRating;
+  if (parsed.language)       params.with_original_language = parsed.language;
+
+  return params;
+}
+
+// ────────────────────────────────────────────────────────────────
+//  PARSER PRINCIPALE
+// ────────────────────────────────────────────────────────────────
+function parseQuery(text) {
+  const lower = normalize(text);
+
+  const result = {
+    personCandidates: [],
+    genreIds: [],
+    minRating: 0,
+    language: null,
+    yearFrom: null,
+    yearTo: null,
+    sortBy: "popularity.desc",
+    mediaType: "movie",
+    rawText: text,
+    sortExplicit: false,
+  };
+
+  // 1. Tipo di media
+  if (/\b(serie\s*tv|telefilm|show|sitcom)\b/.test(lower)) result.mediaType = "tv";
+  else if (/\b(film|cinema|pellicola|movie)\b/.test(lower)) result.mediaType = "movie";
+
+  // 2. Ordinamento
+  for (const [phrase, sort] of Object.entries(SORT_KEYWORDS)) {
+    if (lower.includes(phrase)) { result.sortBy = sort; result.sortExplicit = true; break; }
+  }
+
+  // 3. Generi
+  const foundGenreIds = new Set();
+  for (const [word, ids] of Object.entries(KEYWORD_TO_GENRES)) {
+    if (lower.includes(word)) ids.forEach((id) => foundGenreIds.add(id));
+  }
+  result.genreIds = [...foundGenreIds];
+
+  // 4. Qualità
+  for (const [word, rating] of Object.entries(QUALITY_WORDS)) {
+    if (lower.includes(word)) result.minRating = Math.max(result.minRating, rating);
+  }
+
+  // 5. Lingua
+  for (const [word, code] of Object.entries(LANGUAGE_MAP)) {
+    if (lower.includes(word)) { result.language = code; break; }
+  }
+
+  // 6. Decenni / anni
+  const { yearFrom, yearTo } = extractDecadeAndYear(lower);
+  result.yearFrom = yearFrom;
+  result.yearTo   = yearTo;
+
+  // 7. Persone
+  result.personCandidates = extractPersonCandidates(text, lower);
+
   return result;
 }
 
@@ -428,46 +512,13 @@ exports.smartSearch = async (req, res) => {
     if (!q || q.trim().length < 3) {
       return res.status(400).json({ message: "Query troppo corta." });
     }
-    // Hard cap to prevent ReDoS on very long inputs
     const safeQ = q.slice(0, 200);
 
-    const parsed = parseQuery(safeQ);
-
+    const parsed          = parseQuery(safeQ);
     const resolvedPersons = await resolvePersonIds(parsed.personCandidates);
+    const endpointType    = parsed.mediaType === "tv" ? "tv" : "movie";
 
-    const endpointType = parsed.mediaType === "tv" ? "tv" : "movie";
-
-    // Costruisci params TMDB Discover
-    const params = {
-      api_key: API_KEY,
-      language: "it-IT",
-      sort_by: parsed.sortBy,
-      "vote_count.gte": resolvedPersons.length > 0 ? 50 : 100, // Più tollerante con attori specifici
-      page,
-    };
-
-    if (parsed.genreIds.length > 0) {
-      // Usa pipe | per OR tra generi (così "emozionante" → Dramma OPPURE Thriller)
-      params.with_genres = [...new Set(parsed.genreIds)].slice(0, 2).join("|");
-    }
-
-    if (resolvedPersons.length > 0) {
-      if (parsed.mediaType === "movie") {
-        params.with_cast = resolvedPersons.map((p) => p.id).join(",");
-      } else {
-        // TV: usa with_people (include sia cast che crew)
-        params.with_people = resolvedPersons.map((p) => p.id).join(",");
-      }
-    }
-
-    if (parsed.yearFrom) {
-      const dateField = parsed.mediaType === "tv" ? "first_air_date" : "primary_release_date";
-      params[`${dateField}.gte`] = `${parsed.yearFrom}-01-01`;
-      params[`${dateField}.lte`] = `${parsed.yearTo || parsed.yearFrom}-12-31`;
-    }
-
-    if (parsed.minRating > 0) params["vote_average.gte"] = parsed.minRating;
-    if (parsed.language) params.with_original_language = parsed.language;
+    const params = buildSmartDiscoverParams(API_KEY, parsed, resolvedPersons, page, endpointType);
 
     const hasAnyFilter =
       parsed.genreIds.length > 0 ||
@@ -476,29 +527,27 @@ exports.smartSearch = async (req, res) => {
       parsed.minRating > 0 ||
       parsed.language;
 
-    let results = [];
+    let results    = [];
     let totalPages = 1;
 
     if (hasAnyFilter) {
       const discoverRes = await axios.get(`${BASE_URL}/discover/${endpointType}`, { params });
-      results = discoverRes.data.results || [];
+      results    = discoverRes.data.results    || [];
       totalPages = discoverRes.data.total_pages || 1;
 
-      // Se abbiamo un attore ma 0 risultati con genere → riprova senza genere
       if (results.length === 0 && resolvedPersons.length > 0 && parsed.genreIds.length > 0) {
         console.log("[SMART SEARCH] Retry without genre filter...");
         const fallbackParams = { ...params };
         delete fallbackParams.with_genres;
         const fallbackRes = await axios.get(`${BASE_URL}/discover/${endpointType}`, { params: fallbackParams });
-        results = fallbackRes.data.results || [];
+        results    = fallbackRes.data.results    || [];
         totalPages = fallbackRes.data.total_pages || 1;
       }
     } else {
-      // Nessun filtro riconosciuto → cerca per titolo
       const searchRes = await axios.get(`${BASE_URL}/search/${endpointType}`, {
         params: { api_key: API_KEY, language: "it-IT", query: safeQ, page },
       });
-      results = searchRes.data.results || [];
+      results    = searchRes.data.results    || [];
       totalPages = searchRes.data.total_pages || 1;
     }
 
@@ -510,13 +559,13 @@ exports.smartSearch = async (req, res) => {
       page: parseInt(page),
       explanation,
       parsed: {
-        genres: [...new Set(parsed.genreIds)].map((id) => ({ id, name: GENRE_NAMES[id] })).filter((g) => g.name),
-        persons: resolvedPersons,
-        year: parsed.yearFrom ? { from: parsed.yearFrom, to: parsed.yearTo } : null,
-        language: parsed.language,
+        genres:    [...new Set(parsed.genreIds)].map((id) => ({ id, name: GENRE_NAMES[id] })).filter((g) => g.name),
+        persons:   resolvedPersons,
+        year:      parsed.yearFrom ? { from: parsed.yearFrom, to: parsed.yearTo } : null,
+        language:  parsed.language,
         mediaType: parsed.mediaType,
         minRating: parsed.minRating,
-        sortBy: parsed.sortBy,
+        sortBy:    parsed.sortBy,
         sortLabel: SORT_LABELS[parsed.sortBy] || null,
       },
     });

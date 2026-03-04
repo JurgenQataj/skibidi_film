@@ -11,12 +11,77 @@ async function extractMentions(text) {
   const mentionRegex = /@(\w+)/g;
   const usernames = [];
   let match;
-  while ((match = mentionRegex.exec(text)) !== null) {
-    usernames.push(match[1]);
-  }
+  while ((match = mentionRegex.exec(text)) !== null) usernames.push(match[1]);
   if (usernames.length === 0) return [];
   const users = await User.find({ username: { $in: usernames } }).select("_id");
   return users.map((u) => u._id);
+}
+
+// Extrae campos clave de TMDB y retorna un objeto plano
+function extractMovieFields(movieData, safeMediaType) {
+  const releaseYear = safeMediaType === "tv"
+    ? (movieData.first_air_date ? new Date(movieData.first_air_date).getFullYear() : null)
+    : (movieData.release_date   ? new Date(movieData.release_date).getFullYear()   : null);
+
+  let director = "Sconosciuto";
+  if (safeMediaType === "tv") {
+    const creator = movieData.created_by?.[0];
+    director = creator ? creator.name : "Sconosciuto";
+  } else {
+    const directorData = movieData.credits?.crew?.find(c => c.job === "Director");
+    director = directorData ? directorData.name : "Sconosciuto";
+  }
+
+  const cast    = movieData.credits?.cast?.slice(0, 5).map(c => c.name) || [];
+  const genres  = movieData.genres?.map(g => g.name) || [];
+  const keywords = safeMediaType === "tv"
+    ? (movieData.keywords?.results?.map(k => k.name) || [])
+    : (movieData.keywords?.keywords?.map(k => k.name) || []);
+
+  const title = safeMediaType === "tv" ? movieData.name : movieData.title;
+
+  const targetJobs = [
+    "Special Effects", "Visual Effects Supervisor", "VFX Artist",
+    "Original Music Composer", "Sound Designer", "Sound Mixer", "Original Song Writer",
+    "Songs", "Lyrics", "Producer", "Executive Producer",
+    "Director of Photography", "Camera Operator", "Lighting Technician", "Gaffer",
+    "Production Design", "Art Direction", "Set Decoration",
+    "Writer", "Screenplay", "Original Story", "Characters",
+  ];
+  const crew = (movieData.credits?.crew || [])
+    .filter(c => targetJobs.includes(c.job))
+    .map(c => ({ name: c.name, job: (c.job === "Songs" || c.job === "Lyrics") ? "Original Song Writer" : c.job }));
+
+  const runtime              = movieData.runtime || 0;
+  const production_companies = movieData.production_companies?.map(c => c.name) || [];
+  const production_countries = movieData.production_countries?.map(c => c.name) || [];
+  const original_language    = movieData.original_language || null;
+  const collection_info      = movieData.belongs_to_collection ? {
+    id: movieData.belongs_to_collection.id,
+    name: movieData.belongs_to_collection.name,
+    poster_path: movieData.belongs_to_collection.poster_path,
+    backdrop_path: movieData.belongs_to_collection.backdrop_path,
+  } : null;
+
+  return { releaseYear, director, cast, genres, keywords, title, crew,
+    runtime, production_companies, production_countries, original_language,
+    collection_info, tmdb_id: movieData.id, poster_path: movieData.poster_path };
+}
+
+async function sendMentionNotifications(comment_text, reviewId, userId) {
+  if (!comment_text) return;
+  try {
+    const mentionedIds = await extractMentions(comment_text);
+    const validMentions = mentionedIds.filter(id => id.toString() !== userId);
+    for (const mentionId of validMentions) {
+      await new Notification({
+        recipient: mentionId, sender: userId,
+        type: "review_mention", targetReview: reviewId,
+      }).save();
+    }
+  } catch (err) {
+    console.log("⚠️ Errore notifica menzione recensione:", err.message);
+  }
 }
 
 // Aggiungere una recensione
@@ -24,20 +89,13 @@ exports.addReview = async (req, res) => {
   const { tmdbId, rating, comment_text, is_spoiler, mediaType = "movie" } = req.body;
   const userId = req.user.id;
 
-  if (!tmdbId || rating === undefined) {
-    return res
-      .status(400)
-      .json({ message: "ID del contenuto e valutazione sono obbligatori." });
-  }
-
-  // VALIDAZIONE RATING
-  if (rating < 0 || rating > 10) {
-      return res.status(400).json({ message: "Il voto deve essere compreso tra 0 e 10." });
-  }
+  if (!tmdbId || rating === undefined)
+    return res.status(400).json({ message: "ID del contenuto e valutazione sono obbligatori." });
+  if (rating < 0 || rating > 10)
+    return res.status(400).json({ message: "Il voto deve essere compreso tra 0 e 10." });
 
   try {
-    // 1. Cerca il film nel DB locale
-    const safeTmdbId = Number(tmdbId);
+    const safeTmdbId    = Number(tmdbId);
     const safeMediaType = String(mediaType);
     const movieQuery = {
       tmdb_id: safeTmdbId,
@@ -48,178 +106,70 @@ exports.addReview = async (req, res) => {
     };
     let movie = await Movie.findOne(movieQuery);
 
-    // 2. Se il film non esiste O se mancano dati cruciali (regista/cast/anno/generi), scaricali da TMDB
-    if (!movie || !movie.director || !movie.cast || movie.cast.length === 0 || !movie.release_year || !movie.genres || movie.genres.length === 0) {
-      const tmdbUrl = safeMediaType === "tv" 
-        ? `https://api.themoviedb.org/3/tv/${safeTmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`
-        : `https://api.themoviedb.org/3/movie/${safeTmdbId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
-      
+    // 2. Fetch/heal from TMDB if needed
+    const needsFetch = !movie || !movie.director || !movie.cast ||
+      movie.cast.length === 0 || !movie.release_year ||
+      !movie.genres || movie.genres.length === 0;
+
+    if (needsFetch) {
+      const tmdbBase = `https://api.themoviedb.org/3`;
+      const tmdbPath = safeMediaType === "tv"
+        ? `${tmdbBase}/tv/${safeTmdbId}`
+        : `${tmdbBase}/movie/${safeTmdbId}`;
+      const tmdbUrl = `${tmdbPath}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
+
       try {
-        const tmdbResponse = await axios.get(tmdbUrl);
-        const movieData = tmdbResponse.data;
-
-        // Estrazione Anno
-        const releaseYear = safeMediaType === "tv"
-          ? (movieData.first_air_date ? new Date(movieData.first_air_date).getFullYear() : null)
-          : (movieData.release_date ? new Date(movieData.release_date).getFullYear() : null);
-
-        // Estrazione Regista (Director / Creator)
-        let director = "Sconosciuto";
-        if (safeMediaType === "tv") {
-          const creatorData = movieData.created_by && movieData.created_by.length > 0 ? movieData.created_by[0] : null;
-          director = creatorData ? creatorData.name : "Sconosciuto";
-        } else {
-          const directorData = movieData.credits?.crew?.find(c => c.job === "Director");
-          director = directorData ? directorData.name : "Sconosciuto";
-        }
-
-        // Estrazione Cast (Top 5 attori)
-        const cast = movieData.credits?.cast?.slice(0, 5).map(c => c.name) || [];
-
-        // Estrazione Generi
-        const genres = movieData.genres?.map(g => g.name) || [];
-
-        // Estrazione Parole Chiave
-        let keywords = [];
-        if (safeMediaType === "tv") {
-           keywords = movieData.keywords?.results?.map(k => k.name) || [];
-        } else {
-           keywords = movieData.keywords?.keywords?.map(k => k.name) || [];
-        }
-
-        const title = safeMediaType === "tv" ? movieData.name : movieData.title;
-
-        // Estrazione Crew per stats future
-        const fullCrew = movieData.credits?.crew || [];
-        const production_companies = movieData.production_companies?.map(c => c.name) || [];
-
-        const targetJobs = [
-          "Special Effects", "Visual Effects Supervisor", "VFX Artist",
-          "Original Music Composer", "Sound Designer", "Sound Mixer", "Original Song Writer",
-          "Songs", "Lyrics",
-          "Producer", "Executive Producer",
-          "Director of Photography", "Camera Operator", "Lighting Technician", "Gaffer",
-          "Production Design", "Art Direction", "Set Decoration",
-          "Writer", "Screenplay", "Original Story", "Characters"
-        ];
-
-        const crew = fullCrew
-          .filter(c => targetJobs.includes(c.job))
-          .map(c => {
-            let job = c.job;
-            if (job === "Songs" || job === "Lyrics") job = "Original Song Writer";
-            return { name: c.name, job: job };
-          });
-
-        const runtime = movieData.runtime || 0;
-        const production_countries = movieData.production_countries?.map(c => c.name) || [];
-        const original_language = movieData.original_language || null;
+        const { data: movieData } = await axios.get(tmdbUrl);
+        const fields = extractMovieFields(movieData, safeMediaType);
 
         if (!movie) {
-          // Creazione nuovo film
           movie = new Movie({
-            tmdb_id: movieData.id,
-            media_type: safeMediaType,
-            title: title,
-            poster_path: movieData.poster_path,
-            release_year: releaseYear,
-            director: director,
-            cast: cast,
-            genres: genres,
-            collection_info: movieData.belongs_to_collection ? {
-              id: movieData.belongs_to_collection.id,
-              name: movieData.belongs_to_collection.name,
-              poster_path: movieData.belongs_to_collection.poster_path,
-              backdrop_path: movieData.belongs_to_collection.backdrop_path
-            } : null,
-            production_companies,
-            crew,
-            runtime,
-            production_countries,
-            original_language,
-            keywords
+            tmdb_id: fields.tmdb_id, media_type: safeMediaType,
+            title: fields.title,       poster_path: fields.poster_path,
+            release_year: fields.releaseYear, director: fields.director,
+            cast: fields.cast,         genres: fields.genres,
+            collection_info: fields.collection_info,
+            production_companies: fields.production_companies,
+            crew: fields.crew,         runtime: fields.runtime,
+            production_countries: fields.production_countries,
+            original_language: fields.original_language,
+            keywords: fields.keywords,
           });
           await movie.save();
         } else {
-          // Aggiornamento film esistente (Self-healing)
-          movie.title = title;
-          movie.release_year = releaseYear;
-          movie.director = director;
-          movie.cast = cast;
-          movie.genres = genres;
-          
-          movie.production_companies = production_companies;
-          movie.crew = crew;
-          movie.runtime = runtime;
-          movie.production_countries = production_countries;
-          movie.original_language = original_language;
-          movie.keywords = keywords;
-
-          if (movieData.belongs_to_collection) {
-            movie.collection_info = {
-              id: movieData.belongs_to_collection.id,
-              name: movieData.belongs_to_collection.name,
-              poster_path: movieData.belongs_to_collection.poster_path,
-              backdrop_path: movieData.belongs_to_collection.backdrop_path
-            };
-          } else {
-            movie.collection_info = null;
-          }
+          Object.assign(movie, {
+            title: fields.title,           release_year: fields.releaseYear,
+            director: fields.director,     cast: fields.cast,
+            genres: fields.genres,         production_companies: fields.production_companies,
+            crew: fields.crew,             runtime: fields.runtime,
+            production_countries: fields.production_countries,
+            original_language: fields.original_language,
+            keywords: fields.keywords,     collection_info: fields.collection_info,
+          });
           await movie.save();
         }
       } catch (apiError) {
         console.error("Errore TMDB durante il salvataggio film:", apiError.message);
-        // Se fallisce TMDB ma il film non esiste, non possiamo creare la recensione
-        if (!movie) {
+        if (!movie)
           return res.status(502).json({ message: "Impossibile recuperare i dati del film." });
-        }
-        // Se il film esisteva già, procediamo anche senza aggiornarlo
       }
     }
 
-    // 3. Controllo se l'utente ha già recensito
-    const existingReview = await Review.findOne({
-      user: userId,
-      movie: movie._id,
-    });
-    if (existingReview) {
-      return res
-        .status(409)
-        .json({ message: "Hai già recensito questo film." });
-    }
+    // 3. Check duplicate review
+    const existingReview = await Review.findOne({ user: userId, movie: movie._id });
+    if (existingReview)
+      return res.status(409).json({ message: "Hai già recensito questo film." });
 
-    // 4. Creazione Recensione
-    const newReview = new Review({
-      user: userId,
-      movie: movie._id,
-      rating,
-      comment_text,
-      is_spoiler,
-    });
+    // 4. Create review
+    const newReview = new Review({ user: userId, movie: movie._id, rating, comment_text, is_spoiler });
     await newReview.save();
 
-    try {
-      if (comment_text) {
-        const mentionedIds = await extractMentions(comment_text);
-        const validMentions = mentionedIds.filter(id => id.toString() !== userId);
-        for (const mentionId of validMentions) {
-          const mentionNotif = new Notification({
-            recipient: mentionId,
-            sender: userId,
-            type: "review_mention",
-            targetReview: newReview._id,
-          });
-          await mentionNotif.save();
-        }
-      }
-    } catch (mentionNotifError) {
-      console.log("⚠️ Errore notifica menzione recensione:", mentionNotifError.message);
-    }
+    await sendMentionNotifications(comment_text, newReview._id, userId);
 
-    // Rimuovi dalla watchlist se presente
+    // Remove from watchlist
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });
 
-    // 5. Sync collezioni (AWAITED per live update)
+    // 5. Sync collections
     await userController.syncUserCollections(userId);
 
     res.status(201).json({ message: "Recensione aggiunta con successo!" });

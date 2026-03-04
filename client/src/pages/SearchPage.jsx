@@ -8,13 +8,13 @@ import { SkeletonMovieCard, SkeletonPersonRow, SkeletonWithLogo } from "../compo
 import KeywordInput from "../components/KeywordInput";
 import CustomSelect from "../components/CustomSelect";
 
-function SearchPage() {
-  // Helper per inizializzare lo stato da sessionStorage
-  const getInitialState = (key, defaultValue) => {
-    const saved = sessionStorage.getItem(key);
-    return saved !== null ? JSON.parse(saved) : defaultValue;
-  };
+// Helper to initialise state from sessionStorage (module-level — no closure needed)
+const getInitialState = (key, defaultValue) => {
+  const saved = sessionStorage.getItem(key);
+  return saved !== null ? JSON.parse(saved) : defaultValue;
+};
 
+function SearchPage() {
   const [results, setResults] = useState(() => getInitialState("search_results", []));
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -192,6 +192,24 @@ function SearchPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   // Gestione ricerca con filtri
+  const buildSearchParams = (page, filters, searchParams) => {
+    const p = new URLSearchParams({
+      category: filters.category,
+      page: page.toString(),
+    });
+    if (filters.genre)                       p.set('genre', filters.genre);
+    if (searchParams.get('with_companies'))  p.set('with_companies', searchParams.get('with_companies'));
+    if (searchParams.get('with_origin_country')) p.set('with_origin_country', searchParams.get('with_origin_country'));
+    if (filters.releaseYear.from)            p.set('release_date_gte', `${filters.releaseYear.from}-01-01`);
+    if (filters.releaseYear.to)              p.set('release_date_lte', `${filters.releaseYear.to}-12-31`);
+    if (filters.minRating > 0)               p.set('vote_average_gte', filters.minRating.toString());
+    if (filters.minVoteCount > 0)            p.set('vote_count_gte', filters.minVoteCount.toString());
+    if (filters.language)                    p.set('with_original_language', filters.language);
+    if (filters.keywords.length > 0)         p.set('with_keywords', filters.keywords.map(k => k.id).join(','));
+    if (filters.sortBy)                      p.set('sort_by', filters.sortBy);
+    return p;
+  };
+
   const performSearch = async (page = 1, isNewSearch = false) => {
     if (isNewSearch) {
       setLoading(true);
@@ -201,36 +219,13 @@ function SearchPage() {
     }
 
     try {
-      const params = new URLSearchParams({
-        category: filters.category,
-        page: page.toString(),
-        ...(filters.genre && { genre: filters.genre }),
-        ...(searchParams.get("with_companies") && { with_companies: searchParams.get("with_companies") }),
-        ...(searchParams.get("with_origin_country") && { with_origin_country: searchParams.get("with_origin_country") }),
-        ...(filters.releaseYear.from && {
-          release_date_gte: `${filters.releaseYear.from}-01-01`,
-        }),
-        ...(filters.releaseYear.to && {
-          release_date_lte: `${filters.releaseYear.to}-12-31`,
-        }),
-        ...(filters.minRating > 0 && {
-          vote_average_gte: filters.minRating.toString(),
-        }),
-        ...(filters.minVoteCount > 0 && {
-          vote_count_gte: filters.minVoteCount.toString(), // [NUOVO] Passa al backend
-        }),
-        ...(filters.language && { with_original_language: filters.language }),
-        ...(filters.keywords.length > 0 && { with_keywords: filters.keywords.map(k => k.id).join(",") }),
-        ...(filters.sortBy && { sort_by: filters.sortBy }),
-      });
-
+      const params = buildSearchParams(page, filters, searchParams);
       const endpointPrefix = searchMode === "tv" ? "tv" : "movies";
       const response = await axios.get(
         `${API_URL}/api/${endpointPrefix}/discover?${params.toString()}`
       );
 
       const newResults = response.data.results || [];
-
       if (isNewSearch) {
         setResults(newResults);
       } else {
@@ -242,9 +237,7 @@ function SearchPage() {
       setCurrentPage(page);
     } catch (error) {
       console.error("*** FRONTEND ERROR ***", error);
-      if (isNewSearch) {
-        setResults([]);
-      }
+      if (isNewSearch) setResults([]);
     } finally {
       setLoading(false);
       setLoadingMore(false);

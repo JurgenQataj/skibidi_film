@@ -157,18 +157,21 @@ const GlobalChat = () => {
   };
 
   // Like
-  const handleLike = async (msgId) => {
-    if (!user) return;
-    setMessages((p) => p.map((m) => {
+  const updateLikeState = (messages, msgId, userId) =>
+    messages.map((m) => {
       if (m._id !== msgId) return m;
-      const liked = (m.likes || []).some((id) => (id._id || id).toString() === user.id);
+      const liked = (m.likes || []).some((id) => (id._id || id).toString() === userId);
       return {
         ...m,
         likes: liked
-          ? (m.likes || []).filter((id) => (id._id || id).toString() !== user.id)
-          : [...(m.likes || []), user.id],
+          ? (m.likes || []).filter((id) => (id._id || id).toString() !== userId)
+          : [...(m.likes || []), userId],
       };
-    }));
+    });
+
+  const handleLike = async (msgId) => {
+    if (!user) return;
+    setMessages((p) => updateLikeState(p, msgId, user.id));
     try {
       const tkn = localStorage.getItem('token');
       await axios.post(`${API_URL}/api/chat/${msgId}/like`, {}, {
@@ -242,7 +245,6 @@ const GlobalChat = () => {
                   const isFirst = mi === 0;
                   const isLast = mi === group.msgs.length - 1;
                   const isSingle = group.msgs.length === 1;
-                  const isMiddle = !isFirst && !isLast;
                   const likeCount = (msg.likes || []).length;
                   const isLiked = user && (msg.likes || []).some(
                     (id) => (id._id || id).toString() === user.id
@@ -250,12 +252,19 @@ const GlobalChat = () => {
                   const isDeleting = deletingId === msg._id;
 
                   // Radius class for stacking effect
-                  let radiusClass = '';
-                  if (!isSingle) {
-                    if (isFirst) radiusClass = styles.bubbleFirst;
-                    else if (isLast) radiusClass = styles.bubbleLast;
-                    else radiusClass = styles.bubbleMiddle;
-                  }
+                  const getBubbleRadiusClass = () => {
+                    if (isSingle) return '';
+                    if (isFirst) return styles.bubbleFirst;
+                    if (isLast) return styles.bubbleLast;
+                    return styles.bubbleMiddle;
+                  };
+                  const radiusClass = getBubbleRadiusClass();
+
+                  const toggleSelected = () =>
+                    setSelectedMsg((prev) => (prev === msg._id ? null : msg._id));
+                  const handleRowKeyDown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') toggleSelected();
+                  };
 
                   return (
                     <div
@@ -263,8 +272,8 @@ const GlobalChat = () => {
                       className={`${styles.messageRow} ${isOwn ? styles.ownRow : ''} ${isDeleting ? styles.deleting : ''}`}
                       onMouseEnter={() => setHoveredMsg(msg._id)}
                       onMouseLeave={() => setHoveredMsg(null)}
-                      onClick={() => setSelectedMsg((prev) => prev === msg._id ? null : msg._id)}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedMsg((prev) => prev === msg._id ? null : msg._id); }}
+                      onClick={toggleSelected}
+                      onKeyDown={handleRowKeyDown}
                       tabIndex={0}
                       role="button"
                     >

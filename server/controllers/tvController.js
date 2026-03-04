@@ -27,74 +27,73 @@ exports.searchTv = async (req, res) => {
   }
 };
 
+// ── Helpers for discoverTv ────────────────────────────────────────────────────
+function buildTvDiscoverParams(query, API_KEY) {
+  const {
+    genre, release_date_gte, release_date_lte, vote_average_gte,
+    vote_count_gte, with_original_language, with_keywords,
+    with_companies, with_origin_country, sort_by, page = 1,
+    category = "popular",
+  } = query;
+
+  const params = {
+    api_key: API_KEY,
+    language: "it-IT",
+    page,
+    sort_by: sort_by || "popularity.desc",
+  };
+
+  if (genre)                    params.with_genres = genre;
+  if (release_date_gte)         params["first_air_date.gte"] = release_date_gte;
+  if (release_date_lte)         params["first_air_date.lte"] = release_date_lte;
+  if (vote_average_gte)         params["vote_average.gte"] = vote_average_gte;
+  if (vote_count_gte)           params["vote_count.gte"] = parseInt(vote_count_gte);
+  if (with_original_language)   params.with_original_language = with_original_language;
+  if (with_keywords)            params.with_keywords = with_keywords;
+  if (with_companies)           params.with_companies = with_companies;
+  if (with_origin_country)      params.with_origin_country = with_origin_country;
+  if (category === "top_rated" && !sort_by) params.sort_by = "vote_average.desc";
+
+  return params;
+}
+
+function resolveTvDiscoverUrl(BASE_URL, defaultEndpoint, query) {
+  const { genre, release_date_gte, release_date_lte, vote_average_gte,
+    vote_count_gte, with_original_language, with_keywords,
+    with_companies, with_origin_country, sort_by } = query;
+  const needsDiscover = genre || release_date_gte || release_date_lte ||
+    vote_average_gte || vote_count_gte || with_original_language ||
+    with_keywords || with_companies || with_origin_country ||
+    (sort_by && sort_by !== "popularity.desc");
+  return needsDiscover ? `${BASE_URL}/discover/tv` : `${BASE_URL}${defaultEndpoint}`;
+}
+
 exports.discoverTv = async (req, res) => {
   try {
-    const {
-      category = "popular", // Per le serie TV: popular, top_rated, on_the_air, airing_today
-      genre,
-      release_date_gte,
-      release_date_lte,
-      vote_average_gte,
-      vote_count_gte, // [NUOVO] Estrarre limite minimo voti
-      with_original_language,
-      with_keywords, // [NUOVO] Estrarre le keywords passate
-      with_companies,    // [NUOVO] Per gli studi/case di produzione
-      with_origin_country, // [NUOVO] Per il paese di produzione
-      sort_by,
-      page = 1,
-    } = req.query;
+    const { category = "popular", page = 1 } = req.query;
 
     let endpoint = "/tv/popular";
-    if (category === "top_rated") endpoint = "/tv/top_rated";
+    if (category === "top_rated")                               endpoint = "/tv/top_rated";
     if (category === "now_playing" || category === "on_the_air") endpoint = "/tv/on_the_air";
-    if (category === "upcoming" || category === "airing_today") endpoint = "/tv/airing_today";
+    if (category === "upcoming"   || category === "airing_today") endpoint = "/tv/airing_today";
 
-    const params = {
-      api_key: API_KEY,
-      language: "it-IT",
-      page: page,
-      sort_by: sort_by || "popularity.desc",
-      // Non usiamo region per le Serie TV spesso (o lo usiamo con watch_region)
-    };
-
-    if (genre) params.with_genres = genre;
-    if (release_date_gte) params["first_air_date.gte"] = release_date_gte;
-    if (release_date_lte) params["first_air_date.lte"] = release_date_lte;
-    if (vote_average_gte) params["vote_average.gte"] = vote_average_gte;
-    if (vote_count_gte) params["vote_count.gte"] = parseInt(vote_count_gte); // Assicura che sia numero
-    if (with_original_language) params.with_original_language = with_original_language;
-    if (with_keywords) params.with_keywords = with_keywords;
-    if (with_companies) params.with_companies = with_companies;
-    if (with_origin_country) params.with_origin_country = with_origin_country;
-
-    // Se c'è una categoria specifica e non c'è un ordinamento manuale,
-    // impostiamo il sort_by corretto per quella categoria quando usiamo discover
-    if (category === "top_rated" && !sort_by) params.sort_by = "vote_average.desc";
-
-    let fetchUrl = `${BASE_URL}${endpoint}`;
-    if (genre || release_date_gte || release_date_lte || vote_average_gte || vote_count_gte || with_original_language || with_keywords || with_companies || with_origin_country || (sort_by && sort_by !== "popularity.desc")) {
-        fetchUrl = `${BASE_URL}/discover/tv`;
-    }
+    const params   = buildTvDiscoverParams(req.query, API_KEY);
+    const fetchUrl = resolveTvDiscoverUrl(BASE_URL, endpoint, req.query);
 
     console.log(`🔍 DISCOVER TV URL: ${fetchUrl} | Params:`, { ...params, api_key: "HIDDEN" });
 
     const response = await axios.get(fetchUrl, { params });
-    
-    // Normalizziamo la risposta per assomigliare a quella dei film
-    const normalizedResults = response.data.results.map(item => ({
-      ...item,
-      title: item.name,
-      release_date: item.first_air_date,
-      media_type: "tv"
-    }));
-    
-    return res.json({
-        results: normalizedResults,
-        total_pages: response.data.total_pages,
-        total_results: response.data.total_results,
-        page: parseInt(page),
-    });
 
+    const normalizedResults = response.data.results.map(item => ({
+      ...item, title: item.name, release_date: item.first_air_date, media_type: "tv",
+    }));
+
+    return res.json({
+      results: normalizedResults,
+      total_pages: response.data.total_pages,
+      total_results: response.data.total_results,
+      page: parseInt(page),
+    });
   } catch (error) {
     console.error("ERRORE DISCOVER TV:", error);
     res.status(500).json({ message: "Errore durante la ricerca.", error: error.message });

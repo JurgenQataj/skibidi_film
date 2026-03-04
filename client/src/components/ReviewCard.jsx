@@ -97,18 +97,23 @@ function ReviewCard({ review, onInteraction }) {
     }
   };
 
+  const fetchCommentList = async () => {
+    const response = await axios.get(
+      `${API_URL}/api/comments/review/${review._id}`
+    );
+    return response.data || [];
+  };
+
   const toggleComments = async () => {
     if (comments.shown) {
       setComments({ shown: false, list: [] });
-    } else {
-      try {
-        const response = await axios.get(
-          `${API_URL}/api/comments/review/${review._id}`
-        );
-        setComments({ shown: true, list: response.data || [] });
-      } catch (error) {
-        console.error("Errore caricamento commenti:", error);
-      }
+      return;
+    }
+    try {
+      const list = await fetchCommentList();
+      setComments({ shown: true, list });
+    } catch (error) {
+      console.error("Errore caricamento commenti:", error);
     }
   };
 

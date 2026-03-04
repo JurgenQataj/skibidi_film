@@ -122,26 +122,30 @@ function ProfilePage() {
   const handleFollowToggle = async () => {
     const token = localStorage.getItem("token");
     const endpoint = isFollowing ? "unfollow" : "follow";
-    const method = isFollowing ? "delete" : "post";
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+    const url = `${API_URL}/api/users/${userId}/${endpoint}`;
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const url = `${API_URL}/api/users/${userId}/${endpoint}`;
-      if (method === "post") {
-        await axios.post(url, {}, config);
-      } else {
+      if (isFollowing) {
         await axios.delete(url, config);
+      } else {
+        await axios.post(url, {}, config);
       }
-      setIsFollowing(!isFollowing);
+      setIsFollowing((prev) => !prev);
       setStats((prevStats) => ({
         ...prevStats,
-        followersCount: isFollowing
-          ? prevStats.followersCount - 1
-          : prevStats.followersCount + 1,
+        followersCount: prevStats.followersCount + (isFollowing ? -1 : 1),
       }));
     } catch (error) {
       alert(`Errore durante l'operazione di ${endpoint}`);
     }
   };
+
+  const handleNavToSettings = () => { setIsSettingsMenuOpen(false); navigate('/settings'); };
+  const handleNavToGoals   = () => { setIsSettingsMenuOpen(false); navigate(`/profile/${userId}/goals`); };
+  const handleNavToSaved   = () => { setIsSettingsMenuOpen(false); };
+  const handleLogout       = () => { logout(); navigate("/login"); };
+  const handleListsClick   = () => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true);
+  const makeStatKeyDown    = (fn) => (e) => { if (e.key === 'Enter') fn(); };
 
   const showModalWith = async (type) => {
     try {
@@ -415,23 +419,17 @@ function ProfilePage() {
               
               {isSettingsMenuOpen && (
                 <div className={styles.settingsDropdownMenu}>
-                  <button onClick={() => { 
-                    setIsSettingsMenuOpen(false); 
-                    navigate('/settings'); 
-                  }} className={styles.dropdownMenuItem}>
+                  <button onClick={handleNavToSettings} className={styles.dropdownMenuItem}>
                     <FiSettings className={styles.menuIcon} />
                     <span className={styles.menuText}>Impostazioni</span>
                     <FiChevronRight className={styles.menuChevron} />
                   </button>
-                  <button onClick={() => { 
-                    setIsSettingsMenuOpen(false); 
-                    navigate(`/profile/${userId}/goals`); 
-                  }} className={styles.dropdownMenuItem}>
+                  <button onClick={handleNavToGoals} className={styles.dropdownMenuItem}>
                     <FiTarget className={styles.menuIcon} />
                     <span className={styles.menuText}>Obiettivi</span>
                     <FiChevronRight className={styles.menuChevron} />
                   </button>
-                  <button onClick={() => { setIsSettingsMenuOpen(false); /* Placeholder */ }} className={styles.dropdownMenuItem}>
+                  <button onClick={handleNavToSaved} className={styles.dropdownMenuItem}>
                     <FiBookmark className={styles.menuIcon} />
                     <span className={styles.menuText}>Salvati</span>
                     <FiChevronRight className={styles.menuChevron} />
@@ -449,19 +447,19 @@ function ProfilePage() {
             <div className={styles.rightInfoContainer}>
               <h1 className={styles.username}>{profile.username}</h1>
               <div className={styles.statsContainer}>
-                <div className={styles.statItemClickable} onClick={() => setIsHistoryModalOpen(true)} onKeyDown={(e) => e.key === 'Enter' && setIsHistoryModalOpen(true)} tabIndex={0} role="button">
+                <div className={styles.statItemClickable} onClick={() => setIsHistoryModalOpen(true)} onKeyDown={makeStatKeyDown(() => setIsHistoryModalOpen(true))} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.moviesReviewed}</div>
                   <div className={styles.statLabel}>Film</div>
                 </div>
-                <div className={styles.statItemClickable} onClick={() => setIsTvHistoryModalOpen(true)} onKeyDown={(e) => e.key === 'Enter' && setIsTvHistoryModalOpen(true)} tabIndex={0} role="button">
+                <div className={styles.statItemClickable} onClick={() => setIsTvHistoryModalOpen(true)} onKeyDown={makeStatKeyDown(() => setIsTvHistoryModalOpen(true))} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.tvShowsReviewed || 0}</div>
                   <div className={styles.statLabel}>Serie TV</div>
                 </div>
-                <div className={styles.statItemClickable} onClick={() => showModalWith("followers")} onKeyDown={(e) => e.key === 'Enter' && showModalWith("followers")} tabIndex={0} role="button">
+                <div className={styles.statItemClickable} onClick={() => showModalWith("followers")} onKeyDown={makeStatKeyDown(() => showModalWith("followers"))} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.followersCount}</div>
                   <div className={styles.statLabel}>Follower</div>
                 </div>
-                <div className={styles.statItemClickable} onClick={() => showModalWith("following")} onKeyDown={(e) => e.key === 'Enter' && showModalWith("following")} tabIndex={0} role="button">
+                <div className={styles.statItemClickable} onClick={() => showModalWith("following")} onKeyDown={makeStatKeyDown(() => showModalWith("following"))} tabIndex={0} role="button">
                   <div className={styles.statValue}>{stats.followingCount}</div>
                   <div className={styles.statLabel}>Seguiti</div>
                 </div>
@@ -481,17 +479,17 @@ function ProfilePage() {
                   </button>
                 )
               )}
-              <div className={styles.iconBtn} onClick={() => navigate(`/profile/${userId}/stats`)} onKeyDown={(e) => e.key === 'Enter' && navigate(`/profile/${userId}/stats`)} tabIndex={0} role="button" title="Stats">
+              <div className={styles.iconBtn} onClick={() => navigate(`/profile/${userId}/stats`)} onKeyDown={makeStatKeyDown(() => navigate(`/profile/${userId}/stats`))} tabIndex={0} role="button" title="Stats">
                 <FaChartBar />
               </div>
-              <div className={styles.iconBtn} onClick={() => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true)} onKeyDown={(e) => e.key === 'Enter' && (isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true))} tabIndex={0} role="button" title="Liste">
+              <div className={styles.iconBtn} onClick={handleListsClick} onKeyDown={makeStatKeyDown(handleListsClick)} tabIndex={0} role="button" title="Liste">
                 <FaListUl />
               </div>
               {isOwnProfile && (
                 <div
                   className={styles.iconBtn}
-                  onClick={() => { logout(); navigate("/login"); }}
-                  onKeyDown={(e) => e.key === 'Enter' && (() => { logout(); navigate("/login"); })()}
+                  onClick={handleLogout}
+                  onKeyDown={makeStatKeyDown(handleLogout)}
                   tabIndex={0} role="button"
                   title="Logout"
                   style={{ color: '#e50914' }}
