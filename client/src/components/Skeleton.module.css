@@ -1,109 +1,195 @@
+/* ── Shimmer tematico viola → rosso ──────────────── */
 @keyframes shimmer {
-  0%   { background-position: -600px 0; }
-  100% { background-position: 600px 0; }
+  0%   { background-position: -700px 0; }
+  100% { background-position: 700px 0; }
 }
 
-/* ── Base skeleton ───────────────────────────── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Base skeleton ───────────────────────────────── */
 .skeleton {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
   background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0.04) 0%,
-    rgba(255,255,255,0.09) 45%,
-    rgba(255,255,255,0.04) 90%
+    105deg,
+    rgba(140, 5, 12, 0.08)  0%,
+    rgba(180, 20, 80, 0.16) 30%,
+    rgba(112, 32, 126, 0.22) 50%,
+    rgba(180, 20, 80, 0.16) 70%,
+    rgba(140, 5, 12, 0.08)  100%
   );
-  background-size: 1200px 100%;
-  animation: shimmer 1.6s infinite linear;
+  background-size: 1400px 100%;
+  animation: shimmer 1.8s infinite linear;
+  border: 1px solid rgba(161, 0, 28, 0.12);
 }
 
-/* ── MovieCard ───────────────────────────────── */
+/* ── MovieCard ───────────────────────────────────── */
 .movieCard {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
   width: 100%;
+  animation: fadeSlideIn 0.4s ease both;
 }
 .moviePoster {
   width: 100%;
   aspect-ratio: 2/3;
   height: unset;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 .movieTitle {
-  width: 70%;
-  height: 11px;
-  margin: 2px auto 0;
+  width: 68%;
+  height: 10px;
+  margin: 3px auto 0;
+  border-radius: 99px;
 }
 
-/* ── PersonRow ───────────────────────────────── */
+/* ── PersonRow ───────────────────────────────────── */
 .personRow {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 10px 14px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 12px;
+  background: rgba(140, 5, 12, 0.04);
+  border: 1px solid rgba(161, 0, 28, 0.1);
+  border-radius: 14px;
+  animation: fadeSlideIn 0.4s ease both;
 }
 
-/* ── UserCard ────────────────────────────────── */
+/* ── UserCard ────────────────────────────────────── */
 .userCard {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   padding: 20px 14px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 14px;
+  background: rgba(140, 5, 12, 0.04);
+  border: 1px solid rgba(161, 0, 28, 0.1);
+  border-radius: 16px;
+  animation: fadeSlideIn 0.4s ease both;
 }
 
-/* ── ListCard ────────────────────────────────── */
+/* ── ListCard ────────────────────────────────────── */
 .listCard {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 12px;
+  background: rgba(140, 5, 12, 0.04);
+  border: 1px solid rgba(161, 0, 28, 0.1);
+  border-radius: 14px;
+  animation: fadeSlideIn 0.4s ease both;
 }
 
-/* ── Shared primitives ───────────────────────── */
-.lines { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+/* ── Shared primitives ───────────────────────────── */
+.lines { display: flex; flex-direction: column; gap: 7px; flex: 1; }
 
 .circle44 { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
 .circle64 { width: 64px; height: 64px; border-radius: 50%; }
-.square28 { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; }
+.square28 { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; }
 
-.lineLong  { width: 80%; height: 12px; }
-.lineMed   { width: 65%; height: 12px; }
-.lineShort { width: 50%; height: 10px; }
+.lineLong  { width: 78%; height: 11px; border-radius: 99px; }
+.lineMed   { width: 62%; height: 11px; border-radius: 99px; }
+.lineShort { width: 45%; height: 9px;  border-radius: 99px; }
 
-/* ── Skeleton Logo ───────────────────────────── */
+/* ── Skeleton Logo (loading pagina completa) ─────── */
+@keyframes logoPulse {
+  0%, 100% {
+    transform: scale(0.96);
+    filter: drop-shadow(0 0 12px rgba(229, 9, 20, 0.4))
+            drop-shadow(0 0 30px rgba(112, 32, 126, 0.25));
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 22px rgba(229, 9, 20, 0.75))
+            drop-shadow(0 0 55px rgba(112, 32, 126, 0.55));
+    opacity: 1;
+  }
+}
+
+@keyframes orbitalRing {
+  0%   { transform: scale(0.6); opacity: 0.7; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes barPulse {
+  0%   { opacity: 0.5; transform: scaleX(0.97); }
+  50%  { opacity: 1;   transform: scaleX(1); }
+  100% { opacity: 0.5; transform: scaleX(0.97); }
+}
+
 .logoSkeleton {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 40px 0;
+  min-height: 220px;
+  padding: 50px 0;
   background: transparent;
+  position: relative;
+  gap: 24px;
+}
+
+/* anelli orbitali multipli */
+.logoSkeleton::before,
+.logoSkeleton::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(229, 9, 20, 0.25);
+  animation: orbitalRing 2s ease-out infinite;
+  pointer-events: none;
+}
+.logoSkeleton::before {
+  width: 120px;
+  height: 120px;
+}
+.logoSkeleton::after {
+  width: 160px;
+  height: 160px;
+  animation-delay: 0.6s;
+  border-color: rgba(112, 32, 126, 0.2);
 }
 
 .logoImg {
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
-  animation: pulse 2s infinite ease-in-out;
-  margin-bottom: 20px;
+  border-radius: 16px;
+  animation: logoPulse 2s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.95); opacity: 0.5; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-  100% { transform: scale(0.95); opacity: 0.5; }
+/* barra di progresso indeterminata */
+.loaderBar {
+  width: 120px;
+  height: 2px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.07);
+  overflow: hidden;
+  position: relative;
 }
+
+.loaderBar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #e50914 40%, #9b2fff 60%, transparent);
+  border-radius: 99px;
+  animation: loaderSlide 1.5s ease-in-out infinite;
+}
+
+@keyframes loaderSlide {
+  0%   { transform: translateX(-100%); opacity: 0.8; }
+  50%  { opacity: 1; }
+  100% { transform: translateX(200%); opacity: 0.8; }
+}
+

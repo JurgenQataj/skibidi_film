@@ -234,8 +234,8 @@ function PersonPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Regia ({directedMovies.length})</h2>
           <div className={styles.grid}>
-            {directedMovies.map(movie => (
-              <MovieCard key={movie._id} movie={movie} />
+            {directedMovies.map((movie, index) => (
+              <MovieCard key={`mov-dir-${movie._id}-${index}`} movie={movie} />
             ))}
           </div>
         </section>
@@ -245,8 +245,8 @@ function PersonPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Cast ({actedMovies.length})</h2>
           <div className={styles.grid}>
-            {actedMovies.map(movie => (
-              <MovieCard key={movie._id} movie={movie} />
+            {actedMovies.map((movie, index) => (
+              <MovieCard key={`mov-act-${movie._id}-${index}`} movie={movie} />
             ))}
           </div>
         </section>
@@ -256,8 +256,8 @@ function PersonPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Regia Serie TV ({directedTvMovies.length})</h2>
           <div className={styles.grid}>
-            {directedTvMovies.map(show => (
-              <MovieCard key={`tv-dir-${show._id}`} movie={show} />
+            {directedTvMovies.map((show, index) => (
+              <MovieCard key={`tv-dir-${show._id}-${index}`} movie={show} />
             ))}
           </div>
         </section>
@@ -267,8 +267,8 @@ function PersonPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Serie TV ({actedTvMovies.length})</h2>
           <div className={styles.grid}>
-            {actedTvMovies.map(show => (
-              <MovieCard key={`tv-act-${show._id}`} movie={show} />
+            {actedTvMovies.map((show, index) => (
+              <MovieCard key={`tv-act-${show._id}-${index}`} movie={show} />
             ))}
           </div>
         </section>

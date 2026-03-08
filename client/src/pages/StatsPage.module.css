@@ -282,7 +282,7 @@
 
 
 /* OTTIMIZZAZIONE MOBILE CARD FILM E SEZIONI */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .container {
     padding: 0.5rem 0.5rem 1rem 0.5rem; /* Resetta padding 100px desktop */
   }

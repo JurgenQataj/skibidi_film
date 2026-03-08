@@ -108,7 +108,7 @@
 }
 
 /* Responsive Design - Allineato a ProfilePage per omogeneità */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageContainer {
     padding: 1.5rem 2rem; /* Resetta il padding-top 100px desktop */
   }
@@ -118,7 +118,7 @@
   }
   
   .reviewsGrid {
-    grid-template-columns: repeat(4, 1fr) !important;
+    
     gap: 8px !important;
     justify-content: center !important;
     padding: 0;
@@ -158,11 +158,18 @@
 
 @media (max-width: 480px) {
   .pageContainer {
+  .reviewsGrid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+  .cardWrapper :global(.card) {
+    max-width: unset; /* Rimuovi constraint width stretto per farli riempire la colonna tablet */
+  }
+
     padding: 1rem 1.5rem; /* Margine laterale aumentato sui telefoni */
   }
 
   .reviewsGrid {
-    grid-template-columns: repeat(4, 1fr) !important; /* Forza 4 colonne su schermi piccoli */
+     /* Forza 4 colonne su schermi piccoli */
     gap: 6px !important;
     justify-content: center !important;
   }
@@ -186,4 +193,6 @@
     padding: 2px !important;
     min-height: unset;
   }
+
+  .reviewsGrid { grid-template-columns: repeat(4, 1fr) !important; }
 }

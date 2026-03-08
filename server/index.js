@@ -56,6 +56,7 @@ app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/chat", require("./routes/chatRoutes")); // [NEW] Chat Routes
 app.use("/api/posts", require("./routes/posts")); // [NEW] Admin Posts
 app.use("/api/rating-game", require("./routes/ratingGame")); // [NEW] Rating Game
+app.use("/api/actor-age-game", require("./routes/actorAgeGame")); // [NEW] Indovina il Vecchio
 app.use("/api/push", require("./routes/push")); // [NEW] VAPID Push Subscriptions
 
 app.get("/", (req, res) => res.send("Skibidi Film API Running"));

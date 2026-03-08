@@ -41,7 +41,7 @@
   text-align: center;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageContainer {
     padding: 20px 15px; /* Resetta il 100px desktop */
   }

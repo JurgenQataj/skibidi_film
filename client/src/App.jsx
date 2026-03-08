@@ -6,32 +6,34 @@ import {
   Outlet,
 } from "react-router-dom";
 import useAuthStore from "./store/useAuthStore";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 
-// Import Pagine
-import DiscoverPage from "./pages/DiscoverPage";
-import HomePage from "./pages/HomePage";
-import ListPage from "./pages/ListPage";
-import LoginPage from "./pages/LoginPage";
-import MovieDetailPage from "./pages/MovieDetailPage";
-import TvShowDetailPage from "./pages/TvShowDetailPage"; // [NEW] Import TvShowDetailPage
-import MyListsPage from "./pages/MyListsPage";
-import ProfilePage from "./pages/ProfilePage";
-import RegistrationPage from "./pages/RegistrationPage";
-import SearchPage from "./pages/SearchPage";
-import WatchlistPage from "./pages/WatchlistPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import StatsPage from "./pages/StatsPage"; // Import StatsPage
-import UserHistoryPage from "./pages/UserHistoryPage"; // [NEW] Import UserHistoryPage
-import PersonPage from "./pages/PersonPage";
-import CollectionPage from "./pages/CollectionPage"; // [NEW] Import CollectionPage
-import PartialCollectionsPage from "./pages/PartialCollectionsPage";
-import HorizonPage from "./pages/HorizonPage"; // [NEW] Skibidi Horizon
-import GoalsPage from "./pages/GoalsPage";
-import RatingGamePage from "./pages/RatingGamePage";
-import RatingGamePlay from "./pages/RatingGamePlay";
+// Lazy import Pagine (code splitting: ogni pagina è un chunk separato)
+const DiscoverPage = lazy(() => import("./pages/DiscoverPage"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ListPage = lazy(() => import("./pages/ListPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const MovieDetailPage = lazy(() => import("./pages/MovieDetailPage"));
+const TvShowDetailPage = lazy(() => import("./pages/TvShowDetailPage"));
+const MyListsPage = lazy(() => import("./pages/MyListsPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
+const SearchPage = lazy(() => import("./pages/SearchPage"));
+const WatchlistPage = lazy(() => import("./pages/WatchlistPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const StatsPage = lazy(() => import("./pages/StatsPage"));
+const UserHistoryPage = lazy(() => import("./pages/UserHistoryPage"));
+const PersonPage = lazy(() => import("./pages/PersonPage"));
+const CollectionPage = lazy(() => import("./pages/CollectionPage"));
+const PartialCollectionsPage = lazy(() => import("./pages/PartialCollectionsPage"));
+const HorizonPage = lazy(() => import("./pages/HorizonPage"));
+const GoalsPage = lazy(() => import("./pages/GoalsPage"));
+const RatingGamePage = lazy(() => import("./pages/RatingGamePage"));
+const RatingGamePlay = lazy(() => import("./pages/RatingGamePlay"));
+const ActorAgeGamePage = lazy(() => import("./pages/ActorAgeGamePage"));
+const ActorAgeGamePlay = lazy(() => import("./pages/ActorAgeGamePlay"));
 
 
 // Import Componenti
@@ -52,10 +54,10 @@ function AnimatedLayout() {
     <AnimatePresence mode="wait">
       <motion.div
         key={location.pathname}
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -15 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        initial={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
+        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        exit={{ opacity: 0, scale: 1.01, filter: "blur(4px)" }}
+        transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="page-transition-wrapper"
       >
         <Outlet />
@@ -92,54 +94,58 @@ function App() {
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
       <UpdatePrompt />
-      <Routes>
-        {/* Rotte Pubbliche (Auth) */}
-        <Route
-          path="/register"
-          element={token ? <Navigate to="/" /> : <RegistrationPage />}
-        />
-        <Route
-          path="/login"
-          element={token ? <Navigate to="/" /> : <LoginPage />}
-        />
-        
-        {/* Rotte Password Reset */}
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-
-        {/* Rotte Protette (Richiedono Login) */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <MainLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<HomePage />} />
-          <Route path="search" element={<SearchPage />} />
-          <Route path="discover" element={<DiscoverPage />} />
-          <Route path="my-lists" element={<MyListsPage />} />
-          <Route path="watchlist" element={<WatchlistPage />} />
-          <Route path="notifications" element={<NotificationsPage />} />
-          <Route path="list/:listId" element={<ListPage />} />
-          <Route path="partial-collections" element={<PartialCollectionsPage />} />
-          <Route path="horizon" element={<HorizonPage />} /> {/* [NEW] Skibidi Horizon */}
-          <Route path="rating-game" element={<RatingGamePage />} />
-          <Route path="rating-game/play" element={<RatingGamePlay />} />
+      <Suspense fallback={null}>
+        <Routes>
+          {/* Rotte Pubbliche (Auth) */}
+          <Route
+            path="/register"
+            element={token ? <Navigate to="/" /> : <RegistrationPage />}
+          />
+          <Route
+            path="/login"
+            element={token ? <Navigate to="/" /> : <LoginPage />}
+          />
           
-          {/* Profilo e Statistiche */}
-          <Route path="profile/:userId" element={<ProfilePage />} />
-          <Route path="profile/:userId/stats" element={<StatsPage />} />
-          <Route path="profile/:userId/goals" element={<GoalsPage />} />
-          <Route path="profile/:userId/history" element={<UserHistoryPage />} />
-          <Route path="person/:name" element={<PersonPage />} />
-          <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
-          <Route path="tv/:tmdbId" element={<TvShowDetailPage />} /> {/* [NEW] TV Route */}
-          <Route path="collection/:id" element={<CollectionPage />} />
+          {/* Rotte Password Reset */}
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
-        </Route>
-      </Routes>
+          {/* Rotte Protette (Richiedono Login) */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<HomePage />} />
+            <Route path="search" element={<SearchPage />} />
+            <Route path="discover" element={<DiscoverPage />} />
+            <Route path="my-lists" element={<MyListsPage />} />
+            <Route path="watchlist" element={<WatchlistPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="list/:listId" element={<ListPage />} />
+            <Route path="partial-collections" element={<PartialCollectionsPage />} />
+            <Route path="horizon" element={<HorizonPage />} />
+            <Route path="rating-game" element={<RatingGamePage />} />
+            <Route path="rating-game/play" element={<RatingGamePlay />} />
+            <Route path="actor-age-game" element={<ActorAgeGamePage />} />
+            <Route path="actor-age-game/play" element={<ActorAgeGamePlay />} />
+            
+            {/* Profilo e Statistiche */}
+            <Route path="profile/:userId" element={<ProfilePage />} />
+            <Route path="profile/:userId/stats" element={<StatsPage />} />
+            <Route path="profile/:userId/goals" element={<GoalsPage />} />
+            <Route path="profile/:userId/history" element={<UserHistoryPage />} />
+            <Route path="person/:name" element={<PersonPage />} />
+            <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
+            <Route path="tv/:tmdbId" element={<TvShowDetailPage />} />
+            <Route path="collection/:id" element={<CollectionPage />} />
+
+          </Route>
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

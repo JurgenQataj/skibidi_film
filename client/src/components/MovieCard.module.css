@@ -113,7 +113,7 @@
 }
 
 /* MEDIA QUERIES PER RESPONSIVE */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .card img {
     height: auto !important;
   }

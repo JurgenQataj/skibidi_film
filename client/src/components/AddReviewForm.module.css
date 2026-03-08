@@ -148,7 +148,7 @@
 }
 
 /* MEDIA QUERY PER TABLET E MOBILE */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .formContainer {
     padding: 20px; /* Padding ridotto */
     margin-top: 0;
@@ -241,7 +241,7 @@
 }
 
 /* ACCESSIBILITÀ E TOUCH */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   /* Miglior contrasto per i campi di input su mobile */
   .ratingInput:focus,
   .commentTextarea:focus {

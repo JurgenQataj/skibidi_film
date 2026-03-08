@@ -1,0 +1,121 @@
+/* identico stile Premium agli altri hub game */
+.page {
+  min-height: 100vh;
+  background: #0a0a0f;
+  color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 40px;
+}
+.header { padding: 16px 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.titleRow { display: flex; align-items: center; gap: 14px; }
+.backBtn {
+  background: rgba(255,255,255,0.07); border: none; color: #fff;
+  border-radius: 50%; width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+}
+.backBtn:hover { background: rgba(255,255,255,0.14); }
+.titleContent { display: flex; flex-direction: column; gap: 2px; }
+.title { margin: 0; font-size: 1.7rem; font-weight: 900; letter-spacing: -0.02em; }
+.titleHighlight {
+  background: linear-gradient(135deg, #e50914, #ef4444);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.subtitle { margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+
+.howToPlay { margin: 16px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+.step { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+.stepNum {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: linear-gradient(135deg, #e50914, #ef4444);
+  color: #fff; font-weight: 700; font-size: 0.75rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.statsRow { margin: 16px 16px 0; display: flex; gap: 12px; }
+.statCard {
+  flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.statIcon { font-size: 1.4rem; color: #e50914; }
+.statLabel { margin: 0; font-size: 0.72rem; color: rgba(255,255,255,0.45); }
+.statValue { margin: 0; font-size: 1.5rem; font-weight: 800; }
+
+.playSection { padding: 16px 16px 0; }
+.playBtn {
+  width: 100%; display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(229,9,20,0.15), rgba(239,68,68,0.15));
+  border: 1px solid rgba(229,9,20,0.35);
+  border-radius: 16px; color: #fff; cursor: pointer; transition: all 0.2s ease;
+}
+.playBtn:hover {
+  background: linear-gradient(135deg, rgba(229,9,20,0.28), rgba(239,68,68,0.28));
+  border-color: rgba(229,9,20,0.6); transform: translateY(-1px);
+}
+.playBtnIcon { font-size: 1.6rem; color: #e50914; flex-shrink: 0; }
+.playBtnText { display: flex; flex-direction: column; text-align: left; flex: 1; }
+.playBtnTitle { font-size: 1.1rem; font-weight: 700; }
+.playBtnDesc { font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.playArrow { font-size: 1.6rem; opacity: 0.5; }
+
+.leaderboardSection { margin: 20px 16px 0; }
+.lbHeader { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.lbTitleIcon { color: #FFD700; font-size: 1.1rem; }
+.lbTitle { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.lbList { display: flex; flex-direction: column; gap: 6px; }
+.lbRow {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+}
+.lbRowMe { background: rgba(229,9,20,0.07); border-color: rgba(229,9,20,0.25); }
+.lbSkeleton {
+  height: 48px; animation: shimmer 1.4s infinite linear;
+  background: linear-gradient(90deg, rgba(229,9,20,0.04) 0%, rgba(229,9,20,0.2) 50%, rgba(229,9,20,0.04) 100%);
+  background-size: 600px;
+}
+@keyframes shimmer { 0% { background-position: -600px 0; } 100% { background-position: 600px 0; } }
+.lbRank { font-size: 1rem; width: 28px; text-align: center; flex-shrink: 0; }
+.lbAvatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.lbUsername { flex: 1; font-size: 0.9rem; font-weight: 500; }
+.lbScore { font-weight: 700; color: #e50914; font-size: 1rem; }
+.lbEmpty { text-align: center; padding: 28px 0; color: rgba(255,255,255,0.3); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.lbEmptyIcon { font-size: 2rem; opacity: 0.3; }
+
+.footer { margin-top: auto; padding: 24px 16px 0; text-align: center; }
+.poweredBy { font-size: 0.72rem; color: rgba(255,255,255,0.2); margin: 0; }
+.brand { color: rgba(229,9,20,0.6); }
+
+/* ==============================================
+   MOBILE / TABLET (bottom-nav layout)
+   ============================================== */
+@media (max-width: 1024px) {
+  .page {
+    /* Spinge la pagina in alto a coprire il padding globale del body (54px) */
+    margin-top: -54px; 
+    min-height: calc(100vh + 54px);
+    
+    padding: calc(70px + env(safe-area-inset-top, 0px)) 16px
+             calc(68px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ==============================================
+   DESKTOP  (wider layout)
+   ============================================== */
+@media (min-width: 1025px) {
+  .page {
+    padding-top: 110px;
+    padding-bottom: 60px;
+    align-items: center;
+  }
+  
+  .header, .howToPlay, .statsRow, .playSection, .leaderboardSection {
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

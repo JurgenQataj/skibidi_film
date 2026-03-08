@@ -15,10 +15,11 @@ const Skeleton = ({ style, className }) => (
 
 export default Skeleton;
 
-/** Skeleton con Logo centrato e animato */
+/** Skeleton con Logo centrato, anelli orbitali e barra di loading */
 export const SkeletonWithLogo = () => (
   <div className={styles.logoSkeleton}>
     <img src="/icona3.png" alt="Loading..." className={styles.logoImg} />
+    <div className={styles.loaderBar} />
   </div>
 );
 

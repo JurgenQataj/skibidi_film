@@ -330,7 +330,7 @@
 }
 
 /* === MEDIA QUERIES === */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   /* Mostra la topbar solo su mobile */
   .mobileTopbar {
     display: flex;

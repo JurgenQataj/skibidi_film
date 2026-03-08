@@ -107,7 +107,7 @@
 /* GRIGLIA RESPONSIVE */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* ESATTO: 4 colonne su PC */
+  grid-template-columns: repeat(6, 1fr);
   gap: 1.5rem;
 }
 
@@ -168,7 +168,7 @@
 
 /* --- MEDIA QUERIES (Uniformate alle altre pagine) --- */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .container {
     padding: 15px; /* Resetta padding 100px desktop */
   }
@@ -209,16 +209,14 @@
   }
 
   .grid {
-    /* Tablet / Mobile largo: 4 colonne */
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .grid {
-    /* Mobile piccolo: 4 colonne, gap ancora più piccolo per farceli stare bene */
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(4, 1fr) !important;
     gap: 8px;
   }
 

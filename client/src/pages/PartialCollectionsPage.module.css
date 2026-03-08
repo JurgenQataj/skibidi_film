@@ -170,7 +170,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageContainer { padding: 20px; } /* Resetta padding 100px desktop */
   .titleArea h1 { font-size: 1.8rem; }
   .grid {

@@ -35,6 +35,7 @@ function SplashScreen({ onFinish }) {
         </div>
 
         <h1 className="splash-title">Skibidi Film</h1>
+        <p className="splash-tagline">Ogni film, una storia.</p>
 
         {/* Barra di caricamento */}
         <div className="splash-bar-wrap">

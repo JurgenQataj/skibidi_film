@@ -381,7 +381,7 @@
 }
 
 /* ── Responsive ────────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageContainer { padding: 10px 15px; gap: 16px; } /* Resetta il padding-top 100px desktop */
   
   .heroSection { 
@@ -404,7 +404,7 @@
   }
 
   .resultsGrid {
-    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-columns: repeat(5, 1fr) !important;
     gap: 8px !important;
     justify-content: center;
   }
@@ -416,10 +416,44 @@
 }
 
 @media (max-width: 480px) {
-  .resultsGrid {
-    grid-template-columns: repeat(4, 1fr) !important; /* 4 colonne compatte su mobile */
-    gap: 6px !important;
+  /* Modifiche specifice tablet */
+  .personList {
+     display: grid;
+     grid-template-columns: repeat(5, 1fr);
+     gap: 10px;
+     max-width: 100%;
   }
+  .personRow {
+     flex-direction: column;
+     align-items: center;
+     text-align: center;
+     padding: 10px;
+     border: 1px solid rgba(255,255,255,0.05);
+     border-radius: 12px;
+  }
+  .personRowImg {
+     width: 80px;
+     height: 80px;
+     margin-bottom: 8px;
+  }
+  .personRowName {
+     white-space: normal;
+     font-size: 0.85rem;
+     display: -webkit-box;
+     -webkit-line-clamp: 2;
+     line-clamp: 2;
+     -webkit-box-orient: vertical;
+  }
+   .personRowRole {
+      display: none;
+   }
+}
+
+@media (max-width: 480px) {
+  /* 4 colonne compatte su mobile */
+  .resultsGrid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; }
+  .personList { grid-template-columns: repeat(4, 1fr) !important; }
+  .personRowImg { width: 60px; height: 60px; }
 }
 
 /* ════════════════════════════════════════════
@@ -663,7 +697,7 @@
   transform: translateY(-1px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .smartInfoPopup {
     left: -10px;
     right: -10px;
@@ -711,7 +745,7 @@
 
 
 /* ── Mobile ── */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .smartHint { margin-left: 0; }
   .smartSearchBox { max-width: 100%; }
   .explanationRow { font-size: 0.68rem; }

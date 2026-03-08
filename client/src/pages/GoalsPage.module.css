@@ -14,7 +14,7 @@
   box-sizing: border-box; /* Prevent mobile horizontal overflow */
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageWrapper {
     padding: 20px 20px 80px; /* Reduced top padding to move header higher */
   }

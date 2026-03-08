@@ -105,6 +105,18 @@ function RatingGamePage() {
           </div>
           <span className={styles.playArrow}>›</span>
         </button>
+
+        <button
+          className={`${styles.playBtn} ${styles.ageBtn}`}
+          onClick={() => navigate("/actor-age-game")}
+        >
+          <div className={styles.playBtnIcon}>👴</div>
+          <div className={styles.playBtnText}>
+            <span className={styles.playBtnTitle}>Indovina il Giovane</span>
+            <span className={styles.playBtnDesc}>Quale attore è più giovane?</span>
+          </div>
+          <span className={styles.playArrow}>›</span>
+        </button>
       </div>
 
       {/* Leaderboard */}

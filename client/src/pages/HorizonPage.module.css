@@ -295,7 +295,7 @@
 }
 
 /* === MOBILE (≤ 768px) === */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .container {
     /* Cancella il padding di default del layout base */
     margin-top: -54px;
@@ -689,7 +689,7 @@
 .resetBtn:hover { background: #c0020f; }
 
 /* ── Mobile ── */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .customizerTrigger {
     top: calc(12px + env(safe-area-inset-top, 0px));
     right: 12px;

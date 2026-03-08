@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./StatsPage.module.css";
 import MovieCard from "../components/MovieCard";
-import Skeleton, { SkeletonMovieCard, SkeletonListCard } from "../components/Skeleton";
+import { SkeletonWithLogo } from "../components/Skeleton";
 
 // --- Extracted Sub-Components to Reduce Cognitive Complexity ---
 
@@ -394,39 +394,7 @@ function StatsPage() {
   }, [userId, API_URL, selectedYear]); // Rimosso statsLimit dalle dipendenze, ora è costante
 
   if (loading && !stats) {
-    return (
-      <div className={styles.container}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <Skeleton style={{ height: '40px', width: '250px', margin: '0 auto' }} />
-        </div>
-
-        <div className={styles.summaryGrid}>
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className={styles.summaryItem}>
-              <Skeleton style={{ height: '30px', width: '60px', marginBottom: '8px' }} />
-              <Skeleton style={{ height: '15px', width: '80px' }} />
-            </div>
-          ))}
-        </div>
-
-        <div className={styles.statsGrid}>
-          {[1, 2, 3, 4].map(i => (
-            <section key={i} className={styles.statSection}>
-              <Skeleton style={{ height: '25px', width: '150px', marginBottom: '1.5rem' }} />
-              {i <= 2 ? (
-                <div className={styles.movieList}>
-                  {[1, 2, 3, 4, 5].map(j => <SkeletonMovieCard key={j} />)}
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  {[1, 2, 3, 4, 5].map(j => <SkeletonListCard key={j} />)}
-                </div>
-              )}
-            </section>
-          ))}
-        </div>
-      </div>
-    );
+    return <SkeletonWithLogo />;
   }
 
   if (!stats) return <div className={styles.error}>Impossibile caricare le statistiche.</div>;

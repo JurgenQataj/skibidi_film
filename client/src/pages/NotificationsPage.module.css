@@ -156,7 +156,7 @@
 }
 
 /* === RESPONSIVE === */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageContainer {
     padding: 10px 20px 20px 20px; /* Resetta il padding 100px desktop */
   }

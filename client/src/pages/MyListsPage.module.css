@@ -227,7 +227,7 @@
 }
 
 /* ── Mobile ─────────────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageContainer { padding: 30px 20px; } /* Resetta il 100px desktop */
   .listsGrid { grid-template-columns: 1fr 1fr; gap: 12px; }
   .pageTitle { font-size: 1.4rem; }

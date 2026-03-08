@@ -543,7 +543,7 @@ input:checked + .slider::before {
 /* ══════════════════════════════════════
    RESPONSIVE – Mobile
    ══════════════════════════════════════ */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .pageWrapper {
     padding-top: 0;
     padding-bottom: 70px; /* space for bottom tab bar */

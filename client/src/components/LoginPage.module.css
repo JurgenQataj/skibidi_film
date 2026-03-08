@@ -87,7 +87,7 @@
 }
 
 /* --- Media Queries per il Mobile --- */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .loginContainer {
     width: 100%;
     max-width: 290px;

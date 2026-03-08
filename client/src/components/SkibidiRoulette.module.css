@@ -225,7 +225,7 @@
 }
 
 /* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .openRouletteBtn {
     bottom: 84px;
     right: 18px;

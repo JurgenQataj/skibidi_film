@@ -135,9 +135,68 @@ select:focus {
 }
 
 /* === MEDIA QUERIES === */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   body {
     padding-top: 54px; /* Spazio per la topbar con logo in alto (ora più piccola) */
     padding-bottom: 70px; /* Spazio per la navbar in basso */
   }
 }
+
+/* === MICRO-ANIMAZIONI GLOBALI === */
+
+/* Fade-in naturale per tutte le immagini quando si caricano */
+img {
+  transition: opacity 0.3s ease;
+}
+img[src] {
+  animation: imgFadeIn 0.35s ease both;
+}
+@keyframes imgFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Tutti i bottoni: feedback tattile su click */
+button {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+button:active:not(:disabled) {
+  transform: scale(0.95);
+  opacity: 0.85;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Link hover più fluido */
+a, a:visited {
+  color: var(--violet-bright);
+  transition: color 0.18s ease, opacity 0.18s ease;
+  text-decoration: none;
+}
+a:hover {
+  color: var(--red-bright);
+  opacity: 0.9;
+}
+
+/* Focus ring accessibile e stiloso */
+:focus-visible {
+  outline: 2px solid rgba(229, 9, 20, 0.7);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Scrollbar personalizzata */
+::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(161,0,28,0.5), rgba(112,32,126,0.5));
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--red-main), var(--violet-main));
+}
+

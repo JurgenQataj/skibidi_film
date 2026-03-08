@@ -9,10 +9,10 @@ export default defineConfig(({ command }) => {
       react(),
       basicSsl(),
       VitePWA({
-        registerType: 'autoUpdate', // Cambiato per auto-aggiornare il SW
+        registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
         devOptions: {
-          enabled: true // Abilitato in dev per testare le notifiche
+          enabled: true
         },
         workbox: {
           globPatterns: command === 'serve' ? [] : ['**/*.{js,css,html,ico,png,svg}'],
@@ -49,17 +49,42 @@ export default defineConfig(({ command }) => {
         }
       })
     ],
+    build: {
+      // Minificazione avanzata con terser
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          // Rimuove console.log in produzione
+          drop_console: true,
+          drop_debugger: true,
+        },
+      },
+      // Immagini < 4KB vengono inline come base64 (meno richieste HTTP)
+      assetsInlineLimit: 4096,
+      rollupOptions: {
+        output: {
+          // Chunk splitting: separa le librerie pesanti in bundle dedicati
+          // così il browser può cachearli indipendentemente
+          manualChunks: {
+            // React core — cambia raramente, cache a lungo
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            // Animazioni — framer-motion è ~150kb da isolare
+            'vendor-motion': ['framer-motion'],
+            // Data fetching
+            'vendor-query': ['@tanstack/react-query'],
+            // Icone — react-icons è molto grande
+            'vendor-icons': ['react-icons'],
+          },
+        },
+      },
+    },
     server: {
       host: "0.0.0.0",
       https: true,
       proxy: {
         "/api": {
-          // HTTPS target: the local Express server must also be reachable over HTTPS
-          // (either via a reverse proxy like Caddy/nginx, or by setting VITE_API_TARGET
-          // to http://... in a .env.local to override for plain-HTTP local backends).
           target: process.env.VITE_API_TARGET ?? "http://0.0.0.0:5000", // nosonar
           changeOrigin: true,
-          // Allow self-signed / untrusted certs on the local backend
           secure: false,
         },
       },
@@ -69,7 +94,6 @@ export default defineConfig(({ command }) => {
         "/api": {
           target: process.env.VITE_API_TARGET ?? "http://localhost:5000", // nosonar
           changeOrigin: true,
-          // Allow self-signed / untrusted certs on the local backend
           secure: false,
         },
       },
@@ -78,3 +102,4 @@ export default defineConfig(({ command }) => {
 
   return config;
 });
+

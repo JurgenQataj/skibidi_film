@@ -144,6 +144,8 @@
 
 .ratingBtn:hover   { border-color: rgba(229,9,20,0.45);  box-shadow: 0 8px 30px rgba(229,9,20,0.22);  transform: translateY(-2px); }
 .boxofficeBtn:hover{ border-color: rgba(34,197,94,0.38); box-shadow: 0 8px 30px rgba(34,197,94,0.16); transform: translateY(-2px); }
+.ageBtn::before    { background: radial-gradient(circle at left center, rgba(245,158,11,0.13), transparent 70%); }
+.ageBtn:hover      { border-color: rgba(245,158,11,0.45); box-shadow: 0 8px 30px rgba(245,158,11,0.22); transform: translateY(-2px); }
 
 .playBtnIcon {
   width: 52px; height: 52px;
@@ -259,7 +261,7 @@
 /* ==============================================
    MOBILE  (bottom-nav layout)
    ============================================== */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .page {
     /* Spinge la pagina in alto a coprire il padding globale del body (54px) */
     margin-top: -54px; 
