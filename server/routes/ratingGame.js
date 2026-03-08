@@ -9,7 +9,7 @@ const User = require("../models/User");
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE = "https://api.themoviedb.org/3";
 
-const TOTAL_PAGES = 100;
+const TOTAL_PAGES = 300;
 
 async function getRandomMovie(excludeId = null) {
   // crypto.randomInt(min, max) is a CSPRNG (OS entropy pool) — replaces Math.random()
@@ -18,15 +18,15 @@ async function getRandomMovie(excludeId = null) {
     params: { api_key: TMDB_API_KEY, language: "it-IT", page: randomPage },
   });
   let movies = res.data.results.filter(
-    (m) => m.vote_count >= 1000 && m.id !== excludeId && m.poster_path
+    (m) => m.vote_count >= 1500 && m.id !== excludeId && m.poster_path
   );
   if (movies.length === 0) {
-    const fallbackPage = crypto.randomInt(1, 51);
+    const fallbackPage = crypto.randomInt(1, 101);
     const fallback = await axios.get(`${TMDB_BASE}/movie/popular`, {
       params: { api_key: TMDB_API_KEY, language: "it-IT", page: fallbackPage },
     });
     movies = fallback.data.results.filter(
-      (m) => m.vote_count >= 1000 && m.id !== excludeId && m.poster_path
+      (m) => m.vote_count >= 1500 && m.id !== excludeId && m.poster_path
     );
   }
   if (movies.length === 0) throw new Error("No valid movies found");
