@@ -1,0 +1,299 @@
+/* ==========================================
+   "QUALE ANNO?" — Design aligned with GuessActorGamePlay
+   =========================================== */
+
+.page {
+  min-height: 100vh;
+  background: #0f0f12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  box-sizing: border-box;
+}
+
+/* Sfondo Animato */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(25px) brightness(0.3);
+  z-index: 0;
+  transform: scale(1.1);
+  transition: background-image 1s ease-in-out;
+}
+
+/* ---- Top Bar ---- */
+.topBar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  background: rgba(10, 10, 14, 0.97);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-sizing: border-box;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.backBtn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.88rem;
+  transition: all 0.2s ease; flex-shrink: 0;
+}
+.backBtn:hover { background: rgba(229,9,20,0.3); }
+
+.modeTag {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(229,9,20,0.13);
+  border: 1px solid rgba(229,9,20,0.3);
+  color: #e50914;
+  font-size: 0.76rem; font-weight: 700;
+  padding: 5px 12px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.scoreInfo {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+
+.bestBadge {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.25);
+  color: #FFD700;
+  font-size: 0.82rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+}
+
+.streakBadge {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(245,158,11,0.13);
+  border: 1px solid rgba(245,158,11,0.28);
+  color: #f59e0b;
+  font-size: 0.88rem; font-weight: 800;
+  padding: 4px 12px; border-radius: 20px;
+  min-width: 52px; justify-content: center;
+}
+
+/* ---- Prompt ---- */
+.prompt {
+  padding: 10px 20px 4px;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 10;
+  position: relative;
+}
+.prompt strong { color: #fff; }
+
+/* ---- Arena ---- */
+.arena {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px 32px;
+  gap: 14px;
+  box-sizing: border-box;
+  max-width: 440px;
+  z-index: 5;
+}
+
+/* ---- Image Container ---- */
+.imageContainer {
+  width: 100%;
+  aspect-ratio: 2/3;
+  max-height: 52vh;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.75), 0 0 0 2px rgba(255,255,255,0.05);
+  background: #1a1a22;
+  align-self: center;
+}
+
+.moviePoster {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ---- Input Form ---- */
+.inputForm {
+  display: flex; gap: 10px; width: 100%;
+}
+.guessInput {
+  flex: 1; background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,255,255,0.1);
+  color: #fff; padding: 14px 18px; border-radius: 14px;
+  font-size: 1rem; outline: none; transition: border 0.2s ease;
+  font-weight: 600; font-family: inherit; text-align: center; letter-spacing: 2px;
+}
+.guessInput:focus { border-color: #e50914; background: rgba(255,255,255,0.08); }
+.guessInput::placeholder { color: rgba(255,255,255,0.28); font-weight: 400; letter-spacing: normal;}
+
+/* Rimuove le freccine */
+.guessInput::-webkit-outer-spin-button,
+.guessInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.guessInput[type=number] {
+  appearance: textfield; 
+  -moz-appearance: textfield; 
+}
+
+.submitBtn {
+  background: #e50914; color: #fff;
+  border: none; border-radius: 14px; padding: 0 20px;
+  font-size: 0.95rem; font-weight: 800; cursor: pointer;
+  transition: all 0.2s ease; font-family: inherit; white-space: nowrap;
+}
+.submitBtn:hover { background: #c8081a; transform: scale(1.05); }
+.submitBtn:active { transform: scale(0.95); }
+.submitBtn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; transform: none; }
+
+/* OVERLAY DI RISULTATO IN GAME */
+.overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  z-index: 100; animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(10px); }
+}
+
+.overlayResultText {
+  font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;
+}
+
+.overlayDataBox {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  padding: 30px 40px; border-radius: 20px; text-align: center;
+}
+
+.overlayRealYearLabel {
+  font-size: 1.2rem; color: rgba(255,255,255,0.6); margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+}
+.overlayRealYear {
+  font-size: 4rem; font-weight: 900; color: white; margin: 5px 0 20px 0;
+}
+.overlayPoints {
+  font-size: 1.8rem; font-weight: 800; margin: 0;
+}
+
+.pointsCorrect { color: #00e676; } 
+.pointsClose { color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); } 
+.pointsMissed { color: #ff3d00; text-shadow: 0 0 15px rgba(255, 61, 0, 0.4); }
+
+/* GAME OVER */
+.endScreen {
+  z-index: 100;
+  background: rgba(0,0,0,0.9);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding: 40px; position: absolute; inset: 0;
+  animation: fadeIn 0.5s forwards;
+}
+.gameOverTitle { font-size: 3rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 30px; color: white; }
+.finalScoreBox {
+  background: linear-gradient(135deg, rgba(20,20,30,0.8), rgba(40,40,50,0.8));
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+.finalScoreTitle { font-size: 1.2rem; color: rgba(255,255,255,0.5); font-weight: 700; text-transform: uppercase; margin: 0 0 10px 0; }
+.finalScoreValue { font-size: 5rem; font-weight: 900; color: #ffd700; margin: 0; line-height: 1; text-shadow: 0 0 30px rgba(255,215,0,0.3); }
+.finalScoreMax { font-size: 1.5rem; color: rgba(255,255,255,0.4); }
+.recordNotice { margin-top: 15px; color: #00e676; font-weight: 800; font-size: 1.2rem; background: rgba(0,230,118,0.1); padding: 8px 16px; border-radius: 12px; display: inline-block; }
+.playAgainBtn {
+  background: white; color: black; font-size: 1.2rem; font-weight: 800; padding: 16px 40px; border-radius: 30px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 20px rgba(255,255,255,0.3);
+}
+.playAgainBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,255,255,0.5); background: #f0f0f0; }
+.loadingText { font-size: 2rem; font-weight: 800; color: white; animation: pulseOpacity 1.5s infinite alternate; }
+@keyframes pulseOpacity { from { opacity: 0.5; } to { opacity: 1; } }
+
+/* ============================================
+   MOBILE (bottom-nav layout)
+   ============================================ */
+@media (max-width: 1024px) {
+  .page {
+    min-height: 100vh;
+  }
+  .topBar {
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+    top: 0;
+  }
+  .prompt {
+    padding-top: 20px;
+  }
+  .arena {
+    padding: 8px 10px 16px;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .imageContainer {
+    max-height: 38vh;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+  .inputForm {
+    flex-direction: column;
+  }
+  .submitBtn {
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+  .finalScoreBox { padding: 28px 20px; }
+  .finalScoreValue { font-size: 3.2rem; }
+  .overlayResultText { font-size: 2.2rem; }
+  .overlayRealYear { font-size: 3.5rem; }
+  .gameOverTitle { font-size: 2rem; }
+  .overlayDataBox { padding: 20px; width: 85%; }
+}
+
+@media (max-width: 399px) {
+  .modeTag { display: none; }
+}
+
+/* ============================================
+   DESKTOP
+   ============================================ */
+@media (min-width: 1024px) {
+  .page {
+    padding-top: 80px;
+    padding-bottom: 40px;
+  }
+  .topBar {
+    top: 80px;
+    padding-top: 12px;
+  }
+  .arena {
+    max-width: 400px;
+    padding: 16px 24px 40px;
+    gap: 18px;
+  }
+}

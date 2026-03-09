@@ -199,7 +199,7 @@ function GuessActorGamePlay() {
     return (
       <div className={styles.page}>
         <div className={styles.topBar}>
-          <button className={styles.backBtn} onClick={() => navigate(-1)}><FaArrowLeft /></button>
+          <button className={styles.backBtn} onClick={() => { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(STATE_KEY); navigate("/guess-actor", { replace: true }); }}><FaArrowLeft /></button>
           <span className={styles.modeTag}>🎭 Chi è?</span>
           <span />
         </div>
@@ -215,7 +215,7 @@ function GuessActorGamePlay() {
     return (
       <div className={styles.page}>
         <div className={styles.topBar}>
-          <button className={styles.backBtn} onClick={() => navigate(-1)}><FaArrowLeft /></button>
+          <button className={styles.backBtn} onClick={() => { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(STATE_KEY); navigate("/guess-actor", { replace: true }); }}><FaArrowLeft /></button>
         </div>
         <div className={styles.errorMsg}>Errore nel caricare la partita. Riprova.</div>
       </div>
@@ -230,7 +230,7 @@ function GuessActorGamePlay() {
     <div className={styles.page}>
       {/* Top bar */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+        <button className={styles.backBtn} onClick={() => { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(STATE_KEY); navigate("/guess-actor", { replace: true }); }}>
           <FaArrowLeft />
         </button>
         <span className={styles.modeTag}>🎭 Chi è?</span>
@@ -329,7 +329,7 @@ function GuessActorGamePlay() {
               >
                 Gioca Ancora
               </button>
-              <button className={styles.menuBtn} onClick={() => navigate(-1)}>Menu</button>
+              <button className={styles.menuBtn} onClick={() => { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(STATE_KEY); navigate("/guess-actor", { replace: true }); }}>Menu</button>
             </div>
           </div>
         </div>

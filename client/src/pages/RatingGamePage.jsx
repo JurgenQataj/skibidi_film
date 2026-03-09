@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./RatingGamePage.module.css";
-import { FaStar, FaDollarSign, FaTrophy, FaGamepad, FaMedal, FaArrowLeft, FaEyeSlash } from "react-icons/fa";
+import { FaStar, FaDollarSign, FaTrophy, FaGamepad, FaMedal, FaArrowLeft, FaEyeSlash, FaCalendarAlt } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -126,6 +126,19 @@ function RatingGamePage() {
           <div className={styles.playBtnText}>
             <span className={styles.playBtnTitle}>Chi è?</span>
             <span className={styles.playBtnDesc}>Indovina l'attore pixelato</span>
+          </div>
+          <span className={styles.playArrow}>›</span>
+        </button>
+
+        <button
+          className={`${styles.playBtn} ${styles.ageBtn}`}
+          onClick={() => navigate("/guess-year")}
+          style={{ background: "linear-gradient(135deg, #1f2235, #3a3f58)" }}
+        >
+          <div className={styles.playBtnIcon}><FaCalendarAlt /></div>
+          <div className={styles.playBtnText}>
+            <span className={styles.playBtnTitle}>Quale Anno?</span>
+            <span className={styles.playBtnDesc}>Indovina l'anno di uscita dei film storici</span>
           </div>
           <span className={styles.playArrow}>›</span>
         </button>

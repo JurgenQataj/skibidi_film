@@ -170,7 +170,7 @@ function RatingGamePlay() {
     <div className={styles.page}>
       {/* Top bar */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+        <button className={styles.backBtn} onClick={() => navigate("/rating-game", { replace: true })}>
           <FaArrowLeft />
         </button>
 
@@ -263,7 +263,7 @@ function RatingGamePlay() {
               >
                 Riprova
               </button>
-              <button className={styles.menuBtn} onClick={() => navigate(-1)}>
+              <button className={styles.menuBtn} onClick={() => navigate("/rating-game", { replace: true })}>
                 Menu
               </button>
             </div>

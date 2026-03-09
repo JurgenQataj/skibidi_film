@@ -210,7 +210,7 @@ function ActorAgeGamePlay() {
     <div className={styles.page}>
       {/* Top bar */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+        <button className={styles.backBtn} onClick={() => { sessionStorage.removeItem("actorAgeSession"); navigate("/actor-age", { replace: true }); }}>
           <FaArrowLeft />
         </button>
 
@@ -302,7 +302,7 @@ function ActorAgeGamePlay() {
               </button>
               <button
                 className={styles.menuBtn}
-                onClick={() => navigate(-1)}
+                onClick={() => { sessionStorage.removeItem("actorAgeSession"); navigate("/actor-age", { replace: true }); }}
               >
                 Menu
               </button>
