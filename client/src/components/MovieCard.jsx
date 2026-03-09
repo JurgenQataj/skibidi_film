@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 import { motion } from "framer-motion"; // Aggiunto import per animazioni
 
-const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
+const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false }) => {
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
   const placeholderPoster =
     "https://placehold.co/300x450/1a1a2e/666?text=No+Image";
@@ -57,7 +57,7 @@ const MovieCard = ({ movie, onDelete, showDeleteButton }) => {
             <span style={{color: '#ffd700'}}>★</span> {rating}
           </div>
         )}
-        <div className={styles.title} data-movie-title>{movieTitle}</div>
+        {!hideTitle && <div className={styles.title} data-movie-title>{movieTitle}</div>}
       </motion.div>
     </Link>
   );

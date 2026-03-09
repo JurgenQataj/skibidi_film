@@ -565,7 +565,7 @@ function ProfilePage() {
               ))
             ) : recentReviews.length > 0 ? (
               recentReviews.map((review) => (
-                <MovieCard key={review._id} movie={{...review.movie, media_type: review.movie.media_type || "movie"}} />
+                <MovieCard key={review._id} movie={{...review.movie, media_type: review.movie.media_type || "movie"}} hideTitle={true} />
               ))
             ) : (
               <p>Questo utente non ha ancora recensito nessun film.</p>

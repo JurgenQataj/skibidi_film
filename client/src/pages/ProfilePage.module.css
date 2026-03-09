@@ -813,10 +813,10 @@
   }
 
   .reviewsGrid .card {
-    --title-height: 28px;
     width: 100% !important;
     max-width: 90px;
-    height: calc(120px + var(--title-height)) !important;
+    height: auto !important;
+    aspect-ratio: 2/3;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -825,24 +825,11 @@
 
   .reviewsGrid .card img {
     width: 100% !important;
-    height: 120px !important;
+    height: 100% !important;
     object-fit: cover !important;
     background-color: #1c1e21 !important;
   }
 
-  .reviewsGrid .card .title {
-    width: 100% !important;
-    height: var(--title-height) !important;
-    font-size: 0.55rem !important;
-    line-height: 1.1 !important;
-    text-align: center;
-    white-space: normal !important;
-    overflow: hidden;
-    padding: 2px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   .sectionTitle { font-size: 0.96rem; margin-bottom: 12px; } /* Reduced 20% from desktop 1.25rem, and reduced margin */
 
@@ -919,11 +906,10 @@
   }
 
   .reviewsGrid .card {
-    --title-height: 26px;
     width: 100% !important;
     max-width: 80px;
     height: auto !important;
-    aspect-ratio: 2/3.5;
+    aspect-ratio: 2/3;
   }
 
   .reviewsGrid .card img {
@@ -932,11 +918,6 @@
     aspect-ratio: 2/3 !important;
   }
 
-  .reviewsGrid .card .title {
-    width: 100% !important;
-    height: var(--title-height) !important;
-    font-size: 0.5rem !important;
-  }
 }
 
 /* ── Specific grid overrides for Tablet & Mobile ── */
