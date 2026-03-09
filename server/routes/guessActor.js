@@ -209,11 +209,103 @@ const HOLLYWOOD_ACTOR_IDS = [
 // Dedup
 const ACTOR_POOL = [...new Set(HOLLYWOOD_ACTOR_IDS)];
 
+// =============================================
+// POOL DINAMICO (300 Attori Famosi)
+// Generato in background avviando il server
+// =============================================
+let dynamicActorPool = [];
+const TARGET_POOL_SIZE = 300;
+
+const EXCLUDED_BIRTHPLACE_KEYWORDS = [
+  "india", "pakistan", "bangladesh", "sri lanka", "nepal",
+  "mumbai", "delhi", "karachi", "lahore", "dhaka", "chennai", "kolkata", "punjab", "hyderabad",
+  "egypt", "morocco", "libya", "tunisia", "algeria", "cairo", "casablanca", "tripoli", "tunis",
+  "china", "beijing", "shanghai", "hong kong", "taiwan", "seoul", "korea", "japan", "tokyo", "asia",
+  "philippines", "manila", "thailand", "bangkok", "vietnam", "hanoi", "indonesia", "jakarta", "malaysia",
+];
+
+function isExcludedBirthplace(p) {
+  if (!p) return false;
+  const l = p.toLowerCase();
+  return EXCLUDED_BIRTHPLACE_KEYWORDS.some((k) => l.includes(k));
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function buildDynamicPool() {
+  console.log("[GuessActor] Iniziata la costruzione del pool dei top 300 attori viventi e occidentali...");
+  const actorMap = new Map();
+  
+  // Cerchiamo nelle prime 100 pagine di attori famosi
+  for (let page = 1; page <= 100; page++) {
+
+    try {
+      const listRes = await axios.get(`${TMDB_BASE}/person/popular`, {
+        params: { api_key: TMDB_API_KEY, language: "en-US", page },
+        timeout: 8000,
+      });
+
+      const candidates = listRes.data.results.filter(
+        (p) => p.known_for_department === "Acting" && p.profile_path && !actorMap.has(p.id)
+      );
+
+      for (const c of candidates) {
+        // Rimuoviamo il break early basato solo sulla size, così continuiamo ad aggiungere 
+        // e rimpiazzare attori se ne troviamo di più famosi.
+        try {
+          const d = await axios.get(`${TMDB_BASE}/person/${c.id}`, {
+            params: { api_key: TMDB_API_KEY, language: "it-IT" },
+            timeout: 6000,
+          }).then(r => r.data);
+
+          // Filtra: vivo, con foto, e senza birthplace esclusa (asiatici/nord africa)
+          if (!d.deathday && d.profile_path && !isExcludedBirthplace(d.place_of_birth)) {
+            actorMap.set(d.id, {
+              id: d.id,
+              name: d.name,
+              lastName: getLastWord(d.name),
+              profile_path: d.profile_path,
+              popularity: c.popularity,
+            });
+            
+            // Ordiniamo per popolarità dal più famoso al meno famoso e teniamo solo i top 300
+            dynamicActorPool = [...actorMap.values()]
+              .sort((a, b) => b.popularity - a.popularity)
+              .slice(0, TARGET_POOL_SIZE);
+              
+            // Rimuoviamo dalla mappa quelli scartati per non pesare in memoria
+            actorMap.clear();
+            dynamicActorPool.forEach(actor => actorMap.set(actor.id, actor));
+          }
+          await sleep(100);
+        } catch { /* skip err */ }
+      }
+      
+      await sleep(200);
+    } catch (err) {
+      console.warn(`[GuessActor] Errore pagina TMDB ${page}:`, err.message);
+    }
+  }
+  
+  console.log(`[GuessActor] ✅ Pool completato. Ottenuti ${dynamicActorPool.length} attori da far indovinare.`);
+}
+
+buildDynamicPool().catch(() => {});
+
 // GET /api/guess-actor/session
 router.get("/session", protect, async (req, res) => {
   try {
-    // Shuffle e prendi 12 candidati (alcuni potrebbero non avere una foto)
-    // Fisher-Yates shuffle per una vera casualità
+    // 1) Se il pool dinamico è quasi pronto, usiamo quello in cache (istantaneo e filtrato!)
+    if (dynamicActorPool.length >= 30) {
+      const shuffled = [...dynamicActorPool];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return res.json(shuffled.slice(0, 6));
+    }
+
+    // 2) Fallback: se il pool è ancora vuoto al primissimo avvio del server
     const shuffled = [...ACTOR_POOL];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -230,7 +322,7 @@ router.get("/session", protect, async (req, res) => {
     );
 
     const finalActors = actorResults
-      .filter((r) => r.status === "fulfilled" && r.value.data.profile_path)
+      .filter((r) => r.status === "fulfilled" && r.value.data.profile_path && !r.value.data.deathday)
       .map((r) => r.value.data)
       .slice(0, 6)
       .map((a) => ({
