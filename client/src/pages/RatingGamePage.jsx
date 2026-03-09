@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./RatingGamePage.module.css";
-import { FaStar, FaDollarSign, FaTrophy, FaGamepad, FaMedal, FaArrowLeft } from "react-icons/fa";
+import { FaStar, FaDollarSign, FaTrophy, FaGamepad, FaMedal, FaArrowLeft, FaEyeSlash } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -114,6 +114,18 @@ function RatingGamePage() {
           <div className={styles.playBtnText}>
             <span className={styles.playBtnTitle}>Indovina il Giovane</span>
             <span className={styles.playBtnDesc}>Quale attore è più giovane?</span>
+          </div>
+          <span className={styles.playArrow}>›</span>
+        </button>
+
+        <button
+          className={`${styles.playBtn} ${styles.ageBtn}`}
+          onClick={() => navigate("/guess-actor")}
+        >
+          <div className={styles.playBtnIcon}><FaEyeSlash /></div>
+          <div className={styles.playBtnText}>
+            <span className={styles.playBtnTitle}>Chi è?</span>
+            <span className={styles.playBtnDesc}>Indovina l'attore pixelato</span>
           </div>
           <span className={styles.playArrow}>›</span>
         </button>

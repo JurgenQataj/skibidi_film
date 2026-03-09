@@ -959,4 +959,12 @@
   .listsGrid {
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
   }
+  .badgesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .badgeName {
+    font-size: 0.45rem;
+    padding: 3px 1px;
+  }
 }

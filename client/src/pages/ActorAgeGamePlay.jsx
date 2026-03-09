@@ -210,7 +210,7 @@ function ActorAgeGamePlay() {
     <div className={styles.page}>
       {/* Top bar */}
       <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate("/actor-age-game")}>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
           <FaArrowLeft />
         </button>
 
@@ -302,7 +302,7 @@ function ActorAgeGamePlay() {
               </button>
               <button
                 className={styles.menuBtn}
-                onClick={() => navigate("/actor-age-game")}
+                onClick={() => navigate(-1)}
               >
                 Menu
               </button>

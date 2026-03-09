@@ -1,0 +1,296 @@
+/* ==========================================
+   "CHI È?" — Design aligned with RatingGamePlay
+   =========================================== */
+
+.page {
+  min-height: 100vh;
+  background: #0f0f12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  box-sizing: border-box;
+}
+
+/* ---- Top Bar (identico a RatingGamePlay) ---- */
+.topBar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  background: rgba(10, 10, 14, 0.97);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-sizing: border-box;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.backBtn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.88rem;
+  transition: all 0.2s ease; flex-shrink: 0;
+}
+.backBtn:hover { background: rgba(229,9,20,0.3); }
+
+.modeTag {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(229,9,20,0.13);
+  border: 1px solid rgba(229,9,20,0.3);
+  color: #e50914;
+  font-size: 0.76rem; font-weight: 700;
+  padding: 5px 12px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.scoreInfo {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+
+.bestBadge {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.25);
+  color: #FFD700;
+  font-size: 0.82rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+}
+
+.streakBadge {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(245,158,11,0.13);
+  border: 1px solid rgba(245,158,11,0.28);
+  color: #f59e0b;
+  font-size: 0.88rem; font-weight: 800;
+  padding: 4px 12px; border-radius: 20px;
+  min-width: 52px; justify-content: center;
+}
+
+/* ---- Prompt ---- */
+.prompt {
+  padding: 10px 20px 4px;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+.prompt strong { color: #fff; }
+.pointsHint { color: #22c55e; font-weight: 600; }
+
+/* ---- Loading ---- */
+.loadingWrapper {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.5); gap: 16px; font-size: 0.9rem;
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top-color: #e50914;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.errorMsg {
+  margin-top: 40px; color: #ef4444; font-weight: 600; padding: 20px; text-align: center;
+}
+
+/* ---- Arena ---- */
+.arena {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px 32px;
+  gap: 14px;
+  box-sizing: border-box;
+  max-width: 440px;
+}
+
+/* ---- Image Container ---- */
+.imageContainer {
+  width: 100%;
+  aspect-ratio: 2/3;
+  max-height: 52vh;
+  width: auto;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.75), 0 0 0 2px rgba(255,255,255,0.05);
+  background: #1a1a22;
+  align-self: center;
+}
+
+@keyframes shakeAnim {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-7px)}
+  40%{transform:translateX(7px)}
+  60%{transform:translateX(-4px)}
+  80%{transform:translateX(4px)}
+}
+.shake { animation: shakeAnim 0.45s ease; }
+
+.actorImage {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 10%;
+  transform: scale(1.07); /* hides blur edges */
+  display: block;
+}
+
+/* Attempts dots — overlaid top-right */
+.attemptsOverlay {
+  position: absolute; top: 12px; right: 12px;
+  display: flex; gap: 6px;
+}
+.attemptDot {
+  width: 11px; height: 11px; border-radius: 50%;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 0 1.5px rgba(0,0,0,0.5);
+}
+.attemptDotActive  { background: #e50914; box-shadow: 0 0 10px rgba(229,9,20,0.8), 0 0 0 1.5px rgba(0,0,0,0.5); }
+.attemptDotGone    { background: rgba(255,255,255,0.2); }
+
+/* Result overlays */
+.overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  animation: fadeIn 0.3s ease;
+  padding: 20px; text-align: center; gap: 6px;
+}
+.overlayCorrect { background: rgba(22,163,74,0.92); }
+.overlayWrong   { background: rgba(220,38,38,0.92); }
+@keyframes fadeIn { from{opacity:0;transform:scale(0.96)} to{opacity:1;transform:scale(1)} }
+.overlayIcon     { font-size: 3.2rem; color: #fff; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+.overlayPoints   { font-size: 3rem; font-weight: 900; color: #fff; line-height: 1; }
+.overlayText     { font-size: 1.6rem; font-weight: 900; color: #fff; }
+.revealedName    { font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.88); margin-top: 4px; }
+
+/* ---- Input Form ---- */
+.inputForm {
+  display: flex; gap: 10px; width: 100%;
+}
+.guessInput {
+  flex: 1; background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,255,255,0.1);
+  color: #fff; padding: 14px 18px; border-radius: 14px;
+  font-size: 1rem; outline: none; transition: border 0.2s ease;
+  font-weight: 600; font-family: inherit;
+}
+.guessInput:focus { border-color: #e50914; background: rgba(255,255,255,0.08); }
+.guessInput::placeholder { color: rgba(255,255,255,0.28); font-weight: 400; }
+
+.submitBtn {
+  background: #e50914; color: #fff;
+  border: none; border-radius: 14px; padding: 0 20px;
+  font-size: 0.95rem; font-weight: 800; cursor: pointer;
+  transition: all 0.2s ease; font-family: inherit; white-space: nowrap;
+}
+.submitBtn:hover { background: #c8081a; transform: scale(1.05); }
+.submitBtn:active { transform: scale(0.95); }
+
+/* ---- Game Over ---- */
+.gameOverOverlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.88); backdrop-filter: blur(12px);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.gameOverCard {
+  background: #18181f;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 36px 44px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  max-width: 320px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.gameOverEmoji    { font-size: 2.5rem; margin: 0 0 4px; }
+.gameOverTitle    { font-size: 2rem; font-weight: 900; color: #e50914; margin: 0; letter-spacing: -1px; }
+.gameOverSubtitle { font-size: 0.72rem; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 1.2px; margin: 0; }
+.gameOverScore    { font-size: 4rem; font-weight: 900; color: #fff; margin: 4px 0 0; line-height: 1; }
+.gameOverMax      { font-size: 0.78rem; color: rgba(255,255,255,0.3); margin: 0; }
+.gameOverRecord   { font-size: 0.9rem; color: #FFD700; font-weight: 700; margin: 0; }
+.gameOverBtns { display: flex; gap: 10px; margin-top: 16px; width: 100%; }
+.playAgainBtn {
+  flex: 1; background: #e50914; color: #fff;
+  border: none; border-radius: 13px; padding: 13px; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+}
+.playAgainBtn:hover { background: #c8081a; transform: translateY(-1px); }
+.menuBtn {
+  flex: 1;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.72); border-radius: 13px; padding: 13px;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+}
+.menuBtn:hover { background: rgba(255,255,255,0.13); }
+
+/* ============================================
+   MOBILE (bottom-nav layout) — identico a RatingGamePlay
+   ============================================ */
+@media (max-width: 1024px) {
+  .page {
+    margin-top: -54px;
+    min-height: calc(100vh + 54px);
+  }
+  .topBar {
+    padding-top: 8px;
+    top: calc(40px + env(safe-area-inset-top, 0px));
+  }
+  .arena {
+    padding: 8px 10px 16px;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .imageContainer {
+    max-height: 46vh;
+  }
+  .inputForm {
+    flex-direction: column;
+  }
+  .submitBtn {
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+  .gameOverCard { padding: 28px 20px; }
+  .gameOverScore { font-size: 3.2rem; }
+}
+
+@media (max-width: 399px) {
+  .modeTag { display: none; }
+}
+
+/* ============================================
+   DESKTOP
+   ============================================ */
+@media (min-width: 1024px) {
+  .page {
+    padding-top: 80px;
+    padding-bottom: 40px;
+  }
+  .topBar {
+    top: 80px;
+    padding-top: 12px;
+  }
+  .arena {
+    max-width: 400px;
+    padding: 16px 24px 40px;
+    gap: 18px;
+  }
+}
