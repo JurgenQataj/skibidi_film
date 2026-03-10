@@ -9,18 +9,42 @@
   box-sizing: border-box; /* Previene lo sfondamento a destra */
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
 .title {
   color: #fff;
   font-size: 1rem;
-  margin-top: 0;
-  margin-bottom: 12px;
+  margin: 0;
   font-weight: 700;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .form {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 16px;
 }
 
 .textarea {

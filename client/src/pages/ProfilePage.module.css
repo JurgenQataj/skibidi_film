@@ -929,7 +929,7 @@
     grid-template-columns: repeat(7, 1fr) !important;
   }
   .badgesGrid {
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)) !important;
   }
 }
 
@@ -941,7 +941,7 @@
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
   }
   .badgesGrid {
-    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)) !important;
     gap: 8px !important;
   }
   .badgeName {
