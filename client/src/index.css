@@ -9,8 +9,15 @@
 
 /* Il colore scuro DEVE essere sull'elemento html (root):
    copre status bar area, overscroll, safe-area su Android/iOS */
+/* Global box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html {
   background: #1a1a20; /* Leggermente meno cupo (~10% più chiaro) */
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -21,6 +28,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1a1a20; /* Leggermente meno cupo (~10% più chiaro) */
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Rimuove il colore viola dai link visitati globalmente */

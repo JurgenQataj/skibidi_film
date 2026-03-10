@@ -4,6 +4,7 @@
   margin: 0 auto; 
   padding: 100px 10px 10px; 
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .feedContainer {
