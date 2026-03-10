@@ -314,9 +314,9 @@ function ReviewCard({ review, onInteraction }) {
             >
               {movie.title}
             </Link>
-            {movie.release_date && (
+            {(movie.release_year || movie.release_date) && (
               <span className={styles.releaseYear}>
-                {movie.release_date.split("-")[0]}
+                ({movie.release_year || movie.release_date.split("-")[0]})
               </span>
             )}
           </div>

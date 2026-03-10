@@ -780,7 +780,7 @@ exports.getUserFeed = async (req, res) => {
 
     const reviews = await Review.find({ user: { $in: following } })
       .populate("user", "username avatar_url")
-      .populate("movie", "title poster_path tmdb_id media_type")
+      .populate("movie", "title poster_path tmdb_id media_type release_year")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -815,7 +815,7 @@ exports.getUserFeed = async (req, res) => {
 exports.getUserReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ user: String(req.params.userId) })
-      .populate("movie", "tmdb_id title poster_path media_type")
+      .populate("movie", "tmdb_id title poster_path media_type release_year")
       .sort({ createdAt: -1 });
 
     res.json(reviews.filter((r) => r.movie));
