@@ -536,7 +536,7 @@ function ProfilePage() {
                 <h2 className={styles.sectionTitle} style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
                   Saghe Completate ({profile.completedCollections.length})
                 </h2>
-                {profile.completedCollections.length > (isMobile ? 6 : 10) && (
+                {profile.completedCollections.length > (isMobile ? 7 : 10) && (
                   <button 
                     onClick={() => setShowAllBadges(!showAllBadges)} 
                     className={styles.badgeToggleBtn}
@@ -547,7 +547,7 @@ function ProfilePage() {
                 )}
               </div>
               <div className={styles.badgesGrid}>
-                {(showAllBadges ? profile.completedCollections : profile.completedCollections.slice(0, isMobile ? 6 : 10)).map(coll => (
+                {(showAllBadges ? profile.completedCollections : profile.completedCollections.slice(0, isMobile ? 7 : 10)).map(coll => (
                   <Link key={coll.id} to={`/collection/${coll.id}`} className={styles.badgeCard}>
                     <img src={coll.poster_path ? `https://image.tmdb.org/t/p/w200${coll.poster_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"} alt={coll.name} />
                     <div className={styles.badgeName}>{coll.name}</div>

@@ -414,10 +414,26 @@
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+  animation: mediaSlideDown 0.3s ease-out forwards;
+  transform-origin: top;
+}
+
+@keyframes mediaSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .commentItem {
   font-size: 0.9rem;
   margin-bottom: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .commentForm {
   display: flex;
@@ -426,6 +442,7 @@
 }
 .commentForm input {
   flex: 1;
+  min-width: 0;
   background-color: rgba(0, 0, 0, 0.3);
   border: 1px solid #555;
   border-radius: 5px;
@@ -498,6 +515,9 @@
   margin: 10px 0;
   font-style: italic;
   color: #ffffff;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .manageButtons {
