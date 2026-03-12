@@ -191,44 +191,114 @@
 
 .commentItem {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
   font-size: 0.95rem;
-  margin-bottom: 8px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 8px 12px;
-  border-radius: 10px;
+  margin-bottom: 16px;
+  padding: 4px 0;
+  background: transparent;
+  border-radius: 0;
 }
 
-.commentContent {
+.commentAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 2px;
+}
+
+.commentMain {
   flex-grow: 1;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.4;
+  min-width: 0; /* allows text wrapping */
+  display: flex;
+  flex-direction: column;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.commentAuthorLink,
+.commentAuthorLink:visited {
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.commentAuthorLink:hover {
+  text-decoration: underline;
+}
+
+.commentMeta {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.commentText {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.35;
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
-  min-width: 0;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
 }
 
-.commentItem a {
-  font-weight: 700;
-  color: #d72638; /*--red-bright*/
-  text-decoration: none;
-  margin-right: 6px;
+.commentFooterActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
-.deleteCommentButton {
-  background: none;
+.commentActionText {
+  background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0;
   cursor: pointer;
-  padding: 0 5px;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
-.deleteCommentButton:hover {
-  color: #d72638; /*--red-bright*/
+.commentActionText:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.commentRightCol {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 8px; /* lines up heart roughly with first line of text */
+}
+
+.commentHeart {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.commentHeart:hover {
+  color: #d72638;
+  transform: scale(1.1);
+}
+
+.noCommentsText {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 10px 0;
 }
 
 .commentForm {

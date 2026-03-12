@@ -56,7 +56,13 @@ function RatingGamePlay() {
     }
   }, [mode]);
 
-  useEffect(() => { fetchPair([]); }, [fetchPair]);
+  const hasFetched = React.useRef(false);
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchPair([]);
+    }
+  }, [fetchPair]);
 
   const submitScore = useCallback(async (score) => {
     if (!token || score === 0) return;

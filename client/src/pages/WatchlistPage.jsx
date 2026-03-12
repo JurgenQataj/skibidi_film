@@ -62,9 +62,6 @@ function WatchlistPage() {
     <div className={styles.pageContainer}>
       <header className={styles.header}>
         <h1 className={styles.title}>La mia Watchlist</h1>
-        <p className={styles.description}>
-          I film che hai salvato per guardarli più tardi.
-        </p>
       </header>
       <div className={styles.reviewsGrid}>
         {watchlist.length > 0 ? (

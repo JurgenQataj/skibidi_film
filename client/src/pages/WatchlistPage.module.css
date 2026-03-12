@@ -1,12 +1,12 @@
 /* Container principale moderno */
 .pageContainer {
-  max-width: 1600px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 100px 4rem 2rem; /* Top padding per Navbar fixed */
-  background-color: #0a0a0a;
+  padding: 100px 40px 2rem; /* Top padding per Navbar fixed */
   min-height: 100vh;
   color: #ffffff;
   font-family: 'Inter', sans-serif;
+  background: transparent;
 }
 
 /* Header con gradiente e stile pulito */
@@ -83,19 +83,35 @@
   background: transparent !important;
   border-radius: 0 !important;
   margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 
 /* L'altezza è ereditata dall'aspect-ratio: 2/3 globale di .card img e scalata dalla grid */
 .cardWrapper :global(.card img) {
   width: 100% !important;
   height: auto !important;
+  aspect-ratio: 2/3;
+  object-fit: cover !important;
+  object-position: center !important;
+  background-color: #1c1e21 !important;
+  flex-shrink: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .cardWrapper :global(.card .title) {
-  padding: 15px !important;
-  font-size: 0.95rem !important;
+  width: 100% !important;
+  padding: 5px !important;
+  font-size: 0.85rem !important;
   height: auto !important;
-  min-height: 60px;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
   background: transparent;
 }
 

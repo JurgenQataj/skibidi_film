@@ -127,13 +127,32 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
     }
   };
 
+  const handleLikeComment = async (commentId) => {
+    if (!token) return alert("Devi essere loggato.");
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/comments/review/${review._id}/comment/${commentId}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // res.data.likes = array di ObjectId/string aggiornato
+      const updatedList = comments.list.map((c) =>
+        c._id === commentId ? { ...c, likes: res.data.likes } : c
+      );
+      setComments((prev) => ({ ...prev, list: updatedList }));
+    } catch (error) {
+      console.error("Errore aggiunta like commento:", error);
+    }
+  };
+
   return {
     handleReaction,
     toggleComments,
     handleAddComment,
     handleDeleteComment,
     handleDeletePost,
-    timeAgo
+    timeAgo,
+    handleLikeComment
   };
 }
 
@@ -209,7 +228,8 @@ function ReviewCard({ review, onInteraction }) {
     handleAddComment,
     handleDeleteComment,
     handleDeletePost,
-    timeAgo
+    timeAgo,
+    handleLikeComment
   } = useReviewInteractions({
     review, onInteraction, token, API_URL, comments, setComments,
     commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment
@@ -371,28 +391,69 @@ function ReviewCard({ review, onInteraction }) {
                 .filter((c) => c.user && c.user._id)
                 .map((comment) => (
                   <div key={comment._id} className={styles.commentItem}>
-                    <div className={styles.commentContent}>
-                      <Link
-                        to={`/profile/${comment.user._id}`}
-                        className={styles.authorLink}
-                      >
-                        <strong>{comment.user.username}:</strong>
-                      </Link>
-                      <span> {renderText(comment.comment_text)}</span>
+                    {/* Colonna Sinistra: Avatar */}
+                    <Link to={`/profile/${comment.user._id}`}>
+                      <img
+                        src={
+                          comment.user.avatar_url ||
+                          "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
+                        }
+                        alt="avatar"
+                        className={styles.commentAvatar}
+                      />
+                    </Link>
+
+                    {/* Colonna Centrale: Dati + Testo + Azioni */}
+                    <div className={styles.commentMain}>
+                      <div className={styles.commentHeader}>
+                        <Link to={`/profile/${comment.user._id}`} className={styles.commentAuthorLink}>
+                          {comment.user.username}
+                        </Link>
+                        {comment.createdAt && (
+                          <span className={styles.commentMeta}>
+                            {timeAgo(comment.createdAt).replace('circa ', '').replace('fa', '').trim() || "1 s"}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className={styles.commentText}>
+                        {renderText(comment.comment_text)}
+                      </div>
+                      
+                      <div className={styles.commentFooterActions}>
+                        <button className={styles.commentActionText}>Rispondi</button>
+                        {loggedInUserId === comment.user._id && (
+                          <button
+                            onClick={() => handleDeleteComment(comment._id)}
+                            className={styles.commentActionText}
+                            disabled={isDeletingComment === comment._id}
+                          >
+                            {isDeletingComment === comment._id ? "..." : "Elimina"}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    {loggedInUserId === comment.user._id && (
-                      <button
-                        onClick={() => handleDeleteComment(comment._id)}
-                        className={styles.deleteCommentButton}
-                        disabled={isDeletingComment === comment._id}
-                      >
-                        {isDeletingComment === comment._id ? "..." : "×"}
-                      </button>
-                    )}
+
+                    {/* Colonna Destra: Cuore Like */}
+                    <div 
+                      className={styles.commentRightCol} 
+                      onClick={() => handleLikeComment(comment._id)}
+                    >
+                      {comment.likes?.includes(loggedInUserId) ? (
+                        <FaHeart color="#d72638" className={styles.commentHeart} />
+                      ) : (
+                        <FaRegHeart className={styles.commentHeart} />
+                      )}
+                      {comment.likes?.length > 0 && (
+                        <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>
+                          {comment.likes.length}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))
             ) : (
-              <p>Nessun commento ancora.</p>
+              <p className={styles.noCommentsText}>Nessun commento ancora.</p>
             )}
 
             {token && (

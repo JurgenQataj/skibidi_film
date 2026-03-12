@@ -131,6 +131,35 @@ exports.getComments = async (req, res) => {
   }
 };
 
+exports.toggleCommentLike = async (req, res) => {
+  const { reviewId, commentId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const review = await Review.findById(reviewId);
+    if (!review) return res.status(404).json({ message: "Recensione non trovata." });
+
+    const comment = review.comments.id(commentId);
+    if (!comment) return res.status(404).json({ message: "Commento non trovato." });
+
+    const likeIndex = comment.likes.indexOf(userId);
+    if (likeIndex === -1) {
+      comment.likes.push(userId); // aggiungi like
+    } else {
+      comment.likes.splice(likeIndex, 1); // rimuovi like
+    }
+
+    await review.save();
+    
+    // Potremmo anche inviare una notifica a comment.user se e' un like nuovo e non self-like, 
+    // ma teniamolo semplice e restituiamo i like agionati.
+    res.json({ likes: comment.likes });
+  } catch (err) {
+    console.error("Errore toggleCommentLike:", err);
+    res.status(500).json({ message: "Errore del server." });
+  }
+};
+
 exports.deleteComment = async (req, res) => {
   const { reviewId, commentId } = req.params;
   const userId = req.user.id;

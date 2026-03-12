@@ -10,9 +10,8 @@ const TMDB_IMAGE = "https://image.tmdb.org/t/p/w500";
 // Punti per tentativo: 1° = 3 pt, 2° = 2 pt, 3° = 1 pt
 const POINTS_BY_ATTEMPT = [3, 2, 1];
 
-const INITIAL_BLUR = 16;
-// Riduzione blur per ogni tentativo sbagliato (~33% di INITIAL_BLUR)
-const BLUR_PENALTY = Math.round(INITIAL_BLUR / 3); // ≈ 5 → 16 → 11 → 5
+const BLUR_STAGES = [16, 10, 5];
+// Initialize blurAmount with BLUR_STAGES[0]
 
 const SESSION_KEY = "guessActorSession";
 const STATE_KEY = "guessActorState";
@@ -25,7 +24,7 @@ function GuessActorGamePlay() {
   const [imgLoaded, setImgLoaded] = useState(false);
 
   // Game state
-  const [blurAmount, setBlurAmount] = useState(INITIAL_BLUR);
+  const [blurAmount, setBlurAmount] = useState(BLUR_STAGES[0]);
   const [attempts, setAttempts] = useState(3); // 3 = primo tentativo disponibile
   const [score, setScore] = useState(0);
   const [guess, setGuess] = useState("");
@@ -49,7 +48,7 @@ function GuessActorGamePlay() {
   const fetchSession = useCallback(async (forceNew = false) => {
     setLoading(true);
     setStatus("playing");
-    setBlurAmount(INITIAL_BLUR);
+    setBlurAmount(BLUR_STAGES[0]);
     setAttempts(3);
     setGuess("");
     setNewRecord(false);
@@ -133,7 +132,7 @@ function GuessActorGamePlay() {
   const advanceToNext = (currentScore) => {
     if (currentIndex < actors.length - 1) {
       setCurrentIndex((prev) => prev + 1);
-      setBlurAmount(INITIAL_BLUR);
+      setBlurAmount(BLUR_STAGES[0]);
       setAttempts(3);
       setGuess("");
       setLastPoints(0);
@@ -177,20 +176,20 @@ function GuessActorGamePlay() {
       setScore(newScore);
       scoreRef.current = newScore;
 
-      setTimeout(() => advanceToNext(newScore), 2000);
+      setTimeout(() => advanceToNext(newScore), 2500);
     } else {
       setWrongShake(true);
       setTimeout(() => setWrongShake(false), 500);
 
       if (attempts > 1) {
-        // Riduzione blur aggiuntiva per tentativo sbagliato
-        setBlurAmount((prev) => Math.max(0, prev - BLUR_PENALTY));
-        setAttempts((prev) => prev - 1);
+        const nextAttempt = attempts - 1;
+        setBlurAmount(BLUR_STAGES[3 - nextAttempt]);
+        setAttempts(nextAttempt);
         setGuess("");
       } else {
         // Esauriti i tentativi
         setStatus("wrong");
-        setTimeout(() => advanceToNext(scoreRef.current), 2000);
+        setTimeout(() => advanceToNext(scoreRef.current), 2500);
       }
     }
   };
@@ -259,7 +258,7 @@ function GuessActorGamePlay() {
             className={styles.actorImage}
             style={{
               filter: `blur(${status === "playing" ? blurAmount : 0}px)`,
-              transition: imgLoaded ? "filter 3s linear" : "none",
+              transition: imgLoaded ? (status === "playing" ? "filter 3s ease-out" : "filter 0.5s ease-out") : "none",
             }}
             onLoad={() => setImgLoaded(true)}
           />

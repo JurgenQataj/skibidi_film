@@ -63,6 +63,16 @@ function AnimatedLayout() {
         exit={{ opacity: 0, scale: 1.01, filter: "blur(4px)" }}
         transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="page-transition-wrapper"
+        onAnimationComplete={(definition) => {
+          // Quando finisce l'animazione di entrata, rimuovi filter e transform
+          // per evitare che diventino context block per "position: fixed" 
+          // e per risolvere il bug di Safari che rende neri gli iframe
+          const el = document.querySelector('.page-transition-wrapper');
+          if (el) {
+            el.style.transform = 'none';
+            el.style.filter = 'none';
+          }
+        }}
       >
         <Outlet />
       </motion.div>

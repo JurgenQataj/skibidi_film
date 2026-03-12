@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import styles from "./SkibidiRoulette.module.css";
 import { FaDice, FaPlay } from "react-icons/fa";
@@ -370,7 +371,7 @@ function SkibidiRoulette({ watchlist }) {
 
   if (!watchlist || watchlist.length < 2) return null;
 
-  return (
+  return createPortal(
     <>
       <button
         className={styles.openRouletteBtn}
@@ -439,7 +440,8 @@ function SkibidiRoulette({ watchlist }) {
           </div>
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
 

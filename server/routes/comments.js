@@ -18,4 +18,11 @@ router.delete(
   commentController.deleteComment
 );
 
+// URL: POST /api/comments/review/:reviewId/comment/:commentId/like
+router.post(
+  "/review/:reviewId/comment/:commentId/like",
+  protect,
+  commentController.toggleCommentLike
+);
+
 module.exports = router;

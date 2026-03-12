@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./HorizonPage.module.css";
@@ -41,7 +42,9 @@ function HorizonCard({ movie, isActive }) {
   const [showInfo, setShowInfo] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const playerId = useRef(getPlayerId()).current;
+
+  // Keep track of if the video is "playing" manually
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   useEffect(() => {
     if (!token || !movie?.id) return;
@@ -59,12 +62,35 @@ function HorizonCard({ movie, isActive }) {
 
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe) return;
+    if (!iframe || !iframe.contentWindow) return;
+
     if (isActive) {
-      const src = `https://www.youtube.com/embed/${movie.trailer_key}?autoplay=1&mute=0&controls=0&loop=1&playlist=${movie.trailer_key}&rel=0&modestbranding=1&playsinline=1`;
-      if (iframe.src !== src) iframe.src = src;
+      // Initialize the source only if it's missing (lazy loading)
+      const src = `https://www.youtube.com/embed/${movie.trailer_key}?autoplay=1&mute=0&controls=0&loop=1&playlist=${movie.trailer_key}&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+      if (iframe.src !== src) {
+        iframe.src = src;
+      }
+      
+      // Send play command via raw postMessage
+      try {
+        iframe.contentWindow.postMessage(
+          JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+          "*" // '*' is required here because YT origin changes based on embeds usually
+        );
+      } catch (e) {}
+      
+      // Delay hiding the poster slightly to wait for the video to actually render
+      // since we can't rely on the buggy onStateChange events right now
+      const timer = setTimeout(() => setIsVideoPlaying(true), 1200);
+      return () => clearTimeout(timer);
     } else {
-      iframe.src = "";
+      setIsVideoPlaying(false);
+      try {
+        iframe.contentWindow.postMessage(
+          JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
+          "*"
+        );
+      } catch (e) {}
     }
   }, [isActive, movie.trailer_key]);
 
@@ -100,7 +126,6 @@ function HorizonCard({ movie, isActive }) {
       <div className={styles.videoWrapper}>
         <iframe
           ref={iframeRef}
-          id={playerId}
           className={styles.videoIframe}
           src=""
           title={movie.title}
@@ -110,7 +135,7 @@ function HorizonCard({ movie, isActive }) {
         />
         {movie.backdrop_path && (
           <img
-            className={`${styles.posterFallback} ${isActive ? styles.hidden : ""}`}
+            className={`${styles.posterFallback} ${isVideoPlaying ? styles.hidden : ""}`}
             src={`${IMG_BASE}${movie.backdrop_path}`}
             alt={movie.title}
           />
@@ -339,91 +364,97 @@ function HorizonPage() {
 
   return (
     <div style={{ position: "relative" }}>
-      {/* ── Tasto personalizzazione ── */}
-      <button
-        className={`${styles.customizerTrigger} ${hasActiveFilters ? styles.customizerTriggerActive : ""}`}
-        onClick={() => setShowCustomizer((v) => !v)}
-        aria-label="Personalizza Horizon"
-        title="Personalizza contenuti"
-      >
-        🎛️
-        {hasActiveFilters && <span className={styles.filterDot} />}
-      </button>
+      {/* ── Personalizzazione Portaled ── */}
+      {createPortal(
+        <>
+          {/* Tasto personalizzazione */}
+          <button
+            className={`${styles.customizerTrigger} ${hasActiveFilters ? styles.customizerTriggerActive : ""}`}
+            onClick={() => setShowCustomizer((v) => !v)}
+            aria-label="Personalizza Horizon"
+            title="Personalizza contenuti"
+          >
+            🎛️
+            {hasActiveFilters && <span className={styles.filterDot} />}
+          </button>
 
-      {/* ── Pannello personalizzazione ── */}
-      {showCustomizer && (
-        <div className={styles.customizerPanel} ref={customizerRef}>
-          <div className={styles.customizerHeader}>
-            <span className={styles.customizerTitle}>🎛️ Personalizza Horizon</span>
-            <button
-              className={styles.customizerClose}
-              onClick={() => setShowCustomizer(false)}
-              aria-label="Chiudi"
-            >✕</button>
-          </div>
-
-          {/* Anno */}
-          <div className={styles.customizerSection}>
-            <p className={styles.customizerLabel}>📅 Anno di uscita</p>
-            <div className={styles.yearInputRow}>
-              <input
-                type="text"
-                inputMode="numeric"
-                className={`${styles.yearInput} ${yearTyping ? styles.yearInputTyping : ""}`}
-                placeholder={`Es. 1994, 2007, 2021…`}
-                maxLength={4}
-                value={yearInput}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, "").slice(0, 4);
-                  setYearInput(val);
-                }}
-              />
-              {yearTyping && <span className={styles.yearSpinner} />}
-              {yearInput && !yearTyping && (
+          {/* Pannello personalizzazione */}
+          {showCustomizer && (
+            <div className={styles.customizerPanel} ref={customizerRef}>
+              <div className={styles.customizerHeader}>
+                <span className={styles.customizerTitle}>🎛️ Personalizza Horizon</span>
                 <button
-                  className={styles.clearInputBtn}
-                  onClick={() => {
-                    setYearInput("");
-                    setSelectedYear("");
-                    localStorage.removeItem("horizon_year");
-                    setPage(1); setMovies([]); setHasMore(true);
-                  }}
+                  className={styles.customizerClose}
+                  onClick={() => setShowCustomizer(false)}
+                  aria-label="Chiudi"
                 >✕</button>
-              )}
-            </div>
-            {yearInput.length > 0 && yearInput.length < 4 && (
-              <p className={styles.yearHint}>Scrivi 4 cifre per cercare (es. 1994)</p>
-            )}
-            {selectedYear && !yearTyping && (
-              <p className={styles.yearConfirm}>✅ Trailer più popolari del {selectedYear}</p>
-            )}
-          </div>
+              </div>
 
-          {/* Genere */}
-          <div className={styles.customizerSection}>
-            <p className={styles.customizerLabel}>🎬 Genere</p>
-            <div className={styles.genreGrid}>
-              {GENRES.map((g) => (
-                <button
-                  key={g.id}
-                  className={`${styles.genreChip} ${selectedGenre?.id === g.id ? styles.chipSelected : ""}`}
-                  onClick={() => toggleGenre(g)}
-                >
-                  {g.name}
-                </button>
-              ))}
-            </div>
-          </div>
+              {/* Anno */}
+              <div className={styles.customizerSection}>
+                <p className={styles.customizerLabel}>📅 Anno di uscita</p>
+                <div className={styles.yearInputRow}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className={`${styles.yearInput} ${yearTyping ? styles.yearInputTyping : ""}`}
+                    placeholder={`Es. 1994, 2007, 2021…`}
+                    maxLength={4}
+                    value={yearInput}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 4);
+                      setYearInput(val);
+                    }}
+                  />
+                  {yearTyping && <span className={styles.yearSpinner} />}
+                  {yearInput && !yearTyping && (
+                    <button
+                      className={styles.clearInputBtn}
+                      onClick={() => {
+                        setYearInput("");
+                        setSelectedYear("");
+                        localStorage.removeItem("horizon_year");
+                        setPage(1); setMovies([]); setHasMore(true);
+                      }}
+                    >✕</button>
+                  )}
+                </div>
+                {yearInput.length > 0 && yearInput.length < 4 && (
+                  <p className={styles.yearHint}>Scrivi 4 cifre per cercare (es. 1994)</p>
+                )}
+                {selectedYear && !yearTyping && (
+                  <p className={styles.yearConfirm}>✅ Trailer più popolari del {selectedYear}</p>
+                )}
+              </div>
 
-          {/* Footer */}
-          <div className={styles.customizerFooter}>
-            {hasActiveFilters && (
-              <button className={styles.resetFiltersBtn} onClick={resetFilters}>
-                Rimuovi tutti i filtri
-              </button>
-            )}
-          </div>
-        </div>
+              {/* Genere */}
+              <div className={styles.customizerSection}>
+                <p className={styles.customizerLabel}>🎬 Genere</p>
+                <div className={styles.genreGrid}>
+                  {GENRES.map((g) => (
+                    <button
+                      key={g.id}
+                      className={`${styles.genreChip} ${selectedGenre?.id === g.id ? styles.chipSelected : ""}`}
+                      onClick={() => toggleGenre(g)}
+                    >
+                      {g.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className={styles.customizerFooter}>
+                {hasActiveFilters && (
+                  <button className={styles.resetFiltersBtn} onClick={resetFilters}>
+                    Rimuovi tutti i filtri
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </>,
+        document.body
       )}
 
       {/* ── Scroll cards ── */}
