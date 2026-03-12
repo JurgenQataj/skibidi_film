@@ -245,33 +245,22 @@
    ============================================ */
 @media (max-width: 1024px) {
   .page {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 100dvh;
-    overflow: hidden;
-    overscroll-behavior: none;
-    z-index: 999;
-    background: #0f0f12;
+    min-height: 100vh;
   }
   .topBar {
-    /* Abbassa ulteriormente la barra */
-    padding-top: calc(48px + env(safe-area-inset-top, 0px));
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
     top: 0;
   }
   .prompt {
-    padding-top: 14px;
+    padding-top: 20px;
   }
   .arena {
-    padding: 0px 10px 32px; /* Tagliato ulteriore spazio da sotto */
-    gap: 8px;
+    padding: 8px 10px 16px;
+    gap: 10px;
     max-width: 100%;
-    flex: 1;
-    min-height: 0;
   }
   .imageContainer {
-    flex: 1; /* Permette all'immagine di restringersi se si apre la tastiera */
-    min-height: 0;
-    max-height: 36vh;
+    max-height: 46vh;
   }
   .inputForm {
     flex-direction: column;
