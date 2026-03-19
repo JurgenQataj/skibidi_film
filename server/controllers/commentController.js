@@ -16,6 +16,8 @@ async function sendPushNotification(userId, title, body, url) {
         ).catch(async err => {
           if (err.statusCode === 410) {
             await sub.deleteOne();
+          } else {
+            console.error("Push Notification Delivery Error (non-410):", err, "Endpoint:", sub.endpoint);
           }
         });
       }

@@ -16,17 +16,26 @@ function renderText(text) {
   );
 }
 
-function useReviewInteractions({ review, onInteraction, token, API_URL, comments, setComments, commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment }) {
+function useReviewInteractions({ review, onInteraction, token, API_URL, comments, setComments, commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment, localHasLoved, setLocalHasLoved, setLocalReactionCount, setLocalCommentCount }) {
   const handleReaction = async (reactionType) => {
     if (!token) return;
+    
+    // Optimistic Update
+    const isLiking = !localHasLoved;
+    setLocalHasLoved(isLiking);
+    setLocalReactionCount(prev => isLiking ? prev + 1 : prev - 1);
+
     try {
       await axios.post(
         `${API_URL}/api/reactions/reviews/${review._id}`,
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (onInteraction) onInteraction();
+      // Non chiamiamo più onInteraction() per evitare il reset del feed
     } catch (error) {
+      // Rollback
+      setLocalHasLoved(!isLiking);
+      setLocalReactionCount(prev => isLiking ? prev - 1 : prev + 1);
       console.error("Errore reazione:", error);
       alert(error.response?.data?.message || "Errore");
     }
@@ -71,8 +80,10 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
         }
       );
       setCommentText("");
-      setComments({ shown: true, list: response.data || [] });
-      if (onInteraction) onInteraction();
+      const newList = response.data || [];
+      setComments({ shown: true, list: newList });
+      setLocalCommentCount(newList.length);
+      // Eliminato onInteraction()
     } catch (error) {
       const msg = error.response?.data?.message || "Errore nell'invio del commento.";
       alert(msg);
@@ -94,8 +105,10 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
       const response = await axios.get(
         `${API_URL}/api/comments/review/${review._id}`
       );
-      setComments({ shown: true, list: response.data || [] });
-      if (onInteraction) onInteraction();
+      const newList = response.data || [];
+      setComments({ shown: true, list: newList });
+      setLocalCommentCount(newList.length);
+      // Eliminato onInteraction()
     } catch (error) {
       const msg = error.response?.data?.message || "Errore durante l'eliminazione.";
       alert(msg);
@@ -176,6 +189,34 @@ function ReviewCard({ review, onInteraction }) {
     "https://placehold.co/300x450/1a1a2e/666?text=No+Image";
   const API_URL = import.meta.env.VITE_API_URL || "";
 
+  // Inizializza lo stato locale
+  const [localReactionCount, setLocalReactionCount] = useState(() => {
+    return Array.isArray(review.reactions) ?
+    review.reactions.filter((r) => r.reaction_type === "love").length 
+    : (review.reactions?.love || 0);
+  });
+  
+  const [localHasLoved, setLocalHasLoved] = useState(() => {
+    const raw = review.user_reactions || (Array.isArray(review.reactions) ? review.reactions : []);
+    return raw.some((r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love");
+  });
+
+  const [localCommentCount, setLocalCommentCount] = useState(() => {
+    return review.comments?.length || review.comment_count || 0;
+  });
+
+  // Keep synced if review prop changes significantly from a full refresh
+  useEffect(() => {
+    setLocalReactionCount(
+      Array.isArray(review.reactions) ?
+      review.reactions.filter((r) => r.reaction_type === "love").length 
+      : (review.reactions?.love || 0)
+    );
+    const raw = review.user_reactions || (Array.isArray(review.reactions) ? review.reactions : []);
+    setLocalHasLoved(raw.some((r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love"));
+    setLocalCommentCount(review.comments?.length || review.comment_count || 0);
+  }, [review, loggedInUserId]);
+
   useEffect(() => {
     if (!mentionSearch) {
       setMentionUsers([]);
@@ -232,7 +273,8 @@ function ReviewCard({ review, onInteraction }) {
     handleLikeComment
   } = useReviewInteractions({
     review, onInteraction, token, API_URL, comments, setComments,
-    commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment
+    commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment,
+    localHasLoved, setLocalHasLoved, setLocalReactionCount, setLocalCommentCount
   });
 
   if (!review || !review.user) {
@@ -248,19 +290,7 @@ function ReviewCard({ review, onInteraction }) {
   
   const movie = isPost ? null : review.movie;
   const rating = isPost ? null : review.rating;
-  const comment_text = isPost ? review.text : review.comment_text; 
-
-  const reactionCount =
-    Array.isArray(review.reactions) ?
-    review.reactions.filter((r) => r.reaction_type === "love").length 
-    : (review.reactions?.love || 0);
-  
-  const rawReactions = review.user_reactions || (Array.isArray(review.reactions) ? review.reactions : []);
-  const hasLoved = rawReactions.some(
-    (r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love"
-  );
-
-  const commentCount = review.comments?.length || review.comment_count || 0;
+  const comment_text = isPost ? review.text : review.comment_text;
 
   // --- RENDERING PER ANNUNCI ADMIN ---
   if (isPost) {
@@ -370,15 +400,15 @@ function ReviewCard({ review, onInteraction }) {
                 onClick={() => handleReaction("love")}
                 title="Love"
                 disabled={!loggedInUserId}
-                className={`${styles.instBtn} ${hasLoved ? styles.instBtnLiked : ""}`}
+                className={`${styles.instBtn} ${localHasLoved ? styles.instBtnLiked : ""}`}
               >
-                {hasLoved ? <FaHeart color="#e50914" /> : <FaRegHeart />}
-                <span>{reactionCount}</span>
+                {localHasLoved ? <FaHeart color="#e50914" /> : <FaRegHeart />}
+                <span>{localReactionCount}</span>
               </button>
               
               <button onClick={toggleComments} className={styles.instBtn}>
                 <FaRegComment />
-                <span>{commentCount}</span>
+                <span>{localCommentCount}</span>
               </button>
             </div>
           )}

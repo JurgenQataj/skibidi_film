@@ -586,6 +586,8 @@ exports.followUser = async (req, res) => {
           ).catch(async err => {
             if (err.statusCode === 410) {
               await sub.deleteOne();
+            } else {
+              console.error("Push Notification Delivery Error (non-410):", err);
             }
           });
         }

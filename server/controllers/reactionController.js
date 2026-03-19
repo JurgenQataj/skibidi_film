@@ -59,7 +59,11 @@ exports.addOrUpdateReaction = async (req, res) => {
               { endpoint: sub.endpoint, keys: sub.keys },
               payload
             ).catch(async err => {
-              if (err.statusCode === 410) await sub.deleteOne();
+              if (err.statusCode === 410) {
+                await sub.deleteOne();
+              } else {
+                console.error("Push Notification Delivery Error (non-410):", err);
+              }
             });
           }
         }
