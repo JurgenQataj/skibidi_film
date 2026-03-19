@@ -384,11 +384,15 @@
 @media (max-width: 1024px) {
   .page {
     margin-top: -54px;
-    min-height: calc(100vh + 54px);
+    padding-top: calc(40px + env(safe-area-inset-top, 0px));
+    height: calc(100dvh - 70px);
+    overflow: hidden;
+    overscroll-behavior: none;
   }
   .topBar {
     padding-top: 8px;
-    top: calc(40px + env(safe-area-inset-top, 0px));
+    position: relative;
+    top: 0;
   }
   .arena {
     padding: 6px 6px 8px;

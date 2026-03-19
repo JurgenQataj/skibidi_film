@@ -391,15 +391,18 @@
    ============================================== */
 @media (max-width: 1024px) {
   .page {
-    /* Copre il padding del body globale */
+    /* Cancella il padding del body globale e setta altezza fissa */
     margin-top: -54px;
-    min-height: calc(100vh + 54px);
+    padding-top: calc(40px + env(safe-area-inset-top, 0px));
+    height: calc(100dvh - 70px);
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   .topBar {
-    /* Si posiziona sotto la topbar di Skibidi Film (40px) */
     padding-top: 8px;
-    top: calc(40px + env(safe-area-inset-top, 0px));
+    position: relative;
+    top: 0;
   }
 
   .arena {

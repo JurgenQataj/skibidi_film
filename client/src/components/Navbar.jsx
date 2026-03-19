@@ -22,7 +22,10 @@ function Navbar() {
 
   const isImmersivePage = 
     location.pathname.startsWith('/horizon') || 
-    location.pathname.startsWith('/rating-game');
+    location.pathname.startsWith('/rating-game') ||
+    location.pathname.startsWith('/actor-age-game') ||
+    location.pathname.startsWith('/guess-actor') ||
+    location.pathname.startsWith('/guess-year');
 
   const token = localStorage.getItem("token");
   let userId = null;

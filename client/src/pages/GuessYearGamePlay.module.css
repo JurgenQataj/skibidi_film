@@ -240,10 +240,15 @@
    ============================================ */
 @media (max-width: 1024px) {
   .page {
-    min-height: 100vh;
+    margin-top: -54px;
+    padding-top: calc(40px + env(safe-area-inset-top, 0px));
+    height: calc(100dvh - 70px);
+    overflow: hidden;
+    overscroll-behavior: none;
   }
   .topBar {
-    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+    padding-top: 8px;
+    position: relative;
     top: 0;
   }
   .prompt {
