@@ -18,6 +18,7 @@ router.get("/admin/update-all-data", movieController.updateAllMoviesData);
 
 // --- NUOVA ROTTA PERSONA E SAGA ---
 // DEVE stare PRIMA di /:tmdbId altrimenti viene letto come un ID film
+router.post("/avatars", movieController.getPersonAvatars);
 router.get("/person/:name", movieController.getMoviesByPerson);
 router.get("/collection/:id", movieController.getCollectionDetails);
 

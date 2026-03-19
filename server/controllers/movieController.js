@@ -646,3 +646,28 @@ exports.getHorizonMovies = async (req, res) => {
     res.status(500).json({ message: "Errore del server." });
   }
 };
+
+// --- GET PERSON AVATARS BATCH ---
+exports.getPersonAvatars = async (req, res) => {
+  const { names } = req.body;
+  const TMDB_API_KEY = process.env.TMDB_API_KEY;
+  if (!names || !Array.isArray(names) || names.length === 0) {
+    return res.json({});
+  }
+  
+  const results = {};
+  await Promise.all(
+    names.map(async (name) => {
+      try {
+        const url = `https://api.themoviedb.org/3/search/person?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(name)}`;
+        const response = await axios.get(url);
+        if (response.data.results && response.data.results.length > 0 && response.data.results[0].profile_path) {
+           results[name] = response.data.results[0].profile_path;
+        }
+      } catch (e) {
+        // Silenzio se una chiamata fallisce, continuiamo con le altre
+      }
+    })
+  );
+  res.json(results);
+};

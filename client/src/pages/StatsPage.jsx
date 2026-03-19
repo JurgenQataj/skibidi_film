@@ -7,7 +7,7 @@ import { SkeletonWithLogo } from "../components/Skeleton";
 
 // --- Extracted Sub-Components to Reduce Cognitive Complexity ---
 
-const FavoritePeopleSection = ({ stats, userId, personTypeTab, setPersonTypeTab, actorsLimit, setActorsLimit, directorsLimit, setDirectorsLimit, styles }) => {
+const FavoritePeopleSection = ({ stats, userId, personTypeTab, setPersonTypeTab, actorsLimit, setActorsLimit, directorsLimit, setDirectorsLimit, styles, avatars }) => {
   const isActors = personTypeTab === "actors";
   const currentList = isActors ? stats.topActors : stats.topDirectors;
   const currentLimit = isActors ? actorsLimit : directorsLimit;
@@ -50,8 +50,8 @@ const FavoritePeopleSection = ({ stats, userId, personTypeTab, setPersonTypeTab,
                         onMouseOut={e => e.currentTarget.style.color = 'inherit'}>
                       {person.name}
                   </span>
-                  {person.profile_path && (
-                     <img src={`https://image.tmdb.org/t/p/w185${person.profile_path}`} alt={person.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                  {avatars && avatars[person.name] && (
+                     <img src={`https://image.tmdb.org/t/p/w185${avatars[person.name]}`} alt={person.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
                   )}
                 </a>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -328,6 +328,7 @@ function StatsPage() {
   const { userId } = useParams();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [avatars, setAvatars] = useState({});
   
   // Imposta l'anno corrente come predefinito
   const currentYear = new Date().getFullYear();
@@ -392,6 +393,28 @@ function StatsPage() {
     };
     fetchStats();
   }, [userId, API_URL, selectedYear]); // Rimosso statsLimit dalle dipendenze, ora è costante
+
+  // Fetch avatars for top actors and directors on the client side without blocking the initial render
+  useEffect(() => {
+    if (!stats) return;
+    const namesToFetch = [];
+    if (stats.topActors) {
+      namesToFetch.push(...stats.topActors.slice(0, actorsLimit).map(a => a.name));
+    }
+    if (stats.topDirectors) {
+      namesToFetch.push(...stats.topDirectors.slice(0, directorsLimit).map(d => d.name));
+    }
+    
+    // Only fetch names we haven't loaded yet
+    const missingNames = [...new Set(namesToFetch)].filter(name => !avatars[name]);
+    if (missingNames.length === 0) return;
+    
+    axios.post(`${API_URL}/api/movies/avatars`, { names: missingNames })
+      .then(res => {
+         setAvatars(prev => ({ ...prev, ...res.data }));
+      })
+      .catch(err => console.error("Errore fetch avatars:", err));
+  }, [stats, actorsLimit, directorsLimit, API_URL]);
 
   if (loading && !stats) {
     return <SkeletonWithLogo />;
@@ -480,6 +503,7 @@ function StatsPage() {
           directorsLimit={directorsLimit}
           setDirectorsLimit={setDirectorsLimit}
           styles={styles}
+          avatars={avatars}
         />
 
         {/* Sezione Generi Aggregata (Media Voto e Più visti) */}
