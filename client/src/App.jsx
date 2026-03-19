@@ -44,6 +44,7 @@ const GuessYearGamePlay = lazy(() => import("./pages/GuessYearGamePlay"));
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UpdatePrompt from "./components/UpdatePrompt";
+import InstallPrompt from "./components/InstallPrompt";
 import SplashScreen from "./components/SplashScreen";
 import "./App.css";
 
@@ -108,6 +109,7 @@ function App() {
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
       <UpdatePrompt />
+      <InstallPrompt />
       <Suspense fallback={null}>
         <Routes>
           {/* Rotte Pubbliche (Auth) */}

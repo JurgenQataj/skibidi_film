@@ -3,7 +3,7 @@ import './UpdatePrompt.css';
 
 function UpdatePrompt() {
   const {
-    needRefresh: [needRefresh],
+    needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
@@ -12,12 +12,17 @@ function UpdatePrompt() {
     },
   });
 
+  const handleUpdate = () => {
+    setNeedRefresh(false);
+    updateServiceWorker(true);
+  };
+
   if (!needRefresh) return null;
 
   return (
     <div className="update-prompt">
       <span>🎬 Nuova versione disponibile!</span>
-      <button onClick={() => updateServiceWorker(true)}>
+      <button onClick={handleUpdate}>
         Aggiorna ora
       </button>
     </div>
