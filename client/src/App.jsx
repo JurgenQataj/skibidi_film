@@ -45,6 +45,7 @@ import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UpdatePrompt from "./components/UpdatePrompt";
 import InstallPrompt from "./components/InstallPrompt";
+import EnableNotificationsPrompt from "./components/EnableNotificationsPrompt";
 import SplashScreen from "./components/SplashScreen";
 import "./App.css";
 
@@ -110,6 +111,7 @@ function App() {
       {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
       <UpdatePrompt />
       <InstallPrompt />
+      <EnableNotificationsPrompt />
       <Suspense fallback={null}>
         <Routes>
           {/* Rotte Pubbliche (Auth) */}

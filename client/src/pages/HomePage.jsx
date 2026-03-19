@@ -73,16 +73,9 @@ function HomePage() {
   useEffect(() => {
     fetchFeed(true);
 
-    // Richiedi permesso notifiche push
     const token = localStorage.getItem("token");
     if (token && "Notification" in window) {
-      if (Notification.permission === "default") {
-         Notification.requestPermission().then(permission => {
-           if (permission === "granted") {
-              subscribeUserToPush(token);
-           }
-         });
-      } else if (Notification.permission === "granted") {
+      if (Notification.permission === "granted") {
          subscribeUserToPush(token);
       }
     }

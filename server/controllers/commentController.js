@@ -1,6 +1,30 @@
 const Review = require("../models/Review");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
+const PushSubscription = require("../models/PushSubscription");
+const webpush = require("web-push");
+
+async function sendPushNotification(userId, title, body, url) {
+  try {
+    const subs = await PushSubscription.find({ user: userId });
+    if (subs.length > 0) {
+      const payload = JSON.stringify({ title, body, url });
+      for (let sub of subs) {
+        await webpush.sendNotification(
+          { endpoint: sub.endpoint, keys: sub.keys },
+          payload
+        ).catch(async err => {
+          if (err.statusCode === 410) {
+            await sub.deleteOne();
+          }
+        });
+      }
+    }
+  } catch (e) {
+    console.error("Push Notification Error:", e);
+  }
+}
+
 
 // Estrae @username dal testo e restituisce gli ID utenti trovati
 async function extractMentions(text) {
@@ -45,6 +69,9 @@ exports.addComment = async (req, res) => {
 
     const populatedComments = review.comments.filter((comment) => comment.user);
 
+    const senderUser = await User.findById(userId).select("username");
+    const senderName = senderUser ? senderUser.username : "Un utente";
+
     // 1. Notifica al creatore della recensione (se non è lui stesso a commentare)
     if (review.user.toString() !== userId) {
       try {
@@ -54,6 +81,12 @@ exports.addComment = async (req, res) => {
           type: "new_comment",
           targetReview: review._id,
         }).save();
+        await sendPushNotification(
+          review.user,
+          "Nuovo commento!",
+          `${senderName} ha commentato la tua recensione.`,
+          `/`
+        );
       } catch (err) {
         console.error("⚠️ Errore notifica autore recensione:", err.message);
       }
@@ -72,6 +105,12 @@ exports.addComment = async (req, res) => {
           type: "comment_mention",
           targetReview: review._id,
         }).save();
+        await sendPushNotification(
+          mentionId,
+          "Sei stato menzionato!",
+          `${senderName} ti ha menzionato in un commento.`,
+          `/`
+        );
       }
     } catch (err) {
       console.error("⚠️ Errore notifica mention commento:", err.message);
@@ -99,6 +138,12 @@ exports.addComment = async (req, res) => {
           type: "thread_comment",
           targetReview: review._id,
         }).save();
+        await sendPushNotification(
+          commenterId,
+          "Nuovo commento nel thread!",
+          `${senderName} ha risposto a una recensione che segui.`,
+          `/`
+        );
       }
     } catch (err) {
       console.error("⚠️ Errore notifica thread:", err.message);
