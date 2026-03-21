@@ -125,8 +125,9 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
+  const [sortBy, setSortBy] = useState("publishedAt"); // "publishedAt" | "popularity"
 
-  const fetchNews = useCallback(async (pageNum) => {
+  const fetchNews = useCallback(async (pageNum, sortParam) => {
     try {
       if (pageNum === 1) setLoading(true);
       else setLoadingMore(true);
@@ -134,6 +135,7 @@ export default function NewsPage() {
       const params = new URLSearchParams({
         pageSize: PAGE_SIZE,
         page: pageNum,
+        sortBy: sortParam,
       });
 
       const res = await fetch(`${API_URL}/api/news?${params.toString()}`);
@@ -161,13 +163,19 @@ export default function NewsPage() {
   }, []);
 
   useEffect(() => {
-    fetchNews(1);
-  }, [fetchNews]);
+    fetchNews(1, sortBy);
+  }, [fetchNews, sortBy]);
 
   const loadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchNews(nextPage);
+    fetchNews(nextPage, sortBy);
+  };
+
+  const toggleSort = () => {
+    setSortBy((prev) => (prev === "publishedAt" ? "popularity" : "publishedAt"));
+    setPage(1);
+    setArticles([]); // clear until loads
   };
 
   // ── LOADING INIZIALE
@@ -175,9 +183,11 @@ export default function NewsPage() {
     return (
       <div className={styles.page}>
         <div className={styles.header}>
-          <h1 className={styles.pageTitle}>
-            <span className={styles.pageTitleAccent}>🎬</span> Cinema & TV News
-          </h1>
+          <div className={styles.titleRow}>
+            <h1 className={styles.pageTitle}>
+              <span className={styles.pageTitleAccent}>🎬</span> Cinema & TV News
+            </h1>
+          </div>
           <p className={styles.pageSubtitle}>Le ultime notizie dal mondo del cinema e delle serie TV</p>
         </div>
         <div className={styles.skeletonHero} />
@@ -237,9 +247,27 @@ export default function NewsPage() {
     <div className={styles.page}>
       {/* Header */}
       <div className={styles.header}>
-        <h1 className={styles.pageTitle}>
-          <span className={styles.pageTitleAccent}>🎬</span> Cinema & TV News
-        </h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.pageTitle}>
+            <span className={styles.pageTitleAccent}>🎬</span> Cinema & TV News
+          </h1>
+          
+          <div className={styles.sortToggle}>
+            <button 
+              className={`${styles.sortBtn} ${sortBy === "publishedAt" ? styles.sortBtnActive : ""}`}
+              onClick={() => sortBy !== "publishedAt" && toggleSort()}
+            >
+              🕒 Recenti
+            </button>
+            <button 
+              className={`${styles.sortBtn} ${sortBy === "popularity" ? styles.sortBtnActive : ""}`}
+              onClick={() => sortBy !== "popularity" && toggleSort()}
+            >
+              🔥 Popolari
+            </button>
+          </div>
+        </div>
+
         <p className={styles.pageSubtitle}>
           Le ultime notizie dal mondo del cinema e delle serie TV
         </p>

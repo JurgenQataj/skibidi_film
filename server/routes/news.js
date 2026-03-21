@@ -41,13 +41,14 @@ router.get("/", async (req, res) => {
 
   const page = parseInt(req.query.page) || 1;
   const pageSize = Math.min(parseInt(req.query.pageSize) || 12, 20);
+  const sortBy = req.query.sortBy === "popularity" ? "popularity" : "publishedAt";
 
   try {
     const response = await axios.get("https://newsapi.org/v2/everything", {
       params: {
         q: NEWS_QUERY,
         domains: ENTERTAINMENT_DOMAINS,
-        sortBy: "publishedAt",
+        sortBy,
         pageSize,
         page,
         apiKey: NEWS_API_KEY,

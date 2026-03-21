@@ -5,8 +5,7 @@
 
 .page {
   min-height: calc(100vh - 80px);
-  background: #050508;
-  padding: 32px 24px 80px;
+  padding: 110px 24px 80px; /* added 110px top padding instead of 32px to clear 80px desktop navbar */
   max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
@@ -17,11 +16,20 @@
   margin-bottom: 32px;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
 .pageTitle {
   font-size: clamp(1.6rem, 4vw, 2.4rem);
   font-weight: 900;
   color: #fff;
-  margin: 0 0 8px 0;
+  margin: 0;
   letter-spacing: -0.5px;
   line-height: 1.15;
 }
@@ -34,6 +42,39 @@
   font-size: 0.92rem;
   color: rgba(255, 255, 255, 0.45);
   margin: 0;
+}
+
+/* ── SORT TOGGLE ── */
+.sortToggle {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 30px;
+  padding: 4px;
+}
+
+.sortBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sortBtn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sortBtnActive {
+  background: rgba(229, 9, 20, 0.15);
+  color: #e50914;
 }
 
 /* ══════════════════════════════════════════
@@ -67,6 +108,7 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  image-rendering: -webkit-optimize-contrast; /* forces sharper image rendering on webkit */
 }
 
 .heroGradient {
@@ -178,6 +220,7 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.4s ease;
+  image-rendering: -webkit-optimize-contrast; /* sharper rendering */
 }
 
 .card:hover .cardImage {
@@ -458,8 +501,8 @@
 ══════════════════════════════════════════ */
 @media (max-width: 1024px) {
   .page {
-    /* padding top per la mobile topbar */
-    padding-top: calc(40px + env(safe-area-inset-top, 0px) + 20px);
+    /* Mobile topbar is fixed and overlaps, need more padding */
+    padding-top: calc(70px + env(safe-area-inset-top, 0px));
     /* padding bottom per la bottom navbar */
     padding-bottom: calc(54px + 24px);
   }
