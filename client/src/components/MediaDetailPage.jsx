@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef, useState, useCallback } from "react";
+import { FastAverageColor } from "fast-average-color";
 import { Link } from "react-router-dom";
 import styles from "./MediaDetailPage.module.css";
 import AddReviewForm from "./AddReviewForm";
@@ -144,6 +145,26 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     handleDeleteComment,
   } = useMediaDetail(mediaType);
 
+  const [dynamicColors, setDynamicColors] = useState({ bg: null, primary: null });
+
+  // Extract the dominant color via the Vite /tmdb-img/ proxy (same-origin, no CORS taint)
+  const handleColorExtraction = useCallback((posterPath) => {
+    if (!posterPath) return;
+    const fac = new FastAverageColor();
+    // /tmdb-img/w92<path> is proxied by Vite → image.tmdb.org/t/p/w92<path>
+    const proxyUrl = `/tmdb-img/w92${posterPath}`;
+    fac.getColorAsync(proxyUrl)
+      .then(color => {
+        const [r, g, b] = color.value;
+        const bgRgba = `rgba(${r}, ${g}, ${b}, 0.18)`;
+        setDynamicColors({ bg: bgRgba, primary: color.hex });
+      })
+      .catch(e => {
+        console.warn("FastAverageColor error:", e);
+        setDynamicColors({ bg: null, primary: null });
+      });
+  }, []);
+
   if (loading) return <SkeletonWithLogo />;
   if (error) return <p className={styles.loading}>{error}</p>;
   if (!media) return <p className={styles.loading}>{labels.notFound}</p>;
@@ -151,7 +172,13 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
   const trailer = getMainTrailer(media.videos);
 
   return (
-    <div className={styles.pageContainer}>
+    <div 
+      className={styles.pageContainer}
+      style={{
+        ...(dynamicColors.bg ? { '--dynamic-bg': dynamicColors.bg } : {}),
+        ...(dynamicColors.primary ? { '--dynamic-primary': dynamicColors.primary } : {})
+      }}
+    >
       {/* ── HEADER ── */}
       <div
         className={styles.header}
@@ -169,6 +196,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
               }
               alt={`Locandina di ${media.title}`}
               className={styles.poster}
+              onLoad={() => handleColorExtraction(media.poster_path)}
             />
             <div className={styles.details}>
               <h1 className={styles.title}>

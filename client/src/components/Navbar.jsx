@@ -9,6 +9,7 @@ import {
   FaBell,
   FaPlayCircle,
   FaGamepad,
+  FaNewspaper,
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -25,7 +26,8 @@ function Navbar() {
     location.pathname.startsWith('/rating-game') ||
     location.pathname.startsWith('/actor-age-game') ||
     location.pathname.startsWith('/guess-actor') ||
-    location.pathname.startsWith('/guess-year');
+    location.pathname.startsWith('/guess-year') ||
+    location.pathname.startsWith('/news');
 
   const token = localStorage.getItem("token");
   let userId = null;
@@ -149,6 +151,9 @@ function Navbar() {
           </Link>
           <Link to="/horizon" className={styles.navLink}>
             <FaPlayCircle /> <span>Horizon</span>
+          </Link>
+          <Link to="/news" className={styles.navLink}>
+            <FaNewspaper /> <span>News</span>
           </Link>
           <Link to="/rating-game" className={styles.navLink}>
             <FaGamepad /> <span>Rating Game</span>

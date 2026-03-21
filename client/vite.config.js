@@ -89,6 +89,18 @@ export default defineConfig(({ command }) => {
           changeOrigin: true,
           secure: false,
         },
+        "/tmdb-img": {
+          target: "https://image.tmdb.org/t/p",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/tmdb-img/, ""),
+        },
+        "/newsapi": {
+          target: "https://newsapi.org",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/newsapi/, ""),
+        },
       },
     },
     preview: {
@@ -97,6 +109,18 @@ export default defineConfig(({ command }) => {
           target: process.env.VITE_API_TARGET ?? "http://localhost:5000", // nosonar
           changeOrigin: true,
           secure: false,
+        },
+        "/tmdb-img": {
+          target: "https://image.tmdb.org/t/p",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/tmdb-img/, ""),
+        },
+        "/newsapi": {
+          target: "https://newsapi.org",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/newsapi/, ""),
         },
       },
     },

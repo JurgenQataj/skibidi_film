@@ -38,6 +38,7 @@ const GuessActorGamePage = lazy(() => import("./pages/GuessActorGamePage"));
 const GuessActorGamePlay = lazy(() => import("./pages/GuessActorGamePlay"));
 const GuessYearGamePage = lazy(() => import("./pages/GuessYearGamePage"));
 const GuessYearGamePlay = lazy(() => import("./pages/GuessYearGamePlay"));
+const NewsPage = lazy(() => import("./pages/NewsPage"));
 
 
 // Import Componenti
@@ -154,6 +155,7 @@ function App() {
             <Route path="guess-actor/play" element={<GuessActorGamePlay />} />
             <Route path="guess-year" element={<GuessYearGamePage />} />
             <Route path="guess-year/play" element={<GuessYearGamePlay />} />
+            <Route path="news" element={<NewsPage />} />
             
             {/* Profilo e Statistiche */}
             <Route path="profile/:userId" element={<ProfilePage />} />

@@ -16,6 +16,7 @@
     "axios": "^1.11.0",
     "d3-scale": "^4.0.2",
     "date-fns": "^4.1.0",
+    "fast-average-color": "^9.5.0",
     "framer-motion": "^12.35.0",
     "jwt-decode": "^4.0.0",
     "react": "^18.2.0",

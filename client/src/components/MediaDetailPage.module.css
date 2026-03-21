@@ -1,6 +1,8 @@
 .pageContainer {
   color: white;
-  padding: 100px 0 30px; /* Top padding per Navbar fixed */
+  padding: 0 0 30px; /* Header si estende fino alla navbar */
+  background-color: var(--dynamic-bg, transparent);
+  transition: background-color 0.5s ease;
 }
 
 .loading {
@@ -18,7 +20,7 @@
 
 .headerOverlay {
   background: rgba(15, 15, 18, 0.5);
-  padding: 40px 20px;
+  padding: 120px 20px 40px; /* top: compensa navbar fissa (≈60px) + respiro visivo */
   backdrop-filter: none;
 }
 
@@ -69,7 +71,7 @@
 }
 
 .personLink:hover {
-  color: var(--primary-color);
+  color: var(--dynamic-primary, var(--primary-color));
   text-decoration: underline;
 }
 
@@ -88,9 +90,10 @@
 
 .overviewSection h3 {
   font-size: 1.5rem;
-  border-bottom: 2px solid var(--primary-color);
+  border-bottom: 2px solid var(--dynamic-primary, var(--primary-color));
   padding-bottom: 10px;
   margin-bottom: 15px;
+  transition: border-color 0.5s ease;
 }
 
 .overview {
@@ -146,10 +149,10 @@
 }
 
 .trailerLink {
-  color: var(--primary-color);
+  color: var(--dynamic-primary, var(--primary-color));
   text-decoration: none;
   font-weight: bold;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, color 0.5s ease;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -166,9 +169,10 @@
 
 .castSection h2 {
   font-size: 1.5rem;
-  border-bottom: 2px solid var(--primary-color);
+  border-bottom: 2px solid var(--dynamic-primary, var(--primary-color));
   padding-bottom: 10px;
   margin-bottom: 15px;
+  transition: border-color 0.5s ease;
 }
 
 .castGrid {
@@ -339,9 +343,10 @@
   font-size: 0.9rem;
 }
 .actionButton {
-  background-color: var(--primary-color);
+  background-color: var(--dynamic-primary, var(--primary-color));
   color: white;
   padding: 10px 18px;
+  transition: background-color 0.5s ease, opacity 0.2s;
 }
 .actionButton:hover {
   opacity: 0.8;
@@ -450,12 +455,13 @@
   color: white;
 }
 .commentForm button {
-  background-color: var(--primary-color);
+  background-color: var(--dynamic-primary, var(--primary-color));
   color: white;
   border: none;
   border-radius: 5px;
   padding: 8px 12px;
   cursor: pointer;
+  transition: background-color 0.5s ease;
 }
 
 .deleteCommentButton {

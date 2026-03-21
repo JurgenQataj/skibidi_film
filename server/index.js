@@ -60,6 +60,7 @@ app.use("/api/actor-age-game", require("./routes/actorAgeGame")); // [NEW] Indov
 app.use("/api/guess-actor", require("./routes/guessActor")); // [NEW] Chi è? Indovina Attore
 app.use("/api/guess-year", require("./routes/guessYearGame")); // [NEW] Quale Anno?
 app.use("/api/push", require("./routes/push")); // [NEW] VAPID Push Subscriptions
+app.use("/api/news", require("./routes/news")); // [NEW] Cinema & TV News
 
 app.get("/", (req, res) => res.send("Skibidi Film API Running"));
 
