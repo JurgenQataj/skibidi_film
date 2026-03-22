@@ -152,9 +152,35 @@
   width: 100%;
 }
 
-/* Campanella notifiche — nascosta su desktop */
-.mobileBell {
-  display: none;
+/* Container that holds Notifiche and News */
+.headerIconsContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 8px;
+}
+
+/* Icone Notifiche e News — visibili su desktop e mobile */
+.mobileBell, .newsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.mobileBell:hover, .newsButton:hover {
+  background: rgba(229, 9, 20, 0.25);
+  transform: scale(1.05);
 }
 
 .mobileBellBadge {
@@ -193,12 +219,12 @@
     padding: 0 4px; /* Ridotto il padding laterale ai minimi termini */
   }
   .title {
-    font-size: 0.88rem; /* +10% */
+    font-size: 0.97rem; /* Ulteriore +10% (era 0.88) */
     padding: 0 2px;
-    white-space: nowrap; /* Impedisce che il titolo vada a capo */
+    white-space: nowrap;
   }
   .toggleButton {
-    font-size: 0.77rem; /* +10% */
+    font-size: 0.85rem; /* Ulteriore +10% (era 0.77) */
     padding: 4px 6px;
     white-space: nowrap;
   }
@@ -219,26 +245,20 @@
     aspect-ratio: 2/3 !important;
   }
 
-  /* Campanella mobile — visibile */
-  .mobileBell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    background: transparent;
-    border: none;
-    color: #ffffff;
+  /* Container icone mobile */
+  .headerIconsContainer {
+    gap: 4px;
+    margin-left: 4px;
+  }
+
+  /* Icone Notifiche e News mobile — rimpicciolite */
+  .mobileBell, .newsButton {
     font-size: 1.05rem;
     width: 32px;
     height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.2s ease;
-    margin-left: 8px;
   }
 
-  .mobileBell:active {
+  .mobileBell:active, .newsButton:active {
     background: rgba(229, 9, 20, 0.25);
   }
 }
@@ -262,10 +282,10 @@
 /* Samsung A52 (width around 412px) e S23 (360px) - shrink everything to fit one line */
 @media (max-width: 414px) {
   .title {
-    font-size: 0.77rem; /* +10% */
+    font-size: 0.85rem; /* (era 0.77) */
   }
   .toggleButton {
-    font-size: 0.71rem; /* +10% */
+    font-size: 0.78rem; /* Ulteriore +10% (era 0.71) */
     padding: 4px 4px;
   }
   .toggleContainer {
@@ -280,11 +300,11 @@
     gap: 2px;
   }
   .title {
-    font-size: 0.71rem; /* +10% */
+    font-size: 0.78rem; /* (era 0.71) */
   }
   .toggleButton {
     padding: 4px 4px;
-    font-size: 0.66rem; /* +10% */
+    font-size: 0.73rem; /* Ulteriore +10% (era 0.66) */
     letter-spacing: -0.5px; /* Comprime leggermente il testo per farlo entrare */
   }
   .cardWrapper {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { FaChevronLeft, FaChevronRight, FaBell } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaBell, FaNewspaper } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import styles from "./CustomTrendingRow.module.css";
 import MovieCard from "./MovieCard";
@@ -120,7 +120,7 @@ const CustomTrendingRow = () => {
         </div>
 
         {/* Testo Centrale */}
-        <h2 className={styles.title}>in tendenza</h2>
+        <h2 className={styles.title}>Tendenza</h2>
 
         {/* Switch di Destra (Oggi / Questa Settimana) */}
         <div className={styles.toggleContainer}>
@@ -134,23 +134,33 @@ const CustomTrendingRow = () => {
             className={`${styles.toggleButton} ${timeWindow === "week" ? styles.active : ""}`}
             onClick={() => setTimeWindow("week")}
           >
-            Questa settimana
+            Settimana
           </button>
         </div>
 
-        {/* Campanella notifiche — solo mobile, a destra dello switch */}
-        <button
-          className={styles.mobileBell}
-          onClick={handleBellClick}
-          aria-label="Notifiche"
-        >
-          <FaBell />
-          {unreadCount > 0 && (
-            <span className={styles.mobileBellBadge}>
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
-          )}
-        </button>
+        {/* Campanella notifiche e Icona News (allineate a destra) */}
+        <div className={styles.headerIconsContainer}>
+          <button
+            className={styles.mobileBell}
+            onClick={handleBellClick}
+            aria-label="Notifiche"
+          >
+            <FaBell />
+            {unreadCount > 0 && (
+              <span className={styles.mobileBellBadge}>
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            className={styles.newsButton}
+            onClick={() => navigate("/news")}
+            aria-label="News"
+          >
+            <FaNewspaper />
+          </button>
+        </div>
       </div>
 
       {loading ? (

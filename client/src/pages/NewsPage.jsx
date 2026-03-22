@@ -78,45 +78,7 @@ function NewsCard({ article }) {
   );
 }
 
-// Hero card (articolo in evidenza, il primo della lista)
-function HeroCard({ article }) {
-  const source = article.source?.name || "Fonte sconosciuta";
-  return (
-    <a
-      href={article.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.heroCard}
-    >
-      {article.urlToImage && (
-        <>
-          <img
-            src={article.urlToImage}
-            alt={article.title}
-            className={styles.heroImage}
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
-          <div className={styles.heroGradient} />
-        </>
-      )}
-      <div className={styles.heroContent}>
-        <div className={styles.heroBadge}>🔥 In evidenza</div>
-        <div className={styles.cardMeta} style={{ marginBottom: 8 }}>
-          <span className={styles.cardSource}>{source}</span>
-          <span className={styles.cardDot}>·</span>
-          <span className={styles.cardDate}>{formatDate(article.publishedAt)}</span>
-        </div>
-        <h2 className={styles.heroTitle}>{article.title}</h2>
-        {article.description && (
-          <p className={styles.heroDesc}>{article.description}</p>
-        )}
-        <span className={styles.readMore}>Leggi l'articolo →</span>
-      </div>
-    </a>
-  );
-}
+
 
 export default function NewsPage() {
   const [articles, setArticles] = useState([]);
@@ -241,8 +203,6 @@ export default function NewsPage() {
     );
   }
 
-  const [hero, ...rest] = articles;
-
   return (
     <div className={styles.page}>
       {/* Header */}
@@ -273,12 +233,9 @@ export default function NewsPage() {
         </p>
       </div>
 
-      {/* Hero */}
-      <HeroCard article={hero} />
-
       {/* Grid */}
       <div className={styles.grid}>
-        {rest.map((article, i) => (
+        {articles.map((article, i) => (
           <NewsCard key={`${article.url}-${i}`} article={article} />
         ))}
       </div>

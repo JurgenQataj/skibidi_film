@@ -58,7 +58,7 @@ const TrendingRow = ({ mediaType = "movie" }) => {
             className={`${styles.toggleButton} ${timeWindow === "week" ? styles.active : ""}`}
             onClick={() => setTimeWindow("week")}
           >
-            Questa settimana
+            Settimana
           </button>
         </div>
       </div>

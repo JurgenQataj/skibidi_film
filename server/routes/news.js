@@ -5,7 +5,7 @@ const axios = require("axios");
 const NEWS_API_KEY = process.env.NEWS_API_KEY;
 
 const NEWS_QUERY =
-  'film OR cinema OR "serie TV" OR "serie tv" OR movie OR "box office" OR Oscar OR Netflix OR "Disney+" OR "Amazon Prime Video" OR HBO OR "Prime Video" OR "Apple TV+" OR Cannes OR "Venezia Film Festival" OR "Golden Globe" OR BAFTA OR trailer OR sequel OR blockbuster';
+  '(film OR cinema OR "serie TV" OR "serie tv" OR movie OR "box office" OR Oscar OR Netflix OR "Disney+" OR "Amazon Prime Video" OR HBO OR "Prime Video" OR "Apple TV+" OR Cannes OR "Venezia Film Festival" OR "Golden Globe" OR BAFTA OR trailer OR sequel OR blockbuster) -videogioco -videogiochi -videogame -videogames -gaming -playstation -xbox -nintendo -gta -"video game" -"video games"';
 
 const ENTERTAINMENT_DOMAINS = [
   "variety.com",
@@ -14,7 +14,6 @@ const ENTERTAINMENT_DOMAINS = [
   "rottentomatoes.com",
   "indiewire.com",
   "screenrant.com",
-  "ign.com",
   "empireonline.com",
   "collider.com",
   "slashfilm.com",

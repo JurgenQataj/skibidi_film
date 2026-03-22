@@ -165,7 +165,7 @@
     font-size: 1.2rem;
   }
   .toggleButton {
-    font-size: 0.8rem;
+    font-size: 0.88rem; /* +10% */
     padding: 4px 12px;
   }
   .scrollContainer {
@@ -223,7 +223,7 @@
   }
   .toggleButton {
     padding: 4px 8px;
-    font-size: 0.75rem;
+    font-size: 0.83rem; /* +10% */
   }
   .cardWrapper {
     flex: 0 0 60px; /* Ridotto del ~25% da 81px */

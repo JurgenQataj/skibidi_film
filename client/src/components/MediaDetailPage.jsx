@@ -147,12 +147,13 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
 
   const [dynamicColors, setDynamicColors] = useState({ bg: null, primary: null });
 
-  // Extract the dominant color via the Vite /tmdb-img/ proxy (same-origin, no CORS taint)
+  // Extract the dominant color via the express backend proxy API (fixes CORS in production)
   const handleColorExtraction = useCallback((posterPath) => {
     if (!posterPath) return;
     const fac = new FastAverageColor();
-    // /tmdb-img/w92<path> is proxied by Vite → image.tmdb.org/t/p/w92<path>
-    const proxyUrl = `/tmdb-img/w92${posterPath}`;
+    const API_URL = import.meta.env.VITE_API_URL || "";
+    const proxyUrl = `${API_URL}/api/tmdb-img/w92${posterPath}`;
+    
     fac.getColorAsync(proxyUrl)
       .then(color => {
         const [r, g, b] = color.value;

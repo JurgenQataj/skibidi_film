@@ -62,6 +62,30 @@ app.use("/api/guess-year", require("./routes/guessYearGame")); // [NEW] Quale An
 app.use("/api/push", require("./routes/push")); // [NEW] VAPID Push Subscriptions
 app.use("/api/news", require("./routes/news")); // [NEW] Cinema & TV News
 
+// --- PROXY IMMAGINI TMDB (Risolve CORS in produzione per fast-average-color) ---
+app.get("/api/tmdb-img/:size/:file", async (req, res) => {
+  const axios = require("axios");
+  const { size, file } = req.params;
+  try {
+    const tmdbUrl = `https://image.tmdb.org/t/p/${size}/${file}`;
+    const response = await axios({
+      url: tmdbUrl,
+      method: "GET",
+      responseType: "stream"
+    });
+    
+    // Pass headers
+    res.set("Content-Type", response.headers["content-type"]);
+    res.set("Cache-Control", "public, max-age=31536000, immutable");
+    
+    // Stream response directly to client
+    response.data.pipe(res);
+  } catch (error) {
+    console.error("Errore nel proxy immagine TMDB:", error.message);
+    res.status(500).json({ error: "Failed to fetch image" });
+  }
+});
+
 app.get("/", (req, res) => res.send("Skibidi Film API Running"));
 
 // Health check endpoint to diagnose configuration issues
