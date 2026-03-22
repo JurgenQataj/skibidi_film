@@ -57,12 +57,15 @@ export function useMediaDetail(mediaType) {
       if (userId) {
         promises.push(
           axios.get(`${API_URL}/api/reviews/status/${tmdbId}?mediaType=${mediaType}`, { headers })
+            .catch(() => null)
         );
         promises.push(
           axios.get(`${API_URL}/api/watchlist/status/${tmdbId}?mediaType=${mediaType}`, { headers })
+            .catch(() => null)
         );
         promises.push(
           axios.get(`${API_URL}/api/users/${userId}/lists`, { headers })
+            .catch(() => null)
         );
       }
 
@@ -80,9 +83,9 @@ export function useMediaDetail(mediaType) {
       setSkibidiData(results[1].data);
 
       if (userId && results.length > 2) {
-        setHasUserReviewed(results[2].data.hasReviewed);
-        setIsInWatchlist(results[3].data.isInWatchlist);
-        setUserLists(results[4].data);
+        setHasUserReviewed(results[2]?.data?.hasReviewed || false);
+        setIsInWatchlist(results[3]?.data?.isInWatchlist || false);
+        setUserLists(results[4]?.data || []);
       }
     } catch (err) {
       console.error("Errore nel caricamento dati:", err);

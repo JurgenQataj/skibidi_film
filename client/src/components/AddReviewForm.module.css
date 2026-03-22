@@ -1,265 +1,241 @@
 .formContainer {
-  background: rgba(20, 15, 30, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  padding: 24px;
-  border-radius: 16px;
   margin-bottom: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  /* PREVENZIONE OVERFLOW */
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 100%;
-}
-
-.formContainer h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #fff;
-}
-
-.inputGroup {
-  margin-bottom: 20px;
-  /* PREVENZIONE OVERFLOW */
   width: 100%;
   box-sizing: border-box;
 }
 
-.inputGroup label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  /* PREVENZIONE TESTO LUNGO */
-  word-wrap: break-word;
-}
-
-.ratingInput,
-.commentTextarea {
-  width: 100%;
-  padding: 12px 14px;
+.minimalForm {
+  background: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 20px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background-color: rgba(255, 255, 255, 0.04);
-  color: white;
-  font-size: 1rem;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  box-sizing: border-box;
-  /* PREVENZIONE OVERFLOW */
-  max-width: 100%;
-  resize: vertical; /* Solo resize verticale per textarea */
-  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.ratingInput:focus,
-.commentTextarea:focus {
-  border-color: rgba(200, 8, 18, 0.8);
-  background-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 4px rgba(200, 8, 18, 0.15);
+.minimalForm.active {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.inputArea {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.avatarPlaceholder {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.avatarCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fieldsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.ratingWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  border-radius: 8px;
+  padding: 4px 0;
+  width: fit-content;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ratingWrapper:focus-within {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.starIcon {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.ratingWrapper:focus-within .starIcon {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ratingInput {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-weight: 400;
+  width: 90px;
   outline: none;
+  font-family: inherit;
+  padding: 4px 0;
+  letter-spacing: 0.5px;
+}
+
+.ratingInput::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 300;
+}
+
+.ratingInput::-webkit-inner-spin-button, 
+.ratingInput::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
 
 .commentTextarea {
-  min-height: 80px; /* Altezza minima per textarea (più compatta) */
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: 300;
+  line-height: 1.6;
+  outline: none;
+  resize: none;
+  padding: 4px 0;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.commentTextarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.submitArea {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
 .submitButton {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary-color), #5c2d7e);
-  color: white;
-  font-weight: 600;
-  font-size: 0.95rem;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  letter-spacing: 0.3px;
+  padding: 8px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+  font-size: 0.85rem;
+  font-family: inherit;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
-  /* PREVENZIONE OVERFLOW */
-  box-sizing: border-box;
-  max-width: 100%;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
 }
 
-.submitButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(200, 8, 18, 0.4);
+.minimalForm.active .submitButton {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.submitButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.submitButton:disabled {
+  border-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
 }
 
 .error {
-  color: #ff8a8a;
-  margin-top: -10px;
-  margin-bottom: 15px;
-  /* PREVENZIONE TESTO LUNGO */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  color: rgba(255, 100, 100, 0.8);
+  font-size: 0.8rem;
+  font-weight: 300;
+  margin: 0 0 0 46px;
+  letter-spacing: 0.2px;
 }
 
 /* Mention Dropdown */
 .mentionDropdown {
   position: absolute;
-  bottom: calc(100% - 15px); /* Posiziona appena sopra il bordo superiore della textarea */
+  top: 40px;
   left: 0;
-  right: 0;
-  background: rgba(18, 18, 28, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
+  background: rgba(10, 10, 12, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   z-index: 100;
-  animation: slideUp 0.12s ease;
+  animation: fadeInDown 0.2s ease;
+  max-width: 250px;
+  width: 100%;
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(6px); }
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .mentionOption {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  padding: 9px 14px;
+  padding: 10px 14px;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: white;
-  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 300;
   cursor: pointer;
-  transition: background 0.1s;
+  transition: background 0.2s;
   text-align: left;
 }
 
-.mentionOption:hover { background: rgba(255, 255, 255, 0.07); }
+.mentionOption:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.mentionOption:hover { 
+  background: rgba(255, 255, 255, 0.05); 
+  color: #fff;
+}
 
 .mentionAvatar {
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.8;
 }
 
-/* MEDIA QUERY PER TABLET E MOBILE */
-@media (max-width: 1024px) {
-  .formContainer {
-    padding: 20px; /* Padding ridotto */
-    margin-top: 0;
-    margin-bottom: 30px;
-    /* ASSICURA CHE NON ESCA DALLO SCHERMO */
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+@media (max-width: 768px) {
+  .minimalForm {
+    padding: 16px;
   }
-
-  .inputGroup {
-    margin-bottom: 15px; /* Spazio ridotto tra i campi */
-  }
-
-  .inputGroup label {
-    font-size: 0.9rem; /* Label più piccole */
-    margin-bottom: 6px;
-  }
-
-  .ratingInput,
-  .commentTextarea {
-    padding: 12px; /* Padding maggiore per touch */
-    font-size: 1rem; /* Dimensione leggibile su mobile */
-    border-radius: 6px; /* Bordi meno arrotondati */
-  }
-
-  .ratingInput {
-    /* Specifico per il campo voto */
-    max-width: 120px; /* Non occupa tutta la larghezza */
-  }
-
-  .commentTextarea {
-    min-height: 100px; /* Textarea più grande per facilità di scrittura */
-    line-height: 1.4;
-  }
-
-  .submitButton {
-    padding: 14px; /* Pulsante più grande per touch */
-    font-size: 1rem;
-    border-radius: 6px;
-    /* IMPORTANTE: mantieni la larghezza piena */
-    width: 100%;
-  }
-
-  .error {
-    font-size: 0.9rem;
-    margin-top: -8px;
-    margin-bottom: 12px;
+  
+  .avatarCircle {
+    width: 28px;
+    height: 28px;
   }
 }
 
-/* MEDIA QUERY PER MOBILE MOLTO PICCOLO */
-@media (max-width: 480px) {
-  .formContainer {
-    padding: 15px; /* Padding ancora più ridotto */
-    margin-bottom: 20px;
-  }
 
-  .inputGroup {
-    margin-bottom: 12px;
-  }
-
-  .inputGroup label {
-    font-size: 0.85rem;
-    margin-bottom: 5px;
-  }
-
-  .ratingInput,
-  .commentTextarea {
-    padding: 10px;
-    font-size: 0.95rem;
-  }
-
-  .ratingInput {
-    max-width: 100px; /* Ancora più piccolo su schermi molto piccoli */
-  }
-
-  .commentTextarea {
-    min-height: 90px;
-  }
-
-  .submitButton {
-    padding: 12px;
-    font-size: 0.95rem;
-  }
-
-  .error {
-    font-size: 0.85rem;
-  }
-}
-
-/* ACCESSIBILITÀ E TOUCH */
-@media (max-width: 1024px) {
-  /* Miglior contrasto per i campi di input su mobile */
-  .ratingInput:focus,
-  .commentTextarea:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 1px;
-    border-color: var(--primary-color);
-  }
-
-  /* Effetto hover migliorato per touch */
-  .submitButton:active {
-    transform: translateY(1px);
-    background-color: var(--secondary-color);
-  }
-
-  /* Assicura che i placeholder siano leggibili */
-  .ratingInput::placeholder,
-  .commentTextarea::placeholder {
-    color: #aaa;
-    opacity: 1;
-  }
-}

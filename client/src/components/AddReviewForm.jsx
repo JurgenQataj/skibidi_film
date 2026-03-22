@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import styles from "./AddReviewForm.module.css";
+import { FaStar } from "react-icons/fa";
 
 function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
   const [rating, setRating] = useState("");
@@ -10,6 +11,7 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
   const [mentionUsers, setMentionUsers] = useState([]);
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionPosition, setMentionPosition] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -87,6 +89,7 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
 
       setRating("");
       setComment("");
+      setIsFocused(false);
       onReviewAdded();
     } catch (err) {
       setError(err.response?.data?.message || "Si è verificato un errore.");
@@ -94,61 +97,86 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.formContainer}>
-      <h3>Lascia la tua Recensione</h3>
-      <div className={styles.inputGroup}>
-        <label>Voto (0.0 - 10.0)</label>
-        <input
-          type="number"
-          step="0.1"
-          min="0"
-          max="10"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-          className={styles.ratingInput}
-        />
-      </div>
-      <div className={styles.inputGroup} style={{ position: "relative" }}>
-        <label>Commento (opzionale)</label>
-        {showMentionDropdown && mentionUsers.length > 0 && (
-          <div className={styles.mentionDropdown}>
-            {mentionUsers.map((u) => (
-              <button
-                key={u._id}
-                type="button"
-                className={styles.mentionOption}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleSelectMention(u.username);
-                }}
-              >
-                <img
-                  src={
-                    u.avatar_url ||
-                    "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
-                  }
-                  alt={u.username}
-                  className={styles.mentionAvatar}
-                />
-                <span>@{u.username}</span>
-              </button>
-            ))}
+    <div className={styles.formContainer}>
+      <form onSubmit={handleSubmit} className={`${styles.minimalForm} ${isFocused || comment || rating ? styles.active : ''}`}>
+        <div className={styles.inputArea}>
+          <div className={styles.avatarPlaceholder}>
+            {/* Si potrebbe inserire l'avatar dell'utente loggato qui */}
+            <div className={styles.avatarCircle}></div>
           </div>
-        )}
-        <textarea
-          ref={inputRef}
-          value={comment}
-          onChange={handleCommentChange}
-          className={styles.commentTextarea}
-          rows="4"
-        />
-      </div>
-      {error && <p className={styles.error}>{error}</p>}
-      <button type="submit" className={styles.submitButton}>
-        Invia Recensione
-      </button>
-    </form>
+          
+          <div className={styles.fieldsContainer} style={{ position: "relative" }}>
+            <div className={styles.ratingWrapper}>
+              <FaStar className={styles.starIcon} />
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="10"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                className={styles.ratingInput}
+                placeholder="Voto (0-10)"
+                required
+              />
+            </div>
+
+            {showMentionDropdown && mentionUsers.length > 0 && (
+              <div className={styles.mentionDropdown}>
+                {mentionUsers.map((u) => (
+                  <button
+                    key={u._id}
+                    type="button"
+                    className={styles.mentionOption}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelectMention(u.username);
+                    }}
+                  >
+                    <img
+                      src={
+                        u.avatar_url ||
+                        "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
+                      }
+                      alt={u.username}
+                      className={styles.mentionAvatar}
+                    />
+                    <span>@{u.username}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            <textarea
+              ref={inputRef}
+              value={comment}
+              onChange={handleCommentChange}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className={styles.commentTextarea}
+              rows={isFocused || comment ? "3" : "1"}
+              placeholder="Scrivi una recensione..."
+            />
+          </div>
+        </div>
+        
+        {error && <p className={styles.error}>{error}</p>}
+        
+        <div className={styles.submitArea}>
+          <button 
+            type="submit" 
+            className={styles.submitButton}
+            disabled={!rating}
+          >
+            Pubblica
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
 export default AddReviewForm;
+

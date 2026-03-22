@@ -1,5 +1,4 @@
 import React, { useRef, useState, useCallback } from "react";
-import { FastAverageColor } from "fast-average-color";
 import { Link } from "react-router-dom";
 import styles from "./MediaDetailPage.module.css";
 import AddReviewForm from "./AddReviewForm";
@@ -145,7 +144,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     handleDeleteComment,
   } = useMediaDetail(mediaType);
 
-  const [dynamicColors, setDynamicColors] = useState({ bg: null, primary: null });
+  const [dynamicColors, setDynamicColors] = useState({ gradient: null, primary: null });
   const commentInputRef = useRef(null);
 
   const handleReplyClick = (username) => {
@@ -160,23 +159,74 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     }, 100);
   };
 
-  // Extract the dominant color via the express backend proxy API (fixes CORS in production)
-  const handleColorExtraction = useCallback((posterPath) => {
-    if (!posterPath) return;
-    const fac = new FastAverageColor();
+  // Extract multiple dominant colors from the poster via canvas sampling
+  const handleColorExtraction = useCallback((imagePath) => {
+    if (!imagePath) return;
     const API_URL = import.meta.env.VITE_API_URL || "";
-    const proxyUrl = `${API_URL}/api/tmdb-img/w92${posterPath}`;
-    
-    fac.getColorAsync(proxyUrl)
-      .then(color => {
-        const [r, g, b] = color.value;
-        const bgRgba = `rgba(${r}, ${g}, ${b}, 0.18)`;
-        setDynamicColors({ bg: bgRgba, primary: color.hex });
-      })
-      .catch(e => {
-        console.warn("FastAverageColor error:", e);
-        setDynamicColors({ bg: null, primary: null });
+    const url = `${API_URL}/api/tmdb-img/w500${imagePath}`;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const W = img.naturalWidth || 200;
+      const H = img.naturalHeight || 300;
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, W, H);
+
+      // Sample 3 zones: top-third, mid-third, bottom-third
+      const sampleZone = (y0, y1) => {
+        const data = ctx.getImageData(0, y0, W, y1 - y0).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const pr = data[i], pg = data[i+1], pb = data[i+2];
+          // Skip near-black and near-white pixels
+          const brightness = (pr + pg + pb) / 3;
+          if (brightness < 20 || brightness > 235) continue;
+          r += pr; g += pg; b += pb; count++;
+        }
+        if (count === 0) return null;
+        return [Math.round(r/count), Math.round(g/count), Math.round(b/count)];
+      };
+
+      // Boost saturation of a color so it pops more
+      const saturate = ([r, g, b], factor = 1.6) => {
+        const avg = (r + g + b) / 3;
+        const nr = Math.min(255, Math.round(avg + (r - avg) * factor));
+        const ng = Math.min(255, Math.round(avg + (g - avg) * factor));
+        const nb = Math.min(255, Math.round(avg + (b - avg) * factor));
+        return [nr, ng, nb];
+      };
+
+      const third = Math.floor(H / 3);
+      const c1raw = sampleZone(0, third);
+      const c2raw = sampleZone(third, third * 2);
+      const c3raw = sampleZone(third * 2, H);
+
+      const c1 = c1raw ? saturate(c1raw) : null;
+      const c2 = c2raw ? saturate(c2raw) : null;
+      const c3 = c3raw ? saturate(c3raw) : null;
+
+      // Pick primary from the most vivid sampled color
+      const toHex = ([r,g,b]) => '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+      const primaryColor = c1 || c2 || c3;
+
+      // Build a radial gradient using the sampled zones
+      const a1 = c1 ? `rgba(${c1[0]},${c1[1]},${c1[2]},0.45)` : 'transparent';
+      const a2 = c2 ? `rgba(${c2[0]},${c2[1]},${c2[2]},0.25)` : 'transparent';
+      const gradient = `radial-gradient(ellipse at top left, ${a1} 0%, ${a2} 45%, rgba(13,13,16,0) 75%)`;
+
+      setDynamicColors({
+        gradient,
+        primary: primaryColor ? toHex(primaryColor) : null,
       });
+    };
+    img.onerror = () => {
+      setDynamicColors({ gradient: null, primary: null });
+    };
+    img.src = url;
   }, []);
 
   if (loading) return <SkeletonWithLogo />;
@@ -189,7 +239,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     <div 
       className={styles.pageContainer}
       style={{
-        ...(dynamicColors.bg ? { '--dynamic-bg': dynamicColors.bg } : {}),
+        ...(dynamicColors.gradient ? { '--dynamic-gradient': dynamicColors.gradient } : {}),
         ...(dynamicColors.primary ? { '--dynamic-primary': dynamicColors.primary } : {})
       }}
     >
@@ -210,7 +260,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
               }
               alt={`Locandina di ${media.title}`}
               className={styles.poster}
-              onLoad={() => handleColorExtraction(media.poster_path)}
+              onLoad={() => handleColorExtraction(media.backdrop_path || media.poster_path)}
             />
             <div className={styles.details}>
               <h1 className={styles.title}>
