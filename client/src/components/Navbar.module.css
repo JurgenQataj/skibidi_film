@@ -1,19 +1,18 @@
 .navbar {
-  background-color: rgba(15, 15, 20, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 0 30px;
-  position: fixed; /* Fixed to top */
+  background-color: rgba(10, 10, 12, 0.75);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  padding: 0 36px;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  max-width: none; /* Occupy full width */
+  max-width: none;
   margin: 0;
-  border-radius: 0; /* Remove pill shape */
+  border-radius: 0;
   z-index: 1000;
   box-sizing: border-box;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .navContent {
@@ -22,150 +21,129 @@
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
-  height: 80px; /* Increased height from 60px */
+  height: 64px;
 }
 
-/* === LOGO ROSSO NETFLIX === */
+/* === LOGO === */
 .logo {
-  color: #e50914 !important;
-  font-size: 1.5rem;
-  font-weight: bold;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 1.05rem;
+  font-weight: 600;
   text-decoration: none;
-  letter-spacing: 0.5px;
-  transition: color 0.2s ease;
+  letter-spacing: 0.3px;
+  transition: opacity 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .logoImg {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
 }
 
 .logo:hover {
-  color: #d72638 !important;
+  opacity: 0.75;
 }
 
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 4px;
 }
 
-/* === STATO BASE: TUTTO BIANCO === */
+/* === LINK BASE === */
 .navLink {
-  color: #ffffff !important;
+  color: rgba(255, 255, 255, 0.75) !important;
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.88rem;
+  font-weight: 400;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  gap: 7px;
+  transition: color 0.2s ease;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 16px;
+  padding: 8px 14px;
+  border-radius: 10px;
   position: relative;
+  letter-spacing: 0.2px;
 }
 
-/* Testo dei link sempre bianco di base */
+.navLink svg {
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
 .navLink span {
-  color: #ffffff !important;
-  transition: color 0.2s ease;
+  color: inherit !important;
 }
 
-/* Icone sempre bianche di base */
-.navLink svg,
-.navLink i,
-.navLink [data-icon] {
-  color: #ffffff !important;
-  fill: #ffffff !important;
-  stroke: #ffffff !important;
-  transition: all 0.2s ease;
+/* === HOVER === */
+.navLink:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(255, 255, 255, 0.06);
 }
 
-/* === HOVER/FOCUS === */
-.navLink:hover,
-.navLink:focus-visible {
-  color: #ffffff !important;
-  background-color: rgba(200, 8, 18, 0.9);
-  box-shadow: 0 4px 15px rgba(200, 8, 18, 0.4);
-  transform: translateY(-2px);
-  outline: none;
+.navLink:hover svg {
+  opacity: 1;
 }
 
-/* Testo hover */
-.navLink:hover span,
-.navLink:focus-visible span {
-  color: #ffffff !important;
+/* === LINK ATTIVO === */
+.navLinkActive {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 500;
 }
 
-/* Icone hover */
-.navLink:hover svg,
-.navLink:hover i,
-.navLink:hover [data-icon],
-.navLink:focus-visible svg,
-.navLink:focus-visible i,
-.navLink:focus-visible [data-icon] {
-  color: #ffffff !important;
-  fill: #ffffff !important;
-  stroke: #ffffff !important;
+.navLinkActive::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.7);
 }
 
-/* === LINK ATTIVO (se usi NavLink di React Router) === */
-.navLink.active {
-  color: #e50914 !important;
+.navLinkActive svg {
+  opacity: 1;
 }
 
-.navLink.active span {
-  color: #e50914 !important;
-}
-
-.navLink.active svg,
-.navLink.active i,
-.navLink.active [data-icon] {
-  color: #e50914 !important;
-  fill: #e50914 !important;
-  stroke: #e50914 !important;
-}
-
-/* === CAMPANELLA NOTIFICHE - SENZA BACKGROUND === */
+/* === CAMPANELLA NOTIFICHE === */
 .notificationContainer {
   position: relative;
 }
 
-/* Campanella identica alle altre icone */
 .notificationContainer .navLink {
-  padding: 10px 16px;
+  padding: 8px 14px;
 }
 
-.notificationContainer .navLink:hover,
-.notificationContainer .navLink:focus-visible {
-  background-color: rgba(200, 8, 18, 0.9);
+.notificationContainer .navLink:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Badge conta notifiche */
 .notificationBadge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: 2px;
+  right: 6px;
   background-color: #e50914;
   color: #ffffff !important;
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 11px;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  border: 2px solid rgba(10, 10, 10, 0.9);
+  font-weight: 600;
+  border: 1.5px solid rgba(10, 10, 12, 0.9);
 }
 
 @keyframes badgePulse {
@@ -331,7 +309,6 @@
 
 /* === MEDIA QUERIES === */
 @media (max-width: 1024px) {
-  /* Mostra la topbar solo su mobile */
   .mobileTopbar {
     display: flex;
     justify-content: space-between;
@@ -340,29 +317,32 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(40px + env(safe-area-inset-top, 0px));
+    height: calc(44px + env(safe-area-inset-top, 0px));
     padding-top: env(safe-area-inset-top, 0px);
     padding-left: 16px;
     padding-right: 16px;
     box-sizing: border-box;
-    background-color: #0f0f12;
+    background-color: rgba(10, 10, 12, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
     z-index: 1000;
-    border-bottom: none;
   }
 
   .immersiveTopbar {
     background: transparent !important;
     background-color: transparent !important;
+    backdrop-filter: none !important;
+    border-bottom: none !important;
   }
 
-  /* Campanella in alto a destra nella topbar */
   .mobileBellLink {
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    color: #ffffff;
-    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
     text-decoration: none;
     width: 36px;
     height: 36px;
@@ -372,10 +352,9 @@
 
   .mobileBellLink:hover,
   .mobileBellLink:active {
-    background: rgba(229, 9, 20, 0.25);
+    background: rgba(255, 255, 255, 0.08);
   }
 
-  /* Nascondi la campanella dalla bottom navbar su mobile */
   .mobileHideNotif {
     display: none !important;
   }
@@ -384,16 +363,16 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #e50914 !important;
-    font-size: 1.15rem; /* -10% */
-    font-weight: 800;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 1rem;
+    font-weight: 600;
     text-decoration: none;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
   }
 
   .mobileLogo img {
-    width: 32px; /* Aumentata ma ridotta post 10% shrink */
-    height: 32px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     object-fit: cover;
   }
@@ -407,10 +386,12 @@
     bottom: 0;
     border-radius: 0;
     border-bottom: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    height: 54px; /* -10% (da 60px) */
-    background-color: #0f0f12; /* OPACO: evita che il gradiente rosso del body trapeli */
+    height: 56px;
+    background-color: rgba(10, 10, 12, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     box-shadow: none;
   }
 
@@ -434,30 +415,37 @@
   }
 
   .navLink {
-    font-size: 1.15rem; /* -10% */
-    padding: 0; /* Rimuove padding extra */
+    font-size: 1.25rem;
+    padding: 0;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 0;
     flex: 1;
+    color: rgba(255, 255, 255, 0.6) !important;
   }
-  
+
   .navLink:hover,
   .navLink:focus-visible {
     background-color: transparent !important;
     box-shadow: none;
-    transform: none;
+    color: rgba(255, 255, 255, 0.85) !important;
   }
 
-  .navLink:hover svg,
-  .navLink:focus-visible svg {
-    color: #e50914 !important;
-    fill: #e50914 !important;
+  .navLinkActive {
+    color: rgba(255, 255, 255, 0.95) !important;
   }
 
-  /* Il contenitore della campanella deve ocupare lo stesso spazio degli altri link */
+  /* Pallino sotto l'icona attiva invece del rosso */
+  .navLinkActive::after {
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
   .notificationContainer {
     flex: 1;
     display: flex;
@@ -477,13 +465,12 @@
   .notificationBadge {
     top: 6px;
     right: calc(50% - 14px);
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     font-size: 9px;
-    border-width: 1px;
+    border-width: 1.5px;
   }
 
-  /* Badge nella campanella della topbar — rimane top-right del bottone */
   .mobileBellLink .notificationBadge {
     top: 0px;
     right: 0px;
@@ -494,7 +481,7 @@
     right: -20px;
     top: auto;
     bottom: calc(100% + 10px);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(200, 8, 18, 0.2);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
   }
 }
 
