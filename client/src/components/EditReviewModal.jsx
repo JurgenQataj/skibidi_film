@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import axios from "axios";
 
 function EditReviewModal({ review, onClose, onUpdate }) {
@@ -31,7 +32,7 @@ function EditReviewModal({ review, onClose, onUpdate }) {
     }
   };
 
-  return (
+  return ReactDOM.createPortal(
     <div style={{
       position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: "rgba(0, 0, 0, 0.6)", 
@@ -158,7 +159,8 @@ function EditReviewModal({ review, onClose, onUpdate }) {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

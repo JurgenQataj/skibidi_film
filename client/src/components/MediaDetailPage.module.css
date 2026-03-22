@@ -175,17 +175,17 @@
   transition: border-color 0.5s ease;
 }
 
-.castGrid {
+.castGrid, .recommendationsGrid {
   display: flex;
   overflow-x: auto;
   gap: 15px;
   padding: 10px 5px;
   scrollbar-width: thin;
 }
-.castGrid::-webkit-scrollbar {
+.castGrid::-webkit-scrollbar, .recommendationsGrid::-webkit-scrollbar {
   height: 6px;
 }
-.castGrid::-webkit-scrollbar-thumb {
+.castGrid::-webkit-scrollbar-thumb, .recommendationsGrid::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
@@ -216,12 +216,7 @@
   text-overflow: ellipsis;
 }
 
-.recommendationsGrid {
-  display: flex;
-  overflow-x: auto;
-  gap: 15px;
-  padding: 10px 5px;
-}
+
 
 .movieCardWrapper {
   width: 150px;

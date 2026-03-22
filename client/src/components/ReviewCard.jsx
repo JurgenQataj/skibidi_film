@@ -451,7 +451,22 @@ function ReviewCard({ review, onInteraction }) {
                       </div>
                       
                       <div className={styles.commentFooterActions}>
-                        <button className={styles.commentActionText}>Rispondi</button>
+                        <button 
+                          className={styles.commentActionText}
+                          onClick={() => {
+                            const newText = `@${comment.user.username} `;
+                            setCommentText(newText);
+                            setTimeout(() => {
+                              const input = inputRef.current;
+                              if (input) {
+                                input.focus();
+                                input.setSelectionRange(newText.length, newText.length);
+                              }
+                            }, 100);
+                          }}
+                        >
+                          Rispondi
+                        </button>
                         {loggedInUserId === comment.user._id && (
                           <button
                             onClick={() => handleDeleteComment(comment._id)}

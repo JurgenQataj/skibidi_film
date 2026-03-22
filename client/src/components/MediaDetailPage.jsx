@@ -146,6 +146,19 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
   } = useMediaDetail(mediaType);
 
   const [dynamicColors, setDynamicColors] = useState({ bg: null, primary: null });
+  const commentInputRef = useRef(null);
+
+  const handleReplyClick = (username) => {
+    const newText = `@${username} `;
+    setCommentText(newText);
+    setTimeout(() => {
+      const input = commentInputRef.current;
+      if (input) {
+        input.focus();
+        input.setSelectionRange(newText.length, newText.length);
+      }
+    }, 100);
+  };
 
   // Extract the dominant color via the express backend proxy API (fixes CORS in production)
   const handleColorExtraction = useCallback((posterPath) => {
@@ -549,21 +562,35 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
                       .filter((c) => c.user)
                       .map((comment) => (
                         <div key={comment._id} className={styles.commentItem}>
-                          <Link
-                            to={`/profile/${comment.user._id}`}
-                            className={styles.authorLink}
-                          >
-                            <strong>{comment.user.username}:</strong>
-                          </Link>
-                          <span> {comment.comment_text}</span>
-                          {loggedInUserId === comment.user._id && (
-                            <button
-                              onClick={() => handleDeleteComment(comment._id)}
-                              className={styles.deleteCommentButton}
+                          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", flex: 1 }}>
+                            <Link
+                              to={`/profile/${comment.user._id}`}
+                              className={styles.authorLink}
+                              style={{ marginRight: "5px" }}
                             >
-                              ×
+                              <strong>{comment.user.username}:</strong>
+                            </Link>
+                            <span> {comment.comment_text}</span>
+                          </div>
+                          
+                          <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginLeft: "auto", fontSize: "0.8rem", flexShrink: 0 }}>
+                            <button
+                              type="button"
+                              onClick={() => handleReplyClick(comment.user.username)}
+                              style={{ background: "none", border: "none", color: "var(--dynamic-primary, #aaa)", cursor: "pointer", padding: 0 }}
+                            >
+                              Rispondi
                             </button>
-                          )}
+                            {loggedInUserId === comment.user._id && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteComment(comment._id)}
+                                className={styles.deleteCommentButton}
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     <form
@@ -571,10 +598,11 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
                       onSubmit={(e) => handleAddComment(e, review.id)}
                     >
                       <input
+                        ref={commentInputRef}
                         type="text"
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Scrivi una risposta..."
+                        placeholder="Rispondi... usa @ per taggare"
                       />
                       <button type="submit">Invia</button>
                     </form>
