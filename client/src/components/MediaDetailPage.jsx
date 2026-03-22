@@ -159,7 +159,25 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     }, 100);
   };
 
-  // Extract multiple dominant colors from the poster via canvas sampling
+  // RGB → HSL conversion helper
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+    return [h * 360, s * 100, l * 100];
+  };
+
+  // Extract 2-3 vibrant, distinct colors from the poster via canvas pixel analysis
   const handleColorExtraction = useCallback((imagePath) => {
     if (!imagePath) return;
     const API_URL = import.meta.env.VITE_API_URL || "";
@@ -168,59 +186,75 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
+      // Downscale on canvas for faster processing
+      const SCALE = 80;
       const canvas = document.createElement('canvas');
-      const W = img.naturalWidth || 200;
-      const H = img.naturalHeight || 300;
-      canvas.width = W;
-      canvas.height = H;
+      canvas.width = SCALE;
+      canvas.height = Math.round(SCALE * (img.naturalHeight / img.naturalWidth));
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, W, H);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // Sample 3 zones: top-third, mid-third, bottom-third
-      const sampleZone = (y0, y1) => {
-        const data = ctx.getImageData(0, y0, W, y1 - y0).data;
-        let r = 0, g = 0, b = 0, count = 0;
-        for (let i = 0; i < data.length; i += 4) {
-          const pr = data[i], pg = data[i+1], pb = data[i+2];
-          // Skip near-black and near-white pixels
-          const brightness = (pr + pg + pb) / 3;
-          if (brightness < 20 || brightness > 235) continue;
-          r += pr; g += pg; b += pb; count++;
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+      // Collect all vivid pixels (high saturation, not too dark or too light)
+      const vivid = [];
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const [h, s, l] = rgbToHsl(r, g, b);
+        // Keep only pixels that are colourful enough
+        if (s > 25 && l > 12 && l < 88) {
+          vivid.push({ r, g, b, h, s, l });
         }
-        if (count === 0) return null;
-        return [Math.round(r/count), Math.round(g/count), Math.round(b/count)];
-      };
+      }
 
-      // Boost saturation of a color so it pops more
-      const saturate = ([r, g, b], factor = 1.6) => {
+      if (vivid.length === 0) {
+        setDynamicColors({ gradient: null, primary: null });
+        return;
+      }
+
+      // Sort by saturation descending — most vivid first
+      vivid.sort((a, b) => b.s - a.s);
+
+      // Pick up to 3 colours that are hue-distinct (≥40° apart)
+      const picked = [];
+      const MIN_HUE_DIFF = 40;
+      for (const px of vivid) {
+        const tooClose = picked.some(p => {
+          const diff = Math.abs(p.h - px.h);
+          return Math.min(diff, 360 - diff) < MIN_HUE_DIFF;
+        });
+        if (!tooClose) {
+          picked.push(px);
+          if (picked.length === 3) break;
+        }
+      }
+
+      // Boost each colour to make it pop (push towards more saturation)
+      const boost = ({ r, g, b }) => {
         const avg = (r + g + b) / 3;
-        const nr = Math.min(255, Math.round(avg + (r - avg) * factor));
-        const ng = Math.min(255, Math.round(avg + (g - avg) * factor));
-        const nb = Math.min(255, Math.round(avg + (b - avg) * factor));
-        return [nr, ng, nb];
+        const f = 1.8;
+        return [
+          Math.min(255, Math.round(avg + (r - avg) * f)),
+          Math.min(255, Math.round(avg + (g - avg) * f)),
+          Math.min(255, Math.round(avg + (b - avg) * f)),
+        ];
       };
 
-      const third = Math.floor(H / 3);
-      const c1raw = sampleZone(0, third);
-      const c2raw = sampleZone(third, third * 2);
-      const c3raw = sampleZone(third * 2, H);
+      const toHex = ([r, g, b]) => '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 
-      const c1 = c1raw ? saturate(c1raw) : null;
-      const c2 = c2raw ? saturate(c2raw) : null;
-      const c3 = c3raw ? saturate(c3raw) : null;
+      const colors = picked.map(p => boost(p));
+      const [c1, c2, c3] = colors;
 
-      // Pick primary from the most vivid sampled color
-      const toHex = ([r,g,b]) => '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
-      const primaryColor = c1 || c2 || c3;
-
-      // Build a radial gradient using the sampled zones
-      const a1 = c1 ? `rgba(${c1[0]},${c1[1]},${c1[2]},0.45)` : 'transparent';
-      const a2 = c2 ? `rgba(${c2[0]},${c2[1]},${c2[2]},0.25)` : 'transparent';
-      const gradient = `radial-gradient(ellipse at top left, ${a1} 0%, ${a2} 45%, rgba(13,13,16,0) 75%)`;
+      // Build a full-page gradient covering 100% height
+      const stop1 = c1 ? `rgba(${c1[0]},${c1[1]},${c1[2]},0.55) 0%` : '';
+      const stop2 = c2 ? `rgba(${c2[0]},${c2[1]},${c2[2]},0.35) 30%` : '';
+      const stop3 = c3 ? `rgba(${c3[0]},${c3[1]},${c3[2]},0.15) 60%` : '';
+      const stops = [stop1, stop2, stop3].filter(Boolean).join(', ');
+      const gradient = `linear-gradient(160deg, ${stops}, rgba(13,13,16,0) 90%)`;
 
       setDynamicColors({
         gradient,
-        primary: primaryColor ? toHex(primaryColor) : null,
+        primary: toHex(c1 || colors[0]),
       });
     };
     img.onerror = () => {
@@ -228,6 +262,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     };
     img.src = url;
   }, []);
+
 
   if (loading) return <SkeletonWithLogo />;
   if (error) return <p className={styles.loading}>{error}</p>;
