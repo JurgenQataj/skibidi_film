@@ -1,11 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaRegHeart, FaHeart, FaRegComment } from "react-icons/fa";
+import { FaRegHeart, FaHeart, FaRegComment, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import axios from "axios";
 import styles from "./ReviewCard.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import { jwtDecode } from "jwt-decode";
+
+function renderStars(rating10) {
+  if (rating10 == null) return null;
+  const rating5 = rating10 / 2;
+  const fullStars = Math.floor(rating5);
+  const hasHalfStar = (rating5 - fullStars) >= 0.5;
+
+  const stars = [];
+  for (let i = 0; i < fullStars; i++) {
+    stars.push(<FaStar key={`full-${i}`} color="#00e054" size={13} />);
+  }
+  if (hasHalfStar) {
+    stars.push(<FaStarHalfAlt key="half" color="#00e054" size={13} />);
+  }
+  
+  return (
+    <div style={{ display: "flex", gap: "2px", alignItems: "center", marginBottom: "8px", marginTop: "2px" }}>
+      {stars}
+    </div>
+  );
+}
 
 function renderText(text) {
   if (!text) return null;
@@ -342,54 +363,45 @@ function ReviewCard({ review, onInteraction }) {
   // --- RENDERING CLASSICO PER RECENSIONI FILM/TV ---
   return (
     <div className={styles.card}>
-      <div className={styles.leftColumn}>
-        <Link to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}>
-          <img
-            src={
-              movie.poster_path
-                ? `${posterBaseUrl}${movie.poster_path}`
-                : placeholderPoster
-            }
-            alt={`Locandina di ${movie.title}`}
-            className={styles.poster}
-          />
+      <div className={styles.headerRow}>
+        <div className={styles.movieTitleWrapper}>
+          <Link
+            to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}
+            className={styles.movieTitleLink}
+          >
+            {movie.title.split(":")[0].split(" - ")[0].trim()}
+          </Link>
+          {(movie.release_year || movie.release_date) && (
+            <span className={styles.releaseYear}>
+              {movie.release_year || movie.release_date.split("-")[0]}
+            </span>
+          )}
+        </div>
+        <Link to={`/profile/${user._id}`} className={styles.authorLink}>
+          {user.username || "Utente"}
         </Link>
       </div>
-      <div className={styles.rightColumn}>
-        <div className={styles.headerRow}>
-          <div className={styles.movieTitleWrapper}>
-            <Link
-              to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}
-              className={styles.movieTitleLink}
-            >
-              {movie.title}
-            </Link>
-            {(movie.release_year || movie.release_date) && (
-              <span className={styles.releaseYear}>
-                ({movie.release_year || movie.release_date.split("-")[0]})
-              </span>
-            )}
-          </div>
-          <div className={styles.userInfoWrapper}>
-            <Link to={`/profile/${user._id}`} className={styles.authorLink}>
-              {user.username || "Utente"}
-            </Link>
+
+      <div className={styles.ratingRow}>
+        <span className={styles.ratingValue}>{rating}/10</span>
+      </div>
+
+      <div className={styles.cardBody}>
+        <div className={styles.leftColumn}>
+          <Link to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}>
             <img
               src={
-                user.avatar_url ||
-                "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"
+                movie.poster_path
+                  ? `${posterBaseUrl}${movie.poster_path}`
+                  : placeholderPoster
               }
-              alt="avatar"
-              className={styles.userAvatar}
+              alt={`Locandina di ${movie.title}`}
+              className={styles.poster}
             />
-          </div>
+          </Link>
         </div>
-        
-        <div className={styles.ratingRow}>
-          <span className={styles.ratingValue}>{rating}/10</span>
-        </div>
-        
-        {comment_text && <p className={styles.comment}>{renderText(comment_text)}</p>}
+        <div className={styles.rightColumn}>
+          {comment_text && <p className={styles.comment}>{renderText(comment_text)}</p>}
         {/* Nuova riga combinata Footer */}
         <div className={styles.footerRow}>
           <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
@@ -412,9 +424,11 @@ function ReviewCard({ review, onInteraction }) {
               </button>
             </div>
           )}
-        </div>
+        </div>{/* fine rightColumn */}
+      </div>{/* fine cardBody */}
+    </div>{/* fine card - momentaneo */}
 
-        {comments.shown && (
+      {comments.shown && (
           <div className={styles.commentsSection}>
             {comments.list.length > 0 ? (
               comments.list
@@ -549,7 +563,6 @@ function ReviewCard({ review, onInteraction }) {
             )}
           </div>
         )}
-      </div>
     </div>
   );
 }
