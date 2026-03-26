@@ -234,9 +234,9 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
         const avg = (r + g + b) / 3;
         const f = 1.8;
         return [
-          Math.min(255, Math.round(avg + (r - avg) * f)),
-          Math.min(255, Math.round(avg + (g - avg) * f)),
-          Math.min(255, Math.round(avg + (b - avg) * f)),
+          Math.max(0, Math.min(255, Math.round(avg + (r - avg) * f))),
+          Math.max(0, Math.min(255, Math.round(avg + (g - avg) * f))),
+          Math.max(0, Math.min(255, Math.round(avg + (b - avg) * f))),
         ];
       };
 
