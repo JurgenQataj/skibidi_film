@@ -311,7 +311,7 @@
 @media (max-width: 1024px) {
   .mobileTopbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     position: fixed;
     top: 0;
