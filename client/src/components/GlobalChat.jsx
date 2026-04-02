@@ -16,8 +16,6 @@ function renderText(text) {
 }
 
 // ── MessageBubble ────────────────────────────────────────────────────────────
-// Extracted to module level so that msgs.map() stays ≤ 3 levels deep.
-// All per-message logic lives here at function level 1.
 function getBubbleRadiusClass(isSingle, isFirst, isLast, styles) {
   if (isSingle) return '';
   if (isFirst)  return styles.bubbleFirst;
@@ -122,6 +120,8 @@ function groupMessages(messages) {
   return groups;
 }
 
+const QUICK_EMOJIS = ['😂', '❤️', '🔥', '👏', '😍', '🤯', '😭', '🎬'];
+
 const GlobalChat = () => {
   const { token } = useAuthStore();
   let user = null;
@@ -135,8 +135,10 @@ const GlobalChat = () => {
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionPosition, setMentionPosition] = useState(null);
   const [hoveredMsg, setHoveredMsg] = useState(null);
-  const [selectedMsg, setSelectedMsg] = useState(null); // for tap on mobile
+  const [selectedMsg, setSelectedMsg] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [sendPulse, setSendPulse] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const messagesListRef = useRef(null);
   const inputRef = useRef(null);
@@ -157,7 +159,7 @@ const GlobalChat = () => {
     return () => clearInterval(id);
   }, [fetchMessages]);
 
-  // Auto scroll
+  // Auto scroll smooth
   const scrollToBottom = (behavior = 'auto') => {
     if (messagesListRef.current) {
       messagesListRef.current.scrollTo({ top: messagesListRef.current.scrollHeight, behavior });
@@ -188,18 +190,11 @@ const GlobalChat = () => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setNewMessage(value);
-    
-    // Find where the user is typing
     const cursor = e.target.selectionStart;
     const upToCursor = value.slice(0, cursor);
-    
-    // Match `@` followed by any word characters at the end of the substring
-    // This allows `@` to be typed even if there's text before it.
     const atMatch = upToCursor.match(/(?:^|\s)@(\w*)$/);
-    
     if (atMatch) {
       setMentionSearch(atMatch[1]);
-      // The exact position of the `@` symbol
       setMentionPosition(cursor - atMatch[1].length - 1);
       setShowMentionDropdown(true);
     } else {
@@ -220,10 +215,21 @@ const GlobalChat = () => {
     inputRef.current?.focus();
   };
 
-  // Send
+  const handleEmojiClick = (emoji) => {
+    setNewMessage((prev) => prev + emoji);
+    setShowEmojiPicker(false);
+    inputRef.current?.focus();
+  };
+
+  // Send con pulse
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
+
+    // Animazione pulse sul bottone
+    setSendPulse(true);
+    setTimeout(() => setSendPulse(false), 500);
+
     const optimistic = {
       _id: `tmp-${Date.now()}`,
       user: { _id: user.id, username: user.username, avatar_url: user.avatar_url },
@@ -286,7 +292,7 @@ const GlobalChat = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Escape') setShowMentionDropdown(false);
+    if (e.key === 'Escape') { setShowMentionDropdown(false); setShowEmojiPicker(false); }
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); }
   };
 
@@ -294,10 +300,10 @@ const GlobalChat = () => {
 
   return (
     <div className={styles.chatContainer}>
-      {/* Header stile IG */}
+      {/* ── Sticky Header ── */}
       <div className={styles.chatHeader}>
         <div className={styles.chatHeaderLeft}>
-          <div className={styles.chatHeaderIcon}>💬</div>
+          <div className={styles.chatHeaderIcon}>🎬</div>
           <div>
             <div className={styles.chatTitle}>Forum Globale</div>
             <div className={styles.chatSubtitle}>{messages.length} messaggi</div>
@@ -308,7 +314,7 @@ const GlobalChat = () => {
         </div>
       </div>
 
-      {/* Messaggi */}
+      {/* ── Messaggi ── */}
       <div className={styles.messagesList} ref={messagesListRef}>
         {loading ? (
           <div className={styles.loadingWrap}>
@@ -325,13 +331,11 @@ const GlobalChat = () => {
             const firstMsg = group.msgs[0];
             return (
               <div key={`g-${gi}`} className={styles.messageGroup}>
-                {/* Nome autore: solo se il gruppo non è tuo */}
                 {!isOwn && (
                   <div className={styles.messageAuthor}>
                     {firstMsg.user?.username || 'Utente'}
                   </div>
                 )}
-
                 {group.msgs.map((msg, mi) => (
                   <MessageBubble
                     key={msg._id}
@@ -356,9 +360,10 @@ const GlobalChat = () => {
         )}
       </div>
 
-      {/* Input */}
+      {/* ── Input Area ── */}
       {user ? (
         <div className={styles.inputArea}>
+          {/* Mention Dropdown */}
           {showMentionDropdown && mentionUsers.length > 0 && (
             <div className={styles.mentionDropdown}>
               {mentionUsers.map((u) => (
@@ -377,7 +382,35 @@ const GlobalChat = () => {
               ))}
             </div>
           )}
+
+          {/* Quick Emoji Picker */}
+          {showEmojiPicker && (
+            <div className={styles.emojiPicker}>
+              {QUICK_EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  className={styles.emojiBtn}
+                  onMouseDown={(e) => { e.preventDefault(); handleEmojiClick(emoji); }}
+                  type="button"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+
           <form onSubmit={handleSend} className={styles.chatForm}>
+            {/* Emoji trigger */}
+            <button
+              type="button"
+              className={styles.emojiTrigger}
+              onClick={() => setShowEmojiPicker((v) => !v)}
+              aria-label="Emoji"
+              title="Emoji"
+            >
+              😊
+            </button>
+
             <div className={styles.inputWrapper}>
               <input
                 ref={inputRef}
@@ -385,13 +418,20 @@ const GlobalChat = () => {
                 value={newMessage}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder="Scrivi un messaggio... usa @ per taggare"
+                placeholder="Scrivi un messaggio… usa @ per taggare"
                 className={styles.chatInput}
                 maxLength={500}
                 autoComplete="off"
               />
             </div>
-            <button type="submit" className={styles.sendButton} disabled={!newMessage.trim()}>
+
+            {/* Send button con pulse */}
+            <button
+              type="submit"
+              className={`${styles.sendButton} ${sendPulse ? styles.sendPulse : ''}`}
+              disabled={!newMessage.trim()}
+              aria-label="Invia"
+            >
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
               </svg>
@@ -408,3 +448,4 @@ const GlobalChat = () => {
 };
 
 export default GlobalChat;
+

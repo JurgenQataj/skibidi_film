@@ -130,6 +130,11 @@ function SearchPage() {
   const isInitialMountFilter = useRef(true);
   const isInitialMountMode = useRef(true);
 
+  // Forza lo scroll sempre in cima ogni volta che la pagina viene aperta/ripresa
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
+
   // ── Smart Search ───────────────────────────────────
   const [smartMode, setSmartMode] = useState(() => getInitialState("smart_mode", false));
   const [smartQuery, setSmartQuery] = useState(() => getInitialState("smart_query", ""));

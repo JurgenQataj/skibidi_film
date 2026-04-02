@@ -29,14 +29,7 @@ function GuessYearGamePlay() {
   
   const inputRef = useRef(null);
 
-  // Focus automatico sull'input del nuovo turno
-  useEffect(() => {
-    if (!loading && !overlayState.visible && !gameOver) {
-      setTimeout(() => {
-        if (inputRef.current) inputRef.current.focus();
-      }, 100);
-    }
-  }, [loading, currentIndex, overlayState.visible, gameOver]);
+  // Focus automatico disabilitato per non forzare lo scroll in basso su mobile
 
 
   const fetchSession = async (idsToExclude = usedIds) => {

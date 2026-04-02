@@ -301,7 +301,6 @@ function GuessActorGamePlay() {
               onChange={(e) => setGuess(e.target.value)}
               placeholder="Scrivi il cognome..."
               className={styles.guessInput}
-              autoFocus
               autoComplete="off"
               autoCorrect="off"
               spellCheck="false"

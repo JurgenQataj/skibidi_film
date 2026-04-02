@@ -5,12 +5,12 @@ function SplashScreen({ onFinish }) {
   const [phase, setPhase] = useState('enter'); // enter -> hold -> exit
 
   useEffect(() => {
-    // Fase 1: animazione entrata (1s)
-    // Fase 2: pausa con glow + barra (1.5s)
-    // Fase 3: uscita (0.6s)
-    const holdTimer = setTimeout(() => setPhase('hold'), 900);
-    const exitTimer = setTimeout(() => setPhase('exit'), 2600);
-    const doneTimer = setTimeout(() => onFinish(), 3200);
+    // Fase 1: logo sale e compare (800ms)
+    // Fase 2: breathing + loading bar (2000ms)  
+    // Fase 3: uscita con opacity + translateY(-20px) (600ms)
+    const holdTimer  = setTimeout(() => setPhase('hold'), 800);
+    const exitTimer  = setTimeout(() => setPhase('exit'), 2700);
+    const doneTimer  = setTimeout(() => onFinish(), 3350);
 
     return () => {
       clearTimeout(holdTimer);
@@ -21,11 +21,11 @@ function SplashScreen({ onFinish }) {
 
   return (
     <div className={`splash-screen splash-${phase}`}>
-      {/* Glow radiale di sfondo */}
+      {/* Doppio glow radiale animato */}
       <div className="splash-bg-glow" />
 
       <div className="splash-content">
-        {/* Logo con rings animati */}
+        {/* Rings orbitali */}
         <div className="splash-ring">
           <img
             src="/pwa-192x192.png"
@@ -37,7 +37,6 @@ function SplashScreen({ onFinish }) {
         <h1 className="splash-title">Skibidi Film</h1>
         <p className="splash-tagline">Ogni film, una storia.</p>
 
-        {/* Barra di caricamento */}
         <div className="splash-bar-wrap">
           <div className="splash-bar" />
         </div>
