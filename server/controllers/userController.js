@@ -316,8 +316,15 @@ exports.getUserAdvancedStats = async (req, res) => {
       "Deadpool", "Deadpool 2",
       "Spider-Man", "Spider-Man 2", "Spider-Man 3"
     ];
-    const EXCLUDED_IDS = [24428, 99861, 299536, 299534]; // tmdb_ids per sicurezza sugli Avengers principali
-    const EXCLUDED_ACTORS = ["Joseph Oliveira"]; // Attori singoli da ignorare totalmente
+    const EXCLUDED_IDS = [
+      1726, 1724, 10138, 10195, 1771, 24428, 68721, 76338, 100402, 283995, 
+      99861, 102899, 271110, 453395, 315635, 284053, 284054, 299536, 363088, 
+      299537, 299534, 429617, 497698, 566525, 524434, 634649, 616037, 505642, 
+      640146, 447365, 609681, 533535, 822119, 986056, 617126, 969681, 1003596, 
+      1003598, 246655, 36658, 36668, 49538, 127585, 320288, 2080, 76170, 
+      263115, 293660, 383498, 102382, 559, 114
+    ]; // Tutti i tmdb_id della Marvel e X-Men per evitare discrepanze online
+    const EXCLUDED_ACTORS = ["Joseph Oliveira", "Stan Lee"]; // Attori singoli da ignorare (più Stan Lee per i cameo Marvel nel dubbio)
     
     let allActors = [];
     validReviews.forEach(r => {
