@@ -43,7 +43,7 @@ const FavoritePeopleSection = ({ stats, userId, personTypeTab, setPersonTypeTab,
           <>
             {currentList.slice(0, currentLimit).map((person, idx) => (
               <li key={idx} className={styles.textItem} style={{ alignItems: 'center' }}>
-                <span className={styles.rank}>#{idx + 1}</span>
+                <span className={styles.rank} style={{ marginRight: '12px' }}>#{idx + 1}</span>
                 <a href={`/person/${encodeURIComponent(person.name)}`} className={styles.personLink} style={{textDecoration: 'none', color: 'inherit', flex: 1, display: 'flex', alignItems: 'center', gap: '6px'}}>
                   <span className={styles.name} style={{fontWeight: 'bold', cursor: 'pointer',  transition: 'color 0.2s'}} 
                         onMouseOver={e => e.currentTarget.style.color = '#ff00cc'} 
@@ -65,8 +65,8 @@ const FavoritePeopleSection = ({ stats, userId, personTypeTab, setPersonTypeTab,
                 </div>
               </li>
             ))}
-            {currentList.length > currentLimit && currentLimit < 30 && (
-              <button className={styles.showMoreBtn} onClick={() => setLimit(30)}>Mostra fino a 30 {personLabel}</button>
+            {currentList.length > currentLimit && currentLimit < 50 && (
+              <button className={styles.showMoreBtn} onClick={() => setLimit(50)}>Mostra fino a 50 {personLabel}</button>
             )}
           </>
         )}
@@ -324,6 +324,25 @@ const GeoSection = ({ stats, userId, geoTab, setGeoTab, countriesLimit, setCount
 };
 
 
+// --- Custom Hook per persistere lo stato dei tab e limiti nel session storage ---
+function useSessionState(key, defaultValue) {
+  const [value, setValue] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(key);
+      if (saved !== null) return JSON.parse(saved);
+    } catch (e) {
+      console.warn("Error parsing sessionStorage", e);
+    }
+    return defaultValue;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+
 function StatsPage() {
   const { userId } = useParams();
   const [stats, setStats] = useState(null);
@@ -332,35 +351,35 @@ function StatsPage() {
   
   // Imposta l'anno corrente come predefinito
   const currentYear = new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedYear, setSelectedYear] = useSessionState(`stats_year_${userId}`, currentYear);
   const backendLimit = 50; // Quanti dati richiedere al server in partenza
   
-  // Limiti visualizzazione liste (partono da 10)
-  const [genresLimit, setGenresLimit] = useState(10);
-  const [genresRatingLimit, setGenresRatingLimit] = useState(10);
-  const [personTypeTab, setPersonTypeTab] = useState("actors"); // "actors" o "directors"
-  const [personMetricTab, setPersonMetricTab] = useState("count"); // "count" o "rating"
-  const [genreTab, setGenreTab] = useState("count"); // "count" o "rating"
+  // Limiti visualizzazione liste (persistenti)
+  const [genresLimit, setGenresLimit] = useSessionState(`stats_genresL_${userId}`, 10);
+  const [genresRatingLimit, setGenresRatingLimit] = useSessionState(`stats_genresRL_${userId}`, 10);
+  const [personTypeTab, setPersonTypeTab] = useSessionState(`stats_personT_${userId}`, "actors");
+  const [personMetricTab, setPersonMetricTab] = useSessionState(`stats_personMT_${userId}`, "count");
+  const [genreTab, setGenreTab] = useSessionState(`stats_genreT_${userId}`, "count");
   
   // Limiti Decenni
-  const [decadeTab, setDecadeTab] = useState("count"); // "count" o "rating"
-  const [decadesLimit, setDecadesLimit] = useState(10);
-  const [decadesRatingLimit, setDecadesRatingLimit] = useState(10);
+  const [decadeTab, setDecadeTab] = useSessionState(`stats_decadeT_${userId}`, "count");
+  const [decadesLimit, setDecadesLimit] = useSessionState(`stats_decadesL_${userId}`, 10);
+  const [decadesRatingLimit, setDecadesRatingLimit] = useSessionState(`stats_decadesRL_${userId}`, 10);
 
   // Limiti per la sezione persone unificata
-  const [actorsLimit, setActorsLimit] = useState(10);
-  const [directorsLimit, setDirectorsLimit] = useState(10);
+  const [actorsLimit, setActorsLimit] = useSessionState(`stats_actorsL_${userId}`, 10);
+  const [directorsLimit, setDirectorsLimit] = useSessionState(`stats_directorsL_${userId}`, 10);
 
   // Stato per la nuova sezione Crew e Dietro le Quinte
-  const [crewTypeTab, setCrewTypeTab] = useState("studios");
-  const [crewLimit, setCrewLimit] = useState(10);
+  const [crewTypeTab, setCrewTypeTab] = useSessionState(`stats_crewT_${userId}`, "studios");
+  const [crewLimit, setCrewLimit] = useSessionState(`stats_crewL_${userId}`, 10);
 
   // Stato per la sezione Paesi / Lingue
-  const [geoTab, setGeoTab] = useState("countries"); // "countries" o "languages"
-  const [countriesLimit, setCountriesLimit] = useState(10);
-  const [languagesLimit, setLanguagesLimit] = useState(10);
-  const [keywordsLimit, setKeywordsLimit] = useState(10);
-  const [keywordTab, setKeywordTab] = useState("count"); // "count" o "rating"
+  const [geoTab, setGeoTab] = useSessionState(`stats_geoT_${userId}`, "countries");
+  const [countriesLimit, setCountriesLimit] = useSessionState(`stats_countriesL_${userId}`, 10);
+  const [languagesLimit, setLanguagesLimit] = useSessionState(`stats_languagesL_${userId}`, 10);
+  const [keywordsLimit, setKeywordsLimit] = useSessionState(`stats_keywordsL_${userId}`, 10);
+  const [keywordTab, setKeywordTab] = useSessionState(`stats_keywordT_${userId}`, "count");
 
   // Genera una lista di anni (dal corrente indietro fino al 1900)
   const years = Array.from(new Array(currentYear - 1900 + 1), (val, index) => currentYear - index);
@@ -374,17 +393,6 @@ function StatsPage() {
         // Passiamo l'anno selezionato come parametro
         const res = await axios.get(`${API_URL}/api/users/${userId}/advanced-stats?year=${selectedYear}&limit=${backendLimit}`);
         setStats(res.data);
-        // Resetta i limiti quando si cambia anno o si ricarica
-        setActorsLimit(10);
-        setDirectorsLimit(10);
-        setGenresLimit(10);
-        setGenresRatingLimit(10);
-        setDecadesLimit(10);
-        setDecadesRatingLimit(10);
-        setCrewLimit(10);
-        setCountriesLimit(10);
-        setLanguagesLimit(10);
-        setKeywordsLimit(10);
       } catch (error) {
         console.error("Errore stats:", error);
       } finally {
@@ -415,6 +423,27 @@ function StatsPage() {
       })
       .catch(err => console.error("Errore fetch avatars:", err));
   }, [stats, actorsLimit, directorsLimit, API_URL]);
+
+  // Gestione salvataggio e ripristino dello scroll
+  useEffect(() => {
+    if (stats && !loading) {
+      const scrollKey = `stats_scroll_${userId}`;
+      const savedScroll = sessionStorage.getItem(scrollKey);
+      if (savedScroll) {
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+        }, 50);
+      }
+    }
+  }, [stats, loading, userId]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      sessionStorage.setItem(`stats_scroll_${userId}`, window.scrollY.toString());
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [userId]);
 
   if (loading && !stats) {
     return <SkeletonWithLogo />;

@@ -313,9 +313,12 @@ exports.getUserAdvancedStats = async (req, res) => {
       "X-Men", "X-Men 2", "X-Men - Conflitto finale", "X-Men - L'inizio",
       "X-Men - Giorni di un futuro passato", "X-Men: Apocalisse", "X-Men: Dark Phoenix",
       "X-Men le origini - Wolverine", "X-Men le origini: Wolverine", "Wolverine - L'immortale", "Logan - The Wolverine",
-      "Deadpool", "Deadpool 2"
+      "Deadpool", "Deadpool 2",
+      "Spider-Man", "Spider-Man 2", "Spider-Man 3"
     ];
     const EXCLUDED_IDS = [24428, 99861, 299536, 299534]; // tmdb_ids per sicurezza sugli Avengers principali
+    const EXCLUDED_ACTORS = ["Joseph Oliveira"]; // Attori singoli da ignorare totalmente
+    
     let allActors = [];
     validReviews.forEach(r => {
       // Escludi questi film specifici dalla classifica attori come richiesto
@@ -324,7 +327,9 @@ exports.getUserAdvancedStats = async (req, res) => {
       }
       
       if (r.movie.cast && Array.isArray(r.movie.cast)) {
-        allActors = allActors.concat(r.movie.cast);
+        // Aggiungi solo gli attori che non sono nella lista nera
+        const validCast = r.movie.cast.filter(actor => !EXCLUDED_ACTORS.includes(actor));
+        allActors = allActors.concat(validCast);
       }
     });
     const topActors = countOccurrences(allActors);
