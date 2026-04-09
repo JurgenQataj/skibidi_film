@@ -262,7 +262,16 @@
     gap: 8px;
   }
 
+  .titleRow {
+    flex-direction: column;
+    gap: 5px;
+  }
+
   .pageTitle {
-    font-size: 1.8rem;
+    font-size: clamp(1.2rem, 7vw, 1.8rem);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
   }
 }
