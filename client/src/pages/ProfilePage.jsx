@@ -235,7 +235,7 @@ function ProfilePage() {
 
   const handleNavToSettings = () => { setIsSettingsMenuOpen(false); navigate('/settings'); };
   const handleNavToGoals   = () => { setIsSettingsMenuOpen(false); navigate(`/profile/${userId}/goals`); };
-  const handleNavToSaved   = () => { setIsSettingsMenuOpen(false); setIsSavedModalOpen(true); };
+  const handleNavToSaved   = () => { setIsSettingsMenuOpen(false); navigate(`/profile/${userId}/saved`); };
   const handleLogout       = () => { logout(); navigate("/login"); };
   const handleListsClick   = () => isOwnProfile ? navigate("/my-lists") : setIsListsModalOpen(true);
   const makeStatKeyDown    = (fn) => (e) => { if (e.key === 'Enter') fn(); };
@@ -425,34 +425,6 @@ function ProfilePage() {
                   </div>
                 </Link>
               ))
-          )}
-        </div>
-      </Modal>
-
-      {/* Modal Persone Salvate */}
-      <Modal
-        isOpen={isSavedModalOpen}
-        onClose={() => setIsSavedModalOpen(false)}
-        title={isOwnProfile ? "Le tue Persone Salvate" : `Persone Salvate di ${profile.username}`}
-      >
-        <div className={styles.savedPeopleGrid}>
-          {profile.savedPeople && profile.savedPeople.length > 0 ? (
-            profile.savedPeople.map(person => (
-              <div 
-                key={person.id} 
-                className={styles.savedPersonCard}
-                onClick={() => { setIsSavedModalOpen(false); navigate(`/person/${encodeURIComponent(person.name)}`); }}
-              >
-                <img 
-                  src={person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : "https://placehold.co/185x278/1a1a2e/666?text=No+Img"} 
-                  alt={person.name} 
-                  className={styles.savedPersonImg}
-                />
-                <span className={styles.savedPersonName}>{person.name}</span>
-              </div>
-            ))
-          ) : (
-             <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", width: "100%" }}>Nessuna persona salvata.</p>
           )}
         </div>
       </Modal>

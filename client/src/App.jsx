@@ -25,6 +25,7 @@ const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const StatsPage = lazy(() => import("./pages/StatsPage"));
 const UserHistoryPage = lazy(() => import("./pages/UserHistoryPage"));
+const SavedPeoplePage = lazy(() => import("./pages/SavedPeoplePage"));
 const PersonPage = lazy(() => import("./pages/PersonPage"));
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
 const PartialCollectionsPage = lazy(() => import("./pages/PartialCollectionsPage"));
@@ -162,6 +163,7 @@ function App() {
             <Route path="profile/:userId/stats" element={<StatsPage />} />
             <Route path="profile/:userId/goals" element={<GoalsPage />} />
             <Route path="profile/:userId/history" element={<UserHistoryPage />} />
+            <Route path="profile/:userId/saved" element={<SavedPeoplePage />} />
             <Route path="person/:name" element={<PersonPage />} />
             <Route path="movie/:tmdbId" element={<MovieDetailPage />} />
             <Route path="tv/:tmdbId" element={<TvShowDetailPage />} />

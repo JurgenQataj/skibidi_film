@@ -1,0 +1,295 @@
+.pageWrapper {
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: #fff;
+  padding-bottom: 4rem;
+}
+
+/* ── Sticky, Glassmorphic Header ── */
+.headerContainer {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 100px 2rem 1.5rem; /* Leaves room for main app navbar on desktop */
+  background: rgba(20, 20, 22, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+}
+
+.superTitle {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #a777e3;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.mainTitle {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-4px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Content Grid ── */
+.contentArea {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.grid {
+  display: grid;
+  /* Fluid responsive grid: beautifully handles all screen sizes organically */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 2rem;
+}
+
+/* ── Premium Card Design ── */
+.actorCard {
+  text-decoration: none;
+  display: block;
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 18px;
+  background: #1a1e2e;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: slideUpFade 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* We use a React inline style for staggered animation delay */
+.actorCard:hover {
+  transform: translateY(-12px) scale(1.04);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(167, 119, 227, 0.2);
+  z-index: 2;
+}
+
+.imageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1e2e;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.actorCard:hover .image {
+  transform: scale(1.1);
+}
+
+/* Sleek gradient overlay instead of heavy black boxes */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 15, 25, 0) 50%,
+    rgba(11, 15, 25, 0.85) 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  padding: 1.5rem;
+  transition: opacity 0.3s ease;
+}
+
+.nameInfo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.actorName {
+  color: #ffffff;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  /* Truncate long names elegantly */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.viewProfileLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #a777e3;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.actorCard:hover .viewProfileLabel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Empty State ── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  animation: slideUpFade 0.5s ease-out;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  opacity: 0.4;
+  margin-bottom: 1.5rem;
+}
+
+.emptyTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.5rem;
+}
+
+.emptyDesc {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* ── Keyframes ── */
+@keyframes slideUpFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Media Queries ── */
+@media (max-width: 1024px) {
+  .headerContainer {
+    padding: 85px 1.5rem 1rem;
+  }
+  .contentArea {
+    padding: 2rem 1.5rem;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* Mobile First Magic */
+@media (max-width: 480px) {
+  .pageWrapper {
+    padding-bottom: 2rem;
+  }
+  
+  .headerContainer {
+    /* Ridotto il top-padding per spingere il testo molto in alto */
+    padding: 25px 0.8rem 5px;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    flex-direction: row; 
+    margin-bottom: 10px;
+  }
+
+  /* User requested title on top left and no back button */
+  .titleArea {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .superTitle {
+    font-size: 0.75rem;
+  }
+
+  .mainTitle {
+    font-size: 1.6rem;
+  }
+
+  .backButton {
+    display: none; /* Hidden on mobile */
+  }
+
+  .contentArea {
+    padding: 1.5rem 1rem;
+  }
+
+  .grid {
+    /* Dynamic crisp grid for mobile */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .actorCard {
+    border-radius: 12px;
+  }
+
+  .overlay {
+    padding: 10px;
+    background: linear-gradient(
+      to bottom,
+      rgba(11, 15, 25, 0) 40%,
+      rgba(11, 15, 25, 0.9) 100%
+    );
+  }
+
+  .actorName {
+    font-size: 0.85rem;
+  }
+
+  .viewProfileLabel {
+    display: none;
+  }
+}

@@ -1,7 +1,7 @@
 .pageContainer {
   color: white;
   padding: 0 0 30px;
-  background-color: #0d0d10;
+  background-color: transparent;
   min-height: 100vh;
   position: relative;
 }
