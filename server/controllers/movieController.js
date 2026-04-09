@@ -182,7 +182,7 @@ exports.getMovieDetails = async (req, res) => {
         member.job === "Executive Producer" ||
         member.job === "Co-Producer"
     );
-    const cast = credits?.cast?.slice(0, 10) || [];
+    const cast = credits?.cast?.slice(0, 100) || [];
 
     res.json({
       id: data.id,
@@ -396,6 +396,7 @@ exports.getMoviesByPerson = async (req, res) => {
       });
 
     res.json({
+      personId: personId,
       personName: officialName,
       biography,
       profile_path: profilePath,
@@ -497,7 +498,7 @@ exports.updateAllMoviesData = async (req, res) => {
         const releaseYear = data.release_date ? new Date(data.release_date).getFullYear() : null;
         const directorData = data.credits?.crew?.find(c => c.job === "Director");
         const director = directorData ? directorData.name : "Sconosciuto";
-        const cast = data.credits?.cast?.slice(0, 5).map(c => c.name) || [];
+        const cast = data.credits?.cast?.slice(0, 100).map(c => c.name) || [];
 
         await Movie.findByIdAndUpdate(movie._id, {
           release_year: releaseYear,

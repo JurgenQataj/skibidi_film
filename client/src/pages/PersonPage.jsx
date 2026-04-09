@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import styles from "./PersonPage.module.css";
 import MovieCard from "../components/MovieCard";
 import { SkeletonMovieCard } from "../components/Skeleton";
+import { FiBookmark } from "react-icons/fi";
+import { FaBookmark } from "react-icons/fa";
 
 function PersonPage() {
   const { name } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
   // Helper per inizializzare lo stato da localStorage
   const getInitialState = (key, defaultValue) => {
     const saved = localStorage.getItem(key);
@@ -40,9 +45,23 @@ function PersonPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Chiamata all'API che abbiamo creato nel backend
+        const token = localStorage.getItem("token");
+        let currentUserId = null;
+        if (token) {
+          const decoded = jwtDecode(token);
+          currentUserId = decoded.user.id;
+          setLoggedInUserId(currentUserId);
+        }
+
         const res = await axios.get(`${API_URL}/api/movies/person/${encodeURIComponent(name)}`);
         setData(res.data);
+
+        // Se loggato, verifica se la persona è tra i salvati
+        if (currentUserId && res.data.personId) {
+          const profileRes = await axios.get(`${API_URL}/api/users/${currentUserId}/profile`);
+          const savedPeople = profileRes.data.savedPeople || [];
+          setIsSaved(savedPeople.some(p => p.id === res.data.personId));
+        }
       } catch (error) {
         console.error("Errore caricamento persona:", error);
       } finally {
@@ -51,6 +70,29 @@ function PersonPage() {
     };
     fetchData();
   }, [name, API_URL]);
+
+  const handleToggleSave = async () => {
+    if (!loggedInUserId || !data || !data.personId) return;
+    try {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      if (isSaved) {
+        await axios.delete(`${API_URL}/api/users/${loggedInUserId}/saved-people/${data.personId}`, config);
+        setIsSaved(false);
+      } else {
+        await axios.post(`${API_URL}/api/users/${loggedInUserId}/saved-people`, {
+          personId: data.personId,
+          name: data.personName,
+          profile_path: data.profile_path
+        }, config);
+        setIsSaved(true);
+      }
+    } catch (error) {
+      console.error("Errore durante il salvataggio persona:", error);
+      alert("Errore durante il salvataggio.");
+    }
+  };
 
   if (loading) return (
     <div className={styles.container}>
@@ -127,7 +169,19 @@ function PersonPage() {
           className={styles.personImage}
         />
         <div className={styles.personInfo}>
-          <h1 className={styles.pageTitle}>{data.personName}</h1>
+          <div className={styles.titleRow}>
+            <h1 className={styles.pageTitle}>{data.personName}</h1>
+            {loggedInUserId && (
+              <button 
+                className={`${styles.savePersonBtn} ${isSaved ? styles.saved : ""}`}
+                onClick={handleToggleSave}
+                title={isSaved ? "Rimuovi dai salvati" : "Salva persona"}
+              >
+                {isSaved ? <FaBookmark size={20} /> : <FiBookmark size={20} />}
+                <span className={styles.saveBtnText}>{isSaved ? "Salvato" : "Salva"}</span>
+              </button>
+            )}
+          </div>
           {data.biography ? (
             <div className={styles.biographyContainer}>
               <h3 className={styles.biographyTitle}>Biografia</h3>

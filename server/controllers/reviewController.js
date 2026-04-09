@@ -32,7 +32,7 @@ function extractMovieFields(movieData, safeMediaType) {
     director = directorData ? directorData.name : "Sconosciuto";
   }
 
-  const cast    = movieData.credits?.cast?.slice(0, 5).map(c => c.name) || [];
+  const cast    = movieData.credits?.cast?.slice(0, 100).map(c => c.name) || [];
   const genres  = movieData.genres?.map(g => g.name) || [];
   const keywords = safeMediaType === "tv"
     ? (movieData.keywords?.results?.map(k => k.name) || [])

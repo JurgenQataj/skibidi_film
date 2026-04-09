@@ -46,4 +46,8 @@ router.post("/goals", protect, userController.createGoal);
 router.get("/:userId/goals", userController.getUserGoals);
 router.delete("/goals/:id", protect, userController.deleteGoal);
 
+// --- Saved People ---
+router.post("/:userId/saved-people", protect, userController.savePerson);
+router.delete("/:userId/saved-people/:personId", protect, userController.removeSavedPerson);
+
 module.exports = router;

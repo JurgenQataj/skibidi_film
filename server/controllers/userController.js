@@ -293,8 +293,36 @@ exports.getUserAdvancedStats = async (req, res) => {
     };
 
     // 3. Top 10 Attori più visti
+    const EXCLUDED_TITLES = [
+      "Iron Man", "L'incredibile Hulk", "L'Incredibile Hulk", "Iron Man 2", "Thor", 
+      "Captain America - Il primo Vendicatore", "Captain America: Il primo Vendicatore", "The Avengers",
+      "Iron Man 3", "Thor: The Dark World", "Captain America: The Winter Soldier",
+      "Guardiani della Galassia", "Avengers: Age of Ultron", "Ant-Man",
+      "Captain America: Civil War", "Doctor Strange", "Guardiani della Galassia Vol. 2",
+      "Guardiani della Galassia Volume 2", "Spider-Man: Homecoming", "Thor: Ragnarok",
+      "Black Panther", "Avengers: Infinity War", "Ant-Man and the Wasp", 
+      "Captain Marvel", "Avengers: Endgame", "Spider-Man: Far From Home",
+      "Black Widow", "Shang-Chi e la leggenda dei Dieci Anelli", "Eternals", 
+      "Spider-Man: No Way Home", "Doctor Strange nel Multiverso della Follia", 
+      "Thor: Love and Thunder", "Black Panther: Wakanda Forever",
+      "Ant-Man and the Wasp: Quantumania", "Guardiani della Galassia Vol. 3", 
+      "Guardiani della Galassia Volume 3", "The Marvels",
+      "Deadpool & Wolverine", "Captain America: Brave New World", "Thunderbolts*",
+      "The Fantastic Four: First Steps", "Spider-Man: Brand New Day",
+      "Avengers: Doomsday", "Avengers: Secret Wars",
+      "X-Men", "X-Men 2", "X-Men - Conflitto finale", "X-Men - L'inizio",
+      "X-Men - Giorni di un futuro passato", "X-Men: Apocalisse", "X-Men: Dark Phoenix",
+      "X-Men le origini - Wolverine", "X-Men le origini: Wolverine", "Wolverine - L'immortale", "Logan - The Wolverine",
+      "Deadpool", "Deadpool 2"
+    ];
+    const EXCLUDED_IDS = [24428, 99861, 299536, 299534]; // tmdb_ids per sicurezza sugli Avengers principali
     let allActors = [];
     validReviews.forEach(r => {
+      // Escludi questi film specifici dalla classifica attori come richiesto
+      if (r.movie && (EXCLUDED_TITLES.includes(r.movie.title) || EXCLUDED_IDS.includes(r.movie.tmdb_id))) {
+        return;
+      }
+      
       if (r.movie.cast && Array.isArray(r.movie.cast)) {
         allActors = allActors.concat(r.movie.cast);
       }
@@ -1135,5 +1163,65 @@ exports.getUserFilteredReviews = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Errore server" });
+  }
+};
+
+// --- SAVED PEOPLE ---
+exports.savePerson = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { personId, name, profile_path } = req.body;
+
+    if (userId !== req.user.id) {
+      return res.status(401).json({ message: "Non autorizzato." });
+    }
+
+    if (!personId || !name) {
+       return res.status(400).json({ message: "Dati persona mancanti." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    // Controlla se esiste già
+    const exists = user.savedPeople && user.savedPeople.some(p => p.id === Number(personId));
+    if (exists) {
+      return res.status(400).json({ message: "Persona già salvata." });
+    }
+
+    const newPerson = {
+      id: Number(personId),
+      name,
+      profile_path
+    };
+
+    user.savedPeople.push(newPerson);
+    await user.save();
+
+    res.status(201).json({ message: "Persona salvata con successo.", savedPeople: user.savedPeople });
+  } catch (error) {
+    console.error("Errore savePerson:", error);
+    res.status(500).json({ message: "Errore server durante il salvataggio della persona." });
+  }
+};
+
+exports.removeSavedPerson = async (req, res) => {
+  try {
+    const { userId, personId } = req.params;
+
+    if (userId !== req.user.id) {
+      return res.status(401).json({ message: "Non autorizzato." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    user.savedPeople = user.savedPeople.filter(p => p.id !== Number(personId));
+    await user.save();
+
+    res.json({ message: "Persona rimossa.", savedPeople: user.savedPeople });
+  } catch (error) {
+    console.error("Errore removeSavedPerson:", error);
+    res.status(500).json({ message: "Errore server durante la rimozione della persona." });
   }
 };

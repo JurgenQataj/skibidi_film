@@ -122,7 +122,7 @@ exports.getTvDetails = async (req, res) => {
         member.job === "Executive Producer" ||
         member.job === "Co-Producer"
     );
-    const cast = credits?.cast?.slice(0, 10) || [];
+    const cast = credits?.cast?.slice(0, 100) || [];
     
     const normalizedRecommendations = (data.recommendations?.results || []).map(item => ({
       ...item,

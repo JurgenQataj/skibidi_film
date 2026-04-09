@@ -949,3 +949,55 @@
     padding: 3px 1px;
   }
 }
+
+/* ── Saved People Modale ── */
+.savedPeopleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 15px;
+  padding: 10px 5px;
+}
+
+.savedPersonCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.savedPersonCard:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(229, 9, 20, 0.5);
+  transform: translateY(-4px);
+}
+
+.savedPersonImg {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.savedPersonCard:hover .savedPersonImg {
+  border-color: #a777e3;
+}
+
+.savedPersonName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

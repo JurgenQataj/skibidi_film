@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
   // Liste
   watchlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }],
   lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MovieList' }],
+  savedPeople: [{
+    id: Number,
+    name: String,
+    profile_path: String
+  }],
 
   // Trofei/Badge saghe
   completedCollections: [{ 
