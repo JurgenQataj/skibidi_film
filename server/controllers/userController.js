@@ -222,7 +222,7 @@ exports.getUserStats = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
-    const reviews = await Review.find({ user: String(userId) }).populate("movie", "media_type");
+    const reviews = await Review.find({ user: String(userId) }).populate("movie", "media_type").lean();
     let moviesReviewed = 0;
     let tvShowsReviewed = 0;
 
@@ -263,36 +263,28 @@ exports.getUserAdvancedStats = async (req, res) => {
     const user = await User.findById(userId).select("username");
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
-    // Otteniamo tutte le recensioni popolate con i dati del film
-    const reviews = await Review.find({ user: String(userId) }).populate("movie");
+    // Otteniamo tutte le recensioni popolate con solo campi richiesti e lean() per saltare i doc Mongoose
+    const reviews = await Review.find({ user: String(userId) })
+      .populate({
+        path: "movie",
+        select: "media_type title tmdb_id release_year cast director production_companies crew genres runtime production_countries original_language keywords"
+      })
+      .lean();
 
     // Filtra recensioni valide (dove il film esiste ancora e NON è una serie tv)
     const validReviews = reviews.filter(r => r.movie && r.movie.media_type !== "tv");
 
-    // 1. Top 10 Film dell'anno specifico (voto più alto)
+    // 1. Top 10 Film dell'anno specifico & 2. Top 10 Film All Time (voto più alto)
     const topYear = validReviews
       .filter(r => r.movie.release_year === targetYear)
       .sort((a, b) => b.rating - a.rating)
       .slice(0, 10);
 
-    // 2. Top 10 Film All Time (voto più alto)
     const topAllTime = [...validReviews]
       .sort((a, b) => b.rating - a.rating)
       .slice(0, 10);
 
-    // Helper per contare occorrenze
-    const countOccurrences = (items) => {
-      const counts = {};
-      items.forEach(item => {
-        if (item) counts[item] = (counts[item] || 0) + 1;
-      });
-      return Object.entries(counts)
-        .sort((a, b) => b[1] - a[1]) // Ordina per conteggio decrescente
-        .slice(0, limit) // [MOD] Usa il limit dinamico invece di 10 fisso
-        .map(([name, count]) => ({ name, count }));
-    };
-
-    // 3. Top 10 Attori più visti
+    // Variabili per global count ed esclusione
     const EXCLUDED_TITLES = [
       "Iron Man", "L'incredibile Hulk", "L'Incredibile Hulk", "Iron Man 2", "Thor", 
       "Captain America - Il primo Vendicatore", "Captain America: Il primo Vendicatore", "The Avengers",
@@ -323,182 +315,24 @@ exports.getUserAdvancedStats = async (req, res) => {
       640146, 447365, 609681, 533535, 822119, 986056, 617126, 969681, 1003596, 
       1003598, 246655, 36658, 36668, 49538, 127585, 320288, 2080, 76170, 
       263115, 293660, 383498, 102382, 559, 114
-    ]; // Tutti i tmdb_id della Marvel e X-Men per evitare discrepanze online
-    const EXCLUDED_ACTORS = ["Joseph Oliveira", "Stan Lee"]; // Attori singoli da ignorare (più Stan Lee per i cameo Marvel nel dubbio)
-    
-    let allActors = [];
-    validReviews.forEach(r => {
-      // Escludi questi film specifici dalla classifica attori come richiesto
-      if (r.movie && (EXCLUDED_TITLES.includes(r.movie.title) || EXCLUDED_IDS.includes(r.movie.tmdb_id))) {
-        return;
-      }
-      
-      if (r.movie.cast && Array.isArray(r.movie.cast)) {
-        // Aggiungi solo gli attori che non sono nella lista nera
-        const validCast = r.movie.cast.filter(actor => !EXCLUDED_ACTORS.includes(actor));
-        allActors = allActors.concat(validCast);
-      }
-    });
-    const topActors = countOccurrences(allActors);
+    ];
+    const EXCLUDED_ACTORS = ["Joseph Oliveira", "Stan Lee"];
 
-    // 4. Top 10 Registi più visti
-    let allDirectors = [];
-    validReviews.forEach(r => {
-      if (r.movie.director) {
-        allDirectors.push(r.movie.director);
-      }
-    });
-    const topDirectors = countOccurrences(allDirectors);
-
-    // -- NUOVE CLASSIFICHE CREW E STUDI --
-    let allStudios = [];
-    let crewJobsStats = {};
-
-    validReviews.forEach(r => {
-      if (r.movie.production_companies) {
-         allStudios = allStudios.concat(r.movie.production_companies);
-      }
-      if (r.movie.crew && Array.isArray(r.movie.crew)) {
-          r.movie.crew.forEach(c => {
-             if (!crewJobsStats[c.job]) crewJobsStats[c.job] = [];
-             crewJobsStats[c.job].push(c.name);
-          });
-      }
-    });
-
-    const topStudios = countOccurrences(allStudios);
-    
-    // Aggrega ogni job in un array di "top" contati
-    const topCrewByJob = {};
-    for (const job in crewJobsStats) {
-       topCrewByJob[job] = countOccurrences(crewJobsStats[job]);
-    }
-
-    // 5 & 6. Statistiche Generi Unificate (Visti e Voto)
-    const genreStats = {}; 
-
-    validReviews.forEach(r => {
-      if (r.movie && r.movie.genres && Array.isArray(r.movie.genres)) {
-        r.movie.genres.forEach(genre => {
-          // Normalizzazione robusta
-          let genreName = "";
-          if (typeof genre === 'string') genreName = genre;
-          else if (genre && typeof genre === 'object' && genre.name) genreName = genre.name;
-          
-          genreName = String(genreName).trim();
-          if (!genreName) return;
-
-          if (!genreStats[genreName]) {
-            genreStats[genreName] = { count: 0, sum: 0 };
-          }
-          
-          genreStats[genreName].count += 1;
-          
-          const ratingVal = Number(r.rating);
-          if (!isNaN(ratingVal)) {
-            genreStats[genreName].sum += ratingVal;
-          }
-        });
-      }
-    });
-
-    const allGenresData = Object.entries(genreStats).map(([name, data]) => ({
-      name,
-      count: data.count,
-      avg: data.count > 0 ? Number((data.sum / data.count).toFixed(1)) : 0
-    }));
-
-    // Top Generi più visti (include avg per display)
-    const topGenres = [...allGenresData]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, limit);
-
-    // Top Generi per Voto (include count per display)
-    const topGenresByRating = [...allGenresData]
-      .filter(g => g.count >= 1) 
-      .sort((a, b) => b.avg - a.avg)
-      .slice(0, limit);
-
-    // 7. Statistiche Decenni Unificate
-    const decadeStats = {};
-    validReviews.forEach(r => {
-      if (r.movie && r.movie.release_year) {
-        // Calcola il decennio (es. 1995 -> 1990)
-        let decade = Math.floor(r.movie.release_year / 10) * 10;
-        let decadeName = `Anni '${String(decade).slice(2)}s`; // es. "Anni '90s" -> o meglio "Anni '90"
-        if (decade >= 2000) {
-           decadeName = `Anni ${decade}`;
-        } else {
-           decadeName = `Anni '${String(decade).slice(2)}`;
-        }
-
-        if (!decadeStats[decadeName]) {
-          decadeStats[decadeName] = { count: 0, sum: 0 };
-        }
-        
-        decadeStats[decadeName].count += 1;
-        
-        const ratingVal = Number(r.rating);
-        if (!isNaN(ratingVal)) {
-          decadeStats[decadeName].sum += ratingVal;
-        }
-      }
-    });
-
-    const allDecadesData = Object.entries(decadeStats).map(([name, data]) => ({
-      name,
-      count: data.count,
-      avg: data.count > 0 ? Number((data.sum / data.count).toFixed(1)) : 0
-    }));
-
-    // Top Decenni più visti
-    const topDecades = [...allDecadesData]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, limit);
-
-    // Top Decenni per Voto
-    const topDecadesByRating = [...allDecadesData]
-      .filter(d => d.count >= 1) 
-      .sort((a, b) => b.avg - a.avg)
-      .slice(0, limit);
-
-    // Le immagini profilo vengono ore caricate in modo asincrono dal frontend
-    // tramite un nuovo endpoint per evitare blocchi al caricamento iniziale.
-
-    // -- COUNT GLOBALI --
-    const totalFilms = validReviews.length;
-    
     let totalRuntime = 0;
     const countriesSet = new Set();
+    const allDirectorsSet = new Set();
 
-    validReviews.forEach((r) => {
-      if (r.movie.runtime) {
-         totalRuntime += r.movie.runtime;
-      }
-      if (r.movie.production_countries && Array.isArray(r.movie.production_countries)) {
-        r.movie.production_countries.forEach(c => countriesSet.add(c));
-      }
-    });
-
-    const totalHours = Math.floor(totalRuntime / 60);
-    const totalCountries = countriesSet.size;
-    const totalDirectors = allDirectors.length ? new Set(allDirectors).size : 0;
-
-    // -- TOP PAESI (da production_countries) --
+    // Contatori per iterazione singola
+    const actorsCount = {};
+    const directorsCount = {};
+    const studiosCount = {};
+    const crewJobsStats = {};
+    const genreStats = {};
+    const decadeStats = {};
     const countriesCount = {};
-    validReviews.forEach((r) => {
-      if (r.movie.production_countries && Array.isArray(r.movie.production_countries)) {
-        r.movie.production_countries.forEach(c => {
-          countriesCount[c] = (countriesCount[c] || 0) + 1;
-        });
-      }
-    });
-    const topCountries = Object.entries(countriesCount)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, limit);
+    const langsCount = {};
+    const keywordsStats = {};
 
-    // -- TOP LINGUE (da original_language) --
     const LANGUAGE_NAMES = {
       en: "English", fr: "French", it: "Italian", de: "German", es: "Spanish",
       ja: "Japanese", ko: "Korean", zh: "Chinese", pt: "Portuguese",
@@ -508,71 +342,140 @@ exports.getUserAdvancedStats = async (req, res) => {
       th: "Thai", id: "Indonesian", vi: "Vietnamese", uk: "Ukrainian",
       cn: "Cantonese", fa: "Persian", sr: "Serbian",
     };
-    const langsCount = {};
-    validReviews.forEach((r) => {
-      if (r.movie.original_language) {
-        const code = r.movie.original_language;
+
+    // --- CICLO UNICO PERTUTTE LE STATISTICHE ---
+    for (const r of validReviews) {
+      const m = r.movie;
+      const rating = Number(r.rating) || 0;
+
+      if (m.runtime) totalRuntime += m.runtime;
+
+      if (m.production_countries) {
+        for (const c of m.production_countries) {
+          countriesSet.add(c);
+          countriesCount[c] = (countriesCount[c] || 0) + 1;
+        }
+      }
+
+      if (m.director) {
+        allDirectorsSet.add(m.director);
+        directorsCount[m.director] = (directorsCount[m.director] || 0) + 1;
+      }
+
+      if (!(EXCLUDED_TITLES.includes(m.title) || EXCLUDED_IDS.includes(m.tmdb_id))) {
+        if (m.cast && Array.isArray(m.cast)) {
+          for (const actor of m.cast) {
+            if (!EXCLUDED_ACTORS.includes(actor)) {
+              actorsCount[actor] = (actorsCount[actor] || 0) + 1;
+            }
+          }
+        }
+      }
+
+      if (m.production_companies) {
+        for (const studio of m.production_companies) {
+          studiosCount[studio] = (studiosCount[studio] || 0) + 1;
+        }
+      }
+
+      if (m.crew && Array.isArray(m.crew)) {
+        for (const c of m.crew) {
+          if (!crewJobsStats[c.job]) crewJobsStats[c.job] = {};
+          crewJobsStats[c.job][c.name] = (crewJobsStats[c.job][c.name] || 0) + 1;
+        }
+      }
+
+      if (m.genres && Array.isArray(m.genres)) {
+        for (const genre of m.genres) {
+          let gName = typeof genre === 'object' && genre.name ? genre.name : genre;
+          gName = String(gName).trim();
+          if (gName) {
+            if (!genreStats[gName]) genreStats[gName] = { count: 0, sum: 0 };
+            genreStats[gName].count += 1;
+            genreStats[gName].sum += rating;
+          }
+        }
+      }
+
+      if (m.release_year) {
+        let decade = Math.floor(m.release_year / 10) * 10;
+        let decadeName = decade >= 2000 ? `Anni ${decade}` : `Anni '${String(decade).slice(2)}`;
+        if (!decadeStats[decadeName]) decadeStats[decadeName] = { count: 0, sum: 0 };
+        decadeStats[decadeName].count += 1;
+        decadeStats[decadeName].sum += rating;
+      }
+
+      if (m.original_language) {
+        const code = m.original_language;
         const name = LANGUAGE_NAMES[code] || code.toUpperCase();
         langsCount[name] = (langsCount[name] || 0) + 1;
       }
-    });
-    const topLanguages = Object.entries(langsCount)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, limit);
 
-    // -- TOP KEYWORDS (Temi) --
-    const keywordsStats = {};
-    validReviews.forEach((r) => {
-      if (r.movie.keywords && Array.isArray(r.movie.keywords)) {
-        r.movie.keywords.forEach(k => {
-          if (!keywordsStats[k]) {
-            keywordsStats[k] = { count: 0, sum: 0 };
-          }
+      if (m.keywords && Array.isArray(m.keywords)) {
+        for (const k of m.keywords) {
+          if (!keywordsStats[k]) keywordsStats[k] = { count: 0, sum: 0 };
           keywordsStats[k].count += 1;
-          const rVal = Number(r.rating);
-          if (!isNaN(rVal)) keywordsStats[k].sum += rVal;
-        });
+          keywordsStats[k].sum += rating;
+        }
       }
-    });
+    }
 
-    const allKeywordsData = Object.entries(keywordsStats).map(([name, data]) => ({
-      name,
-      count: data.count,
-      avg: data.count > 0 ? Number((data.sum / data.count).toFixed(1)) : 0
+    // Helper per conversione e top-N
+    const toTopList = (dict, limitSize = limit) => 
+      Object.entries(dict)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, limitSize);
+
+    const mapRatings = (dict) => Object.entries(dict).map(([name, data]) => ({
+      name, count: data.count, avg: data.count > 0 ? Number((data.sum / data.count).toFixed(1)) : 0
     }));
 
-    const topKeywords = [...allKeywordsData]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 30);
+    const topActors = toTopList(actorsCount);
+    const topDirectors = toTopList(directorsCount);
+    const topStudios = toTopList(studiosCount);
+    const topCountries = toTopList(countriesCount);
+    const topLanguages = toTopList(langsCount);
 
-    const topKeywordsByRating = [...allKeywordsData]
-      .filter(k => k.count >= 1)
-      .sort((a, b) => b.avg - a.avg)
-      .slice(0, 30);
+    const topCrewByJob = {};
+    for (const job in crewJobsStats) {
+      topCrewByJob[job] = toTopList(crewJobsStats[job]);
+    }
+
+    const allGenresData = mapRatings(genreStats);
+    const topGenres = [...allGenresData].sort((a, b) => b.count - a.count).slice(0, limit);
+    const topGenresByRating = [...allGenresData].filter(g => g.count >= 1).sort((a, b) => b.avg - a.avg).slice(0, limit);
+
+    const allDecadesData = mapRatings(decadeStats);
+    const topDecades = [...allDecadesData].sort((a, b) => b.count - a.count).slice(0, limit);
+    const topDecadesByRating = [...allDecadesData].filter(g => g.count >= 1).sort((a, b) => b.avg - a.avg).slice(0, limit);
+
+    const allKeywordsData = mapRatings(keywordsStats);
+    const topKeywords = [...allKeywordsData].sort((a, b) => b.count - a.count).slice(0, 30);
+    const topKeywordsByRating = [...allKeywordsData].filter(k => k.count >= 1).sort((a, b) => b.avg - a.avg).slice(0, 30);
+
+    const totalFilms = validReviews.length;
+    const totalHours = Math.floor(totalRuntime / 60);
+    const totalCountries = countriesSet.size;
+    const totalDirectors = allDirectorsSet.size;
 
     res.json({
       username: user.username,
-      topYear,     // Restituiamo la lista dell'anno selezionato
-      targetYear,  // Restituiamo l'anno per conferma
+      topYear,
+      targetYear,
       topAllTime,
       topActors,
       topDirectors,
       topGenres,
-      topGenresByRating, // [NEW]
-      
+      topGenresByRating,
       topDecades,
       topDecadesByRating,
-
       topStudios,
       topCrewByJob,
-
       topCountries,
       topLanguages,
       topKeywords,
       topKeywordsByRating,
-
-      // Global Counts
       totalFilms,
       totalHours,
       totalDirectors,
@@ -685,7 +588,7 @@ exports.getUserGoals = async (req, res) => {
         user: userId,
         isPost: { $ne: true },
         createdAt: { $gte: startDate, $lte: endDate }
-      }).populate('movie');
+      }).populate('movie').lean();
       
       const watchedReviews = reviewsThisYear.filter(r => r.movie && r.movie.media_type !== "tv");
       const moviesWatchedThisYear = watchedReviews.length;
@@ -805,7 +708,8 @@ exports.getUserFeed = async (req, res) => {
       .populate("movie", "title poster_path tmdb_id media_type release_year")
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     const validReviews = reviews.filter((r) => r.user && r.movie);
 
@@ -976,7 +880,7 @@ exports.syncUserCollections = async (userId) => {
   const Review = require("../models/Review");
 
   try {
-    const reviews = await Review.find({ user: userId }).populate('movie');
+    const reviews = await Review.find({ user: userId }).populate('movie').lean();
     const user = await User.findById(userId);
     if (!user) return;
 
@@ -1096,7 +1000,7 @@ exports.getUserFilteredReviews = async (req, res) => {
     const { filter, value, subValue } = req.query;
 
     const Review = require("../models/Review");
-    const reviews = await Review.find({ user: String(userId) }).populate("movie");
+    const reviews = await Review.find({ user: String(userId) }).populate("movie").lean();
     const validReviews = reviews.filter(r => r.movie);
 
     let filtered = [];
