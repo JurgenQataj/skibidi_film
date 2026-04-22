@@ -36,6 +36,7 @@
   width: 100%;
   background-size: cover;
   background-position: center 20%;
+  z-index: 10;
 }
 
 .headerOverlay {

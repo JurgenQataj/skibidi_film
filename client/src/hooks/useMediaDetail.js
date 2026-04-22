@@ -85,7 +85,8 @@ export function useMediaDetail(mediaType) {
       if (userId && results.length > 2) {
         setHasUserReviewed(results[2]?.data?.hasReviewed || false);
         setIsInWatchlist(results[3]?.data?.isInWatchlist || false);
-        setUserLists(results[4]?.data || []);
+        const fetchedLists = results[4]?.data || [];
+        setUserLists(fetchedLists.filter(list => list._id !== "watchlist"));
       }
     } catch (err) {
       console.error("Errore nel caricamento dati:", err);
