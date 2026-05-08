@@ -320,10 +320,13 @@
     per tenere conto della UI del browser mobile.
   */
   .videoIframe {
-    /* Adattiamo alla larghezza per evitare tagli ai bordi (formato 16:9 su schermo portrait) */
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
+    /*
+      Su mobile portrait il viewport è più alto che largo.
+      Usiamo min-width basato sull'altezza per garantire la copertura completa:
+      177.78svh = larghezza minima per un video 16:9 che copre tutta l'altezza.
+    */
+    width: 177.78svh;
+    height: 100svh;
     min-width: unset;
     min-height: unset;
     top: 50%;
@@ -378,10 +381,8 @@
 /* === FIX SPECIFICO PER SAMSUNG A52, S23 E ALTRI DISPOSITIVI PORTRAIT STRETTI === */
 @media (max-width: 480px) {
   .videoIframe {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    /* Garantiamo che rimanga centrato verticalmente */
+    width: 177.78svh;
+    height: 100svh;
     top: 50%;
     transform: translate(-50%, -50%);
   }

@@ -259,7 +259,9 @@ function GuessActorGamePlay() {
               filter: `blur(${status === "playing" ? blurAmount : 0}px)`,
               transition: imgLoaded ? (status === "playing" ? "filter 3s ease-out" : "filter 0.5s ease-out") : "none",
             }}
-            onLoad={() = loading="lazy" decoding="async"> setImgLoaded(true)}
+            onLoad={() => setImgLoaded(true)}
+            loading="lazy"
+            decoding="async"
           />
 
           {/* Pallini tentativi */}
