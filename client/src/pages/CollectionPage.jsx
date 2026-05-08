@@ -68,15 +68,14 @@ function CollectionPage() {
       >
         <div className={styles.headerOverlay}>
           <div className={styles.headerContent}>
-            <img
-              src={
+            <img               src={
                 collection.poster_path
                   ? `${posterBaseUrl}w400${collection.poster_path}`
                   : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
               }
               alt={`Locandina di ${collection.name}`}
               className={styles.poster}
-            />
+             loading="lazy" decoding="async" />
             <div className={styles.details}>
               <h1 className={styles.title}>{collection.name}</h1>
               <p className={styles.overview}>

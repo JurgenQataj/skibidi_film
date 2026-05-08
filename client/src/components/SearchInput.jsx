@@ -189,11 +189,10 @@ const SearchInput = ({
                 onClick={() => handleSuggestionClick(movie)}
               >
                 {movie.poster_path && (
-                  <img
-                    src={`https://image.tmdb.org/t/p/w185${movie.poster_path}`}
+                  <img                     src={`https://image.tmdb.org/t/p/w185${movie.poster_path}`}
                     alt={movie.title}
                     className={styles.suggestionPoster}
-                  />
+                   loading="lazy" decoding="async" />
                 )}
                 <div className={styles.suggestionInfo}>
                   <p className={styles.suggestionTitle}>{movie.title}</p>

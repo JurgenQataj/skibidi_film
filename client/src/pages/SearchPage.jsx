@@ -786,11 +786,10 @@ function SearchPage() {
                       tabIndex={0}
                       role="button"
                     >
-                        <img
-                            src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"}
+                        <img                             src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"}
                             alt={item.name}
                             className={styles.personRowImg}
-                        />
+                         loading="lazy" decoding="async" />
                         <div className={styles.personRowInfo}>
                           <span className={styles.personRowName}>{item.name}</span>
                           {item.known_for && (

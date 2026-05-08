@@ -251,8 +251,7 @@ function GuessActorGamePlay() {
       <div className={styles.arena}>
         {/* Immagine con blur */}
         <div className={`${styles.imageContainer} ${wrongShake ? styles.shake : ""}`}>
-          <img
-            key={`actor-${currentIndex}`}
+          <img             key={`actor-${currentIndex}`}
             src={`${TMDB_IMAGE}${currentActor.profile_path}`}
             alt="Indovina questo attore"
             className={styles.actorImage}
@@ -260,7 +259,7 @@ function GuessActorGamePlay() {
               filter: `blur(${status === "playing" ? blurAmount : 0}px)`,
               transition: imgLoaded ? (status === "playing" ? "filter 3s ease-out" : "filter 0.5s ease-out") : "none",
             }}
-            onLoad={() => setImgLoaded(true)}
+            onLoad={() = loading="lazy" decoding="async"> setImgLoaded(true)}
           />
 
           {/* Pallini tentativi */}

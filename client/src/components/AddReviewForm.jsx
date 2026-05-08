@@ -135,14 +135,13 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
                       handleSelectMention(u.username);
                     }}
                   >
-                    <img
-                      src={
+                    <img                       src={
                         u.avatar_url ||
                         "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
                       }
                       alt={u.username}
                       className={styles.mentionAvatar}
-                    />
+                     loading="lazy" decoding="async" />
                     <span>@{u.username}</span>
                   </button>
                 ))}

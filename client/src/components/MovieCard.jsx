@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 import { motion } from "framer-motion"; // Aggiunto import per animazioni
 
-const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false }) => {
+const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate }) => {
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
   const placeholderPoster =
     "https://placehold.co/300x450/1a1a2e/666?text=No+Image";
@@ -31,7 +31,7 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false }) => 
 
   return (
     // L'intera card rimane un link
-    <Link to={linkPath} className={styles.cardLink} data-movie-link>
+    <Link to={linkPath} className={styles.cardLink} data-movie-link onClick={onBeforeNavigate}>
       <motion.div 
         className={styles.card} 
         data-movie-card
@@ -51,6 +51,8 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false }) => 
           src={posterPath ? `${posterBaseUrl}${posterPath}` : placeholderPoster}
           alt={`Locandina di ${movieTitle}`}
           data-movie-img
+          loading="lazy"
+          decoding="async"
         />
         {rating && parseFloat(rating) > 0 && (
           <div className={styles.ratingBadge}>

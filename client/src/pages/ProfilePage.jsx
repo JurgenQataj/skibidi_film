@@ -322,6 +322,8 @@ function ProfilePage() {
                     alt="avatar Pokémon"
                     className={`${styles.avatarOption} ${editAvatar === url ? styles.selected : ""}`}
                     onClick={() => setEditAvatar(url)}
+                    loading="lazy"
+                    decoding="async"
                   />
                 ))}
               </div>
@@ -353,11 +355,10 @@ function ProfilePage() {
               role="button"
             >
               <span className={styles.historyNumber}>{index + 1}</span>
-              <img
-                src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
+              <img                 src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
                 alt={`Poster di ${review.movie.title}`}
                 className={styles.historyPoster}
-              />
+               loading="lazy" decoding="async" />
               <div className={styles.historyInfo}>
                 <span className={styles.historyTitle}>{review.movie.title}</span>
               </div>
@@ -383,11 +384,10 @@ function ProfilePage() {
               role="button"
             >
               <span className={styles.historyNumber}>{index + 1}</span>
-              <img
-                src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
+              <img                 src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
                 alt={`Poster di ${review.movie.title}`}
                 className={styles.historyPoster}
-              />
+               loading="lazy" decoding="async" />
               <div className={styles.historyInfo}>
                 <span className={styles.historyTitle}>{review.movie.name || review.movie.title}</span>
               </div>
@@ -468,11 +468,10 @@ function ProfilePage() {
             </div>
           )}
           <div className={styles.instaTopSection}>
-            <img
-              src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
+            <img               src={profile.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"}
               alt="Avatar"
               className={styles.avatar}
-            />
+             loading="lazy" decoding="async" />
             <div className={styles.rightInfoContainer}>
               <h1 className={styles.username}>{profile.username}</h1>
               <div className={styles.statsContainer}>
@@ -550,7 +549,7 @@ function ProfilePage() {
               <div className={styles.badgesGrid}>
                 {(showAllBadges ? profile.completedCollections : profile.completedCollections.slice(0, isMobile ? 7 : 10)).map(coll => (
                   <Link key={coll.id} to={`/collection/${coll.id}`} className={styles.badgeCard}>
-                    <img src={coll.poster_path ? `https://image.tmdb.org/t/p/w200${coll.poster_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"} alt={coll.name} />
+                    <img src={coll.poster_path ? `https://image.tmdb.org/t/p/w200${coll.poster_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"} alt={coll.name}  loading="lazy" decoding="async" />
                     <div className={styles.badgeName}>{coll.name}</div>
                   </Link>
                 ))}

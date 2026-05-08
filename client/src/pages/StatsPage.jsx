@@ -51,7 +51,7 @@ const FavoritePeopleSection = ({ stats, userId, personTypeTab, setPersonTypeTab,
                       {person.name}
                   </span>
                   {avatars && avatars[person.name] && (
-                     <img src={`https://image.tmdb.org/t/p/w185${avatars[person.name]}`} alt={person.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                     <img src={`https://image.tmdb.org/t/p/w185${avatars[person.name]}`} alt={person.name} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}  loading="lazy" decoding="async" />
                   )}
                 </a>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

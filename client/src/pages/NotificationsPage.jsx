@@ -132,7 +132,7 @@ function NotificationsPage() {
           src={`${posterBaseUrl}${notification.targetReview.movie.poster_path}`} 
           className={styles.thumbnail}
           alt="poster"
-        />
+         loading="lazy" decoding="async" />
       );
     }
 
@@ -162,14 +162,13 @@ function NotificationsPage() {
                   !notification.read ? styles.unread : ""
                 }`}
               >
-                <img
-                  src={
+                <img                   src={
                     notification?.sender?.avatar_url ||
                     "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"
                   }
                   alt="avatar"
                   className={styles.avatar}
-                />
+                 loading="lazy" decoding="async" />
                 <div className={styles.notificationContent}>
                   <p className={styles.notificationText}>
                     {getNotificationText(notification)}

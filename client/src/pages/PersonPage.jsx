@@ -159,15 +159,14 @@ function PersonPage() {
       
       {/* SEZIONE INFO PERSONA */}
       <div className={styles.personHeader}>
-        <img
-          src={
+        <img           src={
             data.profile_path
               ? `https://image.tmdb.org/t/p/w500${data.profile_path}`
               : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
           }
           alt={data.personName}
           className={styles.personImage}
-        />
+         loading="lazy" decoding="async" />
         <div className={styles.personInfo}>
           <div className={styles.titleRow}>
             <h1 className={styles.pageTitle}>{data.personName}</h1>

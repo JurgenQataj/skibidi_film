@@ -97,7 +97,7 @@ function PartialCollectionsPage() {
                   src={p.poster_path ? `${posterBaseUrl}${p.poster_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"} 
                   alt={p.name} 
                   className={styles.poster}
-                />
+                 loading="lazy" decoding="async" />
                 <div className={styles.progressBadge}>
                   {p.missing} mancanti
                 </div>

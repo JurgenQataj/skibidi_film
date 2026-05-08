@@ -423,11 +423,10 @@ function SkibidiRoulette({ watchlist }) {
 
             {winner && !isSpinning && (
               <div className={styles.winnerCard}>
-                <img
-                  className={styles.winnerPoster}
+                <img                   className={styles.winnerPoster}
                   src={winner.poster_path ? `https://image.tmdb.org/t/p/w300${winner.poster_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"}
                   alt={winner.title || winner.name}
-                />
+                 loading="lazy" decoding="async" />
                 <div className={styles.winnerInfo}>
                   <p className={styles.winnerLabel}>🏆 Esito del Destino</p>
                   <h3 className={styles.winnerTitle}>{winner.title || winner.name}</h3>

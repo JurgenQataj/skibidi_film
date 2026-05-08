@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./WatchlistPage.module.css";
@@ -10,7 +9,6 @@ import SkibidiRoulette from "../components/SkibidiRoulette";
 function WatchlistPage() {
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   const fetchWatchlist = useCallback(async () => {
@@ -32,6 +30,17 @@ function WatchlistPage() {
   useEffect(() => {
     fetchWatchlist();
   }, [fetchWatchlist]);
+
+  // Ripristina la posizione dello scroll PRIMA che il browser dipinga (nessun flash visivo)
+  useLayoutEffect(() => {
+    if (!loading && watchlist.length > 0) {
+      const savedPosition = sessionStorage.getItem("watchlistScrollPos");
+      if (savedPosition) {
+        window.scrollTo({ top: parseInt(savedPosition, 10), behavior: "instant" });
+        sessionStorage.removeItem("watchlistScrollPos");
+      }
+    }
+  }, [loading, watchlist.length]);
 
   // *** CORREZIONE 1: Funzione per rimuovere un film dalla watchlist ***
   const handleRemoveFromWatchlist = async (tmdbId) => {
@@ -69,17 +78,12 @@ function WatchlistPage() {
             <div
               key={movie.tmdb_id}
               className={styles.cardWrapper}
-              onClick={(e) => {
-                // Naviga solo se NON si clicca su un pulsante (es. elimina)
-                if (!e.target.closest("button")) {
-                  navigate(`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`);
-                }
-              }}
             >
               <MovieCard
                 movie={movie}
                 showDeleteButton={true}
                 onDelete={handleRemoveFromWatchlist}
+                onBeforeNavigate={() => sessionStorage.setItem("watchlistScrollPos", window.scrollY)}
               />
             </div>
           ))

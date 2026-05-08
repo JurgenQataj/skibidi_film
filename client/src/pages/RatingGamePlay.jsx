@@ -141,11 +141,10 @@ function RatingGamePlay() {
         key={movie.id}
       >
         {/* Poster fills the card */}
-        <img
-          src={`${TMDB_IMAGE}${movie.poster_path}`}
+        <img           src={`${TMDB_IMAGE}${movie.poster_path}`}
           alt={movie.title}
           className={styles.poster}
-        />
+         loading="lazy" decoding="async" />
 
         {/* Bottom gradient + title */}
         <div className={styles.cardGradient} />

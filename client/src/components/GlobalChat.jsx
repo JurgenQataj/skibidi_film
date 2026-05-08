@@ -54,11 +54,10 @@ function MessageBubble({ msg, mi, groupLength, isOwn, user, hoveredMsg, selected
       {/* Avatar: solo sull'ultimo msg di ogni gruppo altrui */}
       {!isOwn ? (
         isLast || isSingle ? (
-          <img
-            src={msg.user?.avatar_url || 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png'}
+          <img             src={msg.user?.avatar_url || 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png'}
             alt="avatar"
             className={styles.messageAvatar}
-          />
+           loading="lazy" decoding="async" />
         ) : (
           <div className={styles.avatarSpace} />
         )
@@ -372,11 +371,10 @@ const GlobalChat = () => {
                   className={styles.mentionOption}
                   onMouseDown={(e) => { e.preventDefault(); handleSelectMention(u.username); }}
                 >
-                  <img
-                    src={u.avatar_url || 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png'}
+                  <img                     src={u.avatar_url || 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png'}
                     alt={u.username}
                     className={styles.mentionAvatar}
-                  />
+                   loading="lazy" decoding="async" />
                   <span>@{u.username}</span>
                 </button>
               ))}

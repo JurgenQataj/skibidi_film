@@ -296,6 +296,8 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
               alt={`Locandina di ${media.title}`}
               className={styles.poster}
               onLoad={() => handleColorExtraction(media.backdrop_path || media.poster_path)}
+              loading="lazy"
+              decoding="async"
             />
             <div className={styles.details}>
               <h1 className={styles.title}>
@@ -469,8 +471,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
               <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginTop: "2px" }}>
                 {media.watch_providers.flatrate.map((provider) => {
                   const logoRender = (
-                    <img
-                      key={provider.provider_id}
+                    <img                       key={provider.provider_id}
                       src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
                       alt={provider.provider_name}
                       title={provider.provider_name}
@@ -480,7 +481,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
                         borderRadius: "6px",
                         cursor: media.watch_providers.link ? "pointer" : "default",
                       }}
-                    />
+                     loading="lazy" decoding="async" />
                   );
                   return media.watch_providers.link ? (
                     <a
@@ -523,14 +524,13 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
           <div className={styles.castGrid}>
             {media.cast?.map((actor) => (
               <div key={actor.id} className={styles.actorCard}>
-                <img
-                  src={
+                <img                   src={
                     actor.profile_path
                       ? `${POSTER_BASE}w342${actor.profile_path}`
                       : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
                   }
                   alt={actor.name}
-                />
+                 loading="lazy" decoding="async" />
                 <Link
                   to={`/person/${encodeURIComponent(actor.name)}`}
                   className={styles.personLink}

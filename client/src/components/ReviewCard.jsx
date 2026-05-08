@@ -328,14 +328,13 @@ function ReviewCard({ review, onInteraction }) {
               {user.username || "Admin"}
             </Link>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <img
-                src={
+              <img                 src={
                   user.avatar_url ||
                   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png"
                 }
                 alt="avatar"
                 className={styles.userAvatar}
-              />
+               loading="lazy" decoding="async" />
               {loggedInUserId === user._id && (
                 <button
                   onClick={handleDeletePost}
@@ -389,15 +388,14 @@ function ReviewCard({ review, onInteraction }) {
       <div className={styles.cardBody}>
         <div className={styles.leftColumn}>
           <Link to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}>
-            <img
-              src={
+            <img               src={
                 movie.poster_path
                   ? `${posterBaseUrl}${movie.poster_path}`
                   : placeholderPoster
               }
               alt={`Locandina di ${movie.title}`}
               className={styles.poster}
-            />
+             loading="lazy" decoding="async" />
           </Link>
         </div>
         <div className={styles.rightColumn}>
@@ -437,14 +435,13 @@ function ReviewCard({ review, onInteraction }) {
                   <div key={comment._id} className={styles.commentItem}>
                     {/* Colonna Sinistra: Avatar */}
                     <Link to={`/profile/${comment.user._id}`}>
-                      <img
-                        src={
+                      <img                         src={
                           comment.user.avatar_url ||
                           "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
                         }
                         alt="avatar"
                         className={styles.commentAvatar}
-                      />
+                       loading="lazy" decoding="async" />
                     </Link>
 
                     {/* Colonna Centrale: Dati + Testo + Azioni */}
@@ -529,14 +526,13 @@ function ReviewCard({ review, onInteraction }) {
                           handleSelectMention(u.username);
                         }}
                       >
-                        <img
-                          src={
+                        <img                           src={
                             u.avatar_url ||
                             "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"
                           }
                           alt={u.username}
                           className={styles.mentionAvatar}
-                        />
+                         loading="lazy" decoding="async" />
                         <span>@{u.username}</span>
                       </button>
                     ))}

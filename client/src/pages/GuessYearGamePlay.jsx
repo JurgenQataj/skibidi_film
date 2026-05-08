@@ -257,7 +257,7 @@ function GuessYearGamePlay() {
               src={`https://image.tmdb.org/t/p/w500${currentMovie.poster_path}`} 
               alt="Poster Film" 
               className={styles.moviePoster}
-            />
+             loading="lazy" decoding="async" />
          </div>
             
          <form onSubmit={handleSubmit} className={styles.inputForm}>

@@ -69,11 +69,10 @@ const UserCard = ({ user, onNavigate }) => {
   return (
     <div className={styles.card} onClick={handleClick}>
       <div className={styles.avatarWrapper}>
-        <img
-          src={avatar}
+        <img           src={avatar}
           alt={`Avatar di ${user.username}`}
           className={styles.avatar}
-        />
+         loading="lazy" decoding="async" />
       </div>
       <div className={styles.userInfo}>
         <div className={styles.username} title={user.username}>

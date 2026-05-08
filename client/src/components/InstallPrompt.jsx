@@ -83,7 +83,7 @@ function InstallPrompt() {
         {/* Header */}
         <div className="install-sheet-header">
           <div className="install-app-icon">
-            <img src="/pwa-192x192.png" alt="Skibidi Film" />
+            <img src="/pwa-192x192.png" alt="Skibidi Film"  loading="lazy" decoding="async" />
           </div>
           <button
             className="install-close"

@@ -18,7 +18,7 @@ export default Skeleton;
 /** Skeleton con Logo centrato, anelli orbitali e barra di loading */
 export const SkeletonWithLogo = () => (
   <div className={styles.logoSkeleton}>
-    <img src="/icona3.png" alt="Loading..." className={styles.logoImg} />
+    <img src="/icona3.png" alt="Loading..." className={styles.logoImg}  loading="lazy" decoding="async" />
     <div className={styles.loaderBar} />
   </div>
 );

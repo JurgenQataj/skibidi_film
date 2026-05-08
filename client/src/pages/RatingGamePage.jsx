@@ -192,14 +192,13 @@ function RatingGamePage() {
                 >
                   {i < 3 ? rankEmojis[i] : `#${i + 1}`}
                 </span>
-                <img
-                  src={
+                <img                   src={
                     entry.user?.avatar_url ||
                     `https://api.dicebear.com/7.x/initials/svg?seed=${entry.user?.username}&backgroundColor=1a1a2e`
                   }
                   alt={entry.user?.username}
                   className={styles.lbAvatar}
-                />
+                 loading="lazy" decoding="async" />
                 <span className={styles.lbUsername}>@{entry.user?.username}</span>
                 <span className={styles.lbScore}>{entry.score}</span>
               </div>

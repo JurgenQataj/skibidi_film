@@ -134,11 +134,10 @@ function HorizonCard({ movie, isActive }) {
           frameBorder="0"
         />
         {movie.backdrop_path && (
-          <img
-            className={`${styles.posterFallback} ${isVideoPlaying ? styles.hidden : ""}`}
+          <img             className={`${styles.posterFallback} ${isVideoPlaying ? styles.hidden : ""}`}
             src={`${IMG_BASE}${movie.backdrop_path}`}
             alt={movie.title}
-          />
+           loading="lazy" decoding="async" />
         )}
       </div>
 

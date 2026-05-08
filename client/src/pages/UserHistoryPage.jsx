@@ -91,11 +91,10 @@ function UserHistoryPage() {
               role="button"
             >
               <span className={styles.historyNumber}>{index + 1}</span>
-              <img
-                src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
+              <img                 src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
                 alt={`Poster di ${review.movie.title}`}
                 className={styles.historyPoster}
-              />
+               loading="lazy" decoding="async" />
               <div className={styles.historyInfo}>
                 <span className={styles.historyTitle}>{review.movie.title}</span>
                 <span className={styles.historyDetails}>

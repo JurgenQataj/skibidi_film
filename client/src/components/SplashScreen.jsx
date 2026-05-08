@@ -27,11 +27,10 @@ function SplashScreen({ onFinish }) {
       <div className="splash-content">
         {/* Rings orbitali */}
         <div className="splash-ring">
-          <img
-            src="/pwa-192x192.png"
+          <img             src="/pwa-192x192.png"
             alt="Skibidi Film"
             className="splash-logo"
-          />
+           loading="lazy" decoding="async" />
         </div>
 
         <h1 className="splash-title">Skibidi Film</h1>

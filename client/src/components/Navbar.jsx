@@ -37,7 +37,7 @@ function Navbar() {
       {/* Mobile Topbar con Logo (visibile solo su mobile) */}
       <div className={`${styles.mobileTopbar} ${isImmersivePage ? styles.immersiveTopbar : ""}`}>
         <Link to="/" className={styles.mobileLogo}>
-          <img src="/icona3.png" alt="logo" className={styles.logoImg} />
+          <img src="/icona3.png" alt="logo" className={styles.logoImg}  loading="lazy" decoding="async" />
           Skibidi Film
         </Link>
       </div>
@@ -45,7 +45,7 @@ function Navbar() {
       <nav className={styles.navbar}>
       <div className={styles.navContent}>
         <Link to="/" className={styles.logo}>
-          <img src="/icona3.png" alt="logo" className={styles.logoImg} />
+          <img src="/icona3.png" alt="logo" className={styles.logoImg}  loading="lazy" decoding="async" />
           Skibidi Film
         </Link>
         <div className={styles.navLinks}>
