@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import styles from "./SkibidiRoulette.module.css";
 import { FaDice, FaPlay } from "react-icons/fa";
+import { playWinSound, initAudio } from "../utils/audio";
 
 const POSTER_BASE = "https://image.tmdb.org/t/p/w300";
 const SLOT_COUNT = 30; // Reduced roulette wheel
@@ -59,7 +60,8 @@ function SkibidiRoulette({ watchlist }) {
     ballRadius: 0, // dynamic
     ballPhase: "orbit", // orbit, descend, bounce, rest
     bounceCount: 0,
-    lastTime: 0
+    lastTime: 0,
+    lastTickSlot: -1
   });
 
   // Block page scroll when modal open
@@ -306,11 +308,15 @@ function SkibidiRoulette({ watchlist }) {
     } else {
       setWinner(p.finalWinnerMovie);
       setIsSpinning(false);
+      playWinSound();
     }
   }, [draw]);
 
   const triggerSpin = useCallback(() => {
     if (watchlist.length === 0 || isSpinning) return;
+    
+    initAudio(); // Initialize audio context synchronously on user interaction
+    
     setIsSpinning(true);
     setWinner(null);
 

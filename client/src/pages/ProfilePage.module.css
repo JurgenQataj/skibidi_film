@@ -281,35 +281,60 @@
 }
 
 .listCard {
+  width: 100%;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
+  gap: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
   text-decoration: none;
   color: white;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-sizing: border-box;
 }
 
 .listCard:hover {
-  background: rgba(229, 9, 20, 0.1);
-  border-color: rgba(229, 9, 20, 0.4);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .listCardIcon {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.listCard:hover .listCardIcon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.listCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  overflow: hidden;
 }
 
 .listCardTitle {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
+  color: #fff;
+  letter-spacing: 0.01em;
 }
 
 .listCardDesc {
@@ -318,7 +343,22 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
   margin-top: 2px;
+}
+
+.modalListsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 8px 4px;
+}
+
+.modalListsGrid > * {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 /* FORZA DIMENSIONI IDENTICHE ASSOLUTE */
@@ -852,17 +892,18 @@
   }
 
   .avatar {
-    width: 28px;
-    height: 28px;
+    width: 66px;
+    height: 66px;
   }
 
   .username {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
+    text-align: left;
   }
 
   .statsContainer {
-    gap: 12px;
-    justify-content: center;
+    gap: 10px;
+    justify-content: flex-start;
   }
 
   .statItem,

@@ -403,28 +403,26 @@ function ProfilePage() {
         onClose={() => setIsListsModalOpen(false)}
         title={isOwnProfile ? "Le mie Liste" : `Liste di ${profile.username}`}
       >
-        <div className={styles.userList}>
-          {lists.filter((l) => l._id !== "watchlist" && l.id !== "watchlist").length === 0 ? (
+        <div className={styles.modalListsGrid}>
+          {lists.length === 0 ? (
             <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center" }}>Nessuna lista creata.</p>
           ) : (
-            lists
-              .filter((l) => l._id !== "watchlist" && l.id !== "watchlist")
-              .map((list) => (
-                <Link
-                  key={list._id}
-                  to={`/list/${list._id}`}
-                  className={styles.listCard}
-                  onClick={() => setIsListsModalOpen(false)}
-                >
-                  <span className={styles.listCardIcon}>🎬</span>
-                  <div>
-                    <div className={styles.listCardTitle}>{list.title}</div>
-                    {list.description && (
-                      <div className={styles.listCardDesc}>{list.description}</div>
-                    )}
-                  </div>
-                </Link>
-              ))
+            lists.map((list) => (
+              <Link
+                key={list._id}
+                to={list._id === "watchlist" ? (isOwnProfile ? "/watchlist" : `/profile/${profile._id}/watchlist`) : `/list/${list._id}`}
+                className={styles.listCard}
+                onClick={() => setIsListsModalOpen(false)}
+              >
+                <span className={styles.listCardIcon}>{list._id === "watchlist" ? "👀" : "🎬"}</span>
+                <div className={styles.listCardContent}>
+                  <div className={styles.listCardTitle}>{list.title}</div>
+                  {list.description && list._id !== "watchlist" && (
+                    <div className={styles.listCardDesc}>{list.description}</div>
+                  )}
+                </div>
+              </Link>
+            ))
           )}
         </div>
       </Modal>

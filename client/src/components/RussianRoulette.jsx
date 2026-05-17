@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./RussianRoulette.module.css";
 import { FaPlay } from "react-icons/fa";
 import { GiRevolver } from "react-icons/gi";
+import { playGunshotSound, initAudio, playCylinderSpinSound } from "../utils/audio";
 
 // Gun icon for the trigger button
 const GunIcon = () => (
@@ -54,15 +55,24 @@ function RussianRoulette({ watchlist }) {
 
   const handleShoot = () => {
     if (selectedMovies.length < 2) return;
+    
+    initAudio(); // Initialize audio context synchronously
+    
     setStep(2); // Start animation
     
     // Random winner chosen immediately
     const winnerIdx = Math.floor(Math.random() * selectedMovies.length);
     setWinner(selectedMovies[winnerIdx]);
 
+    // Cylinder spin sound starts 2 seconds before the shot (3100 - 2000 = 1100)
+    setTimeout(() => {
+      playCylinderSpinSound();
+    }, 1100);
+
     // Animation timing (spinning is 3s, flash is 0.15s)
     setTimeout(() => {
       setStep(3); // Result
+      playGunshotSound();
     }, 3100);
   };
 

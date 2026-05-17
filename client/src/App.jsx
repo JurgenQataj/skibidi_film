@@ -144,6 +144,7 @@ function App() {
             <Route path="discover" element={<DiscoverPage />} />
             <Route path="my-lists" element={<MyListsPage />} />
             <Route path="watchlist" element={<WatchlistPage />} />
+            <Route path="profile/:userId/watchlist" element={<WatchlistPage />} />
             <Route path="notifications" element={<NotificationsPage />} />
             <Route path="list/:listId" element={<ListPage />} />
             <Route path="partial-collections" element={<PartialCollectionsPage />} />

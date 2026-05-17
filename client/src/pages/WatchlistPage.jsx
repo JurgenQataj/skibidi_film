@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { useParams } from "react-router-dom";
 import styles from "./WatchlistPage.module.css";
 import MovieCard from "../components/MovieCard";
 import { SkeletonMovieCard, SkeletonWithLogo } from "../components/Skeleton";
@@ -8,9 +9,11 @@ import SkibidiRoulette from "../components/SkibidiRoulette";
 import RussianRoulette from "../components/RussianRoulette";
 
 function WatchlistPage() {
+  const { userId: routeUserId } = useParams();
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
+  const [isOwner, setIsOwner] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   const [selectedGenre, setSelectedGenre] = useState("");
@@ -62,10 +65,24 @@ function WatchlistPage() {
     try {
       const token = localStorage.getItem("token");
       const decodedToken = jwtDecode(token);
-      const userId = decodedToken.user.id;
-      setUsername(decodedToken.user.username || "Utente");
+      const currentUserId = decodedToken.user.id;
+      const targetUserId = routeUserId || currentUserId;
+      const ownerStatus = !routeUserId || routeUserId === currentUserId;
+      setIsOwner(ownerStatus);
+
+      if (ownerStatus) {
+        setUsername(decodedToken.user.username || "Utente");
+      } else {
+        try {
+          const profileRes = await axios.get(`${API_URL}/api/users/${targetUserId}/profile`);
+          setUsername(profileRes.data.username);
+        } catch (e) {
+          setUsername("Utente");
+        }
+      }
+
       const response = await axios.get(
-        `${API_URL}/api/watchlist/user/${userId}`
+        `${API_URL}/api/watchlist/user/${targetUserId}`
       );
       setWatchlist(response.data);
     } catch (error) {
@@ -73,7 +90,7 @@ function WatchlistPage() {
     } finally {
       setLoading(false);
     }
-  }, [API_URL]);
+  }, [API_URL, routeUserId]);
 
   useEffect(() => {
     fetchWatchlist();
@@ -188,7 +205,7 @@ function WatchlistPage() {
             >
               <MovieCard
                 movie={movie}
-                showDeleteButton={true}
+                showDeleteButton={isOwner}
                 onDelete={handleRemoveFromWatchlist}
                 onBeforeNavigate={() => sessionStorage.setItem("watchlistScrollPos", window.scrollY)}
               />
