@@ -1,6 +1,6 @@
 /* Container principale moderno */
 .pageContainer {
-  max-width: 960px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 100px 40px 2rem; /* Top padding per Navbar fixed */
   min-height: 100vh;
@@ -9,23 +9,48 @@
   background: transparent;
 }
 
-/* Header con gradiente e stile pulito */
+/* Header */
 .header {
   text-align: center;
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2.5rem;
 }
 
 .title {
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  margin: 0 0 1rem 0;
-  background: linear-gradient(90deg, #ff4757, #ff6b81);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -1px;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.usernameHighlight {
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.movieCountBadge {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d1d1d1;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-transform: uppercase;
+  margin-left: 5px;
+  white-space: nowrap;
 }
 
 .description {
@@ -43,10 +68,132 @@
   font-weight: 600;
 }
 
+/* Filtri - Premium Glassmorphism */
+.filterContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 3rem;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: rgba(30, 30, 30, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 99;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.filterLabel {
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.75rem;
+}
+
+.filterSelect,
+.filterInput {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  min-width: 150px;
+  width: 100%;
+}
+
+.filterSelect:focus,
+.filterInput:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+  background: rgba(20, 20, 20, 0.9);
+  transform: translateY(-2px);
+}
+
+/* Autocomplete Custom List */
+.suggestionsList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-top: 8px;
+  padding: 0;
+  list-style: none;
+  z-index: 100;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.suggestionsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestionsList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestionsList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.suggestionsList::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.suggestionItem {
+  padding: 12px 18px;
+  color: #eee;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 0.95rem;
+}
+
+.suggestionItem:last-child {
+  border-bottom: none;
+}
+
+.suggestionItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  padding-left: 22px;
+}
+
+.suggestionItemDisabled {
+  padding: 12px 16px;
+  color: #777;
+  font-style: italic;
+  text-align: center;
+}
+
 /* Griglia responsive moderna e fissa */
 .reviewsGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   gap: 15px;
   justify-items: stretch;
   align-items: stretch;
@@ -130,12 +277,17 @@
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 1.8rem;
+  }
+  
+  .filterContainer {
+    padding: 15px 20px;
+    gap: 15px;
   }
   
   .reviewsGrid {
-    
-    gap: 8px !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 10px !important;
     justify-content: center !important;
     padding: 0;
   }
@@ -173,27 +325,56 @@
 }
 
 @media (max-width: 480px) {
+  .title {
+    font-size: 1.2rem;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .movieCountBadge {
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    margin-left: 0;
+  }
+
   .pageContainer {
-  .reviewsGrid {
-    grid-template-columns: repeat(5, 1fr) !important;
+    padding: 1rem 1.5rem;
   }
-  .cardWrapper :global(.card) {
-    max-width: unset; /* Rimuovi constraint width stretto per farli riempire la colonna tablet */
+  
+  .filterContainer {
+    flex-direction: column;
+    padding: 20px 15px;
+    gap: 15px;
+    border-radius: 16px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-    padding: 1rem 1.5rem; /* Margine laterale aumentato sui telefoni */
+  .filterGroup {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 6px;
   }
 
+  .filterSelect,
+  .filterInput {
+    width: 100%;
+    min-width: unset;
+    box-sizing: border-box;
+  }
+  
   .reviewsGrid {
-     /* Forza 4 colonne su schermi piccoli */
+    grid-template-columns: repeat(4, 1fr) !important;
     gap: 6px !important;
     justify-content: center !important;
   }
-  
+
   .cardWrapper :global(.card) {
     --title-height: 26px;
     width: 100% !important;
-    max-width: 80px; /* Non farli diventare troppo larghi */
+    max-width: 80px;
     height: calc(110px + var(--title-height)) !important;
   }
 
@@ -209,6 +390,4 @@
     padding: 2px !important;
     min-height: unset;
   }
-
-  .reviewsGrid { grid-template-columns: repeat(4, 1fr) !important; }
 }

@@ -5,7 +5,7 @@ import styles from "./SkibidiRoulette.module.css";
 import { FaDice, FaPlay } from "react-icons/fa";
 
 const POSTER_BASE = "https://image.tmdb.org/t/p/w300";
-const SLOT_COUNT = 36; // A full roulette wheel
+const SLOT_COUNT = 30; // Reduced roulette wheel
 
 /**
  * Cryptographically secure drop-in replacement for Math.random().
@@ -76,19 +76,6 @@ function SkibidiRoulette({ watchlist }) {
     pxRef.current.activeSlots = picked;
     setWinner(null);
   }, [isOpen, watchlist]);
-
-  // Pre-load poster images for drawing on canvas
-  useEffect(() => {
-    // Carica sia gli slot dello stato iniziale che quelli attuali
-    (pxRef.current.activeSlots || slots).forEach((movie) => {
-      const key = movie.id || movie.tmdb_id;
-      if (key && !imagesRef.current[key]) {
-        const img = new Image();
-        img.src = movie.poster_path ? `${POSTER_BASE}${movie.poster_path}` : "";
-        imagesRef.current[key] = img;
-      }
-    });
-  }, [slots]);
 
   // ─── Drawing Engine ───────────────────────────────────────
   const draw = useCallback(() => {
@@ -183,8 +170,8 @@ function SkibidiRoulette({ watchlist }) {
             
             ctx.restore();
         } else {
-            // Fallback color if image not loaded
-            ctx.fillStyle = (i % 2 === 0) ? "#111" : "#e50914"; 
+            // Fallback color if image not loaded or missing
+            ctx.fillStyle = (i % 2 === 0) ? "#16161e" : "#2a2a35"; 
             ctx.fill();
         }
 
@@ -259,6 +246,25 @@ function SkibidiRoulette({ watchlist }) {
     ctx.shadowColor = "transparent";
 
   }, [slots]);
+
+  // Pre-load poster images for drawing on canvas
+  useEffect(() => {
+    (pxRef.current.activeSlots || slots).forEach((movie) => {
+      const key = movie.id || movie.tmdb_id;
+      if (key && !imagesRef.current[key]) {
+        const img = new Image();
+        img.onload = () => {
+          // Ridisegna il canvas appena l'immagine è scaricata, 
+          // per evitare spazi vuoti o bug visivi
+          requestAnimationFrame(draw);
+        };
+        img.src = movie.poster_path ? `${POSTER_BASE}${movie.poster_path}` : "";
+        imagesRef.current[key] = img;
+      }
+    });
+  }, [slots, draw]);
+
+  // (Draw engine moved above useEffect)
 
 
 

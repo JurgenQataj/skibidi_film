@@ -1,21 +1,69 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
+import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./WatchlistPage.module.css";
 import MovieCard from "../components/MovieCard";
 import { SkeletonMovieCard, SkeletonWithLogo } from "../components/Skeleton";
 import SkibidiRoulette from "../components/SkibidiRoulette";
+import RussianRoulette from "../components/RussianRoulette";
 
 function WatchlistPage() {
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState("");
   const API_URL = import.meta.env.VITE_API_URL || "";
+
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedKeyword, setSelectedKeyword] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const availableGenres = useMemo(() => {
+    const genresSet = new Set();
+    watchlist.forEach((movie) => {
+      if (movie.genres && Array.isArray(movie.genres)) {
+        movie.genres.forEach((g) => genresSet.add(g));
+      }
+    });
+    return Array.from(genresSet).sort();
+  }, [watchlist]);
+
+  const availableKeywords = useMemo(() => {
+    const keywordsSet = new Set();
+    watchlist.forEach((movie) => {
+      if (movie.keywords && Array.isArray(movie.keywords)) {
+        movie.keywords.forEach((k) => keywordsSet.add(k));
+      }
+    });
+    return Array.from(keywordsSet).sort();
+  }, [watchlist]);
+
+  const filteredKeywords = useMemo(() => {
+    if (!selectedKeyword) return availableKeywords;
+    const lower = selectedKeyword.toLowerCase();
+    return availableKeywords.filter(k => k.toLowerCase().includes(lower));
+  }, [availableKeywords, selectedKeyword]);
+
+  const filteredWatchlist = useMemo(() => {
+    return watchlist.filter((movie) => {
+      if (selectedGenre && (!movie.genres || !movie.genres.includes(selectedGenre))) {
+        return false;
+      }
+      if (selectedKeyword.trim() !== "") {
+        if (!movie.keywords) return false;
+        const lowerSearch = selectedKeyword.toLowerCase();
+        const hasKeywordMatch = movie.keywords.some(k => k.toLowerCase().includes(lowerSearch));
+        if (!hasKeywordMatch) return false;
+      }
+      return true;
+    });
+  }, [watchlist, selectedGenre, selectedKeyword]);
 
   const fetchWatchlist = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.user.id;
+      setUsername(decodedToken.user.username || "Utente");
       const response = await axios.get(
         `${API_URL}/api/watchlist/user/${userId}`
       );
@@ -70,11 +118,70 @@ function WatchlistPage() {
   return (
     <div className={styles.pageContainer}>
       <header className={styles.header}>
-        <h1 className={styles.title}>La mia Watchlist</h1>
+        <h1 className={styles.title}>
+          <span><span className={styles.usernameHighlight}>{username}'s</span> Watchlist</span>
+          <span className={styles.movieCountBadge}>{watchlist.length} Film</span>
+        </h1>
       </header>
+
+      <div className={styles.filterContainer}>
+        <div className={styles.filterGroup}>
+          <label htmlFor="genreFilter" className={styles.filterLabel}>Genere:</label>
+          <select 
+            id="genreFilter"
+            value={selectedGenre} 
+            onChange={(e) => setSelectedGenre(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="">Tutti i generi</option>
+            {availableGenres.map(genre => (
+              <option key={genre} value={genre}>{genre}</option>
+            ))}
+          </select>
+        </div>
+        <div className={styles.filterGroup} style={{ position: 'relative' }}>
+          <label htmlFor="keywordSearch" className={styles.filterLabel}>Parola chiave:</label>
+          <input 
+            id="keywordSearch"
+            type="text" 
+            placeholder="Cerca o scegli..." 
+            value={selectedKeyword}
+            onChange={(e) => {
+              setSelectedKeyword(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setShowSuggestions(false)}
+            className={styles.filterInput}
+            autoComplete="off"
+          />
+          {showSuggestions && (
+            <ul className={styles.suggestionsList}>
+              {filteredKeywords.length > 0 ? (
+                filteredKeywords.map(keyword => (
+                  <li 
+                    key={keyword} 
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      setSelectedKeyword(keyword);
+                      setShowSuggestions(false);
+                    }}
+                    className={styles.suggestionItem}
+                  >
+                    {keyword}
+                  </li>
+                ))
+              ) : (
+                <li className={styles.suggestionItemDisabled}>Nessuna parola chiave</li>
+              )}
+            </ul>
+          )}
+        </div>
+      </div>
+
       <div className={styles.reviewsGrid}>
-        {watchlist.length > 0 ? (
-          watchlist.map((movie) => (
+        {filteredWatchlist.length > 0 ? (
+          filteredWatchlist.map((movie) => (
             <div
               key={movie.tmdb_id}
               className={styles.cardWrapper}
@@ -88,10 +195,11 @@ function WatchlistPage() {
             </div>
           ))
         ) : (
-          <p className={styles.statusText}>La tua watchlist è vuota.</p>
+          <p className={styles.statusText}>Nessun film trovato con questi filtri o watchlist vuota.</p>
         )}
       </div>
 
+      <RussianRoulette watchlist={watchlist} />
       <SkibidiRoulette watchlist={watchlist} />
     </div>
   );

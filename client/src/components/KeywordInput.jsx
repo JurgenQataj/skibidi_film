@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import styles from "./KeywordInput.module.css";
+import { POPULAR_KEYWORDS } from "../data/popularKeywords";
 
 const KeywordInput = ({ selectedKeywords, onChange }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showAllKeywords, setShowAllKeywords] = useState(false);
   const wrapperRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
@@ -40,6 +42,7 @@ const KeywordInput = ({ selectedKeywords, onChange }) => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setShowSuggestions(false);
+        setShowAllKeywords(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -54,6 +57,7 @@ const KeywordInput = ({ selectedKeywords, onChange }) => {
     }
     setQuery("");
     setShowSuggestions(false);
+    setShowAllKeywords(false);
   };
 
   const handleRemoveKeyword = (keywordId) => {
@@ -106,6 +110,40 @@ const KeywordInput = ({ selectedKeywords, onChange }) => {
             </li>
           ))}
         </ul>
+      )}
+
+      {/* Popular keywords toggle button */}
+      <div className={styles.popularKeywordsToggle}>
+        <button
+          className={styles.toggleBtn}
+          onClick={(e) => {
+            e.preventDefault();
+            setShowAllKeywords(!showAllKeywords);
+            setShowSuggestions(false); // Hide text suggestions
+          }}
+        >
+          {showAllKeywords ? "Chiudi temi..." : "Esplora oltre 100 temi..."}
+        </button>
+      </div>
+
+      {/* Vertical grid of 100+ keywords */}
+      {showAllKeywords && (
+        <div className={styles.popularKeywordsGridWrapper}>
+          <div className={styles.popularKeywordsGrid}>
+            {POPULAR_KEYWORDS.filter(k => !selectedKeywords.find(sk => sk.id === k.id)).map((keyword) => (
+              <button
+                key={keyword.id}
+                className={styles.popularKeywordBtn}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSelectKeyword(keyword);
+                }}
+              >
+                + {keyword.name}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,0 +1,528 @@
+/* --- Bottone Fisso --- */
+.openRouletteBtn {
+  position: fixed;
+  bottom: 105px; /* Sopra a Skibidi Roulette su Desktop */
+  right: 30px;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #111, #333);
+  color: #fff;
+  border: 2px solid #555;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255,255,255,0.1);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.openRouletteBtn:hover {
+  transform: scale(1.1) rotate(-10deg);
+  background: linear-gradient(135deg, #cc0000, #ff4757);
+  border-color: #ff8a97;
+  box-shadow: 0 8px 25px rgba(255, 71, 87, 0.6);
+}
+
+/* --- Modal Overlay Oscuro --- */
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(15px);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Blocca tutte le scrollbar durante l'animazione */
+  color: #fff;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 3rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.closeBtn:hover { color: #fff; }
+
+/* --- Fase 1: Selezione Film --- */
+.selectionContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 1200px;
+  padding: 20px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 5px;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+.title span { 
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 300; 
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #aaa;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 12px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.grid::-webkit-scrollbar { width: 8px; }
+.grid::-webkit-scrollbar-track { background: transparent; }
+.grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+.movieItem {
+  position: relative;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  width: 100%;
+  padding-top: 150%; /* 2:3 aspect ratio garantito */
+}
+.movieItem img { 
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+  display: block; 
+}
+.movieItem:hover { transform: scale(1.03); }
+
+.movieItem.selected {
+  border: 3px solid #ff4757;
+  box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
+  transform: scale(0.95);
+  filter: sepia(0.8) hue-rotate(320deg) saturate(3); /* Effetto rosso sangue */
+}
+.movieItem.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 5px; right: 5px;
+  background: #ff4757;
+  color: white;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold;
+}
+
+/* --- Tamburo della Pistola UI (Cylinder) --- */
+.cylinderWrap {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.cylinder {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #222, #111, #000);
+  border: 4px solid #444;
+  position: relative;
+  box-shadow: inset 0 0 20px #000, 0 10px 30px rgba(0,0,0,0.8);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.chamber {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #050505;
+  border: 2px solid #333;
+  position: absolute;
+  box-shadow: inset 0 5px 10px rgba(0,0,0,0.9);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.chamber.loaded {
+  background: radial-gradient(circle at center, #ffdb58 20%, #d4af37 60%, #b8860b);
+  box-shadow: 0 0 10px #d4af37;
+  border-color: #ffd700;
+}
+
+/* Posizionamento a cerchio (6 camere) */
+.chamber:nth-child(1) { top: 8px; left: 50%; transform: translateX(-50%); }
+.chamber:nth-child(2) { top: 22px; right: 12px; }
+.chamber:nth-child(3) { bottom: 22px; right: 12px; }
+.chamber:nth-child(4) { bottom: 8px; left: 50%; transform: translateX(-50%); }
+.chamber:nth-child(5) { bottom: 22px; left: 12px; }
+.chamber:nth-child(6) { top: 22px; left: 12px; }
+
+.centralPin {
+  width: 16px; height: 16px;
+  background: #333; border-radius: 50%;
+  box-shadow: inset 0 2px 5px rgba(255,255,255,0.2);
+}
+
+.shootBtn {
+  background: linear-gradient(135deg, #cc0000, #ff4757);
+  color: #fff;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(255, 71, 87, 0.4);
+  transition: all 0.2s;
+}
+.shootBtn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+.shootBtn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(255, 71, 87, 0.6); }
+
+
+/* --- Fase 2 & 3: Mini Grid Animata --- */
+.animationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; height: 100%;
+}
+
+.miniGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  width: 100%;
+  position: relative;
+  z-index: 50;
+  padding: 20px;
+}
+
+.miniMovieWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+}
+
+.miniMovieItem {
+  width: 120px;
+  aspect-ratio: 2/3;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  position: relative;
+  background: #1a1a2e;
+}
+
+.miniMovieItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.loserDrop {
+  opacity: 0;
+  transform: translateY(50px) scale(0.8) rotate(10deg);
+  pointer-events: none;
+}
+
+.winnerFocus {
+  transform: scale(1.4) translateY(-10px);
+  z-index: 60;
+  filter: drop-shadow(0 0 30px rgba(255, 71, 87, 0.6));
+}
+
+.bulletHoleSmall {
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  background: radial-gradient(circle at center, transparent 10%, rgba(200,200,200,0.5) 20%, transparent 70%);
+  background-image: repeating-conic-gradient(from 0deg, transparent 0deg 15deg, rgba(255,255,255,0.4) 16deg 17deg);
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 10;
+}
+
+.watchBtnSmall {
+  background: #ff4757;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  animation: btnFadeIn 0.5s ease forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+  white-space: nowrap;
+}
+
+@keyframes btnFadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* --- FPS Gun (Frontale 3D) --- */
+.fpsGunFrontal {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  transform-origin: bottom center;
+}
+
+.gunBarrel3D {
+  position: relative;
+  width: 60px;
+  height: 250px;
+  background: linear-gradient(to right, #111, #3a3a3a 30%, #555 50%, #3a3a3a 70%, #111);
+  border-radius: 8px 8px 0 0;
+  transform: perspective(400px) rotateX(65deg);
+  transform-origin: bottom center;
+  border-top: 5px solid #0a0a0a;
+  box-shadow: 0 40px 50px rgba(0,0,0,0.9), inset 0 8px 15px rgba(255,255,255,0.15);
+}
+
+/* Mirino Anteriore (Punto rosso) */
+.gunSightFront {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 16px;
+  background: #ff2a2a;
+  border-radius: 2px;
+  box-shadow: 0 0 15px #ff2a2a, 0 0 30px #ff2a2a;
+}
+
+/* Tacca di Mira Posteriore */
+.gunSightRear {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 20px;
+  background: #0f0f0f;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  justify-content: space-between;
+}
+.gunSightRear::before, .gunSightRear::after {
+  content: '';
+  width: 10px;
+  height: 14px;
+  background: #222;
+  margin-top: -6px;
+  border-radius: 2px;
+}
+.gunSightRear::before { margin-left: 2px; }
+.gunSightRear::after { margin-right: 2px; }
+
+.aimSweepFrontal {
+  animation: sweepFrontal 3s ease-in-out forwards;
+}
+
+.firingRecoilFrontal {
+  transform: translateX(-50%) rotate(0deg);
+  animation: recoilFrontal 0.5s cubic-bezier(0.1, 2, 0.5, 1) forwards;
+}
+
+@keyframes sweepFrontal {
+  0% { transform: translateX(-50%) rotate(0deg) translateY(100px); }
+  15% { transform: translateX(calc(-50% + 150px)) rotate(15deg); }
+  40% { transform: translateX(calc(-50% - 150px)) rotate(-15deg); }
+  65% { transform: translateX(calc(-50% + 80px)) rotate(8deg); }
+  90% { transform: translateX(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+@keyframes recoilFrontal {
+  0% { transform: translateX(-50%) rotate(0deg) translateY(0) scale(1); }
+  10% { transform: translateX(-50%) rotate(0deg) translateY(80px) scale(1.15); } /* Il rinculo spinge l'arma indietro (verso il basso) */
+  100% { transform: translateX(-50%) rotate(0deg) translateY(0) scale(1); }
+}
+
+.barrelFlashFrontal {
+  position: absolute;
+  bottom: 60px; /* Sopra la canna in prospettiva */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, #ffffff 0%, #ffaa00 20%, rgba(255,0,0,0.8) 50%, transparent 70%);
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: flashAnimFrontal 0.15s ease-out forwards;
+  pointer-events: none;
+  z-index: 101;
+  filter: blur(2px);
+}
+
+@keyframes flashAnimFrontal {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.2); }
+  20% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+  100% { opacity: 0; transform: translateX(-50%) scale(2); }
+}
+
+/* Flash dello sparo */
+.muzzleFlash {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: #fff;
+  z-index: 99999;
+  pointer-events: none;
+  animation: flash 0.15s ease-out forwards;
+}
+
+@keyframes flash {
+  0% { opacity: 0; }
+  10% { opacity: 1; background: #fff; }
+  30% { background: #ffaa00; opacity: 0.8;}
+  100% { opacity: 0; }
+}
+
+/* Screen Shake Effect for the body/modal */
+.shake {
+  animation: shakeAction 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shakeAction {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+  40%, 60% { transform: translate3d(8px, 0, 0); }
+}
+
+/* --- Responsive Mobile --- */
+@media (max-width: 1024px) {
+  .openRouletteBtn {
+    bottom: 155px; /* Mobile: 84px (Skibidi) + 58px (altezza) + 13px (gap) */
+    right: 18px;
+    width: 58px;
+    height: 58px;
+    font-size: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    gap: 8px;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(3, 1fr); /* Esattamente 3 colonne su mobile per non schiacciare */
+    gap: 8px;
+    padding: 8px;
+    max-height: 45vh;
+  }
+  
+  .cylinderWrap {
+    margin-top: 15px;
+    gap: 15px;
+  }
+  
+  .cylinder {
+    width: 90px; height: 90px;
+  }
+  
+  .chamber {
+    width: 20px; height: 20px;
+  }
+  
+  .chamber:nth-child(1) { top: 6px; }
+  .chamber:nth-child(2) { top: 16px; right: 8px; }
+  .chamber:nth-child(3) { bottom: 16px; right: 8px; }
+  .chamber:nth-child(4) { bottom: 6px; }
+  .chamber:nth-child(5) { bottom: 16px; left: 8px; }
+  .chamber:nth-child(6) { top: 16px; left: 8px; }
+  
+  .shootBtn {
+    padding: 12px 20px;
+    font-size: 1.1rem;
+  }
+  
+  .miniGrid {
+    gap: 12px;
+    padding: 10px;
+  }
+  
+  .miniMovieItem {
+    width: 80px;
+  }
+  
+  .gunBarrel3D {
+    width: 45px;
+    height: 160px;
+  }
+  
+  .barrelFlashFrontal {
+    bottom: 40px;
+    width: 180px;
+    height: 180px;
+  }
+  
+  @keyframes sweepFrontal {
+    0% { transform: translateX(-50%) rotate(0deg) translateY(80px); }
+    15% { transform: translateX(calc(-50% + 60px)) rotate(10deg); }
+    40% { transform: translateX(calc(-50% - 60px)) rotate(-10deg); }
+    65% { transform: translateX(calc(-50% + 30px)) rotate(5deg); }
+    90% { transform: translateX(-50%) rotate(0deg); }
+    100% { transform: translateX(-50%) rotate(0deg); }
+  }
+}

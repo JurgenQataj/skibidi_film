@@ -11,17 +11,24 @@ const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
   
   if (!movie) {
     const tmdbUrl = mediaType === "tv"
-      ? `https://api.themoviedb.org/3/tv/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`
-      : `https://api.themoviedb.org/3/movie/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT`;
+      ? `https://api.themoviedb.org/3/tv/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=keywords`
+      : `https://api.themoviedb.org/3/movie/${numericId}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=keywords`;
       
     const tmdbResponse = await axios.get(tmdbUrl);
     const movieData = tmdbResponse.data;
+    
+    const genres = movieData.genres?.map(g => g.name) || [];
+    const keywords = mediaType === "tv"
+      ? (movieData.keywords?.results?.map(k => k.name) || [])
+      : (movieData.keywords?.keywords?.map(k => k.name) || []);
     
     movie = new Movie({
       tmdb_id: movieData.id,
       media_type: mediaType,
       title: mediaType === "tv" ? movieData.name : movieData.title,
       poster_path: movieData.poster_path,
+      genres,
+      keywords
     });
 
     try {
