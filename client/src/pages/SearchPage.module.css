@@ -1,11 +1,12 @@
 .pageContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 100px 40px 20px; /* Top padding per Navbar fixed */
+  padding: 100px 40px 20px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  font-family: var(--font-ui);
 }
 
 /* ── Hero / search area ────────────────────── */
@@ -87,26 +88,31 @@
 
 .chip {
   flex: 0 0 auto;
-  padding: 4px 12px;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.4);
+  padding: 5px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
   font-size: 0.8rem;
   white-space: nowrap;
   cursor: pointer;
-  transition: color 0.2s ease;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.01em;
   font-weight: 500;
+  font-family: var(--font-ui);
 }
 
 .chipActive {
-  color: white;
-  font-weight: 700;
+  background: var(--color-accent-subtle);
+  border-color: var(--color-border-accent);
+  color: var(--color-text-primary);
+  font-weight: 600;
 }
 
 .chip:hover:not(.chipActive) {
-  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255,255,255,0.06);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
 }
 
 /* ── Filter toggle bar ─────────────────────── */
@@ -115,43 +121,45 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
+  gap: 12px;
 }
 
 .toggleFiltersBtn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-muted);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   display: flex;
   align-items: center;
   gap: 6px;
   font-weight: 600;
+  font-family: var(--font-ui);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  transition: color 0.2s;
+  transition: color var(--transition-fast);
   padding: 0;
 }
 
-.toggleFiltersBtn:hover { color: white; }
+.toggleFiltersBtn:hover { color: var(--color-text-primary); }
 
 .icon { font-size: 0.7em; }
 
 .quickApplyBtn {
   background: transparent;
-  color: var(--primary-color, #e50914);
-  border: 1px solid var(--primary-color, #e50914);
-  padding: 4px 12px;
-  border-radius: 4px;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border-accent);
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
+  font-family: var(--font-ui);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .quickApplyBtn:hover {
-  background: rgba(229, 9, 20, 0.1);
+  background: var(--color-accent-subtle);
 }
 
 /* ── Filters section ───────────────────────── */
@@ -241,35 +249,36 @@
 }
 
 .applyBtn {
-  background: var(--primary-color, #e50914);
-  color: white;
+  background: var(--color-accent);
+  color: #fff;
   border: none;
-  padding: 6px 20px;
-  border-radius: 4px;
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  transition: opacity 0.2s;
+  font-size: 0.82rem;
+  font-family: var(--font-ui);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
-.applyBtn:hover { opacity: 0.9; }
+.applyBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
 
 .resetBtn {
   background: transparent;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-muted);
   border: none;
-  padding: 6px 16px;
+  padding: 8px 16px;
   cursor: pointer;
-  font-size: 0.8rem;
-  text-transform: uppercase;
+  font-size: 0.82rem;
+  font-family: var(--font-ui);
   font-weight: 600;
-  transition: color 0.2s;
+  transition: color var(--transition-fast);
 }
 
-.resetBtn:hover {
-  color: white;
-}
+.resetBtn:hover { color: var(--color-text-primary); }
 
 /* ── Loading / no results ──────────────────── */
 .loading,
@@ -363,21 +372,24 @@
 }
 
 .loadMoreBtn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.6);
-  padding: 8px 32px;
-  border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--color-border-hover);
+  color: var(--color-text-secondary);
+  padding: 10px 36px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  transition: all 0.2s;
+  font-size: 0.82rem;
+  font-family: var(--font-ui);
+  transition: all var(--transition-fast);
+  letter-spacing: 0.02em;
 }
 
 .loadMoreBtn:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: white;
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.25);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
 }
 
 /* ── Responsive ────────────────────────────── */
@@ -749,4 +761,258 @@
   .smartHint { margin-left: 0; }
   .smartSearchBox { max-width: 100%; }
   .explanationRow { font-size: 0.68rem; }
+}
+
+/* ══════════════════════════════════════════════════════
+   NUOVE FEATURE — Risultati, Vista Lista, Decade Chips
+   ══════════════════════════════════════════════════════ */
+
+/* ── Results Header: contatore + view toggle ─────────── */
+.resultsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.resultsCount {
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  color: var(--color-text-muted);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ── View Toggle ─────────────────────────────────────── */
+.viewToggle {
+  display: flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.viewBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewBtn:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--color-text-primary);
+}
+
+.viewBtnActive {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
+}
+
+/* ── Grid Card Wrapper (con overlay meta) ────────────── */
+.gridCardWrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.cardMetaOverlay {
+  position: absolute;
+  bottom: 46px; /* sopra la strip titolo della MovieCard */
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 4px;
+  padding: 4px 6px;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+  pointer-events: none;
+}
+
+.gridCardWrapper:hover .cardMetaOverlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cardMetaYear,
+.cardMetaGenre {
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-family: var(--font-ui);
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.cardMetaYear {
+  background: rgba(11,12,16,0.85);
+  color: var(--color-text-secondary);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.cardMetaGenre {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
+  border: 1px solid var(--color-border-accent);
+}
+
+/* ── List View ───────────────────────────────────────── */
+.listView {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border: 1px solid transparent;
+  background: rgba(255,255,255,0.015);
+}
+
+.listItem:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--color-border);
+}
+
+.listPoster {
+  width: 46px;
+  height: 69px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: var(--color-bg-mid);
+}
+
+.listInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.listTitle {
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.listMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.listYear {
+  font-size: 0.75rem;
+  font-family: var(--font-ui);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.listRating {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-ui);
+  color: var(--color-gold);
+  letter-spacing: 0.01em;
+}
+
+.listLang {
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-ui);
+  color: var(--color-text-muted);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border);
+  padding: 1px 5px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.05em;
+}
+
+.listGenreTags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.listGenreTag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  color: var(--color-text-muted);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--color-border);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.01em;
+}
+
+.listOverview {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.listArrow {
+  font-size: 1.3rem;
+  color: var(--color-text-muted);
+  align-self: center;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.listItem:hover .listArrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* ── Responsive nuovi componenti ─────────────────────── */
+@media (max-width: 1024px) {
+  .resultsHeader { margin-bottom: 12px; }
+  .listItem { padding: 10px 10px; gap: 10px; }
+  .listPoster { width: 40px; height: 60px; }
+  .listTitle { font-size: 0.85rem; }
+  .listOverview { -webkit-line-clamp: 1; }
+  .cardMetaOverlay { bottom: 28px; }
+}
+
+@media (max-width: 480px) {
+  .decadeChips { gap: 5px; }
+  .decadeChip { font-size: 0.68rem; padding: 2px 8px; }
+  .listPoster { width: 36px; height: 54px; }
 }

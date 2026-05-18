@@ -118,6 +118,7 @@ function SearchPage() {
   const [currentPage, setCurrentPage] = useState(() => getInitialState("search_currentPage", 1));
   const [totalPages, setTotalPages] = useState(() => getInitialState("search_totalPages", 0));
   const [hasMore, setHasMore] = useState(() => getInitialState("search_hasMore", false));
+  const [viewMode, setViewMode] = useState(() => getInitialState("search_viewMode", "grid"));
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParam = searchParams.get("query");
   const modeParam = searchParams.get("mode");
@@ -190,7 +191,12 @@ function SearchPage() {
     sessionStorage.setItem("smart_query", JSON.stringify(smartQuery));
     sessionStorage.setItem("smart_explanation", JSON.stringify(smartExplanation));
     sessionStorage.setItem("smart_parsed", JSON.stringify(smartParsed));
-  }, [results, hasSearched, currentPage, totalPages, hasMore, searchMode, filters, smartMode, smartQuery, smartExplanation, smartParsed]);
+  }, [results, hasSearched, currentPage, totalPages, hasMore, searchMode, filters, smartMode, smartQuery, smartExplanation, smartParsed, viewMode]);
+  
+  // Salva viewMode
+  useEffect(() => {
+    sessionStorage.setItem("search_viewMode", JSON.stringify(viewMode));
+  }, [viewMode]);
 
   // Lista generi come richiesta
   const genres = [
@@ -237,6 +243,10 @@ function SearchPage() {
     { value: "release_date.desc", name: "Data Rilascio Decrescente" },
     { value: "release_date.asc", name: "Data Rilascio Crescente" },
   ];
+
+  // Mappa genere ID → nome per overlay e lista
+  const genreMap = Object.fromEntries(genres.map(g => [g.id, g.name]));
+
 
 
   // Reset quando cambiano i filtri
@@ -766,42 +776,142 @@ function SearchPage() {
 
       {hasSearched && !loading && (
         <div className={styles.resultsSection}>
+          {/* ── Results header: contatore + view toggle ── */}
+          <div className={styles.resultsHeader}>
+            <span className={styles.resultsCount}>
+              {results.length}{hasMore ? "+" : ""}&nbsp;
+              {searchMode === "person" ? "persone" : searchMode === "tv" ? "serie" : "film"} trovati
+            </span>
+            {searchMode !== "person" && (
+              <div className={styles.viewToggle}>
+                <button
+                  className={`${styles.viewBtn} ${viewMode === "grid" ? styles.viewBtnActive : ""}`}
+                  onClick={() => setViewMode("grid")}
+                  title="Vista griglia"
+                  aria-label="Vista griglia"
+                >⊞</button>
+                <button
+                  className={`${styles.viewBtn} ${viewMode === "list" ? styles.viewBtnActive : ""}`}
+                  onClick={() => setViewMode("list")}
+                  title="Vista lista"
+                  aria-label="Vista lista"
+                >≡</button>
+              </div>
+            )}
+          </div>
+
           {results.length > 0 ? (
             <>
-              {/* Removed redundant "Trovati X risultati" if styling is minimal/clean, or keep it small */}
-              
-              <div className={searchMode === "person" ? styles.personList : styles.resultsGrid}>
-                {results.map((item, index) =>
-                  searchMode !== "person" ? (
-                    <MovieCard
-                        key={`${item.id}-${currentPage}-${index}`}
-                        movie={item}
-                    />
-                  ) : (
-                    <div 
-                      key={item.id} 
-                      className={styles.personRow} 
+              {/* ── GRIGLIA (default) ── */}
+              {searchMode !== "person" && viewMode === "grid" && (
+                <div className={styles.resultsGrid}>
+                  {results.map((item, index) => (
+                    <div key={`${item.id}-${currentPage}-${index}`} className={styles.gridCardWrapper}>
+                      <MovieCard movie={item} />
+                      <div className={styles.cardMetaOverlay}>
+                        {item.release_date && (
+                          <span className={styles.cardMetaYear}>{item.release_date.substring(0, 4)}</span>
+                        )}
+                        {item.genre_ids?.[0] && genreMap[item.genre_ids[0]] && (
+                          <span className={styles.cardMetaGenre}>{genreMap[item.genre_ids[0]]}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ── LISTA DETTAGLIATA ── */}
+              {searchMode !== "person" && viewMode === "list" && (
+                <div className={styles.listView}>
+                  {results.map((item, index) => (
+                    <div
+                      key={`${item.id}-${currentPage}-${index}`}
+                      className={styles.listItem}
+                      onClick={() => searchMode === "tv" || item.media_type === "tv"
+                        ? navigate(`/tv/${item.id}`)
+                        : navigate(`/movie/${item.id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          searchMode === "tv" || item.media_type === "tv"
+                            ? navigate(`/tv/${item.id}`)
+                            : navigate(`/movie/${item.id}`);
+                        }
+                      }}
+                    >
+                      <img
+                        src={item.poster_path
+                          ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                          : "https://placehold.co/92x138/12131a/4a525a?text=N%2FA"}
+                        alt={item.title || item.name}
+                        className={styles.listPoster}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <div className={styles.listInfo}>
+                        <span className={styles.listTitle}>{item.title || item.name}</span>
+                        <div className={styles.listMetaRow}>
+                          {item.release_date && (
+                            <span className={styles.listYear}>{item.release_date.substring(0, 4)}</span>
+                          )}
+                          {item.vote_average > 0 && (
+                            <span className={styles.listRating}>★ {item.vote_average.toFixed(1)}</span>
+                          )}
+                          {item.original_language && (
+                            <span className={styles.listLang}>{item.original_language.toUpperCase()}</span>
+                          )}
+                        </div>
+                        <div className={styles.listGenreTags}>
+                          {item.genre_ids?.slice(0, 3).map(gid =>
+                            genreMap[gid] ? (
+                              <span key={gid} className={styles.listGenreTag}>{genreMap[gid]}</span>
+                            ) : null
+                          )}
+                        </div>
+                        {item.overview && (
+                          <p className={styles.listOverview}>{item.overview}</p>
+                        )}
+                      </div>
+                      <span className={styles.listArrow}>›</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ── PERSONE ── */}
+              {searchMode === "person" && (
+                <div className={styles.personList}>
+                  {results.map((item) => (
+                    <div
+                      key={item.id}
+                      className={styles.personRow}
                       onClick={() => navigate(`/person/${encodeURIComponent(item.name)}`)}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/person/${encodeURIComponent(item.name)}`); }}
                       tabIndex={0}
                       role="button"
                     >
-                        <img                             src={item.profile_path ? `https://image.tmdb.org/t/p/w185${item.profile_path}` : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"}
-                            alt={item.name}
-                            className={styles.personRowImg}
-                         loading="lazy" decoding="async" />
-                        <div className={styles.personRowInfo}>
-                          <span className={styles.personRowName}>{item.name}</span>
-                          {item.known_for && (
-                            <span className={styles.personRowRole}>{item.known_for}</span>
-                          )}
-                        </div>
+                      <img
+                        src={item.profile_path
+                          ? `https://image.tmdb.org/t/p/w185${item.profile_path}`
+                          : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"}
+                        alt={item.name}
+                        className={styles.personRowImg}
+                        loading="lazy" decoding="async"
+                      />
+                      <div className={styles.personRowInfo}>
+                        <span className={styles.personRowName}>{item.name}</span>
+                        {item.known_for && (
+                          <span className={styles.personRowRole}>{item.known_for}</span>
+                        )}
+                      </div>
                     </div>
-                  )
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
 
-              {/* Pulsante Carica Altro */}
+              {/* ── Load More ── */}
               {hasMore && (
                 <div className={styles.loadMoreSection}>
                   <button
@@ -809,16 +919,14 @@ function SearchPage() {
                     onClick={handleLoadMore}
                     disabled={loadingMore}
                   >
-                    {loadingMore ? "..." : "Carica Altri"}
+                    {loadingMore ? "Caricamento..." : "Carica Altri"}
                   </button>
                 </div>
               )}
             </>
           ) : (
             <div className={styles.noResults}>
-              <p>
-                Nessun risultato trovato.
-              </p>
+              <p>Nessun risultato trovato.</p>
             </div>
           )}
         </div>
