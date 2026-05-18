@@ -1007,7 +1007,7 @@
   .listItem { padding: 10px 10px; gap: 10px; }
   .listPoster { width: 40px; height: 60px; }
   .listTitle { font-size: 0.85rem; }
-  .listOverview { -webkit-line-clamp: 1; }
+  .listOverview { -webkit-line-clamp: 1; line-clamp: 1; }
   .cardMetaOverlay { bottom: 28px; }
 }
 
