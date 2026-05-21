@@ -1,70 +1,64 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
-import { motion } from "framer-motion"; // Aggiunto import per animazioni
 import { FiTrash2 } from "react-icons/fi";
 
 const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate }) => {
-  const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
-  const placeholderPoster =
-    "https://placehold.co/300x450/1a1a2e/666?text=No+Image";
+  if (!movie) return null;
 
-  if (!movie) {
-    return null;
-  }
-
-  const movieId = movie.tmdb_id || movie.id;
+  const movieId    = movie.tmdb_id || movie.id;
   const movieTitle = movie.title || "Titolo non disponibile";
   const posterPath = movie.poster_path;
+  const isTv       = movie.media_type === "tv";
+  const linkPath   = isTv ? `/tv/${movieId}` : `/movie/${movieId}`;
+  const rating     = movie.vote_average ? parseFloat(movie.vote_average.toFixed(1)) : null;
+  const year       = movie.release_date ? new Date(movie.release_date).getFullYear() : null;
 
   const handleDeleteClick = (e) => {
-    // Previene la navigazione quando si clicca sulla X
     e.preventDefault();
     e.stopPropagation();
-    if (onDelete) {
-      onDelete(movieId);
-    }
+    if (onDelete) onDelete(movieId);
   };
 
-  const isTv = movie.media_type === "tv";
-  const linkPath = isTv ? `/tv/${movieId}` : `/movie/${movieId}`;
-  const rating = movie.vote_average ? movie.vote_average.toFixed(1) : null;
-
   return (
-    // L'intera card rimane un link
     <Link to={linkPath} className={styles.cardLink} data-movie-link onClick={onBeforeNavigate}>
-      <motion.div 
-        className={styles.card} 
-        data-movie-card
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ scale: 1.05, y: -5 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      >
-        {/* Il pulsante di eliminazione, ora posizionato correttamente */}
+      <div className={styles.card} data-movie-card>
+
+        {/* Delete button */}
         {showDeleteButton && (
           <button onClick={handleDeleteClick} className={styles.deleteButton} title="Rimuovi">
-            <FiTrash2 size={13} />
+            <FiTrash2 size={12} />
           </button>
         )}
+
+        {/* Poster */}
         <img
-          src={posterPath ? `${posterBaseUrl}${posterPath}` : placeholderPoster}
+          src={posterPath
+            ? `https://image.tmdb.org/t/p/w500${posterPath}`
+            : "https://placehold.co/300x450/111113/333?text=—"}
           alt={`Locandina di ${movieTitle}`}
           data-movie-img
           loading="lazy"
           decoding="async"
         />
-        {rating && parseFloat(rating) > 0 && (
+
+        {/* Rating badge */}
+        {rating && rating > 0 && (
           <div className={styles.ratingBadge}>
-            <span style={{color: '#ffd700'}}>★</span> {rating}
+            <span style={{ color: "#e2c77a" }}>★</span>
+            {rating}
+            {year && <span style={{ opacity: 0.5, marginLeft: 3 }}>{year}</span>}
           </div>
         )}
-        {!hideTitle && <div className={styles.title} data-movie-title>{movieTitle}</div>}
-      </motion.div>
+
+        {/* Title overlay */}
+        {!hideTitle && (
+          <div className={styles.title} data-movie-title>{movieTitle}</div>
+        )}
+
+      </div>
     </Link>
   );
 };
 
-// *** AGGIUNTO L'EXPORT DEFAULT CHE MANCAVA! ***
 export default MovieCard;

@@ -1,59 +1,9 @@
-.card {
-  position: relative; /* <<< LA CORREZIONE È QUI */
-  background-color: #2a2d31;
-  border-radius: 12px;
-  overflow: hidden;
-  color: white;
-  cursor: pointer;
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  min-width: 0; /* IMPEDISCE ALL'ELEMENTO DI ALLARGARE LA GRIGLIA */
-}
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.2);
-}
+/* ==========================================================================
+   MOVIE CARD — PREMIUM MINIMAL DESIGN
+   Clean poster card with hover-reveal title overlay and polished badge
+   ========================================================================== */
 
-/* IMMAGINI CON DIMENSIONI IDENTICHE E FISSE PROP. */
-.card img {
-  width: 100% !important;
-  aspect-ratio: 2 / 3 !important;
-  height: auto !important;
-  display: block !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  background-color: #333;
-  border: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  flex-shrink: 0 !important;
-  border-radius: 0 !important;
-  box-sizing: border-box !important;
-}
-
-/* TITOLO CON ALTEZZA FISSA */
-.title {
-  padding: 8px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.85rem;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0)); /* Gradiente per leggibilità */
-}
-
+/* Wrapper link */
 .cardLink {
   text-decoration: none;
   color: inherit;
@@ -61,50 +11,138 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  min-width: 0; /* Previene la dilatazione per via del testo troppo lungo */
+  min-width: 0;
 }
 
-/* ... Aggiungi questo codice alla fine del file ... */
+/* Card shell */
+.card {
+  position: relative;
+  background: #111113;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
 
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+}
+
+/* Poster image — always 2:3 ratio */
+.card img {
+  width: 100% !important;
+  aspect-ratio: 2 / 3 !important;
+  height: auto !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+  background: #1a1a1c !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+  border-radius: 0 !important;
+  box-sizing: border-box !important;
+  /* Subtle scale transition driven by parent hover */
+  transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1),
+              filter 0.4s ease !important;
+  filter: brightness(0.9) !important;
+}
+
+.card:hover img {
+  transform: scale(1.04) !important;
+  filter: brightness(1) !important;
+}
+
+/* Title overlay — slides up on hover */
+.title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28px 10px 10px;
+  background: linear-gradient(to top,
+    rgba(8, 8, 10, 0.96) 0%,
+    rgba(8, 8, 10, 0.7) 55%,
+    transparent 100%);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(245, 245, 245, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.1px;
+  line-height: 1.3;
+  /* Hidden by default, reveal on hover */
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover .title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Rating badge — top-left */
 .ratingBadge {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
-  color: white;
-  font-size: 0.65rem; /* Ridotto del ~10% */
+  top: 7px;
+  left: 7px;
+  background: rgba(8, 8, 10, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(245, 245, 245, 0.9);
+  font-size: 0.64rem;
   font-weight: 700;
-  padding: 3px 5px; /* Padding leggermente ridotto per proporzione */
-  border-radius: 6px;
+  padding: 3px 7px;
+  border-radius: 5px;
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 2px;
-  border: 1px solid rgba(255,255,255,0.1);
+  gap: 3px;
+  letter-spacing: 0.3px;
 }
 
-/* Stile per il pulsante di eliminazione sulla card */
+.ratingBadge svg,
+.ratingBadge span[style] {
+  font-size: 0.62rem;
+}
+
+/* Delete button — top-right */
 .deleteButton {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: rgba(20, 20, 24, 0.85);
+  top: 7px;
+  right: 7px;
+  background: rgba(8, 8, 10, 0.82);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 10; /* Assicura che sia sopra l'immagine */
+  transition: all 0.22s ease;
+  z-index: 10;
   opacity: 0;
-  transform: scale(0.8);
+  transform: scale(0.85);
 }
 
 .card:hover .deleteButton {
@@ -113,58 +151,60 @@
 }
 
 .deleteButton:hover {
-  background-color: #e50914;
-  border-color: #e50914;
-  color: #ffffff;
-  transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
+  background: rgba(220, 38, 38, 0.85);
+  border-color: rgba(220, 38, 38, 0.6);
+  color: #fff;
+  transform: scale(1.08);
 }
 
-/* MEDIA QUERIES PER RESPONSIVE */
-@media (max-width: 1024px) {
-  .card img {
-    height: auto !important;
+/* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .card {
+    border-radius: 8px;
   }
 
+  /* Always show title on mobile (no hover) */
   .title {
-    font-size: 0.7rem;
-    height: 28px;
+    opacity: 1;
+    transform: translateY(0);
+    font-size: 0.70rem;
+    padding: 22px 8px 8px;
+  }
+
+  .ratingBadge {
+    font-size: 0.58rem;
+    padding: 2px 5px;
+    top: 5px;
+    left: 5px;
+  }
+
+  .deleteButton {
+    opacity: 1;
+    transform: scale(0.88);
+    top: 5px;
+    right: 5px;
+    width: 24px;
+    height: 24px;
   }
 }
 
 @media (max-width: 480px) {
-  .card img {
-    height: auto !important;
-  }
+  .card { border-radius: 7px; }
 
   .title {
-    font-size: 0.6rem;
-    height: 24px;
+    font-size: 0.62rem;
+    padding: 18px 6px 6px;
   }
 
   .ratingBadge {
-    font-size: 0.55rem;
+    font-size: 0.54rem;
     padding: 2px 4px;
-  }
-
-  .deleteButton {
-    opacity: 1 !important;
-    transform: scale(0.85) !important;
-    top: 4px;
-    right: 4px;
-    width: 24px;
-    height: 24px;
-    background-color: rgba(20, 20, 24, 0.95);
+    border-radius: 4px;
   }
 }
 
-@media (max-width: 395px) {
-  .title {
-    font-size: 0.55rem;
-    height: 20px;
-  }
-
-  .ratingBadge {
-    font-size: 0.5rem;
-  }
+@media (max-width: 380px) {
+  .title { font-size: 0.56rem; }
+  .ratingBadge { font-size: 0.50rem; }
 }

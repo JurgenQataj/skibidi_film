@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import styles from "./PersonPage.module.css";
 import MovieCard from "../components/MovieCard";
 import { SkeletonMovieCard } from "../components/Skeleton";
-import { FiBookmark } from "react-icons/fi";
+import { FiBookmark, FiSliders, FiCalendar, FiAward, FiTrendingUp } from "react-icons/fi";
 import { FaBookmark } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -17,7 +17,6 @@ function PersonPage() {
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
 
-  // Helper per inizializzare lo stato da localStorage
   const getInitialState = (key, defaultValue) => {
     const saved = localStorage.getItem(key);
     return saved !== null ? JSON.parse(saved) : defaultValue;
@@ -28,9 +27,11 @@ function PersonPage() {
   const [hideShorts, setHideShorts] = useState(() => getInitialState("hideShorts", false));
   const [hideObscure, setHideObscure] = useState(() => getInitialState("hideObscure", true));
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const [sortBy, setSortBy] = useState(() => getInitialState("sortBy", "date"));
+  const [sortBy, setSortBy] = useState(() => {
+    const initial = getInitialState("sortBy", "date");
+    return initial === "popularity" ? "date" : initial;
+  });
 
-  // Salva le preferenze ogni volta che cambiano
   useEffect(() => {
     localStorage.setItem("showOnlyRated", JSON.stringify(showOnlyRated));
     localStorage.setItem("hideDocumentaries", JSON.stringify(hideDocumentaries));
@@ -54,11 +55,8 @@ function PersonPage() {
           currentUserId = decoded.user.id;
           setLoggedInUserId(currentUserId);
         }
-
         const res = await axios.get(`${API_URL}/api/movies/person/${encodeURIComponent(name)}`);
         setData(res.data);
-
-        // Se loggato, verifica se la persona è tra i salvati
         if (currentUserId && res.data.personId) {
           const profileRes = await axios.get(`${API_URL}/api/users/${currentUserId}/profile`);
           const savedPeople = profileRes.data.savedPeople || [];
@@ -78,7 +76,6 @@ function PersonPage() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      
       if (isSaved) {
         await axios.delete(`${API_URL}/api/users/${loggedInUserId}/saved-people/${data.personId}`, config);
         setIsSaved(false);
@@ -96,109 +93,68 @@ function PersonPage() {
     }
   };
 
-  const handleToggleSort = () => {
-    if (sortBy === "date") setSortBy("popularity");
-    else if (sortBy === "popularity") setSortBy("vote_count");
-    else if (sortBy === "vote_count") setSortBy("revenue");
-    else setSortBy("date");
-  };
-
-  const getSortLabel = () => {
-    if (sortBy === "popularity") return "🔥 Popolarità";
-    if (sortBy === "vote_count") return "🗳️ Numero Voti";
-    if (sortBy === "revenue") return "💰 Top Box Office";
-    return "📅 Data di Uscita";
-  };
+  const sortOptions = [
+    { key: "date",       label: "Data",       icon: <FiCalendar size={13} /> },
+    { key: "vote_count", label: "Voti",        icon: <FiAward size={13} /> },
+    { key: "revenue",    label: "Box Office",  icon: <FiTrendingUp size={13} /> },
+  ];
 
   const filterMovies = (list) => {
     let filtered = [...list];
     if (showOnlyRated) filtered = filtered.filter((m) => m.vote_average && m.vote_average > 0);
     if (hideDocumentaries) filtered = filtered.filter((m) => !m.genre_ids?.includes(99));
-    
-    // FILTRI PRECISI
     if (hideObscure) {
-        filtered = filtered.filter((m) => {
-            const char = (m.character || "").toLowerCase();
-            const title = (m.title || "").toLowerCase();
-
-            // Rileva ruoli non accreditati o sconosciuti
-            const badRoleKeywords = [
-              "sconosciuto", "unknown", "uncredited", "non accreditato", "uncredited role",
-              "himself", "herself", "self", "se stesso", "se stessa",
-              "host", "presenter", "presentatore", "guest", "ospite", "narrator", "narratore"
-            ];
-            
-            if (badRoleKeywords.some(w => 
-              char === w || 
-              char.startsWith(w + " ") || 
-              char.endsWith(" " + w) || 
-              char.includes("(" + w + ")") || 
-              char === "guest star"
-            )) {
-              return false;
-            }
-
-            // Rileva film minori estremamente oscuri (senza voti, popolarità bassissima)
-            const currentYear = new Date().getFullYear();
-            const releaseYear = m.release_date ? new Date(m.release_date).getFullYear() : null;
-            const isRecent = releaseYear && releaseYear >= currentYear - 1;
-
-            const hasNoVotes = !m.vote_count || m.vote_count === 0;
-            const isVeryLowPopularity = m.popularity !== undefined && m.popularity < 1.5;
-
-            if (hasNoVotes && isVeryLowPopularity && !isRecent) {
-              return false;
-            }
-
-            // Rileva titoli TV di talk show, interviste o premiazioni
-            const badTitleKeywords = [
-              "the tonight show", "jimmy kimmel", "late night", "live with", 
-              "the oscars", "academy awards", "golden globe", "behind the scenes",
-              "entertainment tonight", "the late late show"
-            ];
-            if (badTitleKeywords.some(w => title.includes(w))) {
-              return false;
-            }
-
-            return true;
-        });
+      filtered = filtered.filter((m) => {
+        const char = (m.character || "").toLowerCase();
+        const title = (m.title || "").toLowerCase();
+        const badRoleKeywords = [
+          "sconosciuto", "unknown", "uncredited", "non accreditato", "uncredited role",
+          "himself", "herself", "self", "se stesso", "se stessa",
+          "host", "presenter", "presentatore", "guest", "ospite", "narrator", "narratore"
+        ];
+        if (badRoleKeywords.some(w =>
+          char === w || char.startsWith(w + " ") || char.endsWith(" " + w) ||
+          char.includes("(" + w + ")") || char === "guest star"
+        )) return false;
+        const currentYear = new Date().getFullYear();
+        const releaseYear = m.release_date ? new Date(m.release_date).getFullYear() : null;
+        const isRecent = releaseYear && releaseYear >= currentYear - 1;
+        const hasNoVotes = !m.vote_count || m.vote_count === 0;
+        const isVeryLowPopularity = m.popularity !== undefined && m.popularity < 1.5;
+        if (hasNoVotes && isVeryLowPopularity && !isRecent) return false;
+        const badTitleKeywords = [
+          "the tonight show", "jimmy kimmel", "late night", "live with",
+          "the oscars", "academy awards", "golden globe", "behind the scenes",
+          "entertainment tonight", "the late late show"
+        ];
+        if (badTitleKeywords.some(w => title.includes(w))) return false;
+        return true;
+      });
     }
-    
-    // Filtro "Under 40 min": Usa il flag is_short calcolato dal server (preciso!)
     if (hideShorts) filtered = filtered.filter((m) => !m.is_short);
-    
-    // ORDINAMENTO
     if (sortBy === "revenue") {
-        filtered.sort((a, b) => {
-            const rankA = a.revenue_rank || 10000;
-            const rankB = b.revenue_rank || 10000;
-            return rankA - rankB;
-        });
-    } else if (sortBy === "popularity") {
-        filtered.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+      filtered.sort((a, b) => (a.revenue_rank || 10000) - (b.revenue_rank || 10000));
     } else if (sortBy === "vote_count") {
-        filtered.sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0));
+      filtered.sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0));
     } else {
-        // Default: Date Descending
-        filtered.sort((a, b) => {
-             const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
-             const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
-             return dateB - dateA;
-        });
+      filtered.sort((a, b) => {
+        const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
+        const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
+        return dateB - dateA;
+      });
     }
-
     return filtered;
   };
 
-  const directedMovies = data?.directed ? filterMovies(data.directed) : [];
-  const actedMovies = data?.acted ? filterMovies(data.acted) : [];
-  const directedTvMovies = data?.directedTv ? filterMovies(data.directedTv) : [];
-  const actedTvMovies = data?.actedTv ? filterMovies(data.actedTv) : [];
+  const directedMovies  = data?.directed   ? filterMovies(data.directed)   : [];
+  const actedMovies     = data?.acted      ? filterMovies(data.acted)      : [];
+  const directedTvMovies= data?.directedTv ? filterMovies(data.directedTv) : [];
+  const actedTvMovies   = data?.actedTv    ? filterMovies(data.actedTv)    : [];
 
-  const hasDirected = directedMovies.length > 0;
-  const hasActed = actedMovies.length > 0;
+  const hasDirected   = directedMovies.length > 0;
+  const hasActed      = actedMovies.length > 0;
   const hasDirectedTv = directedTvMovies.length > 0;
-  const hasActedTv = actedTvMovies.length > 0;
+  const hasActedTv    = actedTvMovies.length > 0;
 
   if (loading) return (
     <div className={styles.container}>
@@ -209,57 +165,90 @@ function PersonPage() {
   );
   if (!data) return <div className={styles.error}>Nessun dato trovato per "{decodedName}".</div>;
 
-  // Calcola popolarità totale media o massima per le statistiche
-  const getPopularityValue = () => {
-    const dPop = data.directed?.[0]?.popularity || 0;
-    const aPop = data.acted?.[0]?.popularity || 0;
-    return Math.max(dPop, aPop);
+  const getInitials = (fullName) => {
+    if (!fullName) return "";
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
-  const popularityValue = getPopularityValue();
+
+  const getRoleLabel = () => {
+    const roles = [];
+    if (data.directed?.length > 0 || data.directedTv?.length > 0) roles.push("Regista");
+    if (data.acted?.length > 0 || data.actedTv?.length > 0) roles.push("Attore");
+    if (roles.length === 0) return "Talento Cinema & TV";
+    return roles.join(" · ").toUpperCase();
+  };
+
+  const initials  = getInitials(data.personName);
+  const roleLabel = getRoleLabel();
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 16, scale: 0.97 },
+    visible: { opacity: 1, y: 0, scale: 1 }
+  };
+
+  const filterOptions = [
+    { label: "Nascondi film senza voto",        checked: showOnlyRated,      setter: setShowOnlyRated },
+    { label: "Nascondi Documentari",             checked: hideDocumentaries,  setter: setHideDocumentaries },
+    { label: "Nascondi cortometraggi",           checked: hideShorts,         setter: setHideShorts },
+    { label: "Nascondi film minori / talk-show", checked: hideObscure,        setter: setHideObscure },
+  ];
 
   return (
     <div className={styles.container}>
-      {/* Dynamic blurred background portal */}
+
+      {/* Ambient backdrop */}
       {data.profile_path && (
-        <div 
-          className={styles.dynamicBackdrop} 
-          style={{ 
-            backgroundImage: `url(https://image.tmdb.org/t/p/w300${data.profile_path})` 
-          }} 
+        <div
+          className={styles.dynamicBackdrop}
+          style={{ backgroundImage: `url(https://image.tmdb.org/t/p/w300${data.profile_path})` }}
         />
       )}
 
-      {/* SEZIONE INFO PERSONA */}
-      <div className={styles.personHeader}>
+      {/* ── HERO ────────────────────────────────────────────────────────── */}
+      <div className={styles.heroCanvas}>
+
+        {/* Background initials watermark */}
+        {initials && (
+          <div className={styles.heroMonogram} aria-hidden="true">{initials}</div>
+        )}
+
+        {/* Portrait — top-left, stretches vertically to match info height */}
         <div className={styles.imageWrapper}>
-          <img           
-            src={
-              data.profile_path
-                ? `https://image.tmdb.org/t/p/w500${data.profile_path}`
-                : "https://placehold.co/300x450/1a1a2e/666?text=No+Image"
-            }
+          <img
+            src={data.profile_path
+              ? `https://image.tmdb.org/t/p/w500${data.profile_path}`
+              : "https://placehold.co/300x450/111113/333?text=—"}
             alt={data.personName}
             className={styles.personImage}
-            loading="lazy" 
-            decoding="async" 
+            loading="eager"
+            decoding="async"
           />
         </div>
+
+        {/* Info panel — role, name, stats, save */}
         <div className={styles.personInfo}>
+
+          <div className={styles.metaRow}>
+            <span className={styles.roleBadge}>{roleLabel}</span>
+          </div>
+
           <div className={styles.titleRow}>
             <h1 className={styles.pageTitle}>{data.personName}</h1>
             {loggedInUserId && (
-              <button 
+              <button
                 className={`${styles.savePersonBtn} ${isSaved ? styles.saved : ""}`}
                 onClick={handleToggleSave}
                 title={isSaved ? "Rimuovi dai salvati" : "Salva talento"}
+                aria-label={isSaved ? "Rimuovi dai salvati" : "Salva talento"}
               >
-                {isSaved ? <FaBookmark size={15} /> : <FiBookmark size={15} />}
+                {isSaved ? <FaBookmark size={13} /> : <FiBookmark size={13} />}
                 <span className={styles.saveBtnText}>{isSaved ? "Salvato" : "Salva"}</span>
               </button>
             )}
           </div>
 
-          {/* STATS COUNT ROW */}
           <div className={styles.talentStats}>
             {(data.directed?.length > 0 || data.directedTv?.length > 0) && (
               <div className={styles.statTag}>
@@ -271,240 +260,152 @@ function PersonPage() {
                 🎭 <span>{data.acted.length + data.actedTv.length}</span> Recitazioni
               </div>
             )}
-            {popularityValue > 0 && (
-              <div className={styles.statTag}>
-                🔥 <span>{parseFloat(popularityValue).toFixed(1)}</span> Popolarità
-              </div>
-            )}
           </div>
-          
+
+        </div>
+
+        {/* Biography — spans full width as second row of the grid */}
+        <div className={styles.biographySection}>
           {data.biography ? (
-            <div className={styles.biographyContainer}>
-              <h3 className={styles.biographyTitle}>Biografia</h3>
-              <p className={`${styles.biographyText} ${!isBioExpanded ? styles.clampedBio : ""}`}>
-                {data.biography}
-              </p>
-              {data.biography.length > 350 && (
-                <button 
+            <>
+              <p className={styles.biographyTitle}>Biografia</p>
+              <motion.div
+                className={styles.biographyTextContainer}
+                initial={false}
+                animate={{ height: isBioExpanded ? "auto" : "84px" }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                style={{ overflow: "hidden", position: "relative" }}
+              >
+                <p className={styles.biographyText}>{data.biography}</p>
+                {!isBioExpanded && data.biography.length > 200 && (
+                  <div className={styles.bioOverlay} />
+                )}
+              </motion.div>
+              {data.biography.length > 200 && (
+                <button
                   className={styles.toggleBioButton}
                   onClick={() => setIsBioExpanded(!isBioExpanded)}
                 >
-                  {isBioExpanded ? "Mostra meno ▲" : "Leggi di più ▼"}
+                  {isBioExpanded ? "Mostra meno ↑" : "Continua a leggere ↓"}
                 </button>
               )}
-            </div>
+            </>
           ) : (
-            <p className={styles.biographyText}>Nessuna biografia disponibile su TMDB.</p>
+            <p className={styles.biographyText} style={{ opacity: 0.32 }}>
+              Nessuna biografia disponibile su TMDB.
+            </p>
           )}
         </div>
-      </div>
-      
-      {/* CONTROLS ROW */}
-      <div className={styles.controlsRow}>
-        <div className={styles.buttonGroup}>
-          <button
-             onClick={handleToggleSort}
-             className={styles.sortButton}
-             title="Cambia ordinamento"
-          >
-            Sort: <span>{getSortLabel()}</span>
-          </button>
 
+      </div>
+
+      {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
+      <div className={styles.controlsRow}>
+
+        {/* Sort pills (segmented control style) */}
+        <div className={styles.sortSegment}>
+          {sortOptions.map(opt => (
+            <button
+              key={opt.key}
+              className={`${styles.segmentBtn} ${sortBy === opt.key ? styles.segmentActive : ""}`}
+              onClick={() => setSortBy(opt.key)}
+            >
+              {opt.icon}
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Filter button + dropdown */}
+        <div className={styles.filterWrap}>
           <button
             onClick={() => setShowFilterDropdown(!showFilterDropdown)}
             className={`${styles.filterButton} ${showFilterDropdown ? styles.activeFilterBtn : ""}`}
+            aria-expanded={showFilterDropdown}
           >
-            ⚙️ Filtra Elementi {showFilterDropdown ? "▲" : "▼"}
+            <FiSliders size={14} />
+            Filtri
+            {showFilterDropdown ? " ▲" : " ▼"}
           </button>
-        </div>
 
-        <AnimatePresence>
-          {showFilterDropdown && (
-            <motion.div
-              className={styles.filterDropdown}
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
-              {[
-                { label: "Nascondi film senza voto", checked: showOnlyRated, setter: setShowOnlyRated },
-                { label: "Nascondi Documentari", checked: hideDocumentaries, setter: setHideDocumentaries },
-                { label: "Nascondi Under 40 min", checked: hideShorts, setter: setHideShorts },
-                { label: "Nascondi film minori e talk-show", checked: hideObscure, setter: setHideObscure },
-              ].map((option, index) => (
-                <label key={index} className={styles.filterLabelOption}>
-                  <input
-                    type="checkbox"
-                    checked={option.checked}
-                    onChange={(e) => option.setter(e.target.checked)}
-                    className={styles.filterCheckbox}
-                  />
-                  <span className={styles.filterLabelText}>{option.label}</span>
-                </label>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+          <AnimatePresence>
+            {showFilterDropdown && (
+              <motion.div
+                className={styles.filterDropdown}
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+              >
+                {filterOptions.map((option, index) => (
+                  <label key={index} className={styles.filterLabelOption}>
+                    <input
+                      type="checkbox"
+                      checked={option.checked}
+                      onChange={(e) => option.setter(e.target.checked)}
+                      className={styles.filterCheckbox}
+                    />
+                    <span className={styles.filterLabelText}>{option.label}</span>
+                  </label>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-      
+
+      {/* ── EMPTY STATE ─────────────────────────────────────────────────── */}
       {!hasDirected && !hasActed && !hasDirectedTv && !hasActedTv && (
         <p className={styles.emptyMsg}>Nessun contenuto corrisponde ai filtri selezionati.</p>
       )}
 
+      {/* ── FILM SECTIONS ───────────────────────────────────────────────── */}
       <AnimatePresence mode="wait">
         <div className={styles.sectionsContainer}>
-          {hasDirected && (
-            <motion.section 
-              className={styles.section}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <h2 className={styles.sectionTitle}>Regia Cinema ({directedMovies.length})</h2>
-              <motion.div 
-                className={styles.grid}
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: { staggerChildren: 0.02 }
-                  }
-                }}
+
+          {[
+            { show: hasDirected,   title: `Regia — Cinema`,    movies: directedMovies,   prefix: "mov-dir" },
+            { show: hasActed,      title: `Cast — Cinema`,     movies: actedMovies,      prefix: "mov-act" },
+            { show: hasDirectedTv, title: `Regia — Serie TV`,  movies: directedTvMovies, prefix: "tv-dir"  },
+            { show: hasActedTv,    title: `Cast — Serie TV`,   movies: actedTvMovies,    prefix: "tv-act"  },
+          ].map(({ show, title, movies, prefix }, si) =>
+            show && (
+              <motion.section
+                key={prefix}
+                className={styles.section}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4, delay: si * 0.08 }}
               >
-                {directedMovies.map((movie, index) => (
-                  <motion.div
-                    key={`mov-dir-${movie._id}-${index}`}
-                    className={styles.cardWrapper}
-                    variants={{
-                      hidden: { opacity: 0, y: 15, scale: 0.95 },
-                      visible: { opacity: 1, y: 0, scale: 1 }
-                    }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  >
-                    <MovieCard movie={movie} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.section>
+                <h2 className={styles.sectionTitle}>
+                  {title}
+                  <span className={styles.sectionCount}>{movies.length}</span>
+                </h2>
+                <motion.div
+                  className={styles.grid}
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { staggerChildren: 0.018 } }
+                  }}
+                >
+                  {movies.map((movie, index) => (
+                    <motion.div
+                      key={`${prefix}-${movie._id}-${index}`}
+                      className={styles.cardWrapper}
+                      variants={cardVariants}
+                      transition={{ type: "spring", stiffness: 220, damping: 22 }}
+                    >
+                      <MovieCard movie={movie} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.section>
+            )
           )}
 
-          {hasActed && (
-            <motion.section 
-              className={styles.section}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-            >
-              <h2 className={styles.sectionTitle}>Cast Cinema ({actedMovies.length})</h2>
-              <motion.div 
-                className={styles.grid}
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: { staggerChildren: 0.02 }
-                  }
-                }}
-              >
-                {actedMovies.map((movie, index) => (
-                  <motion.div
-                    key={`mov-act-${movie._id}-${index}`}
-                    className={styles.cardWrapper}
-                    variants={{
-                      hidden: { opacity: 0, y: 15, scale: 0.95 },
-                      visible: { opacity: 1, y: 0, scale: 1 }
-                    }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  >
-                    <MovieCard movie={movie} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.section>
-          )}
-
-          {hasDirectedTv && (
-            <motion.section 
-              className={styles.section}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, delay: 0.15 }}
-            >
-              <h2 className={styles.sectionTitle}>Regia Serie TV ({directedTvMovies.length})</h2>
-              <motion.div 
-                className={styles.grid}
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: { staggerChildren: 0.02 }
-                  }
-                }}
-              >
-                {directedTvMovies.map((show, index) => (
-                  <motion.div
-                    key={`tv-dir-${show._id}-${index}`}
-                    className={styles.cardWrapper}
-                    variants={{
-                      hidden: { opacity: 0, y: 15, scale: 0.95 },
-                      visible: { opacity: 1, y: 0, scale: 1 }
-                    }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  >
-                    <MovieCard movie={show} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.section>
-          )}
-
-          {hasActedTv && (
-            <motion.section 
-              className={styles.section}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <h2 className={styles.sectionTitle}>Cast Serie TV ({actedTvMovies.length})</h2>
-              <motion.div 
-                className={styles.grid}
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: { opacity: 0 },
-                  visible: {
-                    opacity: 1,
-                    transition: { staggerChildren: 0.02 }
-                  }
-                }}
-              >
-                {actedTvMovies.map((show, index) => (
-                  <motion.div
-                    key={`tv-act-${show._id}-${index}`}
-                    className={styles.cardWrapper}
-                    variants={{
-                      hidden: { opacity: 0, y: 15, scale: 0.95 },
-                      visible: { opacity: 1, y: 0, scale: 1 }
-                    }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  >
-                    <MovieCard movie={show} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.section>
-          )}
         </div>
       </AnimatePresence>
     </div>
