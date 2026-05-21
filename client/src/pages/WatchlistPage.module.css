@@ -224,7 +224,7 @@
 }
 
 /* Override stili interni MovieCard per adattarli al nuovo wrapper evitando distorsioni */
-.cardWrapper :global(.card) {
+.cardWrapper [data-movie-card] {
   width: 100% !important;
   height: 100% !important;
   background: transparent !important;
@@ -238,7 +238,7 @@
 }
 
 /* L'altezza è ereditata dall'aspect-ratio: 2/3 globale di .card img e scalata dalla grid */
-.cardWrapper :global(.card img) {
+.cardWrapper [data-movie-card] [data-movie-img] {
   width: 100% !important;
   height: auto !important;
   aspect-ratio: 2/3;
@@ -251,7 +251,7 @@
   padding: 0 !important;
 }
 
-.cardWrapper :global(.card .title) {
+.cardWrapper [data-movie-card] [data-movie-title] {
   width: 100% !important;
   padding: 5px !important;
   font-size: 0.85rem !important;
@@ -292,7 +292,7 @@
     padding: 0;
   }
   
-  .cardWrapper :global(.card) {
+  .cardWrapper [data-movie-card] {
     --title-height: 28px;
     width: 100% !important;
     max-width: 90px;
@@ -302,13 +302,13 @@
     align-items: center;
   }
 
-  .cardWrapper :global(.card img) {
+  .cardWrapper [data-movie-card] [data-movie-img] {
     width: 100% !important;
     height: 120px !important;
     object-fit: cover !important;
   }
 
-  .cardWrapper :global(.card .title) {
+  .cardWrapper [data-movie-card] [data-movie-title] {
     width: 100% !important;
     height: var(--title-height) !important;
     font-size: 0.55rem !important;
@@ -371,22 +371,22 @@
     justify-content: center !important;
   }
 
-  .cardWrapper :global(.card) {
+  .cardWrapper [data-movie-card] {
     --title-height: 26px;
     width: 100% !important;
     max-width: 80px;
     height: calc(110px + var(--title-height)) !important;
   }
 
-  .cardWrapper :global(.card img) {
+  .cardWrapper [data-movie-card] [data-movie-img] {
     width: 100% !important;
     height: 110px !important;
   }
 
-  .cardWrapper :global(.card .title) {
+  .cardWrapper [data-movie-card] [data-movie-title] {
     width: 100% !important;
     height: var(--title-height) !important;
-    font-size: 0.5rem !important;
+    font-size: 0.55rem !important;
     padding: 2px !important;
     min-height: unset;
   }

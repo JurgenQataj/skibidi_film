@@ -344,13 +344,15 @@ exports.getMoviesByPerson = async (req, res) => {
       character: m.character, 
       job: m.job, 
       revenue_rank: rankMap ? (rankMap.get(m.id) || 10000) : 10000,
-      media_type: isTv ? 'tv' : 'movie' // [ADDED] Per il routing sul frontend
+      media_type: isTv ? 'tv' : 'movie', // [ADDED] Per il routing sul frontend
+      popularity: m.popularity // [ADDED] Per i filtri intelligenti di popolarità
     });
 
     // 3. Filtra Attore
     const acted = cast
       .filter(m => m.poster_path)
       .map(m => formatMovie(m, castRevenueMap))
+      .filter((v, i, a) => a.findIndex(t => t.tmdb_id === v.tmdb_id) === i) // Rimuovi duplicati
       .sort((a, b) => {
         const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
         const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
@@ -362,6 +364,7 @@ exports.getMoviesByPerson = async (req, res) => {
       .filter(m => m.job === "Director")
       .filter(m => m.poster_path)
       .map(m => formatMovie(m, crewRevenueMap))
+      .filter((v, i, a) => a.findIndex(t => t.tmdb_id === v.tmdb_id) === i) // Rimuovi duplicati
       .sort((a, b) => {
         const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
         const dateB = b.release_date ? new Date(b.release_date) : new Date(0);
@@ -376,6 +379,7 @@ exports.getMoviesByPerson = async (req, res) => {
     const actedTv = tvCast
       .filter(m => m.poster_path)
       .map(m => formatMovie(m, null, true)) // isTv = true
+      .filter((v, i, a) => a.findIndex(t => t.tmdb_id === v.tmdb_id) === i) // Rimuovi duplicati
       .sort((a, b) => {
         const dateA = a.release_date ? new Date(a.release_date) : new Date(0);
         const dateB = b.release_date ? new Date(b.release_date) : new Date(0);

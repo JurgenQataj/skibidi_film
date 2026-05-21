@@ -143,7 +143,7 @@ export default function SavedPeoplePage() {
     return topTalent;
   };
 
-  // Ottiene i film con voto più alto del talento
+  // Ottiene i film con più voti ricevuti del talento
   const getTopMovies = () => {
     if (!detailData) return [];
     const all = [...(detailData.directed || []), ...(detailData.acted || [])];
@@ -156,7 +156,7 @@ export default function SavedPeoplePage() {
         unique.push(m);
       }
     });
-    return unique.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0)).slice(0, 4);
+    return unique.sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0)).slice(0, 4);
   };
 
   if (loading) return <SkeletonWithLogo />;

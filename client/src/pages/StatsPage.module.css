@@ -316,7 +316,7 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
   }
-  .movieList :global(.card img) {
+  .movieList [data-movie-card] [data-movie-img] {
     aspect-ratio: 2 / 2.55 !important; /* -15% di altezza */
   }
 }
@@ -327,7 +327,7 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 5px;
   }
-  .movieList :global(.card img) {
+  .movieList [data-movie-card] [data-movie-img] {
     aspect-ratio: 2 / 2.55 !important; /* -15% di altezza */
   }
   .summaryGrid {

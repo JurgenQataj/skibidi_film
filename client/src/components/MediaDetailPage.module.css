@@ -678,14 +678,14 @@
   .movieCardWrapper {
     width: 100px;
   }
-  .recommendationsGrid :global(.card) {
+  .recommendationsGrid [data-movie-card] {
     --title-height: 8px;
     height: calc(140px + var(--title-height)) !important;
   }
-  .recommendationsGrid :global(.card img) {
+  .recommendationsGrid [data-movie-card] [data-movie-img] {
     height: 140px !important;
   }
-  .recommendationsGrid :global(.card .title) {
+  .recommendationsGrid [data-movie-card] [data-movie-title] {
     height: var(--title-height) !important;
     font-size: 0.5rem !important;
     line-height: 1 !important;

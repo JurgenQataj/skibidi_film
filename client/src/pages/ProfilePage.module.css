@@ -362,7 +362,7 @@
 }
 
 /* FORZA DIMENSIONI IDENTICHE ASSOLUTE */
-.reviewsGrid .card {
+.reviewsGrid [data-movie-card] {
   width: 100% !important;
   height: 100% !important;
   display: flex !important;
@@ -372,7 +372,7 @@
   overflow: hidden !important;
 }
 
-.reviewsGrid .card img {
+.reviewsGrid [data-movie-card] [data-movie-img] {
   width: 100% !important;
   height: auto !important;
   aspect-ratio: 2/3;
@@ -385,7 +385,7 @@
   padding: 0 !important;
 }
 
-.reviewsGrid .card .title {
+.reviewsGrid [data-movie-card] [data-movie-title] {
   width: 100% !important;
   padding: 5px !important;
   overflow: hidden !important;
@@ -852,7 +852,7 @@
     grid-auto-rows: unset;
   }
 
-  .reviewsGrid .card {
+  .reviewsGrid [data-movie-card] {
     width: 100% !important;
     max-width: 90px;
     height: auto !important;
@@ -863,7 +863,7 @@
     background-color: #1c1e21 !important;
   }
 
-  .reviewsGrid .card img {
+  .reviewsGrid [data-movie-card] [data-movie-img] {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
@@ -946,14 +946,14 @@
     padding: 0 4px; /* Un po' di margine ai lati */
   }
 
-  .reviewsGrid .card {
+  .reviewsGrid [data-movie-card] {
     width: 100% !important;
     max-width: 80px;
     height: auto !important;
     aspect-ratio: 2/3;
   }
 
-  .reviewsGrid .card img {
+  .reviewsGrid [data-movie-card] [data-movie-img] {
     width: 100% !important;
     height: auto !important;
     aspect-ratio: 2/3 !important;
