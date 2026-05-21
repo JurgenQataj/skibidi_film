@@ -89,10 +89,11 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(20, 20, 24, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   width: 28px;
   height: 28px;
@@ -100,16 +101,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 10; /* Assicura che sia sopra l'immagine */
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.card:hover .deleteButton {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .deleteButton:hover {
   background-color: #e50914;
   border-color: #e50914;
+  color: #ffffff;
   transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
 }
 
 /* MEDIA QUERIES PER RESPONSIVE */
@@ -137,6 +145,16 @@
   .ratingBadge {
     font-size: 0.55rem;
     padding: 2px 4px;
+  }
+
+  .deleteButton {
+    opacity: 1 !important;
+    transform: scale(0.85) !important;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(20, 20, 24, 0.95);
   }
 }
 

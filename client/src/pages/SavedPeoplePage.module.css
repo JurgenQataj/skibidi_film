@@ -3,22 +3,36 @@
   font-family: 'Inter', -apple-system, sans-serif;
   color: #fff;
   padding-bottom: 4rem;
+  background: #0d0d0f;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* ── Sticky, Glassmorphic Header ── */
+/* ── Dynamic Blurred Backdrop ── */
+.dynamicBackdrop {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center 20%;
+  filter: blur(120px) opacity(0.18);
+  pointer-events: none;
+  z-index: 0;
+  transition: background-image 0.8s ease-in-out;
+  transform: scale(1.1);
+}
+
+/* ── Header Design ── */
 .headerContainer {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  padding: 100px 2rem 1.5rem; /* Leaves room for main app navbar on desktop */
-  background: rgba(20, 20, 22, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  z-index: 10;
+  padding: 80px 4rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.3s ease;
+  background: rgba(13, 13, 15, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .titleArea {
@@ -27,79 +41,219 @@
 }
 
 .superTitle {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   color: #a777e3;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
 .mainTitle {
-  font-size: 2.2rem;
-  font-weight: 800;
+  font-size: 2.4rem;
+  font-weight: 900;
   margin: 0;
-  color: #ffffff;
   letter-spacing: -0.5px;
-  line-height: 1.1;
+  background: linear-gradient(135deg, #ffffff 0%, #a8b2d1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .backButton {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #fff;
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 30px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .backButton:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateX(-4px);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(-3px);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* ── Content Grid ── */
+/* ── Content Layout ── */
 .contentArea {
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 3rem 2rem;
+  padding: 2.5rem 4rem;
+  position: relative;
+  z-index: 10;
 }
 
-.grid {
+.dashboardLayout {
   display: grid;
-  /* Fluid responsive grid: beautifully handles all screen sizes organically */
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+/* ── LEFT PANEL ── */
+.leftPanel {
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
 }
 
-/* ── Premium Card Design ── */
-.actorCard {
-  text-decoration: none;
-  display: block;
+/* Stats Card Widget */
+.statsCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.statText {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 5px;
+}
+
+.topTalentBox {
+  margin-left: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding-left: 2rem;
+  max-width: 250px;
+}
+
+.statLabelText {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: #a777e3;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.statValueText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Search Bar */
+.searchContainer {
   position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 1.1rem;
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+.searchBar {
+  width: 100%;
+  padding: 16px 20px 16px 54px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50px;
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.searchBar:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(167, 119, 227, 0.5);
+  box-shadow: 0 0 15px rgba(167, 119, 227, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.searchContainer:focus-within .searchIcon {
+  color: #a777e3;
+}
+
+.noResults {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.05rem;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+/* Talents Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card Container */
+.actorCardContainer {
+  position: relative;
+  width: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: 18px;
-  background: #1a1e2e;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  cursor: pointer;
+}
+
+.actorCard {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 16px;
+  background: #131315;
+  border: 1px solid rgba(255, 255, 255, 0.03);
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation: slideUpFade 0.6s ease-out forwards;
-  opacity: 0;
-  transform: translateY(30px);
 }
 
-/* We use a React inline style for staggered animation delay */
-.actorCard:hover {
-  transform: translateY(-12px) scale(1.04);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(167, 119, 227, 0.2);
-  z-index: 2;
+.actorCardContainer:hover .actorCard {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(167, 119, 227, 0.2);
+  border-color: rgba(167, 119, 227, 0.2);
+}
+
+.selectedCard .actorCard {
+  border-color: #a777e3;
+  box-shadow: 0 0 20px rgba(167, 119, 227, 0.4);
+  transform: translateY(-6px) scale(1.02);
 }
 
 .imageWrapper {
@@ -108,50 +262,62 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: #1a1e2e;
+  background: #101012;
 }
 
 .image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.actorCard:hover .image {
-  transform: scale(1.1);
+.actorCardContainer:hover .image {
+  transform: scale(1.06);
 }
 
-/* Sleek gradient overlay instead of heavy black boxes */
+/* Count seen badge */
+.seenBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(167, 119, 227, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
     rgba(11, 15, 25, 0) 50%,
-    rgba(11, 15, 25, 0.85) 100%
+    rgba(11, 15, 25, 0.95) 100%
   );
   display: flex;
   align-items: flex-end;
-  padding: 1.5rem;
-  transition: opacity 0.3s ease;
+  padding: 0.9rem;
 }
 
 .nameInfo {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .actorName {
   color: #ffffff;
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  /* Truncate long names elegantly */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -159,54 +325,258 @@
   overflow: hidden;
 }
 
-.viewProfileLabel {
-  font-size: 0.75rem;
+/* Remove button */
+.removePersonBtn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(20, 20, 24, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.actorCardContainer:hover .removePersonBtn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.removePersonBtn:hover {
+  background: #e50914;
+  color: #ffffff;
+  border-color: #e50914;
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
+}
+
+/* ── RIGHT PANEL (Showcase) ── */
+.rightPanel {
+  position: sticky;
+  top: 180px; /* Aligned beautifully below navbar */
+  height: calc(100vh - 240px);
+  min-height: 550px;
+}
+
+.showcaseCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 2.2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.05) transparent;
+}
+
+.showcaseCard::-webkit-scrollbar {
+  width: 5px;
+}
+
+.showcaseCard::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+
+/* Header Showcase */
+.showcaseHeader {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.showcaseAvatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(167, 119, 227, 0.4);
+  box-shadow: 0 0 20px rgba(167, 119, 227, 0.2);
+}
+
+.showcaseHeaderInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.showcaseName {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.showcaseMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.showcaseSeenPill {
+  display: flex;
+  align-items: center;
+  background: rgba(167, 119, 227, 0.12);
+  border: 1px solid rgba(167, 119, 227, 0.25);
+  color: #a777e3;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.viewProfileBtn {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.viewProfileBtn:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+/* Sections inside Showcase */
+.showcaseSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.showcaseSubTitle {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #a777e3;
-  font-weight: 600;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
 }
 
-.actorCard:hover .viewProfileLabel {
-  opacity: 1;
-  transform: translateY(0);
+.showcaseBioText {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: justify;
 }
 
-/* ── Empty State ── */
-.emptyState {
+.showcaseBioPlaceholder {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Loader indicators */
+.detailLoader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1.5rem 0;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.9rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #a777e3;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.movieSkeletonRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+/* Horizontal Movie Cards Showcase */
+.showcaseMovieGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 5px;
+}
+
+/* Prompt state when nothing is selected */
+.selectPrompt {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px dashed rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 50vh;
   text-align: center;
-  animation: slideUpFade 0.5s ease-out;
-}
-
-.emptyIcon {
-  font-size: 4rem;
-  opacity: 0.4;
-  margin-bottom: 1.5rem;
-}
-
-.emptyTitle {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.5rem;
-}
-
-.emptyDesc {
+  padding: 3rem;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 1rem;
-  max-width: 300px;
-  line-height: 1.5;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* ── Keyframes ── */
+.selectPromptIcon {
+  font-size: 3.5rem;
+  color: rgba(167, 119, 227, 0.3);
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 10px rgba(167, 119, 227, 0.1));
+}
+
+.selectPrompt h3 {
+  font-size: 1.3rem;
+  color: #fff;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+}
+
+.selectPrompt p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 320px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Keyframes & Animations ── */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes slideUpFade {
   to {
     opacity: 1;
@@ -214,38 +584,56 @@
   }
 }
 
-/* ── Media Queries ── */
-@media (max-width: 1024px) {
+/* ── Media Queries (Responsive) ── */
+@media (max-width: 1200px) {
   .headerContainer {
-    padding: 85px 1.5rem 1rem;
+    padding: 85px 2.5rem 1rem;
   }
   .contentArea {
-    padding: 2rem 1.5rem;
+    padding: 2rem 2.5rem;
   }
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1.5rem;
+  .dashboardLayout {
+    gap: 2rem;
+  }
+  .showcaseMovieGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 968px) {
+  /* Layout breaks into single column on tablets, where Left list is on top, details on bottom */
+  .dashboardLayout {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .rightPanel {
+    position: static;
+    height: auto;
+    min-height: auto;
+  }
+  
+  .showcaseCard {
+    height: auto;
+  }
+  
+  .showcaseMovieGrid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
 /* Mobile First Magic */
 @media (max-width: 480px) {
-  .pageWrapper {
-    padding-bottom: 2rem;
-  }
-  
   .headerContainer {
-    /* Ridotto il top-padding per spingere il testo molto in alto */
-    padding: 25px 0.8rem 5px;
+    padding: 25px 1.2rem 5px;
     background: transparent;
     border-bottom: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    flex-direction: row; 
-    margin-bottom: 10px;
+    flex-direction: row;
+    margin-bottom: 5px;
   }
 
-  /* User requested title on top left and no back button */
   .titleArea {
     width: 100%;
     align-items: flex-start;
@@ -253,6 +641,7 @@
 
   .superTitle {
     font-size: 0.75rem;
+    letter-spacing: 2px;
   }
 
   .mainTitle {
@@ -264,33 +653,112 @@
   }
 
   .contentArea {
-    padding: 1.5rem 1rem;
+    padding: 1rem 1rem;
+  }
+  
+  .leftPanel {
+    gap: 1.2rem;
+  }
+
+  .statsCard {
+    padding: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .statBox {
+    align-items: center;
+  }
+  
+  .statNumber {
+    font-size: 1.5rem;
+  }
+  
+  .statText {
+    font-size: 0.7rem;
+  }
+  
+  .topTalentBox {
+    margin-left: 0;
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 0.8rem;
+    width: 100%;
+    max-width: 100%;
+    align-items: center;
+  }
+
+  .searchBar {
+    padding: 12px 16px 12px 46px;
+    font-size: 0.9rem;
+  }
+  
+  .searchIcon {
+    left: 18px;
+    font-size: 1rem;
   }
 
   .grid {
-    /* Dynamic crisp grid for mobile */
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 8px;
   }
-
+  
   .actorCard {
     border-radius: 12px;
   }
 
   .overlay {
-    padding: 10px;
-    background: linear-gradient(
-      to bottom,
-      rgba(11, 15, 25, 0) 40%,
-      rgba(11, 15, 25, 0.9) 100%
-    );
+    padding: 6px;
   }
 
   .actorName {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
   }
 
-  .viewProfileLabel {
-    display: none;
+  .seenBadge {
+    padding: 2px 6px;
+    font-size: 0.6rem;
+    top: 5px;
+    left: 5px;
+  }
+
+  .removePersonBtn {
+    opacity: 1; /* Always visible on mobile */
+    transform: scale(0.85);
+    top: -4px;
+    right: -4px;
+    width: 24px;
+    height: 24px;
+    background: rgba(20, 20, 24, 0.95);
+  }
+  
+  .showcaseCard {
+    padding: 1.2rem;
+  }
+  
+  .showcaseHeader {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .showcaseAvatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .showcaseName {
+    font-size: 1.4rem;
+  }
+  
+  .showcaseMetaRow {
+    justify-content: center;
+  }
+  
+  .showcaseMovieGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

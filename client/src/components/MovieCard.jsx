@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 import { motion } from "framer-motion"; // Aggiunto import per animazioni
+import { FiTrash2 } from "react-icons/fi";
 
 const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate }) => {
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
@@ -43,8 +44,8 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
       >
         {/* Il pulsante di eliminazione, ora posizionato correttamente */}
         {showDeleteButton && (
-          <button onClick={handleDeleteClick} className={styles.deleteButton}>
-            ×
+          <button onClick={handleDeleteClick} className={styles.deleteButton} title="Rimuovi">
+            <FiTrash2 size={13} />
           </button>
         )}
         <img
