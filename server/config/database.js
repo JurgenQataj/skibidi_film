@@ -11,7 +11,7 @@ const MAX_RETRIES     = 5;     // numero massimo di tentativi
 const connectDB = async (attempt = 1) => {
   try {
     await mongoose.connect(process.env.DATABASE_URL, {
-      // Timeout di connessione più generosi per Atlas (può essere lenta all'avvio)
+      family: 4,                        // Forza IPv4 per evitare problemi di risoluzione DNS (Node 17+)
       serverSelectionTimeoutMS: 15000,  // 15s per trovare il server (default 30s)
       connectTimeoutMS:         15000,  // 15s per aprire la socket
       socketTimeoutMS:          45000,  // 45s per le operazioni socket

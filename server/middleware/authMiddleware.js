@@ -18,7 +18,9 @@ const protect = (req, res, next) => {
 
             next();
         } catch (error) {
-            console.error("Errore verifica token:", error.message);
+            if (error.name !== 'TokenExpiredError') {
+                console.error("Errore verifica token:", error.message);
+            }
             res.status(401).json({ message: 'Non autorizzato, token non valido' });
         }
     }

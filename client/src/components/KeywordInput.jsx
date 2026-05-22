@@ -10,10 +10,19 @@ const KeywordInput = ({ selectedKeywords, onChange }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showAllKeywords, setShowAllKeywords] = useState(false);
   const wrapperRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
   useEffect(() => {
+    // Cancel any ongoing fetch suggestions request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     const fetchSuggestions = async () => {
       if (!query.trim()) {
         setSuggestions([]);
@@ -21,13 +30,25 @@ const KeywordInput = ({ selectedKeywords, onChange }) => {
       }
       setLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/api/movies/keywords/search?query=${encodeURIComponent(query)}`);
-        setSuggestions(response.data.results || []);
+        const response = await axios.get(
+          `${API_URL}/api/movies/keywords/search?query=${encodeURIComponent(query)}`,
+          { signal: controller.signal }
+        );
+        if (abortControllerRef.current === controller) {
+          setSuggestions(response.data.results || []);
+        }
       } catch (error) {
+        if (axios.isCancel(error)) {
+          return; // ignore cancellation
+        }
         console.error("Errore ricerca keywords:", error);
-        setSuggestions([]);
+        if (abortControllerRef.current === controller) {
+          setSuggestions([]);
+        }
       } finally {
-        setLoading(false);
+        if (abortControllerRef.current === controller) {
+          setLoading(false);
+        }
       }
     };
 
@@ -35,7 +56,12 @@ const KeywordInput = ({ selectedKeywords, onChange }) => {
       fetchSuggestions();
     }, 300); // 300ms debounce
 
-    return () => clearTimeout(delayDebounceFn);
+    return () => {
+      clearTimeout(delayDebounceFn);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [query, API_URL]);
 
   useEffect(() => {

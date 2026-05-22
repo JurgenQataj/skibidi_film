@@ -21,6 +21,7 @@ const SearchInput = ({
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const debounceRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -32,20 +33,38 @@ const SearchInput = ({
       return;
     }
 
+    // Cancel any ongoing fetch suggestions request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     try {
       const response = await axios.get(
         `${API_URL}/api/movies/suggestions?query=${encodeURIComponent(
           searchQuery
-        )}&type=${mode}`
+        )}&type=${mode}`,
+        { signal: controller.signal }
       );
-      setSuggestions(response.data.results || []);
-      setShowSuggestions(true);
+      if (abortControllerRef.current === controller) {
+        setSuggestions(response.data.results || []);
+        setShowSuggestions(true);
+      }
     } catch (error) {
+      if (axios.isCancel(error)) {
+        return; // ignore cancellation
+      }
       console.error("Errore nel recupero dei suggerimenti:", error);
-      setSuggestions([]);
+      if (abortControllerRef.current === controller) {
+        setSuggestions([]);
+      }
     } finally {
-      setLoading(false);
+      if (abortControllerRef.current === controller) {
+        setLoading(false);
+      }
     }
   };
 
@@ -62,6 +81,9 @@ const SearchInput = ({
     return () => {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
     };
   }, [query]);
