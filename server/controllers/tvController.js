@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { enrichWithOmdbRatings } = require("../services/omdbService");
 
 const API_KEY = process.env.TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -20,7 +21,8 @@ exports.searchTv = async (req, res) => {
       media_type: "tv"
     }));
     
-    res.json({ ...response.data, results: normalizedResults });
+    const enrichedResults = await enrichWithOmdbRatings(normalizedResults, 'tv');
+    res.json({ ...response.data, results: enrichedResults });
   } catch (error) {
     console.error("Errore ricerca serie tv:", error.message);
     res.status(500).json({ message: "Errore durante la comunicazione con il servizio esterno." });
@@ -87,9 +89,10 @@ exports.discoverTv = async (req, res) => {
     const normalizedResults = response.data.results.map(item => ({
       ...item, title: item.name, release_date: item.first_air_date, media_type: "tv",
     }));
+    const enrichedResults = await enrichWithOmdbRatings(normalizedResults, 'tv');
 
     return res.json({
-      results: normalizedResults,
+      results: enrichedResults,
       total_pages: response.data.total_pages,
       total_results: response.data.total_results,
       page: parseInt(page),

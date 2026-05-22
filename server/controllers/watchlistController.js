@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Movie = require("../models/Movie");
 const axios = require("axios");
+const { enrichWithOmdbRatings } = require("../services/omdbService");
 
 const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
   const numericId = Number(tmdbId);
@@ -85,7 +86,8 @@ exports.getWatchlist = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).populate("watchlist");
     if (!user) return res.status(404).json({ message: "Utente non trovato." });
-    res.status(200).json(user.watchlist || []);
+    const enrichedWatchlist = await enrichWithOmdbRatings(user.watchlist || []);
+    res.status(200).json(enrichedWatchlist);
   } catch (error) {
     console.error("Errore get watchlist:", error);
     res.status(500).json({ message: "Errore server." });

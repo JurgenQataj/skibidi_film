@@ -1,6 +1,7 @@
 const Movie = require("../models/Movie");
 const Review = require("../models/Review");
 const axios = require("axios");
+const { enrichWithOmdbRatings } = require("../services/omdbService");
 
 const API_KEY = process.env.TMDB_API_KEY;
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
@@ -34,7 +35,9 @@ exports.getMovieSuggestions = async (req, res) => {
       release_date: item.release_date || item.first_air_date || null, // Le serie tv hanno first_air_date
       media_type: type 
     }));
-    res.json({ results: suggestions });
+    
+    const enrichedSuggestions = await enrichWithOmdbRatings(suggestions);
+    res.json({ results: enrichedSuggestions });
   } catch (error) {
     console.error("Errore suggestions:", error.message);
     res.status(500).json({ message: error.message, results: [] });
@@ -63,7 +66,9 @@ exports.searchMovies = async (req, res) => {
   try {
     const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT&region=IT`;
     const response = await axios.get(url);
-    res.json(response.data);
+    const results = response.data.results.map(m => ({ ...m, media_type: 'movie' }));
+    const enrichedResults = await enrichWithOmdbRatings(results);
+    res.json({ ...response.data, results: enrichedResults });
   } catch (error) {
     console.error("Errore ricerca film:", error.message);
     res.status(500).json({ message: "Errore durante la comunicazione con il servizio esterno." });
@@ -151,9 +156,11 @@ exports.discoverMovies = async (req, res) => {
     console.log(`🔍 DISCOVER MOVIES URL: ${fetchUrl} | Params:`, { ...params, api_key: "HIDDEN" });
 
     const response = await axios.get(fetchUrl, { params });
+    const results = response.data.results.map(m => ({ ...m, media_type: 'movie' }));
+    const enrichedResults = await enrichWithOmdbRatings(results);
 
     return res.json({
-      results: response.data.results,
+      results: enrichedResults,
       total_pages: response.data.total_pages,
       total_results: response.data.total_results,
       page: parseInt(req.query.page || 1),
@@ -245,10 +252,11 @@ exports.getTrendingMovies = async (req, res) => {
     const timeWindow = req.query.timeWindow === "day" ? "day" : "week";
     const url = `${BASE_URL}/trending/movie/${timeWindow}?api_key=${API_KEY}&language=it-IT`;
     const response = await axios.get(url);
-    res.json(response.data.results);
+    const results = response.data.results.map(m => ({ ...m, media_type: 'movie' }));
+    res.json(results);
   } catch (error) {
     console.error("Errore film di tendenza:", error.message);
-    res.status(500).json({ message: "Errore del servizio esterno." });
+    res.status(500).json({ message: "Errore del server." });
   }
 };
 
@@ -273,11 +281,14 @@ exports.getTopRatedMovies = async (req, res) => {
           tmdb_id: "$movie_details.tmdb_id",
           title: "$movie_details.title",
           poster_path: "$movie_details.poster_path",
+          release_year: "$movie_details.release_year",
+          media_type: { $ifNull: ["$movie_details.media_type", "movie"] },
           average_rating: { $round: ["$average_rating", 1] },
         },
       },
     ]);
-    res.json(topMovies);
+    const enrichedMovies = await enrichWithOmdbRatings(topMovies);
+    res.json(enrichedMovies);
   } catch (error) {
     console.error("Errore recupero top rated:", error.message);
     res.status(500).json({ message: "Errore del server." });

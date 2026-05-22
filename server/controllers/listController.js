@@ -1,6 +1,7 @@
 const MovieList = require("../models/MovieList");
 const Movie = require("../models/Movie");
 const axios = require("axios");
+const { enrichWithOmdbRatings } = require("../services/omdbService");
 
 // Funzione per creare una nuova lista
 exports.createList = async (req, res) => {
@@ -22,7 +23,13 @@ exports.getListDetails = async (req, res) => {
       .populate("movies"); // Aggiunge tutti i dati dei film nella lista
 
     if (!list) return res.status(404).json({ message: "Lista non trovata." });
-    res.json(list);
+    
+    let listData = list.toObject();
+    if (listData.movies && listData.movies.length > 0) {
+      listData.movies = await enrichWithOmdbRatings(listData.movies);
+    }
+    
+    res.json(listData);
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
   }
