@@ -3,6 +3,7 @@ const Review = require("../models/Review");
 const axios = require("axios");
 
 const API_KEY = process.env.TMDB_API_KEY;
+const OMDB_API_KEY = process.env.OMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 
 exports.getMovieSuggestions = async (req, res) => {
@@ -184,6 +185,23 @@ exports.getMovieDetails = async (req, res) => {
     );
     const cast = credits?.cast?.slice(0, 100) || [];
 
+    let omdbData = null;
+    if (data.imdb_id) {
+      try {
+        const omdbRes = await axios.get(`http://www.omdbapi.com/?apikey=${OMDB_API_KEY || "f816b1d6"}&i=${data.imdb_id}`);
+        if (omdbRes.data && omdbRes.data.Response !== "False") {
+          omdbData = {
+            ratings: omdbRes.data.Ratings || [],
+            awards: omdbRes.data.Awards || "N/A",
+            rated: omdbRes.data.Rated || "N/A",
+            boxOffice: omdbRes.data.BoxOffice || "N/A"
+          };
+        }
+      } catch (e) {
+        console.error("Errore fetch OMDb:", e.message);
+      }
+    }
+
     res.json({
       id: data.id,
       title: data.title,
@@ -207,6 +225,7 @@ exports.getMovieDetails = async (req, res) => {
       collection: data.belongs_to_collection || null, // [NUOVO] Saga
       production_companies: data.production_companies || [], // [NUOVO] Case di produzione
       production_countries: data.production_countries || [], // [NUOVO] Paesi di produzione
+      omdb_data: omdbData, // [NUOVO] Dati aggiuntivi da OMDb (Ratings, ecc)
       watch_providers: {
         flatrate: data["watch/providers"]?.results?.IT?.flatrate || [],
         link: data["watch/providers"]?.results?.IT?.link || null

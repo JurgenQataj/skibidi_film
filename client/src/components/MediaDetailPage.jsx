@@ -416,6 +416,22 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
             <p>{formatRating(media.vote_average)}</p>
           </div>
 
+          {/* Voti OMDb (IMDb, Rotten Tomatoes, Metacritic) */}
+          {media.omdb_data?.ratings?.map((r, i) => {
+            let label = r.Source;
+            let icon = "";
+            if (label === "Internet Movie Database") { label = "IMDb"; icon = "⭐️"; }
+            else if (label === "Rotten Tomatoes") { icon = "🍅"; }
+            else if (label === "Metacritic") { icon = "🟩"; }
+
+            return (
+              <div key={i} className={styles.infoBox}>
+                <h4>{label}</h4>
+                <p>{icon} {r.Value}</p>
+              </div>
+            );
+          })}
+
           {/* Genere */}
           <div className={styles.infoBox}>
             <h4>Genere</h4>
