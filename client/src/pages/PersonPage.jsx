@@ -16,6 +16,24 @@ function PersonPage() {
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [news, setNews] = useState(null);
+  const [loadingNews, setLoadingNews] = useState(false);
+  const [newsError, setNewsError] = useState(null);
+
+  const handleLoadNews = async () => {
+    if (!data || !data.personName) return;
+    setLoadingNews(true);
+    setNewsError(null);
+    try {
+      const res = await axios.get(`${API_URL}/api/news?q=${encodeURIComponent(data.personName)}&pageSize=6`);
+      setNews(res.data.articles || []);
+    } catch (err) {
+      console.error("Errore caricamento news:", err);
+      setNewsError("Impossibile caricare le ultime notizie.");
+    } finally {
+      setLoadingNews(false);
+    }
+  };
 
   const getInitialState = (key, defaultValue) => {
     const saved = localStorage.getItem(key);
@@ -188,7 +206,7 @@ function PersonPage() {
     visible: { opacity: 1, y: 0, scale: 1 }
   };
 
-  const filterOptions = [
+  const realFilterOptions = [
     { label: "Nascondi film senza voto",        checked: showOnlyRated,      setter: setShowOnlyRated },
     { label: "Nascondi Documentari",             checked: hideDocumentaries,  setter: setHideDocumentaries },
     { label: "Nascondi cortometraggi",           checked: hideShorts,         setter: setHideShorts },
@@ -337,7 +355,7 @@ function PersonPage() {
                 exit={{ opacity: 0, y: -8, scale: 0.97 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
               >
-                {filterOptions.map((option, index) => (
+                {realFilterOptions.map((option, index) => (
                   <label key={index} className={styles.filterLabelOption}>
                     <input
                       type="checkbox"
@@ -408,6 +426,39 @@ function PersonPage() {
 
         </div>
       </AnimatePresence>
+
+      {/* ── ULTIME NOTIZIE ── */}
+      <div className={styles.newsSection}>
+        <h2 className={styles.sectionTitle}>Ultime Notizie</h2>
+        
+        {!news && !loadingNews && (
+          <button className={styles.loadNewsBtn} onClick={handleLoadNews}>
+            Carica Ultime Notizie su {data.personName}
+          </button>
+        )}
+        
+        {loadingNews && <p>Caricamento notizie in corso...</p>}
+        {newsError && <p className={styles.error}>{newsError}</p>}
+        
+        {news && news.length > 0 && (
+          <div className={styles.newsGrid}>
+            {news.map((article, idx) => (
+              <a key={idx} href={article.url} target="_blank" rel="noopener noreferrer" className={styles.newsCard}>
+                {article.urlToImage && (
+                  <img src={article.urlToImage} alt="News thumbnail" className={styles.newsImg} loading="lazy" />
+                )}
+                <div className={styles.newsContent}>
+                  <p className={styles.newsDate}>{new Date(article.publishedAt).toLocaleDateString("it-IT")}</p>
+                  <h3 className={styles.newsTitle}>{article.title}</h3>
+                  <p className={styles.newsSource}>{article.source?.name}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+        {news && news.length === 0 && <p>Nessuna notizia recente trovata.</p>}
+      </div>
+
     </div>
   );
 }

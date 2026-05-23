@@ -1016,3 +1016,9 @@
   .decadeChip { font-size: 0.68rem; padding: 2px 8px; }
   .listPoster { width: 36px; height: 54px; }
 }
+
+@media (max-width: 768px) {
+  .resultsGrid :global(.movie-card-year) {
+    display: inline !important;
+  }
+}

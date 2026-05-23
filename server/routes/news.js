@@ -42,10 +42,16 @@ router.get("/", async (req, res) => {
   const pageSize = Math.min(parseInt(req.query.pageSize) || 12, 20);
   const sortBy = req.query.sortBy === "popularity" ? "popularity" : "publishedAt";
 
+  let finalQuery = NEWS_QUERY;
+  if (req.query.q) {
+    // Se c'è una query specifica (es. nome attore), la combiniamo con termini generici per assicurarci siano news di spettacolo
+    finalQuery = `"${req.query.q}" AND (film OR cinema OR movie OR "serie tv" OR attore OR regista)`;
+  }
+
   try {
     const response = await axios.get("https://newsapi.org/v2/everything", {
       params: {
-        q: NEWS_QUERY,
+        q: finalQuery,
         domains: ENTERTAINMENT_DOMAINS,
         sortBy,
         pageSize,

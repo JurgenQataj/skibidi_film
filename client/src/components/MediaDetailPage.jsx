@@ -432,6 +432,14 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
             );
           })}
 
+          {/* OMDb Rated & Awards */}
+          {media.omdb_data?.rated && media.omdb_data.rated !== "N/A" && (
+            <div className={styles.infoBox}>
+              <h4>Classificazione</h4>
+              <p>{media.omdb_data.rated}</p>
+            </div>
+          )}
+
           {/* Genere */}
           <div className={styles.infoBox}>
             <h4>Genere</h4>

@@ -807,10 +807,10 @@ function SearchPage() {
                 <div className={styles.resultsGrid}>
                   {results.map((item, index) => (
                     <div key={`${item.id}-${currentPage}-${index}`} className={styles.gridCardWrapper}>
-                      <MovieCard movie={item} />
+                      <MovieCard movie={item} forceTmdb={true} />
                       <div className={styles.cardMetaOverlay}>
-                        {item.release_date && (
-                          <span className={styles.cardMetaYear}>{item.release_date.substring(0, 4)}</span>
+                        {(item.release_date || item.first_air_date) && (
+                          <span className={styles.cardMetaYear}>{(item.release_date || item.first_air_date).substring(0, 4)}</span>
                         )}
                         {item.genre_ids?.[0] && genreMap[item.genre_ids[0]] && (
                           <span className={styles.cardMetaGenre}>{genreMap[item.genre_ids[0]]}</span>

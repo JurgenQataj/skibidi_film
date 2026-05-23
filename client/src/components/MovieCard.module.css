@@ -115,11 +115,20 @@
   align-items: center;
   gap: 3px;
   letter-spacing: 0.3px;
+  max-width: calc(100% - 14px);
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .ratingBadge svg,
 .ratingBadge span[style] {
   font-size: 0.62rem;
+}
+
+.cardYear {
+  opacity: 0.5;
+  margin-left: 3px;
 }
 
 /* Delete button — top-right */
@@ -177,6 +186,11 @@
     padding: 2px 5px;
     top: 5px;
     left: 5px;
+    max-width: calc(100% - 10px);
+  }
+
+  .cardYear {
+    display: none;
   }
 
   .deleteButton {

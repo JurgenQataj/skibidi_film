@@ -86,7 +86,7 @@ const TrendingRow = ({ mediaType = "movie" }) => {
           <div className={styles.scrollContainer} ref={scrollRef}>
             {movies.map((movie) => (
               <div key={movie.id} className={styles.cardWrapper}>
-                <MovieCard movie={movie} />
+                <MovieCard movie={movie} forceTmdb={true} />
               </div>
             ))}
           </div>

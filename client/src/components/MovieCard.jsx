@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 import { FiTrash2 } from "react-icons/fi";
 
-const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate }) => {
+const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate, hideRating = false, forceTmdb = false }) => {
   if (!movie) return null;
 
   const movieId    = movie.tmdb_id || movie.id;
@@ -11,8 +11,8 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
   const posterPath = movie.poster_path;
   const isTv       = movie.media_type === "tv";
   const linkPath   = isTv ? `/tv/${movieId}` : `/movie/${movieId}`;
-  const isImdb     = !!movie.imdb_rating;
-  const ratingText = isImdb ? movie.imdb_rating : (movie.vote_average ? movie.vote_average.toFixed(1) : null);
+  const isImdb     = !forceTmdb && !!movie.imdb_rating;
+  const ratingText = isImdb ? movie.imdb_rating : (movie.vote_average ? Number(movie.vote_average).toFixed(1) : null);
   const year       = movie.release_date ? new Date(movie.release_date).getFullYear() : (movie.first_air_date ? new Date(movie.first_air_date).getFullYear() : null);
 
   const handleDeleteClick = (e) => {
@@ -44,7 +44,7 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
         />
 
         {/* Rating badge */}
-        {ratingText && (
+        {ratingText && !hideRating && (
           <div className={styles.ratingBadge}>
             {isImdb ? (
               <span style={{ color: "#f5c518", fontWeight: "bold", marginRight: 3 }}>IMDb</span>
@@ -52,7 +52,7 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
               <span style={{ color: "#e2c77a" }}>★</span>
             )}
             {ratingText}
-            {year && <span style={{ opacity: 0.5, marginLeft: 3 }}>{year}</span>}
+            {year && <span className={`${styles.cardYear} movie-card-year`}>{year}</span>}
           </div>
         )}
 
