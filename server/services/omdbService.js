@@ -11,7 +11,7 @@ async function enrichWithOmdbRatings(items) {
   if (!items || items.length === 0) return items;
 
   // 1. Estrai gli ID validi
-  const itemIds = items.map(item => item.id || item.tmdb_id).filter(Boolean);
+  const itemIds = items.map(item => item.tmdb_id || item.id).filter(Boolean);
   if (itemIds.length === 0) return items;
 
   // 2. Cerca nella cache DB
@@ -25,7 +25,7 @@ async function enrichWithOmdbRatings(items) {
 
   // 3. Trova quali mancano
   const missingItems = items.filter(item => {
-    const id = item.id || item.tmdb_id;
+    const id = item.tmdb_id || item.id;
     const mType = item.media_type || 'movie';
     return id && !cacheMap.has(`${id}-${mType}`);
   });
@@ -33,7 +33,7 @@ async function enrichWithOmdbRatings(items) {
   // 4. Fetch da OMDb per i mancanti in parallelo
   await Promise.all(missingItems.map(async (item) => {
     try {
-      const id = item.id || item.tmdb_id;
+      const id = item.tmdb_id || item.id;
       const mType = item.media_type || 'movie';
       const title = item.title || item.name;
       const yearStr = item.release_date || item.first_air_date || item.release_year;
@@ -93,7 +93,7 @@ async function enrichWithOmdbRatings(items) {
     const isDoc = typeof item.toObject === 'function';
     const rawItem = isDoc ? item.toObject() : item;
     
-    const id = rawItem.id || rawItem.tmdb_id;
+    const id = rawItem.tmdb_id || rawItem.id;
     const mType = rawItem.media_type || 'movie';
     const cached = cacheMap.get(`${id}-${mType}`);
     

@@ -17,6 +17,14 @@
   transition: border-color 0.2s ease;
 }
 
+.selectHeader span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px;
+  flex: 1;
+}
+
 .selectHeader:hover {
   border-bottom-color: rgba(255, 255, 255, 0.5);
 }

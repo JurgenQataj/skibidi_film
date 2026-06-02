@@ -11,9 +11,12 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
   const posterPath = movie.poster_path;
   const isTv       = movie.media_type === "tv";
   const linkPath   = isTv ? `/tv/${movieId}` : `/movie/${movieId}`;
-  const isImdb     = !forceTmdb && !!movie.imdb_rating;
-  const ratingText = isImdb ? movie.imdb_rating : (movie.vote_average ? Number(movie.vote_average).toFixed(1) : null);
-  const year       = movie.release_date ? new Date(movie.release_date).getFullYear() : (movie.first_air_date ? new Date(movie.first_air_date).getFullYear() : null);
+  const ratingText = movie.vote_average ? Number(movie.vote_average).toFixed(1) : null;
+  const year       = movie.release_date 
+    ? new Date(movie.release_date).getFullYear() 
+    : (movie.first_air_date 
+        ? new Date(movie.first_air_date).getFullYear() 
+        : (movie.release_year || null));
 
   const handleDeleteClick = (e) => {
     e.preventDefault();
@@ -44,14 +47,14 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
         />
 
         {/* Rating badge */}
-        {ratingText && !hideRating && (
+        {(ratingText || year) && !hideRating && (
           <div className={styles.ratingBadge}>
-            {isImdb ? (
-              <span style={{ color: "#f5c518", fontWeight: "bold", marginRight: 3 }}>IMDb</span>
-            ) : (
-              <span style={{ color: "#e2c77a" }}>★</span>
+            {ratingText && (
+              <>
+                <span style={{ color: "#e2c77a" }}>★</span>
+                {ratingText}
+              </>
             )}
-            {ratingText}
             {year && <span className={`${styles.cardYear} movie-card-year`}>{year}</span>}
           </div>
         )}

@@ -6,6 +6,7 @@ const MovieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   poster_path: { type: String },
   release_year: { type: Number },
+  vote_average: { type: Number },
   // Nuovi campi per le statistiche
   director: { type: String }, 
   cast: [{ type: String }], // Array di nomi degli attori

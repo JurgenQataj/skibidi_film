@@ -23,13 +23,18 @@ const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
       ? (movieData.keywords?.results?.map(k => k.name) || [])
       : (movieData.keywords?.keywords?.map(k => k.name) || []);
     
+    const dateStr = mediaType === "tv" ? movieData.first_air_date : movieData.release_date;
+    const release_year = dateStr ? new Date(dateStr).getFullYear() : null;
+    
     movie = new Movie({
       tmdb_id: movieData.id,
       media_type: mediaType,
       title: mediaType === "tv" ? movieData.name : movieData.title,
       poster_path: movieData.poster_path,
       genres,
-      keywords
+      keywords,
+      release_year,
+      vote_average: movieData.vote_average
     });
 
     try {

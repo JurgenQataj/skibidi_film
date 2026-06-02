@@ -7,6 +7,7 @@ import MovieCard from "../components/MovieCard";
 import { SkeletonMovieCard, SkeletonWithLogo } from "../components/Skeleton";
 import SkibidiRoulette from "../components/SkibidiRoulette";
 import RussianRoulette from "../components/RussianRoulette";
+import CustomSelect from "../components/CustomSelect";
 
 function WatchlistPage() {
   const { userId: routeUserId } = useParams();
@@ -16,7 +17,7 @@ function WatchlistPage() {
   const [isOwner, setIsOwner] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL || "";
 
-  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedKeyword, setSelectedKeyword] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -29,6 +30,13 @@ function WatchlistPage() {
     });
     return Array.from(genresSet).sort();
   }, [watchlist]);
+
+  const genreOptions = useMemo(() => {
+    return availableGenres.map(genre => ({
+      value: genre,
+      name: genre
+    }));
+  }, [availableGenres]);
 
   const availableKeywords = useMemo(() => {
     const keywordsSet = new Set();
@@ -48,8 +56,10 @@ function WatchlistPage() {
 
   const filteredWatchlist = useMemo(() => {
     return watchlist.filter((movie) => {
-      if (selectedGenre && (!movie.genres || !movie.genres.includes(selectedGenre))) {
-        return false;
+      if (selectedGenres && selectedGenres.length > 0) {
+        if (!movie.genres) return false;
+        const hasAllGenres = selectedGenres.every((genre) => movie.genres.includes(genre));
+        if (!hasAllGenres) return false;
       }
       if (selectedKeyword.trim() !== "") {
         if (!movie.keywords) return false;
@@ -59,7 +69,7 @@ function WatchlistPage() {
       }
       return true;
     });
-  }, [watchlist, selectedGenre, selectedKeyword]);
+  }, [watchlist, selectedGenres, selectedKeyword]);
 
   const fetchWatchlist = useCallback(async () => {
     try {
@@ -143,18 +153,14 @@ function WatchlistPage() {
 
       <div className={styles.filterContainer}>
         <div className={styles.filterGroup}>
-          <label htmlFor="genreFilter" className={styles.filterLabel}>Genere:</label>
-          <select 
-            id="genreFilter"
-            value={selectedGenre} 
-            onChange={(e) => setSelectedGenre(e.target.value)}
-            className={styles.filterSelect}
-          >
-            <option value="">Tutti i generi</option>
-            {availableGenres.map(genre => (
-              <option key={genre} value={genre}>{genre}</option>
-            ))}
-          </select>
+          <label className={styles.filterLabel}>Generi:</label>
+          <CustomSelect 
+            options={genreOptions}
+            value={selectedGenres} 
+            onChange={setSelectedGenres}
+            placeholder="Tutti i generi"
+            multiple={true}
+          />
         </div>
         <div className={styles.filterGroup} style={{ position: 'relative' }}>
           <label htmlFor="keywordSearch" className={styles.filterLabel}>Parola chiave:</label>
