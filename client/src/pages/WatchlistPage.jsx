@@ -8,17 +8,41 @@ import { SkeletonMovieCard, SkeletonWithLogo } from "../components/Skeleton";
 import SkibidiRoulette from "../components/SkibidiRoulette";
 import RussianRoulette from "../components/RussianRoulette";
 import CustomSelect from "../components/CustomSelect";
+function getUserId(routeUserId) {
+  try {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      return routeUserId || decoded.user?.id || "default";
+    }
+  } catch (e) {}
+  return routeUserId || "default";
+}
 
 function WatchlistPage() {
   const { userId: routeUserId } = useParams();
+  const userIdKey = getUserId(routeUserId);
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [isOwner, setIsOwner] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL || "";
 
-  const [selectedGenres, setSelectedGenres] = useState([]);
-  const [selectedKeyword, setSelectedKeyword] = useState("");
+  const [selectedGenres, setSelectedGenres] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(`watchlistSelectedGenres_${userIdKey}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [selectedKeyword, setSelectedKeyword] = useState(() => {
+    try {
+      return sessionStorage.getItem(`watchlistSelectedKeyword_${userIdKey}`) || "";
+    } catch (e) {
+      return "";
+    }
+  });
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const availableGenres = useMemo(() => {
@@ -106,16 +130,30 @@ function WatchlistPage() {
     fetchWatchlist();
   }, [fetchWatchlist]);
 
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(`watchlistSelectedGenres_${userIdKey}`, JSON.stringify(selectedGenres));
+    } catch (e) {}
+  }, [selectedGenres, userIdKey]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(`watchlistSelectedKeyword_${userIdKey}`, selectedKeyword);
+    } catch (e) {}
+  }, [selectedKeyword, userIdKey]);
+
   // Ripristina la posizione dello scroll PRIMA che il browser dipinga (nessun flash visivo)
   useLayoutEffect(() => {
     if (!loading && watchlist.length > 0) {
-      const savedPosition = sessionStorage.getItem("watchlistScrollPos");
-      if (savedPosition) {
-        window.scrollTo({ top: parseInt(savedPosition, 10), behavior: "instant" });
-        sessionStorage.removeItem("watchlistScrollPos");
-      }
+      try {
+        const savedPosition = sessionStorage.getItem(`watchlistScrollPos_${userIdKey}`);
+        if (savedPosition) {
+          window.scrollTo({ top: parseInt(savedPosition, 10), behavior: "instant" });
+          sessionStorage.removeItem(`watchlistScrollPos_${userIdKey}`);
+        }
+      } catch (e) {}
     }
-  }, [loading, watchlist.length]);
+  }, [loading, watchlist.length, userIdKey]);
 
   // *** CORREZIONE 1: Funzione per rimuovere un film dalla watchlist ***
   const handleRemoveFromWatchlist = async (tmdbId) => {
@@ -213,7 +251,11 @@ function WatchlistPage() {
                 movie={movie}
                 showDeleteButton={isOwner}
                 onDelete={handleRemoveFromWatchlist}
-                onBeforeNavigate={() => sessionStorage.setItem("watchlistScrollPos", window.scrollY)}
+                onBeforeNavigate={() => {
+                  try {
+                    sessionStorage.setItem(`watchlistScrollPos_${userIdKey}`, window.scrollY);
+                  } catch (e) {}
+                }}
               />
             </div>
           ))
