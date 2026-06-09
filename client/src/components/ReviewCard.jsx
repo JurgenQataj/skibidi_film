@@ -6,6 +6,7 @@ import styles from "./ReviewCard.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import { jwtDecode } from "jwt-decode";
+import { useToast } from "../context/ToastContext";
 
 function renderStars(rating10) {
   if (rating10 == null) return null;
@@ -37,7 +38,7 @@ function renderText(text) {
   );
 }
 
-function useReviewInteractions({ review, onInteraction, token, API_URL, comments, setComments, commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment, localHasLoved, setLocalHasLoved, setLocalReactionCount, setLocalCommentCount }) {
+function useReviewInteractions({ review, onInteraction, token, API_URL, comments, setComments, commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment, localHasLoved, setLocalHasLoved, setLocalReactionCount, setLocalCommentCount, toast, confirm }) {
   const handleReaction = async (reactionType) => {
     if (!token) return;
     
@@ -58,7 +59,7 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
       setLocalHasLoved(!isLiking);
       setLocalReactionCount(prev => isLiking ? prev - 1 : prev + 1);
       console.error("Errore reazione:", error);
-      alert(error.response?.data?.message || "Errore");
+      toast(error.response?.data?.message || "Errore", "error");
     }
   };
 
@@ -84,8 +85,8 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!commentText.trim()) return alert("Il commento non può essere vuoto.");
-    if (!token) return alert("Devi essere loggato per commentare.");
+    if (!commentText.trim()) return toast("Il commento non può essere vuoto.", "warning");
+    if (!token) return toast("Devi essere loggato per commentare.", "warning");
 
     setIsSubmittingComment(true);
     const payload = { comment_text: commentText.trim() };
@@ -107,15 +108,15 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
       // Eliminato onInteraction()
     } catch (error) {
       const msg = error.response?.data?.message || "Errore nell'invio del commento.";
-      alert(msg);
+      toast(msg, "error");
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo commento?"))
-      return;
+    const ok = await confirm("Sei sicuro di voler eliminare questo commento?");
+    if (!ok) return;
 
     setIsDeletingComment(commentId);
     try {
@@ -132,21 +133,22 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
       // Eliminato onInteraction()
     } catch (error) {
       const msg = error.response?.data?.message || "Errore durante l'eliminazione.";
-      alert(msg);
+      toast(msg, "error");
     } finally {
       setIsDeletingComment(null);
     }
   };
 
   const handleDeletePost = async () => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo annuncio?")) return;
+    const ok = await confirm("Sei sicuro di voler eliminare questo annuncio?");
+    if (!ok) return;
     try {
       await axios.delete(`${API_URL}/api/posts/${review._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (onInteraction) onInteraction();
     } catch (err) {
-      alert("Errore durante l'eliminazione dell'annuncio.");
+      toast("Errore durante l'eliminazione dell'annuncio.", "error");
     }
   };
 
@@ -162,7 +164,7 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
   };
 
   const handleLikeComment = async (commentId) => {
-    if (!token) return alert("Devi essere loggato.");
+    if (!token) return toast("Devi essere loggato.", "warning");
     try {
       const res = await axios.post(
         `${API_URL}/api/comments/review/${review._id}/comment/${commentId}/like`,
@@ -204,6 +206,7 @@ function ReviewCard({ review, onInteraction }) {
 
   const token = localStorage.getItem("token");
   const loggedInUserId = token ? jwtDecode(token).user.id : null;
+  const { toast, confirm } = useToast();
 
   const posterBaseUrl = "https://image.tmdb.org/t/p/w500";
   const placeholderPoster =
@@ -295,7 +298,8 @@ function ReviewCard({ review, onInteraction }) {
   } = useReviewInteractions({
     review, onInteraction, token, API_URL, comments, setComments,
     commentText, setCommentText, setIsSubmittingComment, setIsDeletingComment,
-    localHasLoved, setLocalHasLoved, setLocalReactionCount, setLocalCommentCount
+    localHasLoved, setLocalHasLoved, setLocalReactionCount, setLocalCommentCount,
+    toast, confirm
   });
 
   if (!review || !review.user) {

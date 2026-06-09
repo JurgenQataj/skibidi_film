@@ -324,9 +324,9 @@ exports.getMoviesByPerson = async (req, res) => {
     // Usiamo discover per trovare ESATTAMENTE i film under 40 min di questa persona
     // E anche per trovare l'ordine di incasso (Revenue) per Cast e Crew
     // [NUOVO] Fetch person details per biografia e profile path
-    const [creditsResponse, shortsResponse, revenueCastResponse, revenueCrewResponse, personDetailsIt, tvCreditsResponse] = await Promise.all([
+    const [creditsResponse, firstShortsResponse, revenueCastResponse, revenueCrewResponse, personDetailsIt, tvCreditsResponse] = await Promise.all([
       axios.get(`${BASE_URL}/person/${personId}/movie_credits?api_key=${API_KEY}&language=it-IT`),
-      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40`),
+      axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40&page=1`),
       axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_cast=${personId}&sort_by=revenue.desc&page=1`),
       axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_crew=${personId}&sort_by=revenue.desc&page=1`),
       axios.get(`${BASE_URL}/person/${personId}?api_key=${API_KEY}&language=it-IT`), // <-- Dettagli persona (IT)
@@ -348,8 +348,27 @@ exports.getMoviesByPerson = async (req, res) => {
       }
     }
     
-    // Create a Set of IDs for short films for fast lookup
-    const shortMovieIds = new Set(shortsResponse.data.results.map(m => m.id));
+    // Create a Set of IDs for short films for fast lookup (handling up to 5 pages / 100 shorts)
+    const shortMovieIds = new Set(firstShortsResponse.data.results?.map(m => m.id) || []);
+    const totalPages = Math.min(firstShortsResponse.data.total_pages || 1, 5);
+    if (totalPages > 1) {
+      const pagePromises = [];
+      for (let p = 2; p <= totalPages; p++) {
+        pagePromises.push(
+          axios.get(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_people=${personId}&with_runtime.lte=40&page=${p}`)
+        );
+      }
+      try {
+        const extraShortsResponses = await Promise.all(pagePromises);
+        extraShortsResponses.forEach(res => {
+          if (res.data && res.data.results) {
+            res.data.results.forEach(m => shortMovieIds.add(m.id));
+          }
+        });
+      } catch (err) {
+        console.error("Errore nel caricamento delle pagine extra di cortometraggi:", err.message);
+      }
+    }
     
     // Revenue Ranks (Map ID -> Rank)
     const getRevenueRankMap = (list) => {

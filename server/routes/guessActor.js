@@ -232,65 +232,8 @@ function isExcludedBirthplace(p) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function buildDynamicPool() {
-  console.log("[GuessActor] Iniziata la costruzione del pool dei top 300 attori viventi e occidentali...");
-  const actorMap = new Map();
-  
-  // Cerchiamo nelle prime 100 pagine di attori famosi
-  for (let page = 1; page <= 100; page++) {
-
-    try {
-      const listRes = await axios.get(`${TMDB_BASE}/person/popular`, {
-        params: { api_key: TMDB_API_KEY, language: "en-US", page },
-        timeout: 8000,
-      });
-
-      const candidates = listRes.data.results.filter(
-        (p) => p.known_for_department === "Acting" && p.profile_path && !actorMap.has(p.id)
-      );
-
-      for (const c of candidates) {
-        // Rimuoviamo il break early basato solo sulla size, così continuiamo ad aggiungere 
-        // e rimpiazzare attori se ne troviamo di più famosi.
-        try {
-          const d = await axios.get(`${TMDB_BASE}/person/${c.id}`, {
-            params: { api_key: TMDB_API_KEY, language: "it-IT" },
-            timeout: 6000,
-          }).then(r => r.data);
-
-          // Filtra: vivo, con foto, e senza birthplace esclusa (asiatici/nord africa)
-          if (!d.deathday && d.profile_path && !isExcludedBirthplace(d.place_of_birth)) {
-            actorMap.set(d.id, {
-              id: d.id,
-              name: d.name,
-              lastName: getLastWord(d.name),
-              profile_path: d.profile_path,
-              popularity: c.popularity,
-            });
-            
-            // Ordiniamo per popolarità dal più famoso al meno famoso e teniamo solo i top 300
-            dynamicActorPool = [...actorMap.values()]
-              .sort((a, b) => b.popularity - a.popularity)
-              .slice(0, TARGET_POOL_SIZE);
-              
-            // Rimuoviamo dalla mappa quelli scartati per non pesare in memoria
-            actorMap.clear();
-            dynamicActorPool.forEach(actor => actorMap.set(actor.id, actor));
-          }
-          await sleep(100);
-        } catch { /* skip err */ }
-      }
-      
-      await sleep(200);
-    } catch (err) {
-      console.warn(`[GuessActor] Errore pagina TMDB ${page}:`, err.message);
-    }
-  }
-  
-  console.log(`[GuessActor] ✅ Pool completato. Ottenuti ${dynamicActorPool.length} attori da far indovinare.`);
-}
-
-buildDynamicPool().catch(() => {});
+// L'espansione dinamica del pool è stata disabilitata.
+// Il gioco utilizzerà il pool curato (ACTOR_POOL) definito sopra.
 
 // GET /api/guess-actor/session
 router.get("/session", protect, async (req, res) => {

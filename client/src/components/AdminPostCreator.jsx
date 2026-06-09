@@ -3,11 +3,13 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import styles from "./AdminPostCreator.module.css";
+import { useToast } from "../context/ToastContext";
 
 function AdminPostCreator({ onPostCreated }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { toast } = useToast();
   
   const token = localStorage.getItem("token");
   if (!token) return null;
@@ -41,7 +43,7 @@ function AdminPostCreator({ onPostCreated }) {
       setIsExpanded(false); // Chiudi dopo la creazione
     } catch (error) {
       console.error("Errore creazione post:", error);
-      alert("Errore nella creazione del post admin.");
+      toast("Errore nella creazione del post admin.", "error");
     } finally {
       setLoading(false);
     }

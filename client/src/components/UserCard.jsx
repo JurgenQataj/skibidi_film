@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import styles from "./UserCard.module.css";
+import { useToast } from "../context/ToastContext";
 
 const MAX_USERNAME_LENGTH = 11;
 
@@ -22,6 +23,7 @@ const UserCard = ({ user, onNavigate }) => {
 
   const token = localStorage.getItem("token");
   const loggedInUserId = token ? jwtDecode(token).user.id : null;
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!token || !loggedInUserId || loggedInUserId === user._id) return;
@@ -55,7 +57,7 @@ const UserCard = ({ user, onNavigate }) => {
       }
       setIsFollowing(!isFollowing);
     } catch (err) {
-      alert("Errore durante l'operazione");
+      toast("Errore durante l'operazione", "error");
     } finally {
       setLoadingFollow(false);
     }

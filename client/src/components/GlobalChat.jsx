@@ -3,6 +3,7 @@ import axios from 'axios';
 import useAuthStore from "../store/useAuthStore";
 import { jwtDecode } from 'jwt-decode';
 import styles from './GlobalChat.module.css';
+import { useToast } from '../context/ToastContext';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -125,6 +126,7 @@ const GlobalChat = () => {
   const { token } = useAuthStore();
   let user = null;
   if (token) { try { user = jwtDecode(token).user; } catch (e) {} }
+  const { confirm } = useToast();
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -278,7 +280,8 @@ const GlobalChat = () => {
 
   // Delete
   const handleDelete = async (msgId) => {
-    if (!window.confirm('Eliminare questo messaggio?')) return;
+    const ok = await confirm('Eliminare questo messaggio?');
+    if (!ok) return;
     setDeletingId(msgId);
     try {
       const tkn = localStorage.getItem('token');

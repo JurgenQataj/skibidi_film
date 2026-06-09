@@ -7,6 +7,7 @@ import UserCard from "../components/UserCard";
 import Modal from "../components/Modal";
 import { jwtDecode } from "jwt-decode";
 import useAuthStore from "../store/useAuthStore";
+import { useToast } from "../context/ToastContext";
 
 import { FaChartBar, FaListUl, FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
 import { FiMenu, FiSettings, FiTarget, FiBookmark, FiChevronRight } from "react-icons/fi";
@@ -38,7 +39,7 @@ function useProfileActions({
   profile, setProfile, userId, isFollowing, setIsFollowing,
   setStats, setModalData, setEditBio, setEditAvatar,
   setEditEmail, setEditUsername, setIsEditModalOpen,
-  logout, navigate, API_URL
+  logout, navigate, API_URL, toast, confirm
 }) {
   const handleFollowToggle = async () => {
     const token = localStorage.getItem("token");
@@ -57,7 +58,7 @@ function useProfileActions({
         followersCount: prevStats.followersCount + (isFollowing ? -1 : 1),
       }));
     } catch (error) {
-      alert(`Errore durante l'operazione di ${endpoint}`);
+      toast(`Errore durante l'operazione di ${endpoint}`, "error");
     }
   };
 
@@ -70,7 +71,7 @@ function useProfileActions({
         content: response.data,
       });
     } catch (error) {
-      alert(`Errore nel caricamento di ${type}`);
+      toast(`Errore nel caricamento di ${type}`, "error");
     }
   };
 
@@ -98,30 +99,32 @@ function useProfileActions({
       );
       setProfile(updatedProfile.data);
       setIsEditModalOpen(false);
-      alert("Profilo aggiornato!");
+      toast("Profilo aggiornato!", "success");
     } catch (error) {
-      alert(error.response?.data?.message || "Errore durante l'aggiornamento.");
+      toast(error.response?.data?.message || "Errore durante l'aggiornamento.", "error");
     }
   };
 
   const handleDeleteAccount = async () => {
-    const confirmation = window.prompt(
-      "Questa azione è irreversibile. Per confermare, scrivi il tuo username:"
+    const ok = await confirm(
+      "Questa azione è irreversibile. Sei sicuro di voler eliminare il tuo account?"
     );
-    if (confirmation === profile.username) {
+    if (!ok) return;
+    const username = window.prompt("Per confermare, scrivi il tuo username:");
+    if (username === profile.username) {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(`${API_URL}/api/users/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("Account eliminato con successo.");
+        toast("Account eliminato con successo.", "success");
         logout();
         navigate("/login");
       } catch (error) {
-        alert("Errore durante l'eliminazione dell'account.");
+        toast("Errore durante l'eliminazione dell'account.", "error");
       }
-    } else if (confirmation !== null) {
-      alert("Username non corretto. Eliminazione annullata.");
+    } else if (username !== null) {
+      toast("Username non corretto. Eliminazione annullata.", "warning");
     }
   };
 
@@ -174,6 +177,7 @@ function ProfilePage() {
   const [showEditAvatars, setShowEditAvatars] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
+  const { toast, confirm } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -230,7 +234,7 @@ function ProfilePage() {
     profile, setProfile, userId, isFollowing, setIsFollowing,
     setStats, setModalData, setEditBio, setEditAvatar,
     setEditEmail, setEditUsername, setIsEditModalOpen,
-    logout, navigate, API_URL
+    logout, navigate, API_URL, toast, confirm
   });
 
   const handleNavToSettings = () => { setIsSettingsMenuOpen(false); navigate('/settings'); };

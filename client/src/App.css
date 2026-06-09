@@ -223,3 +223,160 @@ a:hover {
   background: linear-gradient(180deg, var(--red-main), var(--violet-main));
 }
 
+/* ══════════════════════════════════════════════════════
+   TOAST NOTIFICATION SYSTEM
+   ══════════════════════════════════════════════════════ */
+
+/* Stack posizionato in basso a destra (desktop) / basso al centro (mobile) */
+.toast-stack {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: 340px;
+  width: calc(100vw - 32px);
+}
+
+@media (max-width: 1024px) {
+  /* Su mobile siamo sopra la bottom navbar (56px) + 16px di padding */
+  .toast-stack {
+    bottom: 82px;
+    right: 50%;
+    transform: translateX(50%);
+    max-width: 90vw;
+    align-items: center;
+  }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #fff;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255,255,255,0.06) inset;
+  pointer-events: all;
+  cursor: pointer;
+  animation: toastIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  border: 1px solid rgba(255,255,255,0.07);
+  line-height: 1.35;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.toast-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.toast-message {
+  flex: 1;
+}
+
+/* Varianti colore */
+.toast-success {
+  background: rgba(0, 180, 100, 0.22);
+  border-color: rgba(0, 210, 100, 0.3);
+}
+.toast-success .toast-icon { color: #00e054; }
+
+.toast-error {
+  background: rgba(215, 38, 56, 0.22);
+  border-color: rgba(229, 9, 20, 0.35);
+}
+.toast-error .toast-icon { color: #e50914; }
+
+.toast-info {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.toast-info .toast-icon { color: rgba(255,255,255,0.7); }
+
+.toast-warning {
+  background: rgba(245, 197, 24, 0.15);
+  border-color: rgba(245, 197, 24, 0.3);
+}
+.toast-warning .toast-icon { color: #f5c518; }
+
+/* ══════════════════════════════════════════════════════
+   CONFIRM MODAL (sostituto di window.confirm)
+   ══════════════════════════════════════════════════════ */
+.toast-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: toastIn 0.18s ease both;
+}
+
+.toast-confirm-box {
+  background: #1a0d22;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
+
+.toast-confirm-msg {
+  color: rgba(255,255,255,0.88);
+  font-size: 0.97rem;
+  line-height: 1.5;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.toast-confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.toast-confirm-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.toast-confirm-cancel {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.75);
+}
+.toast-confirm-cancel:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+.toast-confirm-ok {
+  background: var(--red-main, #a1001c);
+  color: #fff;
+}
+.toast-confirm-ok:hover {
+  background: var(--red-bright, #d72638);
+}

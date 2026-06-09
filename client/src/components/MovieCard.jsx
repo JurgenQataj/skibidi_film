@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 import { FiTrash2 } from "react-icons/fi";
 
-const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate, hideRating = false, forceTmdb = false }) => {
+const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate, hideRating = false, forceTmdb = false, sortBy = "rating_desc" }) => {
   if (!movie) return null;
 
   const movieId    = movie.tmdb_id || movie.id;
@@ -11,7 +11,23 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
   const posterPath = movie.poster_path;
   const isTv       = movie.media_type === "tv";
   const linkPath   = isTv ? `/tv/${movieId}` : `/movie/${movieId}`;
-  const ratingText = movie.vote_average ? Number(movie.vote_average).toFixed(1) : null;
+  
+  let ratingText = movie.vote_average ? Number(movie.vote_average).toFixed(1) : null;
+  let ratingIcon = <span style={{ color: "#e2c77a" }}>★</span>;
+
+  if (!forceTmdb) {
+    if (sortBy === "imdb_desc") {
+      ratingText = (movie.imdb_rating && movie.imdb_rating !== "N/A") ? movie.imdb_rating : "N/A";
+      ratingIcon = <span style={{ color: "#f5c518", fontWeight: "bold", fontSize: "0.8em", marginRight: "3px" }}>IMDb</span>;
+    } else if (sortBy === "rotten_desc") {
+      ratingText = (movie.rotten_tomatoes && movie.rotten_tomatoes !== "N/A") ? movie.rotten_tomatoes : "N/A";
+      ratingIcon = <span style={{ color: "#fa320a", fontSize: "1.1em", marginRight: "3px" }}>🍅</span>;
+    } else if (sortBy === "meta_desc") {
+      ratingText = (movie.metascore && movie.metascore !== "N/A") ? movie.metascore : "N/A";
+      ratingIcon = <span style={{ color: "#66cc33", fontWeight: "bold", fontSize: "0.9em", marginRight: "3px" }}>M</span>;
+    }
+  }
+
   const year       = movie.release_date 
     ? new Date(movie.release_date).getFullYear() 
     : (movie.first_air_date 
@@ -51,7 +67,7 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
           <div className={styles.ratingBadge}>
             {ratingText && (
               <>
-                <span style={{ color: "#e2c77a" }}>★</span>
+                {ratingIcon}
                 {ratingText}
               </>
             )}

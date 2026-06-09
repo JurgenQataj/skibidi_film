@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import { Home, Search, Compass, Tv2, Gamepad2, UserRound } from "lucide-react";
+import { Home, Search, Compass, Tv2, Gamepad2, UserRound, Bookmark } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
 function Navbar() {
@@ -61,9 +61,9 @@ function Navbar() {
             <Compass size={20} strokeWidth={1.5} />
             <span>Scopri</span>
           </Link>
-          <Link to="/horizon" className={`${styles.navLink} ${isActive("/horizon") ? styles.navLinkActive : ""}`}>
-            <Tv2 size={20} strokeWidth={1.5} />
-            <span>Horizon</span>
+          <Link to="/watchlist" className={`${styles.navLink} ${isActive("/watchlist") ? styles.navLinkActive : ""}`}>
+            <Bookmark size={20} strokeWidth={1.5} />
+            <span>Watchlist</span>
           </Link>
           <Link to="/rating-game" className={`${styles.navLink} ${isActive("/rating-game") ? styles.navLinkActive : ""}`}>
             <Gamepad2 size={20} strokeWidth={1.5} />

@@ -30,19 +30,38 @@ async function enrichWithOmdbRatings(items) {
     return id && !cacheMap.has(`${id}-${mType}`);
   });
 
-  // 4. Fetch da OMDb per i mancanti in parallelo
-  await Promise.all(missingItems.map(async (item) => {
+  // 4. Fetch da OMDb per i mancanti (in sequenza per evitare Rate Limit di TMDB)
+  for (const item of missingItems) {
     try {
       const id = item.tmdb_id || item.id;
       const mType = item.media_type || 'movie';
-      const title = item.title || item.name;
-      const yearStr = item.release_date || item.first_air_date || item.release_year;
-      const year = yearStr ? new Date(yearStr).getFullYear() : "";
+      
+      // 4.1 Recupera imdb_id da TMDB per essere accurati al 100%
+      const TMDB_API_KEY = process.env.TMDB_API_KEY;
+      const tmdbUrl = `https://api.themoviedb.org/3/${mType}/${id}/external_ids?api_key=${TMDB_API_KEY}`;
+      let imdbId = null;
+      try {
+        const tmdbRes = await axios.get(tmdbUrl);
+        imdbId = tmdbRes.data.imdb_id;
+      } catch (err) {
+        console.error(`TMDB error fetching external_ids for ${mType} ${id}:`, err.message);
+      }
 
-      if (!title) return;
-
-      const url = `http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(title)}&y=${year}&type=${mType === 'tv' ? 'series' : 'movie'}`;
-      const res = await axios.get(url);
+      let res = { data: { Response: "False" } };
+      
+      if (imdbId) {
+        const url = `http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&i=${imdbId}`;
+        res = await axios.get(url);
+      } else {
+        // Fallback: search by title if no imdbId
+        const title = item.title || item.name;
+        const yearStr = item.release_date || item.first_air_date || item.release_year;
+        const year = yearStr ? new Date(yearStr).getFullYear() : "";
+        if (title) {
+          const fallbackUrl = `http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(title)}&y=${year}&type=${mType === 'tv' ? 'series' : 'movie'}`;
+          res = await axios.get(fallbackUrl);
+        }
+      }
 
       if (res.data && res.data.Response !== "False") {
         let rotten = null;
@@ -82,10 +101,14 @@ async function enrichWithOmdbRatings(items) {
         );
         cacheMap.set(`${id}-${mType}`, emptyCache);
       }
+      
+      // Delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
     } catch (err) {
       console.error(`Errore fetch OMDb per ${item.title || item.name}:`, err.message);
     }
-  }));
+  }
 
   // 5. Arricchisci gli items originali restituendo il nuovo array
   // Importante: per i mongoose document (.toObject()) o JSON classici
@@ -101,7 +124,8 @@ async function enrichWithOmdbRatings(items) {
       return {
         ...rawItem,
         imdb_rating: cached.imdb_rating,
-        rotten_tomatoes: cached.rotten_tomatoes
+        rotten_tomatoes: cached.rotten_tomatoes,
+        metascore: cached.metascore
       };
     }
     return rawItem;

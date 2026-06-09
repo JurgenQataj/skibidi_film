@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { useToast } from "../context/ToastContext";
 
 /**
  * Hook condiviso per la pagina di dettaglio film/serie TV.
@@ -10,6 +11,7 @@ import { jwtDecode } from "jwt-decode";
 export function useMediaDetail(mediaType) {
   const { tmdbId } = useParams();
   const navigate = useNavigate();
+  const { toast, confirm } = useToast();
 
   const [media, setMedia] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
@@ -101,8 +103,8 @@ export function useMediaDetail(mediaType) {
   }, [fetchData]);
 
   const handleDeleteReview = async (reviewId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare la tua recensione?"))
-      return;
+    const ok = await confirm("Sei sicuro di voler eliminare la tua recensione?");
+    if (!ok) return;
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API_URL}/api/reviews/${reviewId}`, {
@@ -110,7 +112,7 @@ export function useMediaDetail(mediaType) {
       });
       fetchData();
     } catch (error) {
-      alert("Errore durante l'eliminazione della recensione.");
+      toast("Errore durante l'eliminazione della recensione.", "error");
     }
   };
 
@@ -125,7 +127,7 @@ export function useMediaDetail(mediaType) {
       }
       setIsInWatchlist(!isInWatchlist);
     } catch (error) {
-      alert("Errore nell'aggiornamento della watchlist.");
+      toast("Errore nell'aggiornamento della watchlist.", "error");
     }
   };
 
@@ -137,11 +139,12 @@ export function useMediaDetail(mediaType) {
         { tmdbId, mediaType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert(successMessage);
+      toast(successMessage, "success");
       setShowLists(false);
     } catch (error) {
-      alert(
-        error.response?.data?.message || "Errore durante l'aggiunta alla lista."
+      toast(
+        error.response?.data?.message || "Errore durante l'aggiunta alla lista.",
+        "error"
       );
     }
   };
@@ -163,7 +166,7 @@ export function useMediaDetail(mediaType) {
         ),
       }));
     } catch (error) {
-      alert("Errore durante l'invio della reazione.");
+      toast("Errore durante l'invio della reazione.", "error");
     }
   };
 
@@ -198,13 +201,13 @@ export function useMediaDetail(mediaType) {
       setActiveComments({ reviewId, comments: response.data || [] });
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.message || "Errore");
+      toast(error.response?.data?.message || "Errore", "error");
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo commento?"))
-      return;
+    const ok = await confirm("Sei sicuro di voler eliminare questo commento?");
+    if (!ok) return;
     const token = localStorage.getItem("token");
     try {
       await axios.delete(
@@ -220,7 +223,7 @@ export function useMediaDetail(mediaType) {
       });
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.message || "Errore");
+      toast(error.response?.data?.message || "Errore", "error");
     }
   };
 

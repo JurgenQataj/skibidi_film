@@ -8,6 +8,9 @@ import { SkeletonMovieCard, SkeletonWithLogo } from "../components/Skeleton";
 import SkibidiRoulette from "../components/SkibidiRoulette";
 import RussianRoulette from "../components/RussianRoulette";
 import CustomSelect from "../components/CustomSelect";
+import { useToast } from "../context/ToastContext";
+import ImportListModal from "../components/ImportListModal";
+import { Download } from "lucide-react";
 function getUserId(routeUserId) {
   try {
     const token = localStorage.getItem("token");
@@ -26,7 +29,9 @@ function WatchlistPage() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [isOwner, setIsOwner] = useState(true);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL || "";
+  const { toast, confirm } = useToast();
 
   const [selectedGenres, setSelectedGenres] = useState(() => {
     try {
@@ -44,6 +49,43 @@ function WatchlistPage() {
     }
   });
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const [selectedType, setSelectedType] = useState(() => {
+    try { return sessionStorage.getItem(`watchlistSelectedType_${userIdKey}`) || "all"; } catch (e) { return "all"; }
+  });
+
+  const [selectedRuntime, setSelectedRuntime] = useState(() => {
+    try { return sessionStorage.getItem(`watchlistSelectedRuntime_${userIdKey}`) || "all"; } catch (e) { return "all"; }
+  });
+  
+  const [sortBy, setSortBy] = useState(() => {
+    try { return sessionStorage.getItem(`watchlistSortBy_${userIdKey}`) || "recent"; } catch (e) { return "recent"; }
+  });
+
+  const typeOptions = [
+    { value: "all", name: "Tutti" },
+    { value: "movie", name: "Film" },
+    { value: "tv", name: "Serie TV" }
+  ];
+
+  const runtimeOptions = [
+    { value: "all", name: "Tutte" },
+    { value: "short", name: "Breve (< 90 min)" },
+    { value: "medium", name: "Medio (90 - 120 min)" },
+    { value: "long", name: "Lungo (120 - 180 min)" },
+    { value: "epic", name: "Epico (> 180 min)" }
+  ];
+
+  const sortOptions = [
+    { value: "recent", name: "Aggiunti di recente" },
+    { value: "oldest", name: "Aggiunti prima" },
+    { value: "rating_desc", name: "Voto TMDB" },
+    { value: "imdb_desc", name: "Voto IMDb" },
+    { value: "rotten_desc", name: "Rotten Tomatoes" },
+    { value: "meta_desc", name: "Metacritic" },
+    { value: "year_desc", name: "Anno (Nuovi prima)" },
+    { value: "year_asc", name: "Anno (Vecchi prima)" },
+  ];
 
   const availableGenres = useMemo(() => {
     const genresSet = new Set();
@@ -79,7 +121,11 @@ function WatchlistPage() {
   }, [availableKeywords, selectedKeyword]);
 
   const filteredWatchlist = useMemo(() => {
-    return watchlist.filter((movie) => {
+    let result = watchlist.filter((movie) => {
+      if (selectedType !== "all") {
+        const type = movie.media_type || "movie";
+        if (type !== selectedType) return false;
+      }
       if (selectedGenres && selectedGenres.length > 0) {
         if (!movie.genres) return false;
         const hasAllGenres = selectedGenres.every((genre) => movie.genres.includes(genre));
@@ -91,9 +137,59 @@ function WatchlistPage() {
         const hasKeywordMatch = movie.keywords.some(k => k.toLowerCase().includes(lowerSearch));
         if (!hasKeywordMatch) return false;
       }
+      if (selectedRuntime !== "all") {
+        const rt = movie.runtime || 0;
+        if (rt === 0) return false;
+        if (selectedRuntime === "short" && rt >= 90) return false;
+        if (selectedRuntime === "medium" && (rt < 90 || rt > 120)) return false;
+        if (selectedRuntime === "long" && (rt <= 120 || rt > 180)) return false;
+        if (selectedRuntime === "epic" && rt <= 180) return false;
+      }
       return true;
     });
-  }, [watchlist, selectedGenres, selectedKeyword]);
+
+    const getImdb = (v) => {
+      if (!v) return -1;
+      const str = String(v).toUpperCase();
+      if (str === "N/A" || str === "NULL") return -1;
+      const num = parseFloat(str);
+      return isNaN(num) ? -1 : num;
+    };
+    
+    const getRotten = (v) => {
+      if (!v) return -1;
+      const str = String(v).toUpperCase();
+      if (str === "N/A" || str === "NULL") return -1;
+      const num = parseInt(str.replace("%", ""), 10);
+      return isNaN(num) ? -1 : num;
+    };
+
+    const getMeta = (v) => {
+      if (!v) return -1;
+      const str = String(v).toUpperCase();
+      if (str === "N/A" || str === "NULL") return -1;
+      const num = parseInt(str, 10);
+      return isNaN(num) ? -1 : num;
+    };
+
+    if (sortBy === "rating_desc") {
+      result.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
+    } else if (sortBy === "imdb_desc") {
+      result.sort((a, b) => getImdb(b.imdb_rating) - getImdb(a.imdb_rating));
+    } else if (sortBy === "rotten_desc") {
+      result.sort((a, b) => getRotten(b.rotten_tomatoes) - getRotten(a.rotten_tomatoes));
+    } else if (sortBy === "meta_desc") {
+      result.sort((a, b) => getMeta(b.metascore) - getMeta(a.metascore));
+    } else if (sortBy === "year_desc") {
+      result.sort((a, b) => (b.release_year || 0) - (a.release_year || 0));
+    } else if (sortBy === "year_asc") {
+      result.sort((a, b) => (a.release_year || 0) - (b.release_year || 0));
+    } else if (sortBy === "recent") {
+      result.reverse();
+    }
+
+    return result;
+  }, [watchlist, selectedGenres, selectedKeyword, selectedType, sortBy, selectedRuntime]);
 
   const fetchWatchlist = useCallback(async () => {
     try {
@@ -142,6 +238,18 @@ function WatchlistPage() {
     } catch (e) {}
   }, [selectedKeyword, userIdKey]);
 
+  useEffect(() => {
+    try { sessionStorage.setItem(`watchlistSelectedType_${userIdKey}`, selectedType); } catch (e) {}
+  }, [selectedType, userIdKey]);
+
+  useEffect(() => {
+    try { sessionStorage.setItem(`watchlistSelectedRuntime_${userIdKey}`, selectedRuntime); } catch (e) {}
+  }, [selectedRuntime, userIdKey]);
+
+  useEffect(() => {
+    try { sessionStorage.setItem(`watchlistSortBy_${userIdKey}`, sortBy); } catch (e) {}
+  }, [sortBy, userIdKey]);
+
   // Ripristina la posizione dello scroll PRIMA che il browser dipinga (nessun flash visivo)
   useLayoutEffect(() => {
     if (!loading && watchlist.length > 0) {
@@ -157,12 +265,8 @@ function WatchlistPage() {
 
   // *** CORREZIONE 1: Funzione per rimuovere un film dalla watchlist ***
   const handleRemoveFromWatchlist = async (tmdbId) => {
-    if (
-      !window.confirm(
-        "Sei sicuro di voler rimuovere questo film dalla watchlist?"
-      )
-    )
-      return;
+    const ok = await confirm("Sei sicuro di voler rimuovere questo film dalla watchlist?");
+    if (!ok) return;
     try {
       const token = localStorage.getItem("token");
       const movieToRemove = watchlist.find(m => m.tmdb_id === tmdbId);
@@ -171,10 +275,9 @@ function WatchlistPage() {
       await axios.delete(`${API_URL}/api/watchlist/${tmdbId}?mediaType=${mediaType}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Aggiorna lo stato per rimuovere il film senza ricaricare la pagina
       setWatchlist((prev) => prev.filter((movie) => movie.tmdb_id !== tmdbId));
     } catch (error) {
-      alert("Errore durante la rimozione del film.");
+      toast("Errore durante la rimozione del film.", "error");
     }
   };
 
@@ -183,13 +286,34 @@ function WatchlistPage() {
   return (
     <div className={styles.pageContainer}>
       <header className={styles.header}>
-        <h1 className={styles.title}>
-          <span><span className={styles.usernameHighlight}>{username}'s</span> Watchlist</span>
-          <span className={styles.movieCountBadge}>{watchlist.length} Film</span>
-        </h1>
+        <div className={styles.headerTop}>
+          <h1 className={styles.title}>
+            <span><span className={styles.usernameHighlight}>{username}'s</span> Watchlist</span>
+            <span className={styles.movieCountBadge}>{watchlist.length} Film</span>
+          </h1>
+          {isOwner && (
+            <button 
+              className={styles.importListBtn} 
+              onClick={() => setIsImportModalOpen(true)}
+            >
+              <Download size={16} />
+              Importa da altre Liste
+            </button>
+          )}
+        </div>
       </header>
 
       <div className={styles.filterContainer}>
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Tipo:</label>
+          <CustomSelect 
+            options={typeOptions}
+            value={selectedType} 
+            onChange={setSelectedType}
+            placeholder="Tutti"
+            multiple={false}
+          />
+        </div>
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel}>Generi:</label>
           <CustomSelect 
@@ -198,6 +322,26 @@ function WatchlistPage() {
             onChange={setSelectedGenres}
             placeholder="Tutti i generi"
             multiple={true}
+          />
+        </div>
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Ordina per:</label>
+          <CustomSelect 
+            options={sortOptions}
+            value={sortBy} 
+            onChange={setSortBy}
+            placeholder="Aggiunti di recente"
+            multiple={false}
+          />
+        </div>
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Durata:</label>
+          <CustomSelect 
+            options={runtimeOptions}
+            value={selectedRuntime} 
+            onChange={setSelectedRuntime}
+            placeholder="Tutte"
+            multiple={false}
           />
         </div>
         <div className={styles.filterGroup} style={{ position: 'relative' }}>
@@ -250,6 +394,7 @@ function WatchlistPage() {
               <MovieCard
                 movie={movie}
                 showDeleteButton={isOwner}
+                sortBy={sortBy}
                 onDelete={handleRemoveFromWatchlist}
                 onBeforeNavigate={() => {
                   try {
@@ -266,6 +411,13 @@ function WatchlistPage() {
 
       <RussianRoulette watchlist={watchlist} />
       <SkibidiRoulette watchlist={watchlist} />
+
+      <ImportListModal 
+        isOpen={isImportModalOpen} 
+        onClose={() => setIsImportModalOpen(false)} 
+        targetListId="watchlist"
+        onSuccess={fetchWatchlist}
+      />
     </div>
   );
 }

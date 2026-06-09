@@ -6,6 +6,7 @@ import useAuthStore from "../store/useAuthStore";
 import { jwtDecode } from "jwt-decode";
 import styles from "./GoalsPage.module.css";
 import { FiTarget, FiPlus, FiArrowLeft, FiTrash2 } from "react-icons/fi";
+import { useToast } from "../context/ToastContext";
 
 function GoalsPage() {
   const { userId } = useParams();
@@ -33,6 +34,7 @@ function GoalsPage() {
 
   const isOwnProfile = loggedInUserId === userId;
   const API_URL = import.meta.env.VITE_API_URL || "";
+  const { confirm } = useToast();
 
   useEffect(() => {
     fetchGoals();
@@ -76,7 +78,8 @@ function GoalsPage() {
   };
 
   const handleDeleteGoal = async (goalId) => {
-    if (!window.confirm("Vuoi davvero eliminare questo obiettivo?")) return;
+    const ok = await confirm("Vuoi davvero eliminare questo obiettivo?");
+    if (!ok) return;
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API_URL}/api/users/goals/${goalId}`, {

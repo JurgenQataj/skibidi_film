@@ -26,6 +26,10 @@ const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
     const dateStr = mediaType === "tv" ? movieData.first_air_date : movieData.release_date;
     const release_year = dateStr ? new Date(dateStr).getFullYear() : null;
     
+    const runtime = mediaType === "tv"
+      ? (movieData.episode_run_time && movieData.episode_run_time.length > 0 ? movieData.episode_run_time[0] : 0)
+      : (movieData.runtime || 0);
+    
     movie = new Movie({
       tmdb_id: movieData.id,
       media_type: mediaType,
@@ -34,7 +38,8 @@ const findOrCreateMovie = async (tmdbId, mediaType = "movie") => {
       genres,
       keywords,
       release_year,
-      vote_average: movieData.vote_average
+      vote_average: movieData.vote_average,
+      runtime
     });
 
     try {
@@ -67,6 +72,33 @@ exports.addToWatchlist = async (req, res) => {
   } catch (error) {
     console.error("Errore add watchlist:", error);
     res.status(500).json({ message: "Errore server." });
+  }
+};
+
+exports.addBatchToWatchlist = async (req, res) => {
+  const { movies } = req.body; // array of { tmdbId, mediaType }
+  const userId = req.user.id;
+
+  if (!movies || !Array.isArray(movies) || movies.length === 0) {
+    return res.status(400).json({ message: "Nessun film fornito." });
+  }
+
+  try {
+    const movieIds = [];
+    for (const item of movies) {
+      if (!item.tmdbId) continue;
+      const movie = await findOrCreateMovie(item.tmdbId, item.mediaType || "movie");
+      movieIds.push(movie._id);
+    }
+
+    if (movieIds.length > 0) {
+      await User.findByIdAndUpdate(userId, { $addToSet: { watchlist: { $each: movieIds } } });
+    }
+
+    res.status(200).json({ message: `${movieIds.length} elementi aggiunti alla watchlist.` });
+  } catch (error) {
+    console.error("Errore addBatchToWatchlist:", error);
+    res.status(500).json({ message: "Errore server durante l'aggiunta multipla." });
   }
 };
 

@@ -8,6 +8,7 @@ import { SkeletonMovieCard } from "../components/Skeleton";
 import { FiBookmark, FiSliders, FiCalendar, FiAward, FiTrendingUp } from "react-icons/fi";
 import { FaBookmark } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "../context/ToastContext";
 
 function PersonPage() {
   const { name } = useParams();
@@ -60,6 +61,7 @@ function PersonPage() {
 
   const API_URL = import.meta.env.VITE_API_URL || "";
   const decodedName = decodeURIComponent(name);
+  const { toast } = useToast();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -107,7 +109,7 @@ function PersonPage() {
       }
     } catch (error) {
       console.error("Errore durante il salvataggio persona:", error);
-      alert("Errore durante il salvataggio.");
+      toast("Errore durante il salvataggio.", "error");
     }
   };
 
@@ -119,27 +121,37 @@ function PersonPage() {
 
   const filterMovies = (list) => {
     let filtered = [...list];
-    if (showOnlyRated) filtered = filtered.filter((m) => m.vote_average && m.vote_average > 0);
-    if (hideDocumentaries) filtered = filtered.filter((m) => !m.genre_ids?.includes(99));
+    if (showOnlyRated) {
+      filtered = filtered.filter((m) => m.vote_count && m.vote_count > 0 && m.vote_average && m.vote_average > 0);
+    }
+    if (hideDocumentaries) {
+      filtered = filtered.filter((m) => !m.genre_ids?.includes(99));
+    }
     if (hideObscure) {
       filtered = filtered.filter((m) => {
+        // Filter out TV shows by genre: News (10763), Reality (10764), Soap (10766), Talk (10767)
+        if (m.genre_ids?.some(id => [10763, 10764, 10766, 10767].includes(id))) return false;
+
         const char = (m.character || "").toLowerCase();
         const title = (m.title || "").toLowerCase();
         const badRoleKeywords = [
           "sconosciuto", "unknown", "uncredited", "non accreditato", "uncredited role",
           "himself", "herself", "self", "se stesso", "se stessa",
-          "host", "presenter", "presentatore", "guest", "ospite", "narrator", "narratore"
+          "host", "presenter", "presentatore", "guest", "ospite", "narrator", "narratore",
+          "cameo", "extra", "background", "audience", "archive"
         ];
         if (badRoleKeywords.some(w =>
           char === w || char.startsWith(w + " ") || char.endsWith(" " + w) ||
           char.includes("(" + w + ")") || char === "guest star"
         )) return false;
+
         const currentYear = new Date().getFullYear();
         const releaseYear = m.release_date ? new Date(m.release_date).getFullYear() : null;
         const isRecent = releaseYear && releaseYear >= currentYear - 1;
         const hasNoVotes = !m.vote_count || m.vote_count === 0;
         const isVeryLowPopularity = m.popularity !== undefined && m.popularity < 1.5;
         if (hasNoVotes && isVeryLowPopularity && !isRecent) return false;
+
         const badTitleKeywords = [
           "the tonight show", "jimmy kimmel", "late night", "live with",
           "the oscars", "academy awards", "golden globe", "behind the scenes",
@@ -149,7 +161,9 @@ function PersonPage() {
         return true;
       });
     }
-    if (hideShorts) filtered = filtered.filter((m) => !m.is_short);
+    if (hideShorts) {
+      filtered = filtered.filter((m) => !m.is_short);
+    }
     if (sortBy === "revenue") {
       filtered.sort((a, b) => (a.revenue_rank || 10000) - (b.revenue_rank || 10000));
     } else if (sortBy === "vote_count") {

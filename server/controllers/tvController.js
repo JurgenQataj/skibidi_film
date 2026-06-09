@@ -110,7 +110,7 @@ exports.getTvDetails = async (req, res) => {
   }
   const safeTmdbId = parseInt(tmdbId, 10);
 
-  const url = `${BASE_URL}/tv/${safeTmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos,watch/providers`;
+  const url = `${BASE_URL}/tv/${safeTmdbId}?api_key=${API_KEY}&language=it-IT&append_to_response=credits,recommendations,videos,watch/providers,external_ids`;
   
   try {
     const response = await axios.get(url);
@@ -133,6 +133,25 @@ exports.getTvDetails = async (req, res) => {
       release_date: item.first_air_date,
       media_type: "tv"
     }));
+
+    let omdbData = null;
+    const imdbId = data.external_ids?.imdb_id;
+    if (imdbId) {
+      try {
+        const OMDB_API_KEY = process.env.OMDB_API_KEY || "f816b1d6";
+        const omdbRes = await axios.get(`http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&i=${imdbId}`);
+        if (omdbRes.data && omdbRes.data.Response !== "False") {
+          omdbData = {
+            ratings: omdbRes.data.Ratings || [],
+            awards: omdbRes.data.Awards || "N/A",
+            rated: omdbRes.data.Rated || "N/A",
+            boxOffice: omdbRes.data.BoxOffice || "N/A"
+          };
+        }
+      } catch (e) {
+        console.error("Errore fetch OMDb per TV:", e.message);
+      }
+    }
 
     res.json({
       id: data.id,
@@ -164,6 +183,7 @@ exports.getTvDetails = async (req, res) => {
       },
       production_companies: data.production_companies || [], // [NUOVO]
       production_countries: data.production_countries || [], // [NUOVO]
+      omdb_data: omdbData, // Aggiunto fetch OMDB per TV Shows
     });
   } catch (error) {
     if (error.response && error.response.status === 404) {

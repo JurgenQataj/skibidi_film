@@ -371,8 +371,6 @@ function isExcludedBirthplace(p) {
 
 // ─── POOL CACHED IN MEMORIA ──────────────────────────────────────────────────
 let actorPool = [];
-let poolBuiltAt = 0;
-const POOL_TTL_MS = 12 * 60 * 60 * 1000;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -398,100 +396,44 @@ function isValidActor(d) {
   return d.birthday && !d.deathday && d.profile_path && !isExcludedBirthplace(d.place_of_birth);
 }
 
-/**
- * Avvia il riempimento del pool in background (Fase 2).
- * Esplora fno a 100 pagine, prelevando tutti gli attori con popularity decente
- * e aggiungendoli *in diretta* ad actorPool.
- */
+/* 
+ * L'espansione del pool (Fase 2) è stata disabilitata per non intasare il terminale
+ * e non fare 2000+ richieste a TMDB ad ogni riavvio del server.
 async function hydratePoolInBg(actorMap) {
-  console.log("[ActorAgeGame] Iniziata l'espansione del pool in background (fino a 100 pagine TMDB)...");
-
-  for (let page = 1; page <= 100; page++) {
-    try {
-      const listRes = await axios.get(`${TMDB_BASE}/person/popular`, {
-        params: { api_key: TMDB_API_KEY, language: "en-US", page },
-        timeout: 8000,
-      });
-
-      const candidates = listRes.data.results.filter(
-        (p) =>
-          p.known_for_department === "Acting" &&
-          p.profile_path &&
-          p.popularity >= 10 &&
-          !actorMap.has(p.id)
-      );
-
-      for (const c of candidates) {
-        try {
-          const d = await fetchPersonDetail(c.id);
-          if (isValidActor(d)) {
-            const newActor = formatActor(d.id, d, c.popularity);
-            actorMap.set(d.id, newActor);
-            
-            // Aggiunge dinamicamente all'array in memoria!
-            // In questo modo il gioco vede l'array ingrandirsi partita dopo partita.
-            actorPool.push(newActor);
-          }
-          await sleep(150); // Pausa onesta per il rate-limiting
-        } catch { /* ignoriamo fallimenti singoli */ }
-      }
-
-      await sleep(300); // Pausa più lunga tra una pagina e l'altra
-
-      // Log occasionale per mostrare la crescita senza inondare il terminale
-      if (page % 10 === 0) {
-        console.log(`[ActorAgeGame] Hydration in corso... Pagina ${page}/100 completata. Pool attuale: ${actorPool.length}`);
-      }
-
-    } catch (err) {
-      console.warn(`[ActorAgeGame] Errore silente a pagina TMDB ${page}:`, err.message);
-    }
-  }
-
-  console.log(`[ActorAgeGame] ✅ Hydration conclusa. Pool finale generato in background: ${actorPool.length} attori.`);
+  // ...
 }
+*/
 
 /**
- * Costruisce la base solida ("Fase 1") bloccando lo strato minimo per poter giocare sùbito.
+ * Costruisce la base solida ("Fase 1") in background in modo non bloccante.
  * Contiene i TMDB IDs famosi e curati (~150).
  */
 async function buildPoolCore() {
-  console.log("[ActorAgeGame] Caricamento Base Pool (Lista Curata Estesa)...");
+  // console.log("[ActorAgeGame] Caricamento Base Pool in background...");
   const actorMap = new Map();
 
   const uniqueIds = [...new Set(CURATED_ACTOR_IDS)];
   for (const id of uniqueIds) {
     try {
       const d = await fetchPersonDetail(id);
-      if (isValidActor(d)) actorMap.set(d.id, formatActor(d.id, d, d.popularity));
-      await sleep(100);
+      if (isValidActor(d)) {
+        const formatted = formatActor(d.id, d, d.popularity);
+        actorMap.set(d.id, formatted);
+        
+        // Aggiungiamo all'array in memoria man mano che li carichiamo per renderlo giocabile sùbito
+        if (!actorPool.some(a => a.id === d.id)) {
+          actorPool.push(formatted);
+        }
+      }
+      await sleep(150);
     } catch { /* skip err */ }
   }
 
-  if (actorMap.size >= 4) {
-    actorPool = [...actorMap.values()];
-    poolBuiltAt = Date.now();
-    console.log(`[ActorAgeGame] Base pronta! Giocabile da SUBITO con ${actorPool.length} attori Top.`);
-    
-    // Ora avvia il riempimento asincrono massiccio
-    // .catch previene qualsiasi crash dal propagarsi
-    hydratePoolInBg(actorMap).catch(e => console.error("Bg hydrate fail:", e.message));
-  } else {
-    console.warn("[ActorAgeGame] Pool curato troppo piccolo. Fallimento critico?");
-  }
-}
-
-let poolBuildAttempts = 0;
-const MAX_POOL_BUILD_ATTEMPTS = 3;
-
-async function ensurePool() {
-  const expired = Date.now() - poolBuiltAt > POOL_TTL_MS;
-  if (actorPool.length >= 4 && !expired) return;
-  if (poolBuildAttempts >= MAX_POOL_BUILD_ATTEMPTS) return;
-  poolBuildAttempts++;
-  await buildPoolCore();
-  if (actorPool.length >= 4) poolBuildAttempts = 0;
-  else await sleep(10_000);
+  // console.log(`[ActorAgeGame] Base pronta! Caricati ${actorPool.length} attori Top.`);
+  
+  // Ora avvia il riempimento asincrono massiccio
+  // Disabilitato per evitare rate-limits e console spam
+  // hydratePoolInBg(actorMap).catch(e => console.error("Bg hydrate fail:", e.message));
 }
 
 buildPoolCore().catch(() => {});
@@ -511,15 +453,35 @@ function getAgeFromBirthday(birthday) {
 
 router.get("/pair", async (req, res) => {
   try {
-    await ensurePool();
-    if (actorPool.length < 4) {
-      return res.status(503).json({ error: "Pool in costruzione, riprova tra qualche secondo." });
+    let currentPool = actorPool;
+
+    // Fallback rapido all'avvio: se il pool in memoria non ha ancora abbastanza elementi,
+    // carichiamo 10 attori curati a caso in parallelo sul momento
+    if (currentPool.length < 4) {
+      console.log("[ActorAgeGame] Pool non pronto all'avvio, eseguo caricamento rapido di fallback...");
+      const uniqueIds = [...new Set(CURATED_ACTOR_IDS)];
+      const shuffledIds = [...uniqueIds].sort(() => 0.5 - Math.random()).slice(0, 10);
+      const settled = await Promise.allSettled(shuffledIds.map(id => fetchPersonDetail(id)));
+      
+      const tempPool = [];
+      settled.forEach(r => {
+        if (r.status === "fulfilled" && isValidActor(r.value)) {
+          tempPool.push(formatActor(r.value.id, r.value, r.value.popularity));
+        }
+      });
+      
+      if (tempPool.length >= 4) {
+        currentPool = tempPool;
+      } else {
+        return res.status(503).json({ error: "Pool in costruzione, riprova tra qualche secondo." });
+      }
     }
+
     const excludeIds = req.query.exclude
       ? req.query.exclude.split(",").map(Number).filter(Boolean)
       : [];
-    let available = actorPool.filter((a) => !excludeIds.includes(a.id));
-    if (available.length < 2) available = actorPool;
+    let available = currentPool.filter((a) => !excludeIds.includes(a.id));
+    if (available.length < 2) available = currentPool;
     const actorA = available[crypto.randomInt(0, available.length)];
     const ageA = getAgeFromBirthday(actorA.birthday);
 

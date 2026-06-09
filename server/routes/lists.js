@@ -9,6 +9,7 @@ router.post('/', protect, listController.createList);
 router.get('/:listId', listController.getListDetails); // Questa è pubblica, ok senza protect
 router.delete('/:listId', protect, listController.deleteList);
 router.post('/:listId/movies', protect, listController.addMovieToList);
+router.post('/:listId/batch', protect, listController.addBatchToList);
 router.delete('/:listId/movies/:tmdbId', protect, listController.removeMovieFromList);
 
 module.exports = router;

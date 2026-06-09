@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import styles from "./MyListsPage.module.css";
 import { FaPlus, FaTrash, FaFilm, FaBookmark, FaHourglassHalf } from "react-icons/fa";
 import { SkeletonListCard, SkeletonWithLogo } from "../components/Skeleton";
+import { useToast } from "../context/ToastContext";
 
 function MyListsPage() {
   const [lists, setLists] = useState([]);
@@ -14,6 +15,7 @@ function MyListsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || "";
+  const { toast, confirm } = useToast();
 
   const fetchLists = useCallback(async () => {
     try {
@@ -46,21 +48,21 @@ function MyListsPage() {
       setIsFormOpen(false);
       fetchLists();
     } catch (error) {
-      alert(error.response?.data?.message || "Errore nella creazione.");
+      toast(error.response?.data?.message || "Errore nella creazione.", "error");
     }
   };
 
   const handleDeleteList = async (listId) => {
-    if (window.confirm("Sei sicuro di voler eliminare questa lista?")) {
-      try {
-        const token = localStorage.getItem("token");
-        await axios.delete(`${API_URL}/api/lists/${listId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        fetchLists();
-      } catch (error) {
-        alert(error.response?.data?.message || "Errore durante l'eliminazione.");
-      }
+    const ok = await confirm("Sei sicuro di voler eliminare questa lista?");
+    if (!ok) return;
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/api/lists/${listId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchLists();
+    } catch (error) {
+      toast(error.response?.data?.message || "Errore durante l'eliminazione.", "error");
     }
   };
 

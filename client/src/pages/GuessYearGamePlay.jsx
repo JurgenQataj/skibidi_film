@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./GuessYearGamePlay.module.css";
 import { FaArrowLeft } from "react-icons/fa";
+import { useToast } from "../context/ToastContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
 function GuessYearGamePlay() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [session, setSession] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -57,7 +59,7 @@ function GuessYearGamePlay() {
       }));
     } catch (err) {
       console.error("Errore avvio partita guess-year:", err);
-      alert("Errore caricamento partita. Riprova.");
+      toast("Errore caricamento partita. Riprova.", "error");
       navigate("/guess-year");
     } finally {
       setLoading(false);
