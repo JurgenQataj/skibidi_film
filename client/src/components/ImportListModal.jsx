@@ -4,6 +4,7 @@ import Modal from "./Modal";
 import { useToast } from "../context/ToastContext";
 import styles from "./ImportListModal.module.css";
 import { jwtDecode } from "jwt-decode";
+import { ChevronRight } from "lucide-react";
 
 export default function ImportListModal({ isOpen, onClose, targetListId, onSuccess }) {
   const [step, setStep] = useState(1); // 1: Select User, 2: Select List, 3: Select Movies
@@ -11,6 +12,7 @@ export default function ImportListModal({ isOpen, onClose, targetListId, onSucce
   
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchUserQuery, setSearchUserQuery] = useState("");
   
   const [lists, setLists] = useState([]);
   const [selectedList, setSelectedList] = useState(null);
@@ -126,14 +128,15 @@ export default function ImportListModal({ isOpen, onClose, targetListId, onSucce
       onClose();
     } catch (error) {
       console.error("Errore importazione:", error);
-      toast("Errore durante l'importazione.", "error");
+      const serverMessage = error.response?.data?.message || "Errore durante l'importazione.";
+      toast(serverMessage, "error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Importa da altre Liste">
+    <Modal isOpen={isOpen} onClose={onClose} title="Importa da altre Liste" size="large">
       <div className={styles.modalContainer}>
         {loading && <div className={styles.loadingSpinner}>Caricamento in corso...</div>}
 
@@ -142,21 +145,42 @@ export default function ImportListModal({ isOpen, onClose, targetListId, onSucce
             <div className={styles.stepHeader}>
               <h3 className={styles.stepTitle}>Seleziona un utente che segui</h3>
             </div>
+            
+            {users.length > 5 && (
+              <input 
+                type="text" 
+                placeholder="Cerca utente..." 
+                className={styles.searchInput}
+                value={searchUserQuery}
+                onChange={(e) => setSearchUserQuery(e.target.value)}
+              />
+            )}
+
             {users.length === 0 ? (
               <div className={styles.emptyState}>Non segui ancora nessun utente.</div>
             ) : (
-              <div className={styles.usersGrid}>
-                {users.map(user => (
-                  <div key={user._id} className={styles.userCard} onClick={() => handleSelectUser(user)}>
-                    <img 
-                      src={user.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"} 
-                      className={styles.userAvatar} 
-                      alt={user.username} 
-                      loading="lazy"
-                    />
-                    <div className={styles.userName}>{user.username}</div>
+              <div className={styles.usersList}>
+                {users.filter(u => !searchUserQuery || u.username.toLowerCase().includes(searchUserQuery.toLowerCase())).map(user => (
+                  <div key={user._id} className={styles.userRow} onClick={() => handleSelectUser(user)}>
+                    <div className={styles.userLeftInfo}>
+                      <img 
+                        src={user.avatar_url || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/151.png"} 
+                        className={styles.userAvatar} 
+                        alt={user.username} 
+                        loading="lazy"
+                      />
+                      <div className={styles.userTextInfo}>
+                        <div className={styles.userName}>{user.username}</div>
+                        <div className={styles.userSub}>Visualizza le sue liste e watchlist</div>
+                      </div>
+                    </div>
+                    <ChevronRight className={styles.chevronRight} size={18} />
                   </div>
                 ))}
+                
+                {users.length > 0 && users.filter(u => !searchUserQuery || u.username.toLowerCase().includes(searchUserQuery.toLowerCase())).length === 0 && (
+                  <div className={styles.emptyState}>Nessun utente trovato con questo nome.</div>
+                )}
               </div>
             )}
           </>
@@ -196,18 +220,23 @@ export default function ImportListModal({ isOpen, onClose, targetListId, onSucce
                 <div className={styles.moviesGrid}>
                   {movies.map(movie => {
                     const isSelected = selectedMovies.some(m => m.tmdbId === movie.tmdb_id && m.mediaType === movie.media_type);
+                    const movieTitle = movie.title || movie.name || "Titolo non disponibile";
                     return (
                       <div 
                         key={`${movie.media_type || 'movie'}-${movie.tmdb_id}`} 
                         className={`${styles.movieItem} ${isSelected ? styles.selected : ''}`}
                         onClick={() => toggleMovieSelection(movie)}
+                        title={movieTitle}
                       >
                         <img 
                           src={movie.poster_path ? `https://image.tmdb.org/t/p/w185${movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"} 
                           className={styles.moviePoster}
-                          alt={movie.title || movie.name}
+                          alt={movieTitle}
                           loading="lazy"
                         />
+                        <div className={styles.movieTitleOverlay}>
+                          {movieTitle}
+                        </div>
                         <div className={styles.checkboxOverlay}>
                           {isSelected && <span className={styles.checkIcon}>✓</span>}
                         </div>

@@ -27,36 +27,38 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <form onSubmit={handleSubmit} className={styles.loginForm}>
-        <h2>Recupera Password</h2>
-        <p style={{textAlign: 'center', marginBottom: '15px', color: '#ccc'}}>
-          Inserisci la tua email. Ti invieremo un link per resettare la password.
-        </p>
+    <div className={styles.pageWrapper}>
+      <div className={styles.loginContainer}>
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
+          <h2>Recupera Password</h2>
+          <p style={{textAlign: 'center', marginBottom: '15px', color: '#ccc'}}>
+            Inserisci la tua email. Ti invieremo un link per resettare la password.
+          </p>
 
-        <div className={styles.inputGroup}>
-          <label>Email:</label>
-          <input
-            className={styles.inputField}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="La tua email"
-          />
-        </div>
+          <div className={styles.inputGroup}>
+            <label>Email:</label>
+            <input
+              className={styles.inputField}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="La tua email"
+            />
+          </div>
 
-        {message && <p style={{ color: "lightgreen", textAlign: "center" }}>{message}</p>}
-        {error && <p style={{ color: "#ff8a8a", textAlign: "center" }}>{error}</p>}
+          {message && <p style={{ color: "lightgreen", textAlign: "center" }}>{message}</p>}
+          {error && <p style={{ color: "#ff8a8a", textAlign: "center" }}>{error}</p>}
 
-        <button type="submit" className={styles.submitButton} disabled={loading}>
-          {loading ? "Invio in corso..." : "Invia Link di Reset"}
-        </button>
+          <button type="submit" className={styles.submitButton} disabled={loading}>
+            {loading ? "Invio in corso..." : "Invia Link di Reset"}
+          </button>
 
-        <p style={{ marginTop: "15px", textAlign: "center" }}>
-          <Link to="/login">Torna al Login</Link>
-        </p>
-      </form>
+          <p style={{ marginTop: "15px", textAlign: "center" }}>
+            <Link to="/login">Torna al Login</Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

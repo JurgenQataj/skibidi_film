@@ -1,123 +1,197 @@
-/* Wrapper che copre tutta la viewport — mostra lo sfondo dietro */
+/* ==========================================================================
+   LOGIN & REGISTRATION — PREMIUM GLASSMORPHISM THEME
+   Sleek dark mode card with smooth gradients, glows, and responsive dimensions.
+   ========================================================================== */
+
+/* Full viewport wrapper */
 .pageWrapper {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: radial-gradient(circle at center, rgba(30, 30, 35, 0.8) 0%, rgba(10, 10, 12, 1) 100%);
+}
+
+/* Glassmorphic Container */
+.loginContainer {
+  background: rgba(18, 18, 22, 0.65);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  padding: 40px 32px;
+  border-radius: 24px;
+  color: #ffffff;
+  width: 100%;
+  max-width: 380px; /* Compact and elegant on desktop */
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.7),
+    0 0 24px rgba(229, 9, 20, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
 }
 
-.loginContainer {
-  background-color: rgba(10, 10, 12, 0.85);
-  backdrop-filter: blur(15px);
-  padding: 50px 40px;
-  border-radius: 16px;
-  color: white;
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(200, 8, 18, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
+/* Glowing title with gradient text */
 .loginContainer h2 {
   text-align: center;
-  margin: 0 0 10px 0;
-  font-size: 2rem;
-  font-weight: 700;
+  margin: 0 0 8px 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff 30%, #a5a5a5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+/* Input group */
 .inputGroup {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* Left-aligned */
   gap: 8px;
   width: 100%;
 }
 
 .inputGroup label {
-  width: 60%;
+  width: 100%;
   text-align: left;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
 }
 
+/* Premium input fields */
 .inputField {
-  width: 60%; /* Dimezzato su PC */
-  padding: 14px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: white;
+  width: 100%; /* Spans full width of container */
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #ffffff;
   box-sizing: border-box;
-  font-size: 16px;
-  transition: all 0.2s ease;
+  font-size: 16px; /* Prevents iOS auto-zoom */
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .inputField:focus {
   outline: none;
-  border-color: var(--primary-color, #e50914);
-  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(229, 9, 20, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 0 0 3px rgba(229, 9, 20, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
 }
 
 .inputField::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
 }
 
+/* Glowing Submit Button */
 .submitButton {
-  padding: 12px 15px;
-  border-radius: var(--border-radius);
+  width: 100%; /* Centered and full width */
+  padding: 14px 20px;
+  border-radius: 10px;
   border: none;
-  background-color: var(--primary-color);
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
+  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-  width: 60%; /* Allineato agli input */
-  margin: 10px auto 0 auto;
-  transition: background-color 0.2s ease-in-out;
-  display: block;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(229, 9, 20, 0.35);
+  margin-top: 12px;
 }
 
-.submitButton:hover {
-  background-color: var(
-    --secondary-color
-  ); /* Al passaggio del mouse, diventa rosso Netflix */
+.submitButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f40612 0%, #cf0a13 100%);
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.5);
+  transform: translateY(-2px);
 }
 
-/* --- Media Queries per il Mobile --- */
-@media (max-width: 1024px) {
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Helper text & links */
+.loginContainer p {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.loginContainer a {
+  color: #e50914;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.loginContainer a:hover {
+  color: #ff3b47;
+  text-decoration: underline;
+}
+
+/* Media Queries - Perfect Responsive Layout */
+@media (max-width: 768px) {
+  .pageWrapper {
+    padding: 16px;
+  }
+
   .loginContainer {
-    width: 100%;
-    max-width: 290px;
-    padding: 26px 20px;
-    gap: 14px;
-    border-radius: 16px;
+    max-width: 320px; /* Elegant compact card width on mobile */
+    padding: 32px 24px;
+    gap: 18px;
+    border-radius: 20px;
   }
-  
+
   .loginContainer h2 {
-    font-size: 1.4rem;
-  }
-  
-  .inputGroup label {
-    width: 100%;
-  }
-
-  .inputField {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 15px;
-  }
-
-  .submitButton {
-    width: 100%;
+    font-size: 1.6rem;
   }
 }
 
 @media (max-width: 480px) {
-  .loginContainer {
-    max-width: 270px;
-    padding: 22px 18px;
+  .pageWrapper {
+    padding: 12px;
   }
+
+  .loginContainer {
+    max-width: 305px; /* Extremely safe width for narrow viewports (e.g. iPhone SE) */
+    padding: 28px 20px;
+    gap: 16px;
+  }
+}
+
+.forgotPasswordLink {
+  display: block;
+  text-align: right;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4) !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  margin-top: -6px;
+}
+
+.forgotPasswordLink:hover {
+  color: #ff3b47 !important;
+  text-decoration: underline;
+}
+
+.authFooter {
+  margin-top: 10px !important;
+  text-align: center !important;
 }

@@ -62,13 +62,11 @@ function LoginPage() {
           {loading ? "Caricamento..." : "Accedi"}
         </button>
 
-        <div style={{ marginTop: "10px", textAlign: "right" }}>
-          <Link to="/forgot-password" style={{ fontSize: "0.9rem", color: "#aaa", textDecoration: "none" }}>
-            Password dimenticata?
-          </Link>
-        </div>
+        <Link to="/forgot-password" className={styles.forgotPasswordLink}>
+          Password dimenticata?
+        </Link>
 
-        <p style={{ marginTop: "20px", textAlign: 'center' }}>
+        <p className={styles.authFooter}>
           Non hai un account? <Link to="/register">Registrati</Link>
         </p>
       </form>

@@ -43,65 +43,67 @@ function RegistrationPage() {
   };
 
   return (
-    <form onSubmit={handleRegister} className={styles.loginContainer}>
-      <h2>Registrazione</h2>
-      
-      <div className={styles.inputGroup}>
-        <label>Username:</label>
-        <input
-          className={styles.inputField}
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          maxLength={10}
-          required
-        />
-      </div>
+    <div className={styles.pageWrapper}>
+      <form onSubmit={handleRegister} className={styles.loginContainer}>
+        <h2>Registrazione</h2>
+        
+        <div className={styles.inputGroup}>
+          <label>Username:</label>
+          <input
+            className={styles.inputField}
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            maxLength={10}
+            required
+          />
+        </div>
 
-      {/* NUOVO CAMPO EMAIL */}
-      <div className={styles.inputGroup}>
-        <label>Email (per recupero password):</label>
-        <input
-          className={styles.inputField}
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          placeholder="tua@email.com"
-        />
-      </div>
+        {/* NUOVO CAMPO EMAIL */}
+        <div className={styles.inputGroup}>
+          <label>Email (per recupero password):</label>
+          <input
+            className={styles.inputField}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="tua@email.com"
+          />
+        </div>
 
-      <div className={styles.inputGroup}>
-        <label>Password:</label>
-        <input
-          className={styles.inputField}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
+        <div className={styles.inputGroup}>
+          <label>Password:</label>
+          <input
+            className={styles.inputField}
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
 
-      <div className={styles.inputGroup}>
-        <label>Codice Invito (Opzionale):</label>
-        <input
-          className={styles.inputField}
-          type="text"
-          value={inviteCode}
-          onChange={(e) => setInviteCode(e.target.value)}
-        />
-      </div>
+        <div className={styles.inputGroup}>
+          <label>Codice Invito (Opzionale):</label>
+          <input
+            className={styles.inputField}
+            type="text"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+          />
+        </div>
 
-      {error && <p style={{ color: "#ff8a8a" }}>{error}</p>}
+        {error && <p style={{ color: "#ff8a8a", textAlign: "center", fontSize: "0.9rem" }}>{error}</p>}
 
-      <button type="submit" className={styles.submitButton} disabled={loading}>
-        {loading ? "Caricamento..." : "Registrati"}
-      </button>
+        <button type="submit" className={styles.submitButton} disabled={loading}>
+          {loading ? "Caricamento..." : "Registrati"}
+        </button>
 
-      <p style={{ marginTop: "15px" }}>
-        Hai già un account? <Link to="/login">Accedi</Link>
-      </p>
-    </form>
+        <p className={styles.authFooter}>
+          Hai già un account? <Link to="/login">Accedi</Link>
+        </p>
+      </form>
+    </div>
   );
 }
 

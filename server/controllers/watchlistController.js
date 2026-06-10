@@ -87,8 +87,12 @@ exports.addBatchToWatchlist = async (req, res) => {
     const movieIds = [];
     for (const item of movies) {
       if (!item.tmdbId) continue;
-      const movie = await findOrCreateMovie(item.tmdbId, item.mediaType || "movie");
-      movieIds.push(movie._id);
+      try {
+        const movie = await findOrCreateMovie(item.tmdbId, item.mediaType || "movie");
+        movieIds.push(movie._id);
+      } catch (err) {
+        console.error(`Errore findOrCreateMovie per tmdbId ${item.tmdbId}:`, err.message);
+      }
     }
 
     if (movieIds.length > 0) {
@@ -98,7 +102,7 @@ exports.addBatchToWatchlist = async (req, res) => {
     res.status(200).json({ message: `${movieIds.length} elementi aggiunti alla watchlist.` });
   } catch (error) {
     console.error("Errore addBatchToWatchlist:", error);
-    res.status(500).json({ message: "Errore server durante l'aggiunta multipla." });
+    res.status(500).json({ message: `Errore server durante l'aggiunta multipla: ${error.message}` });
   }
 };
 

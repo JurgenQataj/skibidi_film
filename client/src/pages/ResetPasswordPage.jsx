@@ -37,39 +37,41 @@ function ResetPasswordPage() {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <form onSubmit={handleSubmit} className={styles.loginForm}>
-        <h2>Imposta Nuova Password</h2>
+    <div className={styles.pageWrapper}>
+      <div className={styles.loginContainer}>
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
+          <h2>Imposta Nuova Password</h2>
 
-        <div className={styles.inputGroup}>
-          <label>Nuova Password:</label>
-          <input
-            className={styles.inputField}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+          <div className={styles.inputGroup}>
+            <label>Nuova Password:</label>
+            <input
+              className={styles.inputField}
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className={styles.inputGroup}>
-          <label>Conferma Password:</label>
-          <input
-            className={styles.inputField}
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        </div>
+          <div className={styles.inputGroup}>
+            <label>Conferma Password:</label>
+            <input
+              className={styles.inputField}
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        {message && <p style={{ color: "lightgreen", textAlign: "center" }}>{message}</p>}
-        {error && <p style={{ color: "#ff8a8a", textAlign: "center" }}>{error}</p>}
+          {message && <p style={{ color: "lightgreen", textAlign: "center" }}>{message}</p>}
+          {error && <p style={{ color: "#ff8a8a", textAlign: "center" }}>{error}</p>}
 
-        <button type="submit" className={styles.submitButton} disabled={loading}>
-          {loading ? "Salvataggio..." : "Aggiorna Password"}
-        </button>
-      </form>
+          <button type="submit" className={styles.submitButton} disabled={loading}>
+            {loading ? "Salvataggio..." : "Aggiorna Password"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

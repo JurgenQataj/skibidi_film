@@ -192,7 +192,7 @@ exports.addBatchToList = async (req, res) => {
     res.json({ message: `${addedCount} film aggiunti alla lista.` });
   } catch (error) {
     console.error("Errore addBatchToList:", error);
-    res.status(500).json({ message: "Errore del server." });
+    res.status(500).json({ message: `Errore del server durante l'aggiunta multipla alla lista: ${error.message}` });
   }
 };
 
