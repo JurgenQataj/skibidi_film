@@ -370,15 +370,27 @@ function PersonPage() {
                 transition={{ duration: 0.18, ease: "easeOut" }}
               >
                 {realFilterOptions.map((option, index) => (
-                  <label key={index} className={styles.filterLabelOption}>
+                  <div 
+                    key={index} 
+                    className={styles.filterLabelOption}
+                    onClick={() => option.setter(!option.checked)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        option.setter(!option.checked);
+                      }
+                    }}
+                  >
                     <input
                       type="checkbox"
                       checked={option.checked}
-                      onChange={(e) => option.setter(e.target.checked)}
+                      readOnly
                       className={styles.filterCheckbox}
                     />
                     <span className={styles.filterLabelText}>{option.label}</span>
-                  </label>
+                  </div>
                 ))}
               </motion.div>
             )}
