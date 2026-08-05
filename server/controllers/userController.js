@@ -880,7 +880,7 @@ exports.syncUserCollections = async (userId) => {
   const Review = require("../models/Review");
 
   try {
-    const reviews = await Review.find({ user: userId }).populate('movie').lean();
+    const reviews = await Review.find({ user: userId }).populate('movie');
     const user = await User.findById(userId);
     if (!user) return;
 
@@ -889,9 +889,7 @@ exports.syncUserCollections = async (userId) => {
     // --- Self-healing PARALLELO: recupera collection_info per film senza ---
     const needsSync = validMovies.filter(movie => {
       const ci = movie.collection_info;
-      if (!ci) return true;
-      const ciObj = movie.toObject().collection_info || {};
-      return Object.keys(ciObj).length === 0 || ci.id === undefined;
+      return !ci || ci.id === undefined || ci.id === null;
     });
 
     if (needsSync.length > 0) {

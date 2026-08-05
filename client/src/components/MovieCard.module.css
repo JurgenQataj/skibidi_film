@@ -115,9 +115,7 @@
   align-items: center;
   gap: 3px;
   letter-spacing: 0.3px;
-  max-width: calc(100% - 14px);
   box-sizing: border-box;
-  overflow: hidden;
   white-space: nowrap;
 }
 
@@ -126,9 +124,26 @@
   font-size: 0.62rem;
 }
 
+.ratingContent {
+  display: inline;
+}
+
 .cardYear {
   opacity: 0.5;
   margin-left: 3px;
+}
+
+/* Compact badge for trending rows — desktop only */
+@media (min-width: 769px) {
+  .compactBadge {
+    font-size: 0.48rem;
+    padding: 2px 5px;
+    gap: 2px;
+  }
+
+  .compactBadge .cardYear {
+    margin-left: 2px;
+  }
 }
 
 .imdbLabel {

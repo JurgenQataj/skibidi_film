@@ -37,8 +37,8 @@ const pokemonAvatars = [
 
 function useProfileActions({
   profile, setProfile, userId, isFollowing, setIsFollowing,
-  setStats, setModalData, setEditBio, setEditAvatar,
-  setEditEmail, setEditUsername, setIsEditModalOpen,
+  setStats, setModalData, editBio, setEditBio, editAvatar, setEditAvatar,
+  editEmail, setEditEmail, editUsername, setEditUsername, setIsEditModalOpen,
   logout, navigate, API_URL, toast, confirm
 }) {
   const handleFollowToggle = async () => {
@@ -232,8 +232,8 @@ function ProfilePage() {
     handleDeleteAccount
   } = useProfileActions({
     profile, setProfile, userId, isFollowing, setIsFollowing,
-    setStats, setModalData, setEditBio, setEditAvatar,
-    setEditEmail, setEditUsername, setIsEditModalOpen,
+    setStats, setModalData, editBio, setEditBio, editAvatar, setEditAvatar,
+    editEmail, setEditEmail, editUsername, setEditUsername, setIsEditModalOpen,
     logout, navigate, API_URL, toast, confirm
   });
 

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./MovieCard.module.css";
 import { FiTrash2 } from "react-icons/fi";
 
-const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate, hideRating = false, forceTmdb = false, sortBy = "rating_desc" }) => {
+const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBeforeNavigate, hideRating = false, forceTmdb = false, sortBy = "rating_desc", compactBadge = false }) => {
   if (!movie) return null;
 
   const movieId    = movie.tmdb_id || movie.id;
@@ -64,12 +64,12 @@ const MovieCard = ({ movie, onDelete, showDeleteButton, hideTitle = false, onBef
 
         {/* Rating badge */}
         {(ratingText || year) && !hideRating && (
-          <div className={styles.ratingBadge}>
+          <div className={`${styles.ratingBadge} ${compactBadge ? styles.compactBadge : ''}`}>
             {ratingText && (
-              <>
+              <span className={styles.ratingContent}>
                 {ratingIcon}
                 {ratingText}
-              </>
+              </span>
             )}
             {year && <span className={`${styles.cardYear} movie-card-year`}>{year}</span>}
           </div>

@@ -193,7 +193,7 @@ const CustomTrendingRow = () => {
           >
             {items.map((item) => (
               <motion.div key={item.id} className={styles.cardWrapper} variants={itemVariants}>
-                <MovieCard movie={{ ...item, media_type: mediaType }} forceTmdb={true} />
+                <MovieCard movie={{ ...item, media_type: mediaType }} forceTmdb={true} compactBadge={true} />
               </motion.div>
             ))}
           </motion.div>

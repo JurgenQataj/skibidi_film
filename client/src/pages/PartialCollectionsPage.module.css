@@ -40,8 +40,8 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 16px;
 }
 
 .card {
@@ -90,16 +90,16 @@
 }
 
 .info {
-  padding: 15px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
 .name {
-  font-size: 1rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -125,6 +125,12 @@
   color: rgba(255, 255, 255, 0.5);
   text-align: right;
   font-weight: 600;
+}
+
+.syncArea {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
 .emptyState {
@@ -164,15 +170,15 @@
 }
 
 @media (max-width: 1024px) {
+  .pageContainer { padding: 20px; }
+  .titleArea h1 { font-size: 1.8rem; }
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 12px;
   }
 }
 
-@media (max-width: 1024px) {
-  .pageContainer { padding: 20px; } /* Resetta padding 100px desktop */
-  .titleArea h1 { font-size: 1.8rem; }
+@media (max-width: 768px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;

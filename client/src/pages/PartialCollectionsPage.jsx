@@ -68,6 +68,16 @@ function PartialCollectionsPage() {
         </p>
       </header>
 
+      <div className={styles.syncArea}>
+        <button 
+          className={styles.syncButton} 
+          onClick={handleManualSync}
+          disabled={syncing}
+        >
+          {syncing ? "Sincronizzazione in corso..." : "🔄 Sincronizza ora"}
+        </button>
+      </div>
+
       {loading ? (
         <div className={styles.grid}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonListCard key={i} />)}
@@ -77,15 +87,8 @@ function PartialCollectionsPage() {
       ) : partials.length === 0 ? (
         <div className={styles.emptyState}>
           <p>Non abbiamo ancora analizzato le tue saghe o non ne hai di sospese.</p>
-          <button 
-            className={styles.syncButton} 
-            onClick={handleManualSync}
-            disabled={syncing}
-          >
-            {syncing ? "Sincronizzazione in corso..." : "Sincronizza ora"}
-          </button>
           <p style={{ fontSize: '0.8rem', marginTop: '15px', color: 'rgba(255,255,255,0.3)' }}>
-            L'analisi richiede circa 20-30 secondi la prima volta.
+            Premi "Sincronizza ora" per aggiornare. L'analisi richiede circa 20-30 secondi la prima volta.
           </p>
         </div>
       ) : (
@@ -111,7 +114,7 @@ function PartialCollectionsPage() {
                   ></div>
                 </div>
                 <div className={styles.counts}>
-                  Visuati: {p.seen} su {p.total}
+                  Visti: {p.seen} su {p.total}
                 </div>
               </div>
             </Link>
