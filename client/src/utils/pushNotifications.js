@@ -29,17 +29,20 @@ export const subscribeUserToPush = async (token) => {
       return;
     }
 
-    // Replace with the VAPID Public Key from your .env
-    const publicVapidKey = "BPnIjDgxIejdPqkpM1UR86RJbXVRNd9TVFdSysLiMO7wdzE5VryDjKGC3HHTJoFWb02d7tje5_Ws5uxvRgCho_M";
+    const publicVapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || "BBxuLOz8QIq2f-hQhVbu0yXwkiynygrJwIFLlsTtAFcWzLi9SzEPRsHkjLVeQfwZjQfohg29lW88F60LLBMC09M";
 
-    // Re-check for existing subscription
-    const existingSubscription = await registration.pushManager.getSubscription();
-    if (existingSubscription) {
-      console.log("User is already subscribed to push notifications");
-      return existingSubscription;
+    // Check for existing subscription and unsubscribe if it was created under old keys
+    let subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      try {
+        await subscription.unsubscribe();
+      } catch (e) {
+        console.warn("Could not unsubscribe old push subscription:", e);
+      }
     }
 
-    const subscription = await registration.pushManager.subscribe({
+    // Subscribe with current VAPID key
+    subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
     });
