@@ -1,5 +1,7 @@
 const Review = require("../models/Review");
 const Notification = require("../models/Notification");
+const User = require("../models/User");
+const { sendPushNotification } = require("../services/pushService");
 
 // Funzione per aggiungere o modificare una reazione
 exports.addOrUpdateReaction = async (req, res) => {
@@ -8,7 +10,7 @@ exports.addOrUpdateReaction = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const review = await Review.findById(reviewId);
+    const review = await Review.findById(reviewId).populate("movie", "title poster_path");
     if (!review)
       return res.status(404).json({ message: "Recensione non trovata." });
 
@@ -41,32 +43,16 @@ exports.addOrUpdateReaction = async (req, res) => {
 
       // Invia notifica Push all'autore della review
       try {
-        const PushSubscription = require("../models/PushSubscription");
-        const webpush = require("web-push");
-        const User = require("../models/User");
-
-        const subs = await PushSubscription.find({ user: review.user });
-        if (subs.length > 0) {
-          const reactor = await User.findById(userId).select("username");
-          const payload = JSON.stringify({
-            title: "Nuova Reazione!",
-            body: `${reactor.username} ha reagito alla tua recensione.`,
-            url: `/`
-          });
-          
-          for (let sub of subs) {
-            await webpush.sendNotification(
-              { endpoint: sub.endpoint, keys: sub.keys },
-              payload
-            ).catch(async err => {
-              if (err.statusCode === 410) {
-                await sub.deleteOne();
-              } else {
-                console.error("Push Notification Delivery Error (non-410):", err);
-              }
-            });
-          }
-        }
+        const reactor = await User.findById(userId).select("username avatar_url");
+        const movieTitle = review.movie?.title ? `su ${review.movie.title}` : "alla tua recensione";
+        const reactionEmoji = reaction_type === "like" ? "❤️" : reaction_type === "fire" ? "🔥" : reaction_type === "laugh" ? "😂" : "👍";
+        
+        await sendPushNotification(review.user, {
+          title: `${reactor?.username || "Qualcuno"} ha reagito ${reactionEmoji}`,
+          body: `Ha aggiunto una reazione alla tua recensione ${movieTitle}.`,
+          icon: reactor?.avatar_url || "/pwa-192x192.png",
+          url: `/`
+        });
       } catch (err) {
         console.error("Errore Push Reaction:", err);
       }

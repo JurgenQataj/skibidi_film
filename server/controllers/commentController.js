@@ -1,32 +1,7 @@
 const Review = require("../models/Review");
 const Notification = require("../models/Notification");
 const User = require("../models/User");
-const PushSubscription = require("../models/PushSubscription");
-const webpush = require("web-push");
-
-async function sendPushNotification(userId, title, body, url) {
-  try {
-    const subs = await PushSubscription.find({ user: userId });
-    if (subs.length > 0) {
-      const payload = JSON.stringify({ title, body, url });
-      for (let sub of subs) {
-        await webpush.sendNotification(
-          { endpoint: sub.endpoint, keys: sub.keys },
-          payload
-        ).catch(async err => {
-          if (err.statusCode === 410) {
-            await sub.deleteOne();
-          } else {
-            console.error("Push Notification Delivery Error (non-410):", err, "Endpoint:", sub.endpoint);
-          }
-        });
-      }
-    }
-  } catch (e) {
-    console.error("Push Notification Error:", e);
-  }
-}
-
+const { sendPushNotification } = require("../services/pushService");
 
 // Estrae @username dal testo e restituisce gli ID utenti trovati
 async function extractMentions(text) {
@@ -68,11 +43,25 @@ exports.addComment = async (req, res) => {
     await review.save();
 
     await review.populate("comments.user", "username avatar_url");
+    await review.populate("movie", "title poster_path");
 
     const populatedComments = review.comments.filter((comment) => comment.user);
 
-    const senderUser = await User.findById(userId).select("username");
+    const senderUser = await User.findById(userId).select("username avatar_url");
     const senderName = senderUser ? senderUser.username : "Un utente";
+    const senderAvatar = senderUser?.avatar_url || "/pwa-192x192.png";
+
+    const movieTitle = review.movie?.title || "una recensione";
+    const posterUrl = review.movie?.poster_path
+      ? (review.movie.poster_path.startsWith("http")
+          ? review.movie.poster_path
+          : `https://image.tmdb.org/t/p/w500${review.movie.poster_path}`)
+      : undefined;
+
+    const trimmedComment = comment_text.trim();
+    const commentSnippet = trimmedComment.length > 90
+      ? `"${trimmedComment.substring(0, 87)}..."`
+      : `"${trimmedComment}"`;
 
     // 1. Notifica al creatore della recensione (se non è lui stesso a commentare)
     if (review.user.toString() !== userId) {
@@ -83,12 +72,14 @@ exports.addComment = async (req, res) => {
           type: "new_comment",
           targetReview: review._id,
         }).save();
-        await sendPushNotification(
-          review.user,
-          "Nuovo commento!",
-          `${senderName} ha commentato la tua recensione.`,
-          `/`
-        );
+        
+        await sendPushNotification(review.user, {
+          title: `${senderName} su ${movieTitle} 💬`,
+          body: commentSnippet,
+          icon: senderAvatar,
+          image: posterUrl,
+          url: `/`
+        });
       } catch (err) {
         console.error("⚠️ Errore notifica autore recensione:", err.message);
       }
@@ -107,12 +98,14 @@ exports.addComment = async (req, res) => {
           type: "comment_mention",
           targetReview: review._id,
         }).save();
-        await sendPushNotification(
-          mentionId,
-          "Sei stato menzionato!",
-          `${senderName} ti ha menzionato in un commento.`,
-          `/`
-        );
+        
+        await sendPushNotification(mentionId, {
+          title: `${senderName} ti ha menzionato su ${movieTitle} 💬`,
+          body: commentSnippet,
+          icon: senderAvatar,
+          image: posterUrl,
+          url: `/`
+        });
       }
     } catch (err) {
       console.error("⚠️ Errore notifica mention commento:", err.message);
@@ -140,12 +133,13 @@ exports.addComment = async (req, res) => {
           type: "thread_comment",
           targetReview: review._id,
         }).save();
-        await sendPushNotification(
-          commenterId,
-          "Nuovo commento nel thread!",
-          `${senderName} ha risposto a una recensione che segui.`,
-          `/`
-        );
+        
+        await sendPushNotification(commenterId, {
+          title: `${senderName} ha risposto su ${movieTitle} 💬`,
+          body: commentSnippet,
+          icon: senderAvatar,
+          url: `/`
+        });
       }
     } catch (err) {
       console.error("⚠️ Errore notifica thread:", err.message);

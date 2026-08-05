@@ -4,6 +4,7 @@ const MovieList = require("../models/MovieList");
 const Notification = require("../models/Notification");
 const Post = require("../models/Post");
 const Goal = require("../models/Goal");
+const { sendPushNotification } = require("../services/pushService");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -509,32 +510,13 @@ exports.followUser = async (req, res) => {
     });
     // Push Notification for new follower
     try {
-      const PushSubscription = require("../models/PushSubscription");
-      const webpush = require("web-push");
-
-      const subs = await PushSubscription.find({ user: req.params.userId });
-      
-      if (subs.length > 0) {
-        const follower = await User.findById(req.user.id).select("username");
-        const payload = JSON.stringify({
-          title: "Nuovo Follower!",
-          body: `${follower.username} ha iniziato a seguirti.`,
-          url: `/profile/${req.user.id}`
-        });
-
-        for (let sub of subs) {
-          await webpush.sendNotification(
-            { endpoint: sub.endpoint, keys: sub.keys },
-            payload
-          ).catch(async err => {
-            if (err.statusCode === 410) {
-              await sub.deleteOne();
-            } else {
-              console.error("Push Notification Delivery Error (non-410):", err);
-            }
-          });
-        }
-      }
+      const follower = await User.findById(req.user.id).select("username avatar_url");
+      await sendPushNotification(req.params.userId, {
+        title: `${follower?.username || "Qualcuno"} ha iniziato a seguirti! 👤`,
+        body: `Guarda il suo profilo per scoprire i film e le sue recensioni.`,
+        icon: follower?.avatar_url || "/pwa-192x192.png",
+        url: `/profile/${req.user.id}`
+      });
     } catch (e) {
       console.error("Push Notification Error (follow):", e);
     }

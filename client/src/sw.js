@@ -14,12 +14,15 @@ self.addEventListener('push', (event) => {
       const title = data.title || 'Skibidi Film';
       const options = {
         body: data.body || 'Nuova notifica disponibile!',
-        icon: '/pwa-192x192.png',
+        icon: data.icon || '/pwa-192x192.png',
         badge: '/pwa-192x192.png',
+        image: data.image || undefined,
         vibrate: [100, 50, 100],
+        tag: data.tag || undefined,
         data: {
           url: data.url || '/'
-        }
+        },
+        actions: data.actions || []
       };
       
       event.waitUntil(self.registration.showNotification(title, options));
