@@ -12,27 +12,37 @@ self.addEventListener('push', (event) => {
       console.log('Push received:', data);
       
       const title = data.title || 'Skibidi Film';
+      const iconUrl = data.icon 
+        ? new URL(data.icon, self.location.origin).href 
+        : new URL('/pwa-192x192.png', self.location.origin).href;
+      
       const options = {
         body: data.body || 'Nuova notifica disponibile!',
-        icon: data.icon || '/pwa-192x192.png',
-        badge: '/pwa-192x192.png',
-        image: data.image || undefined,
-        vibrate: [100, 50, 100],
-        tag: data.tag || undefined,
+        icon: iconUrl,
+        badge: new URL('/pwa-192x192.png', self.location.origin).href,
         data: {
           url: data.url || '/'
-        },
-        actions: data.actions || []
+        }
       };
-      
+
+      if (data.tag) options.tag = data.tag;
+      if (data.image) options.image = data.image;
+      if (Array.isArray(data.actions) && data.actions.length > 0) {
+        options.actions = data.actions;
+      }
+      if (Array.isArray(data.vibrate) && data.vibrate.length > 0) {
+        options.vibrate = data.vibrate;
+      }
+
       event.waitUntil(self.registration.showNotification(title, options));
     } catch (e) {
       console.error('Error parsing push data:', e);
       // Fallback for non-JSON payload
+      const fallbackIcon = new URL('/pwa-192x192.png', self.location.origin).href;
       event.waitUntil(
         self.registration.showNotification('Skibidi Film', {
-          body: event.data.text(),
-          icon: '/pwa-192x192.png',
+          body: event.data ? event.data.text() : 'Nuova notifica disponibile!',
+          icon: fallbackIcon,
           data: { url: '/' }
         })
       );

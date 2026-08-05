@@ -36,8 +36,7 @@ exports.getMovieSuggestions = async (req, res) => {
       media_type: type 
     }));
     
-    const enrichedSuggestions = await enrichWithOmdbRatings(suggestions);
-    res.json({ results: enrichedSuggestions });
+    res.json({ results: suggestions });
   } catch (error) {
     console.error("Errore suggestions:", error.message);
     res.status(500).json({ message: error.message, results: [] });

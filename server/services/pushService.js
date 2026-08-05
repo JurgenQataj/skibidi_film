@@ -1,6 +1,18 @@
 const PushSubscription = require("../models/PushSubscription");
 const webpush = require("web-push");
 
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  try {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT || "mailto:jurgen126q@gmail.com",
+      process.env.VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+  } catch (err) {
+    console.error("Errore configurazione VAPID in pushService:", err.message);
+  }
+}
+
 /**
  * Invia una notifica Push ricca di contenuti a un utente
  * @param {String|ObjectId} userId - ID dell'utente destinatario
@@ -29,7 +41,8 @@ async function sendPushNotification(userId, { title, body, url = "/", icon, imag
     for (let sub of subs) {
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: sub.keys },
-        payload
+        payload,
+        { TTL: 86400 }
       ).catch(async (err) => {
         // Se 410 (scaduta), 404 (non trovata), 403 (chiavi VAPID cambiate), rimuoviamo la sottoscrizione non valida
         if (err.statusCode === 410 || err.statusCode === 404 || err.statusCode === 403) {
