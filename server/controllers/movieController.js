@@ -7,6 +7,30 @@ const API_KEY = process.env.TMDB_API_KEY;
 const OMDB_API_KEY = process.env.OMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 
+// --- In-memory cache for suggestions (avoids TMDB round-trip per keystroke) ---
+const suggestionsServerCache = new Map();
+const SUGGESTIONS_CACHE_TTL = 2 * 60 * 1000; // 2 minuti
+const SUGGESTIONS_CACHE_MAX = 200;
+
+const getSuggestionsCached = (key) => {
+  const entry = suggestionsServerCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > SUGGESTIONS_CACHE_TTL) {
+    suggestionsServerCache.delete(key);
+    return null;
+  }
+  return entry.data;
+};
+
+const setSuggestionsCached = (key, data) => {
+  if (suggestionsServerCache.size >= SUGGESTIONS_CACHE_MAX) {
+    // Evict oldest
+    const oldest = suggestionsServerCache.keys().next().value;
+    suggestionsServerCache.delete(oldest);
+  }
+  suggestionsServerCache.set(key, { data, ts: Date.now() });
+};
+
 exports.getMovieSuggestions = async (req, res) => {
   try {
     const searchQuery = req.query.query;
@@ -16,6 +40,14 @@ exports.getMovieSuggestions = async (req, res) => {
     }
     if (!API_KEY) {
       return res.status(500).json({ message: "API key not configured", results: [] });
+    }
+
+    // Check server-side cache first
+    const cacheKey = `${type}:${searchQuery.toLowerCase().trim()}`;
+    const cached = getSuggestionsCached(cacheKey);
+    if (cached) {
+      res.set("Cache-Control", "public, max-age=60, s-maxage=120");
+      return res.json({ results: cached });
     }
 
     // Scegli l'endpoint in base al tipo
@@ -36,6 +68,10 @@ exports.getMovieSuggestions = async (req, res) => {
       media_type: type 
     }));
     
+    // Cache on server
+    setSuggestionsCached(cacheKey, suggestions);
+    
+    res.set("Cache-Control", "public, max-age=60, s-maxage=120");
     res.json({ results: suggestions });
   } catch (error) {
     console.error("Errore suggestions:", error.message);

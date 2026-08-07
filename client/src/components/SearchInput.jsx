@@ -4,6 +4,30 @@ import axios from "axios";
 import styles from "./SearchInput.module.css";
 import { FaSearch } from "react-icons/fa";
 
+// Client-side cache for suggestions (survives re-renders, shared across instances)
+const suggestionsCache = new Map();
+const CACHE_MAX_SIZE = 50;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+const getCachedSuggestions = (key) => {
+  const entry = suggestionsCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    suggestionsCache.delete(key);
+    return null;
+  }
+  return entry.data;
+};
+
+const setCachedSuggestions = (key, data) => {
+  // Evict oldest if cache is full
+  if (suggestionsCache.size >= CACHE_MAX_SIZE) {
+    const oldestKey = suggestionsCache.keys().next().value;
+    suggestionsCache.delete(oldestKey);
+  }
+  suggestionsCache.set(key, { data, timestamp: Date.now() });
+};
+
 const SearchInput = ({
   onMovieSelect,
   onSearch,
@@ -25,11 +49,22 @@ const SearchInput = ({
 
   const API_URL = import.meta.env.VITE_API_URL || "";
 
-  // Fetch suggestions con debounce
+  // Fetch suggestions con debounce e cache
   const fetchSuggestions = async (searchQuery) => {
     if (searchQuery.length < 2) {
       setSuggestions([]);
       setShowSuggestions(false);
+      return;
+    }
+
+    const cacheKey = `${mode}:${searchQuery.toLowerCase().trim()}`;
+
+    // Check client-side cache first — show results instantly
+    const cached = getCachedSuggestions(cacheKey);
+    if (cached) {
+      setSuggestions(cached);
+      setShowSuggestions(true);
+      setLoading(false);
       return;
     }
 
@@ -50,8 +85,11 @@ const SearchInput = ({
         { signal: controller.signal }
       );
       if (abortControllerRef.current === controller) {
-        setSuggestions(response.data.results || []);
+        const results = response.data.results || [];
+        setSuggestions(results);
         setShowSuggestions(true);
+        // Cache the results
+        setCachedSuggestions(cacheKey, results);
       }
     } catch (error) {
       if (axios.isCancel(error)) {
@@ -74,9 +112,14 @@ const SearchInput = ({
       clearTimeout(debounceRef.current);
     }
 
+    // Use shorter debounce if we have a cache hit, longer for network calls
+    const cacheKey = `${mode}:${query.toLowerCase().trim()}`;
+    const hasCached = getCachedSuggestions(cacheKey);
+    const delay = hasCached ? 50 : 150;
+
     debounceRef.current = setTimeout(() => {
       fetchSuggestions(query);
-    }, 300);
+    }, delay);
 
     return () => {
       if (debounceRef.current) {
