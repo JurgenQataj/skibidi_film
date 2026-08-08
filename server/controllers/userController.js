@@ -1209,7 +1209,7 @@ exports.exportUserData = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    const formattedReviews = reviews.map(r => ({
+    const formattedReviews = (reviews || []).map(r => ({
       movie_title: r.movie?.title || "N/A",
       tmdb_id: r.movie?.tmdb_id || null,
       media_type: r.movie?.media_type || "movie",
@@ -1217,16 +1217,18 @@ exports.exportUserData = async (req, res) => {
       comment: r.comment_text || "",
       is_spoiler: r.is_spoiler || false,
       director: r.movie?.director || "N/A",
-      genres: r.movie?.genres?.join(", ") || "",
+      genres: Array.isArray(r.movie?.genres) ? r.movie.genres.join(", ") : (r.movie?.genres || ""),
       date: r.createdAt,
     }));
 
-    const formattedWatchlist = (user.watchlist || []).map(m => ({
-      title: m.title,
-      tmdb_id: m.tmdb_id,
-      media_type: m.media_type || "movie",
-      release_year: m.release_year || null,
-    }));
+    const formattedWatchlist = (user.watchlist || [])
+      .filter(m => m !== null && m !== undefined)
+      .map(m => ({
+        title: m.title || "N/A",
+        tmdb_id: m.tmdb_id || null,
+        media_type: m.media_type || "movie",
+        release_year: m.release_year || null,
+      }));
 
     res.json({
       profile: {

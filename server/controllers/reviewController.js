@@ -98,7 +98,7 @@ async function syncMovieFromTMDB(movie, safeTmdbId, safeMediaType) {
   const tmdbUrl = `${tmdbPath}?api_key=${process.env.TMDB_API_KEY}&language=it-IT&append_to_response=credits,keywords`;
 
   try {
-    const { data: movieData } = await axios.get(tmdbUrl);
+    const { data: movieData } = await axios.get(tmdbUrl, { timeout: 4000 });
     const fields = extractMovieFields(movieData, safeMediaType);
 
     if (!movie) {
@@ -158,10 +158,17 @@ exports.addReview = async (req, res) => {
     let movie = await Movie.findOne(movieQuery);
 
     // 2. Fetch/heal from TMDB if needed
-    try {
-      movie = await syncMovieFromTMDB(movie, safeTmdbId, safeMediaType);
-    } catch (e) {
-      return res.status(502).json({ message: e.message });
+    if (!movie) {
+      try {
+        movie = await syncMovieFromTMDB(null, safeTmdbId, safeMediaType);
+      } catch (e) {
+        return res.status(502).json({ message: e.message });
+      }
+    } else {
+      // Film già presente in DB: l'eventuale healing avviene in background senza rallentare la risposta
+      syncMovieFromTMDB(movie, safeTmdbId, safeMediaType).catch(err =>
+        console.error("⚠️ Errore background sync TMDB:", err.message)
+      );
     }
 
     // 3. Check duplicate review
@@ -301,8 +308,10 @@ exports.deleteReview = async (req, res) => {
 
     await review.deleteOne();
 
-    // Sync collezioni (AWAITED per live update) dopo eliminazione
-    await userController.syncUserCollections(req.user.id);
+    // Fire-and-forget: la sync delle collezioni non deve bloccare la risposta dell'API
+    userController.syncUserCollections(req.user.id).catch(err =>
+      console.error("⚠️ Errore background sync collezioni:", err.message)
+    );
 
     res.json({ message: "Recensione eliminata con successo." });
   } catch (error) {

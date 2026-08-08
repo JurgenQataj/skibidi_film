@@ -201,10 +201,15 @@ function SettingsPage() {
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
+    a.style.display = "none";
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      if (document.body.contains(a)) {
+        document.body.removeChild(a);
+      }
+      URL.revokeObjectURL(url);
+    }, 1000);
   };
 
   const handleExport = async (format) => {
@@ -217,12 +222,12 @@ function SettingsPage() {
       const data = res.data;
 
       if (format === "json") {
-        downloadFile(JSON.stringify(data, null, 2), "skibidi_film_export.json", "application/json");
+        downloadFile(JSON.stringify(data, null, 2), "skibidi_film_export.json", "application/json;charset=utf-8");
         showToast("Export JSON scaricato!");
       } else {
         // CSV
         const csvRows = ["Titolo,TMDB ID,Tipo,Voto,Commento,Spoiler,Regista,Generi,Data"];
-        for (const r of data.reviews) {
+        for (const r of (data.reviews || [])) {
           const row = [
             `"${(r.movie_title || "").replace(/"/g, '""')}"`,
             r.tmdb_id || "",
@@ -240,7 +245,7 @@ function SettingsPage() {
         csvRows.push(""); 
         csvRows.push("--- WATCHLIST ---");
         csvRows.push("Titolo,TMDB ID,Tipo,Anno");
-        for (const w of data.watchlist) {
+        for (const w of (data.watchlist || [])) {
           csvRows.push([
             `"${(w.title || "").replace(/"/g, '""')}"`,
             w.tmdb_id || "",
@@ -248,7 +253,7 @@ function SettingsPage() {
             w.release_year || "",
           ].join(","));
         }
-        downloadFile(csvRows.join("\n"), "skibidi_film_export.csv", "text/csv;charset=utf-8");
+        downloadFile("\uFEFF" + csvRows.join("\n"), "skibidi_film_export.csv", "text/csv;charset=utf-8");
         showToast("Export CSV scaricato!");
       }
     } catch (err) {

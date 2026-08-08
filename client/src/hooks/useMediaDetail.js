@@ -102,17 +102,23 @@ export function useMediaDetail(mediaType) {
     fetchData();
   }, [fetchData]);
 
+  const [isDeletingReview, setIsDeletingReview] = useState(false);
+
   const handleDeleteReview = async (reviewId) => {
     const ok = await confirm("Sei sicuro di voler eliminare la tua recensione?");
     if (!ok) return;
+    setIsDeletingReview(true);
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API_URL}/api/reviews/${reviewId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchData();
+      setHasUserReviewed(false);
+      await fetchData();
     } catch (error) {
       toast("Errore durante l'eliminazione della recensione.", "error");
+    } finally {
+      setIsDeletingReview(false);
     }
   };
 
@@ -247,6 +253,7 @@ export function useMediaDetail(mediaType) {
     setEditingReview,
     fetchData,
     handleDeleteReview,
+    isDeletingReview,
     handleWatchlistToggle,
     handleAddToList,
     handleReaction,

@@ -61,14 +61,19 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
     inputRef.current?.focus();
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError("");
 
     if (!rating) {
       setError("Devi inserire un voto.");
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       const token = localStorage.getItem("token");
@@ -93,6 +98,8 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
       onReviewAdded();
     } catch (err) {
       setError(err.response?.data?.message || "Si è verificato un errore.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -167,9 +174,9 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
           <button 
             type="submit" 
             className={styles.submitButton}
-            disabled={!rating}
+            disabled={!rating || isSubmitting}
           >
-            Pubblica
+            {isSubmitting ? "Pubblicazione..." : "Pubblica"}
           </button>
         </div>
       </form>

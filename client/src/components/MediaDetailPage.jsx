@@ -136,6 +136,7 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     setEditingReview,
     fetchData,
     handleDeleteReview,
+    isDeletingReview,
     handleWatchlistToggle,
     handleAddToList,
     handleReaction,
@@ -621,8 +622,9 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
                         <button
                           onClick={() => handleDeleteReview(review.id)}
                           className={styles.deleteButton}
+                          disabled={isDeletingReview}
                         >
-                          Elimina
+                          {isDeletingReview ? "Eliminazione..." : "Elimina"}
                         </button>
                       </div>
                     )}
