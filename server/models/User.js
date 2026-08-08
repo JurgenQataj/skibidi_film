@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     missing: Number
   }],
 
+  // Privacy
+  private_profile: { type: Boolean, default: false },
+  hide_history: { type: Boolean, default: false },
+
   // Preferenze Notifiche Push (granulari)
   notification_preferences: {
     push_enabled:   { type: Boolean, default: true },  // Master switch

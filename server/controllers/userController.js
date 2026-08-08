@@ -167,7 +167,7 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { bio, avatar_url, email, username } = req.body;
+    const { bio, avatar_url, email, username, password, private_profile, hide_history } = req.body;
     
     if (email) {
       const emailExists = await User.findOne({ email: String(email), _id: { $ne: req.user.id } });
@@ -182,9 +182,22 @@ exports.updateUserProfile = async (req, res) => {
       if (usernameExists) return res.status(400).json({ message: "Username già in uso." });
     }
 
-    const updateData = { bio, avatar_url };
+    const updateData = {};
+    if (bio !== undefined) updateData.bio = bio;
+    if (avatar_url !== undefined) updateData.avatar_url = avatar_url;
     if (email) updateData.email = email;
     if (username) updateData.username = username;
+    if (typeof private_profile === "boolean") updateData.private_profile = private_profile;
+    if (typeof hide_history === "boolean") updateData.hide_history = hide_history;
+
+    // Cambio password: hash con bcrypt
+    if (password && password.trim().length > 0) {
+      if (password.length < 6) {
+        return res.status(400).json({ message: "La password deve avere almeno 6 caratteri." });
+      }
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -193,6 +206,7 @@ exports.updateUserProfile = async (req, res) => {
     ).select("-password");
     res.json(user);
   } catch (error) {
+    console.error("Errore aggiornamento profilo:", error);
     res.status(500).json({ message: "Errore aggiornamento profilo." });
   }
 };
@@ -872,10 +886,11 @@ exports.syncUserCollections = async (userId) => {
     const validMovies = reviews.map(r => r.movie).filter(movie => movie && movie.media_type !== "tv");
 
     // --- Self-healing PARALLELO: recupera collection_info per film senza ---
+    // Limita a max 10 per batch per evitare troppe chiamate parallele
     const needsSync = validMovies.filter(movie => {
       const ci = movie.collection_info;
       return !ci || ci.id === undefined || ci.id === null;
-    });
+    }).slice(0, 10);
 
     if (needsSync.length > 0) {
       await Promise.allSettled(
@@ -883,7 +898,7 @@ exports.syncUserCollections = async (userId) => {
           try {
             const r = await axios.get(
               `https://api.themoviedb.org/3/movie/${movie.tmdb_id}?api_key=${TMDB_API_KEY}&language=it-IT`,
-              { timeout: 8000 }
+              { timeout: 5000 }
             );
             const coll = r.data.belongs_to_collection;
             movie.collection_info = coll
@@ -925,7 +940,7 @@ exports.syncUserCollections = async (userId) => {
         try {
           const r = await axios.get(
             `https://api.themoviedb.org/3/collection/${coll.id}?api_key=${TMDB_API_KEY}&language=it-IT`,
-            { timeout: 8000 }
+            { timeout: 5000 }
           );
           const released = (r.data.parts || []).filter(
             p => p.release_date && new Date(p.release_date) <= today
@@ -1176,5 +1191,55 @@ exports.updateNotificationPreferences = async (req, res) => {
   } catch (error) {
     console.error("Errore updateNotificationPreferences:", error);
     res.status(500).json({ message: "Errore server." });
+  }
+};
+
+// --- EXPORT DATI UTENTE ---
+exports.exportUserData = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId)
+      .select("username email bio avatar_url createdAt private_profile hide_history")
+      .populate("watchlist", "tmdb_id title poster_path media_type release_year");
+
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    const reviews = await Review.find({ user: userId })
+      .populate("movie", "tmdb_id title poster_path media_type release_year director genres")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const formattedReviews = reviews.map(r => ({
+      movie_title: r.movie?.title || "N/A",
+      tmdb_id: r.movie?.tmdb_id || null,
+      media_type: r.movie?.media_type || "movie",
+      rating: r.rating,
+      comment: r.comment_text || "",
+      is_spoiler: r.is_spoiler || false,
+      director: r.movie?.director || "N/A",
+      genres: r.movie?.genres?.join(", ") || "",
+      date: r.createdAt,
+    }));
+
+    const formattedWatchlist = (user.watchlist || []).map(m => ({
+      title: m.title,
+      tmdb_id: m.tmdb_id,
+      media_type: m.media_type || "movie",
+      release_year: m.release_year || null,
+    }));
+
+    res.json({
+      profile: {
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        member_since: user.createdAt,
+      },
+      reviews: formattedReviews,
+      watchlist: formattedWatchlist,
+    });
+  } catch (error) {
+    console.error("Errore exportUserData:", error);
+    res.status(500).json({ message: "Errore durante l'esportazione dei dati." });
   }
 };

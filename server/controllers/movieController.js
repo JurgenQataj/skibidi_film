@@ -57,7 +57,7 @@ exports.getMovieSuggestions = async (req, res) => {
     
     const url = `${BASE_URL}/${endpoint}?api_key=${API_KEY}&query=${encodeURIComponent(searchQuery)}&language=it-IT&page=1`;
     
-    const response = await axios.get(url);
+    const response = await axios.get(url, { timeout: 4000 });
     
     // Mappiamo i risultati gestendo sia film (title, poster_path) che persone (name, profile_path)
     const suggestions = response.data.results.slice(0, 5).map((item) => ({

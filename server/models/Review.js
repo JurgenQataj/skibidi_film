@@ -29,4 +29,9 @@ const ReviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indice composto per il check duplicati (addReview: findOne user+movie)
+ReviewSchema.index({ user: 1, movie: 1 }, { unique: true });
+// Indice per le query per film (getReviewsForMovie)
+ReviewSchema.index({ movie: 1 });
+
 module.exports = mongoose.model("Review", ReviewSchema);

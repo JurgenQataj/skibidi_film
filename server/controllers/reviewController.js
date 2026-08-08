@@ -173,13 +173,19 @@ exports.addReview = async (req, res) => {
     const newReview = new Review({ user: userId, movie: movie._id, rating, comment_text, is_spoiler });
     await newReview.save();
 
-    await sendMentionNotifications(comment_text, newReview._id, userId);
+    // Fire-and-forget: le menzioni non devono bloccare la response
+    sendMentionNotifications(comment_text, newReview._id, userId).catch(err =>
+      console.error("⚠️ Errore background menzioni:", err.message)
+    );
 
     // Remove from watchlist
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });
 
-    // 5. Sync collections
-    await userController.syncUserCollections(userId);
+    // Fire-and-forget: la sync delle collezioni non deve bloccare la response
+    // (può fare decine di chiamate TMDB e impiegare 5-15s)
+    userController.syncUserCollections(userId).catch(err =>
+      console.error("⚠️ Errore background sync collezioni:", err.message)
+    );
 
     res.status(201).json({ message: "Recensione aggiunta con successo!" });
   } catch (error) {

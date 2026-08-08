@@ -82,7 +82,7 @@ const SearchInput = ({
         `${API_URL}/api/movies/suggestions?query=${encodeURIComponent(
           searchQuery
         )}&type=${mode}`,
-        { signal: controller.signal }
+        { signal: controller.signal, timeout: 4000 }
       );
       if (abortControllerRef.current === controller) {
         const results = response.data.results || [];
@@ -115,7 +115,7 @@ const SearchInput = ({
     // Use shorter debounce if we have a cache hit, longer for network calls
     const cacheKey = `${mode}:${query.toLowerCase().trim()}`;
     const hasCached = getCachedSuggestions(cacheKey);
-    const delay = hasCached ? 50 : 150;
+    const delay = hasCached ? 50 : 100;
 
     debounceRef.current = setTimeout(() => {
       fetchSuggestions(query);

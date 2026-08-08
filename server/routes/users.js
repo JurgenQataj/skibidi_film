@@ -54,4 +54,7 @@ router.delete("/:userId/saved-people/:personId", protect, userController.removeS
 router.get("/notification-preferences", protect, userController.getNotificationPreferences);
 router.put("/notification-preferences", protect, userController.updateNotificationPreferences);
 
+// --- Data Export ---
+router.get("/export-data", protect, userController.exportUserData);
+
 module.exports = router;

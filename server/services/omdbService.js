@@ -43,7 +43,7 @@ async function enrichWithOmdbRatings(items) {
           const tmdbUrl = `https://api.themoviedb.org/3/${mType}/${id}/external_ids?api_key=${TMDB_API_KEY}`;
           let imdbId = null;
           try {
-            const tmdbRes = await axios.get(tmdbUrl);
+            const tmdbRes = await axios.get(tmdbUrl, { timeout: 5000 });
             imdbId = tmdbRes.data.imdb_id;
           } catch (err) {
             console.error(`TMDB error fetching external_ids for ${mType} ${id}:`, err.message);
@@ -53,7 +53,7 @@ async function enrichWithOmdbRatings(items) {
           
           if (imdbId) {
             const url = `http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&i=${imdbId}`;
-            res = await axios.get(url);
+            res = await axios.get(url, { timeout: 5000 });
           } else {
             // Fallback: search by title if no imdbId
             const title = item.title || item.name;
@@ -61,7 +61,7 @@ async function enrichWithOmdbRatings(items) {
             const year = yearStr ? new Date(yearStr).getFullYear() : "";
             if (title) {
               const fallbackUrl = `http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(title)}&y=${year}&type=${mType === 'tv' ? 'series' : 'movie'}`;
-              res = await axios.get(fallbackUrl);
+              res = await axios.get(fallbackUrl, { timeout: 5000 });
             }
           }
 
