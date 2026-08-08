@@ -16,6 +16,10 @@ export const urlBase64ToUint8Array = (base64String) => {
   return outputArray;
 }
 
+/**
+ * Iscrivi l'utente alle notifiche push.
+ * Gestisce anche il rinnovo della subscription se le chiavi VAPID sono cambiate.
+ */
 export const subscribeUserToPush = async (token) => {
   if (!('serviceWorker' in navigator)) {
     console.warn("Service workers are not supported in this browser");
@@ -61,4 +65,75 @@ export const subscribeUserToPush = async (token) => {
   } catch (error) {
     console.error("Failed to subscribe the user to push notifications:", error);
   }
+};
+
+/**
+ * Disiscrivi l'utente dalle notifiche push (browser + backend).
+ * Se endpoint è specificato, rimuove solo quel device.
+ * Altrimenti rimuove tutte le subscription dell'utente.
+ */
+export const unsubscribeUserFromPush = async (token, endpoint = null) => {
+  if (!('serviceWorker' in navigator)) return;
+
+  try {
+    // 1. Disiscrivi dal browser
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      await subscription.unsubscribe();
+    }
+
+    // 2. Rimuovi dal backend
+    await axios.delete(`${API_URL}/api/push/unsubscribe`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { endpoint: endpoint || subscription?.endpoint }
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Failed to unsubscribe from push notifications:", error);
+    return false;
+  }
+};
+
+/**
+ * Verifica lo stato della subscription push dell'utente.
+ * Restituisce { subscribed: boolean, deviceCount: number, browserPermission: string }
+ */
+export const checkPushSubscriptionStatus = async (token) => {
+  const result = {
+    subscribed: false,
+    deviceCount: 0,
+    browserPermission: 'unsupported',
+    hasActiveSubscription: false,
+  };
+
+  // Check browser support
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    return result;
+  }
+
+  result.browserPermission = Notification.permission;
+
+  // Check if there's an active browser subscription
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    result.hasActiveSubscription = !!subscription;
+  } catch (e) {
+    console.warn("Could not check push subscription:", e);
+  }
+
+  // Check backend status
+  try {
+    const res = await axios.get(`${API_URL}/api/push/status`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    result.subscribed = res.data.subscribed;
+    result.deviceCount = res.data.deviceCount;
+  } catch (e) {
+    console.warn("Could not check push status from backend:", e);
+  }
+
+  return result;
 };

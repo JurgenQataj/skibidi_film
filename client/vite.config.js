@@ -12,7 +12,7 @@ export default defineConfig(({ command }) => {
         strategies: 'injectManifest',
         srcDir: 'src',
         filename: 'sw.js',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'badge-96x96.png'],
         devOptions: {
           enabled: true,
           type: 'module'
@@ -21,15 +21,19 @@ export default defineConfig(({ command }) => {
           injectionPoint: undefined
         },
         manifest: {
+          id: '/skibidi-film',
           name: 'Skibidi Film',
-          short_name: 'Skibidi Film',
-          description: 'Track your watched movies and reviews',
+          short_name: 'Skibidi',
+          description: 'Tieni traccia dei film visti, scrivi recensioni e scopri nuovi film.',
           theme_color: '#0a0a0f',
           background_color: '#0a0a0f',
           display: 'standalone',
           orientation: 'portrait',
           start_url: '/',
           scope: '/',
+          dir: 'ltr',
+          lang: 'it',
+          categories: ['entertainment', 'social'],
           icons: [
             {
               src: 'pwa-192x192.png',

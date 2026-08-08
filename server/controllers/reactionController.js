@@ -41,17 +41,25 @@ exports.addOrUpdateReaction = async (req, res) => {
       });
       await notification.save();
 
-      // Invia notifica Push all'autore della review
+      // Invia notifica Push all'autore della review (fire-and-forget)
       try {
         const reactor = await User.findById(userId).select("username avatar_url");
         const movieTitle = review.movie?.title ? `su ${review.movie.title}` : "alla tua recensione";
         const reactionEmoji = reaction_type === "like" ? "❤️" : reaction_type === "fire" ? "🔥" : reaction_type === "laugh" ? "😂" : "👍";
         
-        await sendPushNotification(review.user, {
+        // Determina l'URL corretto per la notifica
+        const movieTmdbId = review.movie?.tmdb_id || review.movie?._id;
+        const mediaType = review.movie?.media_type === "tv" ? "tv" : "movie";
+        const notifUrl = movieTmdbId ? `/${mediaType}/${movieTmdbId}` : "/";
+
+        // Fire-and-forget: non blocca la response HTTP
+        sendPushNotification(review.user, {
           title: `${reactor?.username || "Qualcuno"} ha reagito ${reactionEmoji}`,
           body: `Ha aggiunto una reazione alla tua recensione ${movieTitle}.`,
           icon: reactor?.avatar_url || "/pwa-192x192.png",
-          url: `/`
+          url: notifUrl,
+          tag: `reaction-${review._id}`,
+          notificationType: "new_reaction",
         });
       } catch (err) {
         console.error("Errore Push Reaction:", err);

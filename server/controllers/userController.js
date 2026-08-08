@@ -508,14 +508,17 @@ exports.followUser = async (req, res) => {
       sender: req.user.id,
       type: "new_follower",
     });
-    // Push Notification for new follower
+    // Push Notification for new follower (fire-and-forget)
     try {
       const follower = await User.findById(req.user.id).select("username avatar_url");
-      await sendPushNotification(req.params.userId, {
+      // Fire-and-forget: non blocca la response HTTP
+      sendPushNotification(req.params.userId, {
         title: `${follower?.username || "Qualcuno"} ha iniziato a seguirti! 👤`,
         body: `Guarda il suo profilo per scoprire i film e le sue recensioni.`,
         icon: follower?.avatar_url || "/pwa-192x192.png",
-        url: `/profile/${req.user.id}`
+        url: `/profile/${req.user.id}`,
+        tag: `follow-${req.user.id}`,
+        notificationType: "new_follower",
       });
     } catch (e) {
       console.error("Push Notification Error (follow):", e);
@@ -1119,5 +1122,59 @@ exports.removeSavedPerson = async (req, res) => {
   } catch (error) {
     console.error("Errore removeSavedPerson:", error);
     res.status(500).json({ message: "Errore server durante la rimozione della persona." });
+  }
+};
+
+// --- PREFERENZE NOTIFICHE PUSH ---
+
+exports.getNotificationPreferences = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("notification_preferences");
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    // Se l'utente non ha ancora preferenze (vecchio account), restituisci i default
+    const prefs = user.notification_preferences || {
+      push_enabled: true,
+      comments: true,
+      reactions: true,
+      followers: true,
+      mentions: true,
+      thread_replies: true,
+    };
+
+    res.json(prefs);
+  } catch (error) {
+    console.error("Errore getNotificationPreferences:", error);
+    res.status(500).json({ message: "Errore server." });
+  }
+};
+
+exports.updateNotificationPreferences = async (req, res) => {
+  try {
+    const allowedFields = ["push_enabled", "comments", "reactions", "followers", "mentions", "thread_replies"];
+    const updates = {};
+
+    for (const field of allowedFields) {
+      if (typeof req.body[field] === "boolean") {
+        updates[`notification_preferences.${field}`] = req.body[field];
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "Nessuna preferenza valida da aggiornare." });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updates },
+      { new: true }
+    ).select("notification_preferences");
+
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    res.json(user.notification_preferences);
+  } catch (error) {
+    console.error("Errore updateNotificationPreferences:", error);
+    res.status(500).json({ message: "Errore server." });
   }
 };

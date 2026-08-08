@@ -12,26 +12,53 @@ self.addEventListener('push', (event) => {
       console.log('Push received:', data);
       
       const title = data.title || 'Skibidi Film';
-      const iconUrl = data.icon 
-        ? new URL(data.icon, self.location.origin).href 
-        : new URL('/pwa-192x192.png', self.location.origin).href;
+
+      // --- ICON: Avatar dell'utente o icona app ---
+      // Se il server manda un URL completo (es: avatar TMDB), usalo direttamente
+      // Se manda un path relativo (es: /pwa-192x192.png), costruisci l'URL
+      let iconUrl;
+      if (data.icon && (data.icon.startsWith('http://') || data.icon.startsWith('https://'))) {
+        iconUrl = data.icon;
+      } else {
+        iconUrl = new URL(data.icon || '/pwa-192x192.png', self.location.origin).href;
+      }
+
+      // --- BADGE: Icona piccola monocromatica per la barra di stato Android ---
+      // Deve essere bianca su sfondo trasparente, ~96x96px
+      const badgeUrl = new URL('/badge-96x96.png', self.location.origin).href;
       
       const options = {
         body: data.body || 'Nuova notifica disponibile!',
         icon: iconUrl,
-        badge: new URL('/pwa-192x192.png', self.location.origin).href,
+        badge: badgeUrl,
         data: {
           url: data.url || '/'
-        }
+        },
+        // Timestamp: mostra quando la notifica è stata generata
+        timestamp: data.timestamp || Date.now(),
+        // Renotify: segnala anche quando sostituisce una notifica con lo stesso tag
+        renotify: data.renotify || false,
+        // Silent: non riprodurre suono (opzionale)
+        silent: data.silent || false,
       };
 
+      // Tag per collapsing: se lo stesso tag arriva di nuovo, sostituisce la precedente
       if (data.tag) options.tag = data.tag;
+
+      // Immagine grande (locandina film)
       if (data.image) options.image = data.image;
+
+      // Azioni rapide (es: "Visualizza", "Rispondi")
       if (Array.isArray(data.actions) && data.actions.length > 0) {
         options.actions = data.actions;
       }
+
+      // Vibration pattern per mobile
       if (Array.isArray(data.vibrate) && data.vibrate.length > 0) {
         options.vibrate = data.vibrate;
+      } else {
+        // Default vibration pattern: breve-pausa-breve
+        options.vibrate = [100, 50, 100];
       }
 
       event.waitUntil(self.registration.showNotification(title, options));
@@ -39,10 +66,12 @@ self.addEventListener('push', (event) => {
       console.error('Error parsing push data:', e);
       // Fallback for non-JSON payload
       const fallbackIcon = new URL('/pwa-192x192.png', self.location.origin).href;
+      const fallbackBadge = new URL('/badge-96x96.png', self.location.origin).href;
       event.waitUntil(
         self.registration.showNotification('Skibidi Film', {
           body: event.data ? event.data.text() : 'Nuova notifica disponibile!',
           icon: fallbackIcon,
+          badge: fallbackBadge,
           data: { url: '/' }
         })
       );
@@ -50,22 +79,57 @@ self.addEventListener('push', (event) => {
   }
 });
 
-// Handle Notification Click
+// Handle Notification Click (inclusi click su azioni rapide)
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
-  const targetUrl = event.notification.data.url || '/';
 
+  // Determina l'URL target: se l'utente ha cliccato un'azione, potrebbe avere un URL specifico
+  let targetUrl = '/';
+
+  if (event.action) {
+    // L'utente ha cliccato una delle quick actions
+    switch (event.action) {
+      case 'view':
+        // "Visualizza" → vai alla pagina della notifica
+        targetUrl = event.notification.data?.url || '/';
+        break;
+      case 'dismiss':
+        // "Chiudi" → non fare niente, la notifica è già chiusa
+        return;
+      default:
+        targetUrl = event.notification.data?.url || '/';
+    }
+  } else {
+    // Click generico sul corpo della notifica
+    targetUrl = event.notification.data?.url || '/';
+  }
+
+  // Prova a focalizzare una finestra esistente con lo stesso URL,
+  // altrimenti aprine una nuova
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Cerca una finestra che già mostra la stessa pagina
       for (const client of clientList) {
         if (client.url.includes(targetUrl) && 'focus' in client) {
           return client.focus();
         }
       }
+      // Se nessuna finestra trovata, cerca una qualsiasi finestra aperta e naviga
+      for (const client of clientList) {
+        if ('focus' in client && 'navigate' in client) {
+          return client.focus().then(() => client.navigate(targetUrl));
+        }
+      }
+      // Se nessuna finestra aperta, aprine una nuova
       if (self.clients.openWindow) {
         return self.clients.openWindow(targetUrl);
       }
     })
   );
+});
+
+// Handle notification close (per analytics future, opzionale)
+self.addEventListener('notificationclose', (event) => {
+  // Potrebbe essere usato per tracciare quante notifiche vengono ignorate
+  console.log('Notification dismissed:', event.notification.tag || 'no-tag');
 });

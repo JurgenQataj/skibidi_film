@@ -5,11 +5,33 @@ import styles from "./NotificationsPage.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import { SkeletonWithLogo } from "../components/Skeleton";
+import { MdNotificationsActive, MdNotificationsOff, MdSend, MdSettings, MdInfoOutline, MdCheckCircle } from "react-icons/md";
+import { subscribeUserToPush, checkPushSubscriptionStatus } from "../utils/pushNotifications";
 
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Push Notification state
+  const [pushInfo, setPushInfo] = useState({
+    browserPermission: "default",
+    subscribed: false,
+    hasActiveSubscription: false,
+    deviceCount: 0
+  });
+  const [pushActionLoading, setPushActionLoading] = useState(false);
+  const [testPushStatus, setTestPushStatus] = useState(null);
+  const [showAndroidGuide, setShowAndroidGuide] = useState(false);
+
   const API_URL = import.meta.env.VITE_API_URL || "";
+
+  const refreshPushStatus = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const status = await checkPushSubscriptionStatus(token);
+      setPushInfo(status);
+    }
+  };
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -26,7 +48,57 @@ function NotificationsPage() {
       }
     };
     fetchNotifications();
+    refreshPushStatus();
   }, [API_URL]);
+
+  const handleEnablePush = async () => {
+    setPushActionLoading(true);
+    setTestPushStatus(null);
+    try {
+      if (!('Notification' in window)) {
+        alert("Il tuo browser non supporta le notifiche Push.");
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = localStorage.getItem("token");
+        if (token) {
+          await subscribeUserToPush(token);
+          localStorage.removeItem("dismissedNotificationPrompt");
+        }
+      } else if (permission === "denied") {
+        setShowAndroidGuide(true);
+      }
+    } catch (err) {
+      console.error("Errore abilitazione push:", err);
+    } finally {
+      await refreshPushStatus();
+      setPushActionLoading(false);
+    }
+  };
+
+  const handleTestPush = async () => {
+    setPushActionLoading(true);
+    setTestPushStatus(null);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(`${API_URL}/api/push/test-push`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTestPushStatus({
+        type: "success",
+        message: `📲 Notifica di prova inviata! (Dispositivi raggiunti: ${res.data.sent || 0})`
+      });
+    } catch (err) {
+      console.error("Errore invio test push:", err);
+      setTestPushStatus({
+        type: "error",
+        message: "❌ Errore durante l'invio della notifica di prova. Verifica di aver attivato le notifiche."
+      });
+    } finally {
+      setPushActionLoading(false);
+    }
+  };
 
   const getNotificationLink = (notification) => {
     // CONTROLLO DI SICUREZZA
@@ -149,6 +221,84 @@ function NotificationsPage() {
   return (
     <div className={styles.pageContainer}>
       <h1 className={styles.title}>Le tue Notifiche</h1>
+
+      {/* --- PUSH NOTIFICATION CONTROL BANNER --- */}
+      <div className={styles.pushCard}>
+        <div className={styles.pushHeader}>
+          <div className={styles.pushTitleGroup}>
+            {pushInfo.browserPermission === "granted" && pushInfo.subscribed ? (
+              <MdNotificationsActive className={`${styles.pushIcon} ${styles.active}`} />
+            ) : (
+              <MdNotificationsOff className={`${styles.pushIcon} ${styles.inactive}`} />
+            )}
+            <div>
+              <h3 className={styles.pushTitle}>Notifiche Push sul tuo Dispositivo</h3>
+              <p className={styles.pushSubtitle}>
+                {pushInfo.browserPermission === "granted" && pushInfo.subscribed ? (
+                  <span className={styles.statusOk}>
+                    <MdCheckCircle style={{ verticalAlign: "middle", marginRight: 4 }} />
+                    Attive su questo telefono ({pushInfo.deviceCount} {pushInfo.deviceCount === 1 ? "dispositivo" : "dispositivi"})
+                  </span>
+                ) : pushInfo.browserPermission === "denied" ? (
+                  <span className={styles.statusError}>
+                    ⚠️ Bloccate dal browser. Segui le istruzioni qui sotto per riattivarle.
+                  </span>
+                ) : (
+                  <span className={styles.statusWarn}>
+                    ⚠️ Non ancora abilitate o da risincronizzare
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.pushActions}>
+          <button 
+            className={styles.enableBtn}
+            onClick={handleEnablePush}
+            disabled={pushActionLoading}
+          >
+            <MdNotificationsActive size={18} />
+            {pushActionLoading ? "Attivazione in corso..." : "Attiva / Risincronizza Push"}
+          </button>
+
+          {pushInfo.browserPermission === "granted" && (
+            <button 
+              className={styles.testBtn}
+              onClick={handleTestPush}
+              disabled={pushActionLoading}
+            >
+              <MdSend size={16} />
+              Invia Prova
+            </button>
+          )}
+
+          <Link to="/settings" className={styles.settingsLinkBtn} title="Preferenze Notifiche">
+            <MdSettings size={18} />
+          </Link>
+        </div>
+
+        {testPushStatus && (
+          <div className={`${styles.testStatusBox} ${styles[testPushStatus.type]}`}>
+            {testPushStatus.message}
+          </div>
+        )}
+
+        {/* Android / Browser Guide expander if denied or requested */}
+        {(pushInfo.browserPermission === "denied" || showAndroidGuide) && (
+          <div className={styles.androidGuideBox}>
+            <h4><MdInfoOutline size={18} /> Come sbloccare le notifiche su Android / Chrome:</h4>
+            <ol>
+              <li>Tocca l'icona del <strong>lucchetto 🔒</strong> o <strong>impostazioni ⚙️</strong> nella barra degli indirizzi in alto.</li>
+              <li>Seleziona <strong>Impostazioni sito</strong> o <strong>Permessi</strong>.</li>
+              <li>Trova la voce <strong>Notifiche</strong> e impostala su <strong>Consenti</strong>.</li>
+              <li>Torna qui e clicca sul pulsante <strong>"Attiva / Risincronizza Push"</strong> in alto.</li>
+            </ol>
+          </div>
+        )}
+      </div>
+
       <div className={styles.notificationsList}>
         {notifications.length > 0 ? (
           notifications.map((notification) => (

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import {
   FiUser, FiSliders, FiBell, FiDatabase, FiLock,
   FiLogOut, FiDownload, FiTrash2, FiAlertTriangle,
@@ -36,6 +37,158 @@ function ToggleRow({ title, description, checked, onChange }) {
   );
 }
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
+/* ── Notifications Tab (connected to backend) ── */
+function NotificationsTab({ token }) {
+  const [prefs, setPrefs] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [pushStatus, setPushStatus] = useState("unknown"); // "granted", "denied", "default", "unsupported"
+
+  // Fetch preferences from backend
+  useEffect(() => {
+    const fetchPrefs = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/users/notification-preferences`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPrefs(res.data);
+      } catch (err) {
+        console.error("Errore fetch preferenze notifiche:", err);
+        // Fallback defaults
+        setPrefs({
+          push_enabled: true,
+          comments: true,
+          reactions: true,
+          followers: true,
+          mentions: true,
+          thread_replies: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPrefs();
+
+    // Check browser push permission status
+    if ('Notification' in window) {
+      setPushStatus(Notification.permission);
+    } else {
+      setPushStatus('unsupported');
+    }
+  }, [token]);
+
+  // Save a single preference toggle
+  const togglePref = useCallback(async (field) => {
+    if (!prefs || saving) return;
+    const newValue = !prefs[field];
+    const optimistic = { ...prefs, [field]: newValue };
+    setPrefs(optimistic);
+    setSaving(true);
+
+    try {
+      await axios.put(`${API_URL}/api/users/notification-preferences`, 
+        { [field]: newValue },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.error("Errore salvataggio preferenza:", err);
+      // Rollback
+      setPrefs(prefs);
+    } finally {
+      setSaving(false);
+    }
+  }, [prefs, saving, token]);
+
+  if (loading || !prefs) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
+        Caricamento preferenze...
+      </div>
+    );
+  }
+
+  const pushStatusLabel = {
+    granted: "✅ Attive",
+    denied: "❌ Bloccate dal browser",
+    default: "⚠️ Non ancora richieste",
+    unsupported: "❌ Non supportate",
+  };
+
+  return (
+    <>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Notifiche Push</h2>
+        <p className={styles.sectionDesc}>
+          Controlla quali notifiche vuoi ricevere. Le modifiche sono salvate automaticamente.
+        </p>
+      </div>
+
+      {/* Push permission status */}
+      <div className={styles.card}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0' }}>
+          <div>
+            <h4 style={{ margin: 0, color: 'var(--text-primary, #fff)' }}>Stato Push Browser</h4>
+            <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-muted, #888)' }}>
+              {pushStatusLabel[pushStatus] || pushStatus}
+            </p>
+          </div>
+          {pushStatus === 'denied' && (
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted, #888)', maxWidth: 200, textAlign: 'right' }}>
+              Vai nelle impostazioni del browser per sbloccare le notifiche.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Master switch */}
+      <div className={styles.card}>
+        <ToggleRow
+          title="Push Abilitate"
+          description="Interruttore principale. Se disattivato, nessuna push verrà inviata."
+          checked={prefs.push_enabled}
+          onChange={() => togglePref('push_enabled')}
+        />
+      </div>
+
+      {/* Granular toggles (disabled if master is off) */}
+      <div className={styles.card} style={{ opacity: prefs.push_enabled ? 1 : 0.5, pointerEvents: prefs.push_enabled ? 'auto' : 'none' }}>
+        <ToggleRow
+          title="💬 Commenti"
+          description="Quando qualcuno commenta una tua recensione."
+          checked={prefs.comments}
+          onChange={() => togglePref('comments')}
+        />
+        <ToggleRow
+          title="❤️ Reazioni"
+          description="Quando qualcuno reagisce a una tua recensione."
+          checked={prefs.reactions}
+          onChange={() => togglePref('reactions')}
+        />
+        <ToggleRow
+          title="👤 Nuovi Follower"
+          description="Quando qualcuno inizia a seguirti."
+          checked={prefs.followers}
+          onChange={() => togglePref('followers')}
+        />
+        <ToggleRow
+          title="📢 Menzioni"
+          description="Quando qualcuno ti menziona con @username."
+          checked={prefs.mentions}
+          onChange={() => togglePref('mentions')}
+        />
+        <ToggleRow
+          title="🔄 Risposte nei Thread"
+          description="Quando qualcuno risponde in un thread a cui partecipi."
+          checked={prefs.thread_replies}
+          onChange={() => togglePref('thread_replies')}
+        />
+      </div>
+    </>
+  );
+}
+
 /* ── Main Component ── */
 function SettingsPage() {
   const { token, logout, user } = useAuthStore();
@@ -46,10 +199,9 @@ function SettingsPage() {
   const [theme, setTheme]                         = useState("dark");
   const [language, setLanguage]                   = useState("it");
   const [startPage, setStartPage]                 = useState("feed");
-  const [notificationsEnabled, setNotifications]  = useState(true);
-  const [goalReminders, setGoalReminders]         = useState(true);
   const [privateProfile, setPrivateProfile]       = useState(false);
   const [hideHistory, setHideHistory]             = useState(false);
+
 
   if (!token) {
     return (
@@ -228,27 +380,7 @@ function SettingsPage() {
       /* ── NOTIFICATIONS ── */
       case "notifications":
         return (
-          <>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Notifiche</h2>
-              <p className={styles.sectionDesc}>Scegli quali avvisi vuoi ricevere.</p>
-            </div>
-
-            <div className={styles.card}>
-              <ToggleRow
-                title="Nuove Uscite"
-                description="Avvisi per i film e le serie nella tua Watchlist."
-                checked={notificationsEnabled}
-                onChange={() => setNotifications(!notificationsEnabled)}
-              />
-              <ToggleRow
-                title="Promemoria Obiettivi"
-                description="Aggiornamenti sui film visti e sui tuoi Goals."
-                checked={goalReminders}
-                onChange={() => setGoalReminders(!goalReminders)}
-              />
-            </div>
-          </>
+          <NotificationsTab token={token} />
         );
 
       /* ── DATA ── */

@@ -58,6 +58,11 @@ exports.addComment = async (req, res) => {
           : `https://image.tmdb.org/t/p/w500${review.movie.poster_path}`)
       : undefined;
 
+    // Determina l'URL corretto per la notifica (film o serie TV)
+    const movieTmdbId = review.movie?.tmdb_id || review.movie?._id;
+    const mediaType = review.movie?.media_type === "tv" ? "tv" : "movie";
+    const notifUrl = movieTmdbId ? `/${mediaType}/${movieTmdbId}` : "/";
+
     const trimmedComment = comment_text.trim();
     const commentSnippet = trimmedComment.length > 90
       ? `"${trimmedComment.substring(0, 87)}..."`
@@ -73,12 +78,18 @@ exports.addComment = async (req, res) => {
           targetReview: review._id,
         }).save();
         
-        await sendPushNotification(review.user, {
+        // Fire-and-forget: non blocca la response HTTP
+        sendPushNotification(review.user, {
           title: `${senderName} su ${movieTitle} 💬`,
           body: commentSnippet,
           icon: senderAvatar,
           image: posterUrl,
-          url: `/`
+          url: notifUrl,
+          tag: `comment-${review._id}`,
+          notificationType: "new_comment",
+          actions: [
+            { action: "view", title: "Visualizza" }
+          ]
         });
       } catch (err) {
         console.error("⚠️ Errore notifica autore recensione:", err.message);
@@ -99,12 +110,18 @@ exports.addComment = async (req, res) => {
           targetReview: review._id,
         }).save();
         
-        await sendPushNotification(mentionId, {
+        // Fire-and-forget
+        sendPushNotification(mentionId, {
           title: `${senderName} ti ha menzionato su ${movieTitle} 💬`,
           body: commentSnippet,
           icon: senderAvatar,
           image: posterUrl,
-          url: `/`
+          url: notifUrl,
+          tag: `mention-${review._id}`,
+          notificationType: "comment_mention",
+          actions: [
+            { action: "view", title: "Visualizza" }
+          ]
         });
       }
     } catch (err) {
@@ -134,11 +151,14 @@ exports.addComment = async (req, res) => {
           targetReview: review._id,
         }).save();
         
-        await sendPushNotification(commenterId, {
+        // Fire-and-forget
+        sendPushNotification(commenterId, {
           title: `${senderName} ha risposto su ${movieTitle} 💬`,
           body: commentSnippet,
           icon: senderAvatar,
-          url: `/`
+          url: notifUrl,
+          tag: `thread-${review._id}`,
+          notificationType: "thread_comment",
         });
       }
     } catch (err) {

@@ -50,4 +50,8 @@ router.delete("/goals/:id", protect, userController.deleteGoal);
 router.post("/:userId/saved-people", protect, userController.savePerson);
 router.delete("/:userId/saved-people/:personId", protect, userController.removeSavedPerson);
 
+// --- Notification Preferences ---
+router.get("/notification-preferences", protect, userController.getNotificationPreferences);
+router.put("/notification-preferences", protect, userController.updateNotificationPreferences);
+
 module.exports = router;
