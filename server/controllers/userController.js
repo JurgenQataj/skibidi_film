@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/User");
 const Review = require("../models/Review");
 const MovieList = require("../models/MovieList");
@@ -10,6 +11,31 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const axios = require("axios");
 const SibApiV3Sdk = require("sib-api-v3-sdk");
+
+// Helper universale per la ricerca utente via ObjectId, username o identity token ("me")
+const findUserByIdOrUsername = async (identifier, currentUserId = null) => {
+  if (!identifier || identifier === "null" || identifier === "undefined") {
+    if (currentUserId && mongoose.Types.ObjectId.isValid(currentUserId)) {
+      return await User.findById(currentUserId).select("-password").lean();
+    }
+    return null;
+  }
+  if (identifier === "me") {
+    if (currentUserId && mongoose.Types.ObjectId.isValid(currentUserId)) {
+      return await User.findById(currentUserId).select("-password").lean();
+    }
+    return null;
+  }
+  if (mongoose.Types.ObjectId.isValid(identifier)) {
+    const user = await User.findById(identifier).select("-password").lean();
+    if (user) return user;
+  }
+  const cleanUsername = String(identifier).trim();
+  const escapedUsername = cleanUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return await User.findOne({
+    username: { $regex: new RegExp(`^${escapedUsername}$`, "i") },
+  }).select("-password").lean();
+};
 
 // Configurazione Brevo (una volta sola a livello di file)
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
@@ -157,11 +183,13 @@ exports.resetPassword = async (req, res) => {
 
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).select("-password");
+    const currentUserId = req.user?.id || req.user?._id;
+    const user = await findUserByIdOrUsername(req.params.userId, currentUserId);
     if (!user) return res.status(404).json({ message: "Utente non trovato." });
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: "ID utente non valido." });
+    console.error("Errore getUserProfile:", error);
+    res.status(500).json({ message: "Errore durante il recupero del profilo." });
   }
 };
 
@@ -232,12 +260,13 @@ exports.deleteUserProfile = async (req, res) => {
 
 exports.getUserStats = async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const user = await User.findById(userId);
+    const currentUserId = req.user?.id || req.user?._id;
+    const user = await findUserByIdOrUsername(req.params.userId, currentUserId);
 
     if (!user) return res.status(404).json({ message: "Utente non trovato" });
 
-    const reviews = await Review.find({ user: String(userId) }).populate("movie", "media_type").lean();
+    const targetUserId = user._id;
+    const reviews = await Review.find({ user: targetUserId }).populate("movie", "media_type").lean();
     let moviesReviewed = 0;
     let tvShowsReviewed = 0;
 
@@ -270,27 +299,30 @@ exports.getUserStats = async (req, res) => {
 // --- GET FULL USER PROFILE IN A SINGLE FAST ROUNDTRIP ---
 exports.getUserFullProfile = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const identifier = req.params.userId;
     const currentUserId = req.user?.id || req.user?._id;
 
-    // Parallel DB Execution
-    const [user, reviews, lists] = await Promise.all([
-      User.findById(userId).select("-password").lean(),
-      Review.find({ user: String(userId) })
-        .populate("movie", "media_type title poster_path release_year vote_average tmdb_id")
-        .sort({ createdAt: -1 })
-        .lean(),
-      MovieList.find({ user: userId })
-        .select("name isPublic movies createdAt")
-        .lean(),
-    ]);
+    const user = await findUserByIdOrUsername(identifier, currentUserId);
 
     if (!user) {
       return res.status(404).json({ message: "Utente non trovato" });
     }
 
+    const targetUserId = user._id;
+
+    // Parallel DB Execution
+    const [reviews, lists] = await Promise.all([
+      Review.find({ user: targetUserId })
+        .populate("movie", "media_type title poster_path release_year vote_average tmdb_id")
+        .sort({ createdAt: -1 })
+        .lean(),
+      MovieList.find({ user: targetUserId })
+        .select("name isPublic movies createdAt")
+        .lean(),
+    ]);
+
     // Stats calculation from reviews & user arrays
-    const validReviews = reviews.filter((r) => r.movie);
+    const validReviews = (reviews || []).filter((r) => r.movie);
     let moviesReviewed = 0;
     let tvShowsReviewed = 0;
 
@@ -314,7 +346,7 @@ exports.getUserFullProfile = async (req, res) => {
     };
 
     let isFollowing = false;
-    if (currentUserId && String(currentUserId) !== String(userId)) {
+    if (currentUserId && String(currentUserId) !== String(targetUserId)) {
       isFollowing = user.followers
         ? user.followers.some((fId) => String(fId) === String(currentUserId))
         : false;
@@ -337,16 +369,17 @@ exports.getUserFullProfile = async (req, res) => {
 // --- NUOVA FUNZIONE: STATISTICHE AVANZATE DINAMICHE (Con Anno) ---
 exports.getUserAdvancedStats = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const currentUserId = req.user?.id || req.user?._id;
+    const user = await findUserByIdOrUsername(req.params.userId, currentUserId);
+    if (!user) return res.status(404).json({ message: "Utente non trovato" });
+
+    const userId = user._id;
     // Leggiamo l'anno dalla query string, altrimenti usiamo l'anno corrente
     const targetYear = parseInt(req.query.year) || new Date().getFullYear();
     const limit = parseInt(req.query.limit) || 30; // [NEW] Limit per le classifiche (default 30)
 
-    const user = await User.findById(userId).select("username");
-    if (!user) return res.status(404).json({ message: "Utente non trovato" });
-
     // Otteniamo tutte le recensioni popolate con solo campi richiesti e lean() per saltare i doc Mongoose
-    const reviews = await Review.find({ user: String(userId) })
+    const reviews = await Review.find({ user: userId })
       .populate({
         path: "movie",
         select: "media_type title tmdb_id release_year cast director production_companies crew genres runtime production_countries original_language keywords"
@@ -639,17 +672,18 @@ exports.createGoal = async (req, res) => {
 
 exports.getUserGoals = async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const goals = await Goal.find({ user: String(userId) }).sort({ year: -1 });
+    const currentUserId = req.user?.id || req.user?._id;
+    const user = await findUserByIdOrUsername(req.params.userId, currentUserId);
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    const userId = user._id;
+    const goals = await Goal.find({ user: userId }).sort({ year: -1 });
 
     // Per ogni goal, calcoliamo i film visti in quell'anno
     const goalsWithProgress = await Promise.all(goals.map(async (goal) => {
-      // Trova le recensioni (solo film, non tv) di questo utente fatte nell'anno del goal
-      // Attenzione: usiamo la data in cui ha *registrato* la recensione
       const startDate = new Date(`${goal.year}-01-01T00:00:00Z`);
       const endDate = new Date(`${goal.year}-12-31T23:59:59Z`);
 
-      // Count solo Reviews che hanno un reference a un movie e non sono post
       const reviewsThisYear = await Review.find({
         user: userId,
         isPost: { $ne: true },
@@ -659,7 +693,6 @@ exports.getUserGoals = async (req, res) => {
       const watchedReviews = reviewsThisYear.filter(r => r.movie && r.movie.media_type !== "tv");
       const moviesWatchedThisYear = watchedReviews.length;
       
-      // Mappa i dati dei film visti per mostrarli nel frontend (id, titolo, poster, voto)
       const watchedMoviesList = watchedReviews.map(r => ({
         reviewId: r._id,
         movieId: r.movie.tmdb_id,
@@ -702,12 +735,15 @@ exports.deleteGoal = async (req, res) => {
 
 exports.unfollowUser = async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.user.id, {
-      $pull: { following: req.params.userId },
-    });
-    await User.findByIdAndUpdate(req.params.userId, {
-      $pull: { followers: req.user.id },
-    });
+    const targetUser = await findUserByIdOrUsername(req.params.userId);
+    if (targetUser) {
+      await User.findByIdAndUpdate(req.user.id, {
+        $pull: { following: targetUser._id },
+      });
+      await User.findByIdAndUpdate(targetUser._id, {
+        $pull: { followers: req.user.id },
+      });
+    }
     res.json({ message: "Non segui più." });
   } catch (error) {
     res.status(500).json({ message: "Errore server" });
@@ -720,8 +756,10 @@ exports.getFollowStatus = async (req, res) => {
     if (!currentUser)
       return res.status(404).json({ message: "Utente non trovato" });
 
+    const targetUser = await findUserByIdOrUsername(req.params.userId);
     const following = currentUser.following || [];
-    res.json({ isFollowing: following.includes(req.params.userId) });
+    const isFollowing = targetUser ? following.some(f => String(f) === String(targetUser._id)) : false;
+    res.json({ isFollowing });
   } catch (error) {
     res.status(500).json({ message: "Errore server" });
   }
@@ -729,7 +767,10 @@ exports.getFollowStatus = async (req, res) => {
 
 exports.getFollowers = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).populate(
+    const targetUser = await findUserByIdOrUsername(req.params.userId);
+    if (!targetUser) return res.status(404).json({ message: "Utente non trovato" });
+
+    const user = await User.findById(targetUser._id).populate(
       "followers",
       "_id username avatar_url"
     );
@@ -743,7 +784,10 @@ exports.getFollowers = async (req, res) => {
 
 exports.getFollowing = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).populate(
+    const targetUser = await findUserByIdOrUsername(req.params.userId);
+    if (!targetUser) return res.status(404).json({ message: "Utente non trovato" });
+
+    const user = await User.findById(targetUser._id).populate(
       "following",
       "_id username avatar_url"
     );
@@ -806,7 +850,11 @@ exports.getUserFeed = async (req, res) => {
 
 exports.getUserReviews = async (req, res) => {
   try {
-    const reviews = await Review.find({ user: String(req.params.userId) })
+    const currentUserId = req.user?.id || req.user?._id;
+    const user = await findUserByIdOrUsername(req.params.userId, currentUserId);
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    const reviews = await Review.find({ user: user._id })
       .populate("movie", "tmdb_id title poster_path media_type release_year")
       .sort({ createdAt: -1 });
 
@@ -818,7 +866,11 @@ exports.getUserReviews = async (req, res) => {
 
 exports.getUserLists = async (req, res) => {
   try {
-    const lists = await MovieList.find({ user: String(req.params.userId) }).sort({
+    const currentUserId = req.user?.id || req.user?._id;
+    const user = await findUserByIdOrUsername(req.params.userId, currentUserId);
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
+    const lists = await MovieList.find({ user: user._id }).sort({
       createdAt: -1,
     });
 
@@ -1064,8 +1116,12 @@ exports.getUserFilteredReviews = async (req, res) => {
     const { userId } = req.params;
     const { filter, value, subValue } = req.query;
 
+    const currentUserId = req.user?.id || req.user?._id;
+    const user = await findUserByIdOrUsername(userId, currentUserId);
+    if (!user) return res.status(404).json({ message: "Utente non trovato." });
+
     const Review = require("../models/Review");
-    const reviews = await Review.find({ user: String(userId) }).populate("movie").lean();
+    const reviews = await Review.find({ user: user._id }).populate("movie").lean();
     const validReviews = reviews.filter(r => r.movie);
 
     let filtered = [];

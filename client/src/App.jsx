@@ -162,6 +162,7 @@ function App() {
             <Route path="settings" element={<SettingsPage />} />
             
             {/* Profilo e Statistiche */}
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="profile/:userId/stats" element={<StatsPage />} />
             <Route path="profile/:userId/goals" element={<GoalsPage />} />

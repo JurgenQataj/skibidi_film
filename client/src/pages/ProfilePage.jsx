@@ -189,13 +189,15 @@ function ProfilePage() {
         if (token) {
           try {
             const decoded = jwtDecode(token);
-            currentUserId = decoded.user?.id || decoded.user?._id;
+            currentUserId = decoded.user?.id || decoded.user?._id || decoded?.id || decoded?._id;
           } catch (e) {}
         }
         setLoggedInUserId(currentUserId);
 
+        const targetId = (!userId || userId === "undefined" || userId === "null") ? (currentUserId || "me") : userId;
+
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const res = await axios.get(`${API_URL}/api/users/${userId}/full-profile`, config);
+        const res = await axios.get(`${API_URL}/api/users/${targetId}/full-profile`, config);
 
         setProfile(res.data.profile);
         setStats(res.data.stats);

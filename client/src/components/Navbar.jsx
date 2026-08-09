@@ -20,7 +20,8 @@ function Navbar() {
 
   if (token) {
     try {
-      userId = jwtDecode(token).user.id;
+      const decoded = jwtDecode(token);
+      userId = decoded.user?.id || decoded.user?._id || decoded?.id || decoded?._id || "me";
     } catch (error) {
       console.error("Token non valido:", error);
       localStorage.removeItem("token");
