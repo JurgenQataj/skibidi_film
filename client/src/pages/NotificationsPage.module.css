@@ -139,7 +139,6 @@
 }
 
 .followBackButton {
-  background-color: #3b82f6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -147,12 +146,30 @@
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, opacity 0.2s;
   white-space: nowrap;
 }
 
-.followBackButton:hover {
-  background-color: #2563eb;
+.followBackButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notFollowing {
+  background-color: #0095f6; /* Blue */
+}
+
+.notFollowing:hover:not(:disabled) {
+  background-color: #0084db;
+}
+
+.following {
+  background-color: #363636; /* Dark Gray */
+  color: #ffffff;
+}
+
+.following:hover:not(:disabled) {
+  background-color: #262626;
 }
 
 /* === RESPONSIVE === */

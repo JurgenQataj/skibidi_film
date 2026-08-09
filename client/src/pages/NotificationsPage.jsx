@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import styles from "./NotificationsPage.module.css";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import { SkeletonWithLogo } from "../components/Skeleton";
 import { MdNotificationsActive, MdNotificationsOff, MdSend, MdSettings, MdInfoOutline, MdCheckCircle } from "react-icons/md";
 import { subscribeUserToPush, checkPushSubscriptionStatus } from "../utils/pushNotifications";
+import { useToast } from "../context/ToastContext";
 
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+  const [followingIds, setFollowingIds] = useState(new Set());
+  const [followLoadingMap, setFollowLoadingMap] = useState({});
+  const { toast } = useToast();
+
   // Push Notification state
   const [pushInfo, setPushInfo] = useState({
     browserPermission: "default",
@@ -34,20 +39,50 @@ function NotificationsPage() {
   };
 
   useEffect(() => {
-    const fetchNotifications = async () => {
+    const fetchNotificationsAndFollowing = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`${API_URL}/api/notifications`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setNotifications(response.data);
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        let currentUserId = null;
+        try {
+          const decoded = jwtDecode(token);
+          currentUserId = decoded.user?.id || decoded.user?._id;
+        } catch (e) {
+          console.error("Errore decoding token:", e);
+        }
+
+        const [notificationsRes, followingRes] = await Promise.allSettled([
+          axios.get(`${API_URL}/api/notifications`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          currentUserId
+            ? axios.get(`${API_URL}/api/users/${currentUserId}/following`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+            : Promise.resolve(null),
+        ]);
+
+        if (notificationsRes.status === "fulfilled") {
+          setNotifications(notificationsRes.value.data);
+        }
+
+        if (followingRes.status === "fulfilled" && followingRes.value?.data) {
+          const ids = new Set(
+            followingRes.value.data.map((u) => (typeof u === "string" ? u : u._id))
+          );
+          setFollowingIds(ids);
+        }
       } catch (error) {
         console.error("Errore nel caricamento delle notifiche:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchNotifications();
+    fetchNotificationsAndFollowing();
     refreshPushStatus();
   }, [API_URL]);
 
@@ -97,6 +132,42 @@ function NotificationsPage() {
       });
     } finally {
       setPushActionLoading(false);
+    }
+  };
+
+  const handleFollowToggle = async (e, targetUserId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const token = localStorage.getItem("token");
+    if (!token || !targetUserId || followLoadingMap[targetUserId]) return;
+
+    setFollowLoadingMap((prev) => ({ ...prev, [targetUserId]: true }));
+    const isFollowing = followingIds.has(targetUserId);
+    const endpoint = isFollowing ? "unfollow" : "follow";
+    const method = isFollowing ? "delete" : "post";
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      if (method === "post") {
+        await axios.post(`${API_URL}/api/users/${targetUserId}/${endpoint}`, {}, config);
+      } else {
+        await axios.delete(`${API_URL}/api/users/${targetUserId}/${endpoint}`, config);
+      }
+
+      setFollowingIds((prev) => {
+        const newSet = new Set(prev);
+        if (isFollowing) {
+          newSet.delete(targetUserId);
+        } else {
+          newSet.add(targetUserId);
+        }
+        return newSet;
+      });
+    } catch (err) {
+      console.error("Errore durante l'operazione di follow:", err);
+      if (toast) toast("Errore durante l'operazione", "error");
+    } finally {
+      setFollowLoadingMap((prev) => ({ ...prev, [targetUserId]: false }));
     }
   };
 
@@ -183,15 +254,20 @@ function NotificationsPage() {
     if (!notification) return null;
 
     if (notification.type === "new_follower") {
+      if (!notification.sender || !notification.sender._id) return null;
+      const targetUserId = notification.sender._id;
+      const isFollowing = followingIds.has(targetUserId);
+      const isLoading = followLoadingMap[targetUserId];
+
       return (
         <button 
-          className={styles.followBackButton} 
-          onClick={(e) => {
-            e.preventDefault(); 
-            // Here you could add follow-back logic
-          }}
+          className={`${styles.followBackButton} ${
+            isFollowing ? styles.following : styles.notFollowing
+          }`} 
+          onClick={(e) => handleFollowToggle(e, targetUserId)}
+          disabled={isLoading}
         >
-          Visualizza
+          {isFollowing ? "Segui già" : "Segui"}
         </button>
       );
     }
