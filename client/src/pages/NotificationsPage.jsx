@@ -17,6 +17,11 @@ function NotificationsPage() {
   const [followLoadingMap, setFollowLoadingMap] = useState({});
   const { toast } = useToast();
 
+  // Paginazione
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   // Push Notification state
   const [pushInfo, setPushInfo] = useState({
     browserPermission: "default",
@@ -56,7 +61,7 @@ function NotificationsPage() {
         }
 
         const [notificationsRes, followingRes] = await Promise.allSettled([
-          axios.get(`${API_URL}/api/notifications`, {
+          axios.get(`${API_URL}/api/notifications?page=1&limit=20`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           currentUserId
@@ -67,7 +72,15 @@ function NotificationsPage() {
         ]);
 
         if (notificationsRes.status === "fulfilled") {
-          setNotifications(notificationsRes.value.data);
+          const data = notificationsRes.value.data;
+          if (Array.isArray(data)) {
+            setNotifications(data);
+            setHasMore(false);
+          } else if (data?.notifications) {
+            setNotifications(data.notifications);
+            setHasMore(data.hasMore || false);
+            setPage(data.page || 1);
+          }
         }
 
         if (followingRes.status === "fulfilled" && followingRes.value?.data) {
@@ -85,6 +98,28 @@ function NotificationsPage() {
     fetchNotificationsAndFollowing();
     refreshPushStatus();
   }, [API_URL]);
+
+  const loadMoreNotifications = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    try {
+      const token = localStorage.getItem("token");
+      const nextPage = page + 1;
+      const res = await axios.get(`${API_URL}/api/notifications?page=${nextPage}&limit=20`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = res.data;
+      if (data?.notifications) {
+        setNotifications((prev) => [...prev, ...data.notifications]);
+        setHasMore(data.hasMore || false);
+        setPage(data.page || nextPage);
+      }
+    } catch (err) {
+      console.error("Errore caricamento altre notifiche:", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const handleEnablePush = async () => {
     setPushActionLoading(true);
@@ -182,6 +217,7 @@ function NotificationsPage() {
       case "new_comment":
       case "review_mention":
       case "comment_mention":
+      case "following_review":
         // CONTROLLO DI SICUREZZA ANCORA PIÙ SPECIFICO
         if (
           notification.targetReview &&
@@ -203,6 +239,15 @@ function NotificationsPage() {
     if (!notification || !notification.sender) return "Nuova notifica da un utente eliminato.";
 
     switch (notification.type) {
+      case "following_review":
+        return (
+          <>
+            <strong>{notification.sender.username}</strong> ha pubblicato una nuova recensione
+            {notification.targetReview?.movie?.title ? (
+              <> su <em>{notification.targetReview.movie.title}</em></>
+            ) : "."}
+          </>
+        );
       case "new_follower":
         return (
           <>
@@ -411,6 +456,28 @@ function NotificationsPage() {
           ))
         ) : (
           <p className={styles.statusText}>Nessuna notifica per ora.</p>
+        )}
+
+        {hasMore && (
+          <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "16px" }}>
+            <button
+              onClick={loadMoreNotifications}
+              disabled={loadingMore}
+              style={{
+                padding: "12px 28px",
+                borderRadius: "14px",
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03))",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#fff",
+                fontWeight: "600",
+                fontSize: "0.9rem",
+                cursor: "pointer",
+                transition: "all 0.2s ease"
+              }}
+            >
+              {loadingMore ? "Caricamento in corso..." : "Carica altre notifiche"}
+            </button>
+          </div>
         )}
       </div>
     </div>

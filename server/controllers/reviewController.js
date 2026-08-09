@@ -4,6 +4,7 @@ const User = require("../models/User");
 const Notification = require("../models/Notification");
 const userController = require("./userController");
 const axios = require("axios");
+const { sendPushNotification } = require("../services/pushService");
 
 // Estrae @username dal testo e restituisce gli ID utenti trovati
 async function extractMentions(text) {
@@ -73,14 +74,77 @@ async function sendMentionNotifications(comment_text, reviewId, userId) {
   try {
     const mentionedIds = await extractMentions(comment_text);
     const validMentions = mentionedIds.filter(id => id.toString() !== userId);
+    if (validMentions.length === 0) return;
+
+    const sender = await User.findById(userId).select("username avatar_url");
+    const review = await Review.findById(reviewId).populate("movie", "title poster_path tmdb_id media_type");
+
+    const movieTitle = review?.movie?.title || "una recensione";
+    const posterUrl = review?.movie?.poster_path
+      ? (review.movie.poster_path.startsWith("http")
+          ? review.movie.poster_path
+          : `https://image.tmdb.org/t/p/w500${review.movie.poster_path}`)
+      : undefined;
+    const movieTmdbId = review?.movie?.tmdb_id || review?.movie?._id;
+    const mediaType = review?.movie?.media_type === "tv" ? "tv" : "movie";
+    const notifUrl = movieTmdbId ? `/${mediaType}/${movieTmdbId}` : "/";
+
     for (const mentionId of validMentions) {
       await new Notification({
         recipient: mentionId, sender: userId,
         type: "review_mention", targetReview: reviewId,
       }).save();
+
+      sendPushNotification(mentionId, {
+        title: `${sender?.username || "Qualcuno"} ti ha menzionato 📢`,
+        body: `Ti ha menzionato in una recensione di ${movieTitle}`,
+        icon: sender?.avatar_url || "/pwa-192x192.png",
+        image: posterUrl,
+        url: notifUrl,
+        tag: `review-mention-${reviewId}`,
+        notificationType: "review_mention",
+      });
     }
   } catch (err) {
     console.log("⚠️ Errore notifica menzione recensione:", err.message);
+  }
+}
+
+async function notifyFollowersAboutReview(publisherId, reviewId, movie, comment_text, rating) {
+  try {
+    const publisher = await User.findById(publisherId).select("username avatar_url followers");
+    if (!publisher || !publisher.followers || publisher.followers.length === 0) return;
+
+    const movieTitle = movie?.title || "un titolo";
+    const posterUrl = movie?.poster_path
+      ? (movie.poster_path.startsWith("http")
+          ? movie.poster_path
+          : `https://image.tmdb.org/t/p/w500${movie.poster_path}`)
+      : undefined;
+    const movieTmdbId = movie?.tmdb_id || movie?._id;
+    const mediaType = movie?.media_type === "tv" ? "tv" : "movie";
+    const notifUrl = movieTmdbId ? `/${mediaType}/${movieTmdbId}` : "/";
+
+    const ratingText = rating !== undefined ? ` (Voto: ${rating}/10)` : "";
+    const trimmed = (comment_text || "").trim();
+    const commentSnippet = trimmed
+      ? (trimmed.length > 70 ? `"${trimmed.substring(0, 67)}..."` : `"${trimmed}"`)
+      : `Ha pubblicato una recensione di ${movieTitle}${ratingText}.`;
+
+    for (const followerId of publisher.followers) {
+      // Solo notifica Push esterna (non salviamo la notifica in-app nel DB)
+      sendPushNotification(followerId, {
+        title: `${publisher.username} ha recensito ${movieTitle} 🎬`,
+        body: commentSnippet,
+        icon: publisher.avatar_url || "/pwa-192x192.png",
+        image: posterUrl,
+        url: notifUrl,
+        tag: `following-review-${reviewId}`,
+        notificationType: "following_review",
+      });
+    }
+  } catch (err) {
+    console.error("⚠️ Errore notifyFollowersAboutReview:", err);
   }
 }
 
@@ -183,6 +247,11 @@ exports.addReview = async (req, res) => {
     // Fire-and-forget: le menzioni non devono bloccare la response
     sendMentionNotifications(comment_text, newReview._id, userId).catch(err =>
       console.error("⚠️ Errore background menzioni:", err.message)
+    );
+
+    // Fire-and-forget: notifica i follower per la nuova recensione
+    notifyFollowersAboutReview(userId, newReview._id, movie, comment_text, rating).catch(err =>
+      console.error("⚠️ Errore background notifica follower recensione:", err.message)
     );
 
     // Remove from watchlist

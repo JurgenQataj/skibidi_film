@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   FiBell, FiDatabase, FiLogOut, FiDownload, FiAlertTriangle,
-  FiCheck, FiX,
+  FiCheck, FiX, FiShield, FiFilm, FiMessageSquare, FiHeart,
+  FiUserPlus, FiAtSign, FiRepeat, FiCheckCircle, FiXCircle, FiAlertCircle
 } from "react-icons/fi";
 import {
   HiOutlineCloudDownload,
@@ -17,13 +18,18 @@ const TABS = [
   { id: "data",          label: "Dati",      Icon: FiDatabase },
 ];
 
-/* ── Tiny reusable Toggle Row ── */
-function ToggleRow({ title, description, checked, onChange, disabled }) {
+/* ── Modern Toggle Row Component ── */
+function ModernToggleRow({ icon: Icon, iconBg, title, description, checked, onChange, disabled }) {
   return (
-    <div className={styles.toggleRow}>
+    <div className={`${styles.modernToggleRow} ${disabled ? styles.disabledRow : ""}`}>
+      {Icon && (
+        <div className={styles.toggleIconWrapper} style={{ background: iconBg }}>
+          <Icon className={styles.toggleIcon} />
+        </div>
+      )}
       <div className={styles.toggleInfo}>
-        <h4>{title}</h4>
-        <p>{description}</p>
+        <h4 className={styles.toggleTitle}>{title}</h4>
+        <p className={styles.toggleDesc}>{description}</p>
       </div>
       <label className={styles.toggleSwitch}>
         <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} />
@@ -50,7 +56,7 @@ function Toast({ message, type, onClose }) {
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
-/* ── Notifications Tab (connected to backend) ── */
+/* ── Notifications Tab (Redesigned & Modernized) ── */
 function NotificationsTab({ token }) {
   const [prefs, setPrefs] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,6 +75,7 @@ function NotificationsTab({ token }) {
         setPrefs({
           push_enabled: true, comments: true, reactions: true,
           followers: true, mentions: true, thread_replies: true,
+          followed_reviews: true,
         });
       } finally {
         setLoading(false);
@@ -103,66 +110,176 @@ function NotificationsTab({ token }) {
 
   if (loading || !prefs) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted, #888)' }}>
-        Caricamento preferenze...
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner} />
+        <p>Caricamento preferenze...</p>
       </div>
     );
   }
 
-  const pushStatusLabel = {
-    granted: "✅ Attive",
-    denied: "❌ Bloccate dal browser",
-    default: "⚠️ Non ancora richieste",
-    unsupported: "❌ Non supportate",
+  const statusConfig = {
+    granted: {
+      label: "Attive e Funzionanti",
+      desc: "Questo dispositivo riceve correttamente le notifiche push in tempo reale.",
+      badgeClass: styles.statusBadgeActive,
+      Icon: FiCheckCircle,
+    },
+    denied: {
+      label: "Bloccate dal Browser",
+      desc: "Sblocca le autorizzazioni notifiche nelle impostazioni del browser.",
+      badgeClass: styles.statusBadgeBlocked,
+      Icon: FiXCircle,
+    },
+    default: {
+      label: "Da Abilitare",
+      desc: "Non hai ancora concesso il permesso notifiche sul browser.",
+      badgeClass: styles.statusBadgeWarn,
+      Icon: FiAlertCircle,
+    },
+    unsupported: {
+      label: "Non Supportate",
+      desc: "Il browser corrente non supporta il sistema Web Push.",
+      badgeClass: styles.statusBadgeBlocked,
+      Icon: FiXCircle,
+    },
   };
 
-  return (
-    <>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Notifiche Push</h2>
-        <p className={styles.sectionDesc}>
-          Controlla quali notifiche vuoi ricevere. Le modifiche sono salvate automaticamente.
-        </p>
-      </div>
+  const currentStatus = statusConfig[pushStatus] || statusConfig.default;
+  const StatusIcon = currentStatus.Icon;
 
-      <div className={styles.card}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0' }}>
+  return (
+    <div className={styles.notificationsTabContainer}>
+      <div className={styles.sectionHeader}>
+        <div className={styles.headerTitleGroup}>
+          <div className={styles.headerIconBadge}>
+            <FiBell />
+          </div>
           <div>
-            <h4 style={{ margin: 0, color: 'var(--text-primary, #fff)' }}>Stato Push Browser</h4>
-            <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-muted, #888)' }}>
-              {pushStatusLabel[pushStatus] || pushStatus}
+            <h2 className={styles.sectionTitle}>Centro Preferenze Push</h2>
+            <p className={styles.sectionDesc}>
+              Personalizza le notifiche in tempo reale sul tuo dispositivo. Le modifiche sono istantanee.
             </p>
           </div>
-          {pushStatus === 'denied' && (
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted, #888)', maxWidth: 200, textAlign: 'right' }}>
-              Vai nelle impostazioni del browser per sbloccare le notifiche.
-            </p>
-          )}
         </div>
       </div>
 
-      <div className={styles.card}>
-        <ToggleRow
-          title="Push Abilitate"
-          description="Interruttore principale. Se disattivato, nessuna push verrà inviata."
+      {/* Hero Browser Status Card */}
+      <div className={styles.browserStatusCard}>
+        <div className={styles.statusHeaderRow}>
+          <div className={styles.statusInfoGroup}>
+            <div className={styles.statusPulseDotGroup}>
+              <span className={`${styles.pulseDot} ${currentStatus.badgeClass}`} />
+              <h4 className={styles.statusTitle}>Stato Push Browser</h4>
+            </div>
+            <p className={styles.statusDesc}>{currentStatus.desc}</p>
+          </div>
+          <div className={`${styles.statusBadgePill} ${currentStatus.badgeClass}`}>
+            <StatusIcon size={14} />
+            <span>{currentStatus.label}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Master Toggle Switch Card */}
+      <div className={`${styles.masterToggleCard} ${prefs.push_enabled ? styles.masterActive : styles.masterInactive}`}>
+        <ModernToggleRow
+          icon={FiShield}
+          iconBg="linear-gradient(135deg, #e50914, #a1001c)"
+          title="Notifiche Push Generali"
+          description="Interruttore principale. Disattivandolo non riceverai alcuna notifica su questo dispositivo."
           checked={prefs.push_enabled}
-          onChange={() => togglePref('push_enabled')}
+          onChange={() => togglePref("push_enabled")}
         />
       </div>
 
-      <div className={styles.card} style={{ opacity: prefs.push_enabled ? 1 : 0.5, pointerEvents: prefs.push_enabled ? 'auto' : 'none' }}>
-        <ToggleRow title="💬 Commenti" description="Quando qualcuno commenta una tua recensione."
-          checked={prefs.comments} onChange={() => togglePref('comments')} />
-        <ToggleRow title="❤️ Reazioni" description="Quando qualcuno reagisce a una tua recensione."
-          checked={prefs.reactions} onChange={() => togglePref('reactions')} />
-        <ToggleRow title="👤 Nuovi Follower" description="Quando qualcuno inizia a seguirti."
-          checked={prefs.followers} onChange={() => togglePref('followers')} />
-        <ToggleRow title="📢 Menzioni" description="Quando qualcuno ti menziona con @username."
-          checked={prefs.mentions} onChange={() => togglePref('mentions')} />
-        <ToggleRow title="🔄 Risposte nei Thread" description="Quando qualcuno risponde in un thread a cui partecipi."
-          checked={prefs.thread_replies} onChange={() => togglePref('thread_replies')} />
+      {/* Categorized Preferences */}
+      <div className={`${styles.categoriesWrapper} ${!prefs.push_enabled ? styles.disabledSection : ""}`}>
+        {!prefs.push_enabled && (
+          <div className={styles.disabledOverlayBadge}>
+            <FiShield size={16} />
+            <span>Attiva le Notifiche Push Generali per personalizzare le categorie</span>
+          </div>
+        )}
+
+        {/* Group 1: Attività & Seguiti */}
+        <div className={styles.categoryCard}>
+          <h3 className={styles.categoryHeading}>
+            <span className={styles.categoryHeadingDot} style={{ background: '#e50914' }} />
+            Attività & Seguiti
+          </h3>
+          <ModernToggleRow
+            icon={FiFilm}
+            iconBg="rgba(229, 9, 20, 0.2)"
+            title="Recensioni dei Seguiti"
+            description="Ricevi una notifica push esterna quando un utente che segui pubblica una recensione."
+            checked={prefs.followed_reviews}
+            onChange={() => togglePref("followed_reviews")}
+            disabled={!prefs.push_enabled}
+          />
+          <ModernToggleRow
+            icon={FiUserPlus}
+            iconBg="rgba(34, 197, 94, 0.2)"
+            title="Nuovi Follower"
+            description="Ricevi un avviso immediato quando qualcuno inizia a seguire il tuo profilo."
+            checked={prefs.followers}
+            onChange={() => togglePref("followers")}
+            disabled={!prefs.push_enabled}
+          />
+        </div>
+
+        {/* Group 2: Interazioni sulle tue Recensioni */}
+        <div className={styles.categoryCard}>
+          <h3 className={styles.categoryHeading}>
+            <span className={styles.categoryHeadingDot} style={{ background: '#3b82f6' }} />
+            Le Tue Recensioni
+          </h3>
+          <ModernToggleRow
+            icon={FiMessageSquare}
+            iconBg="rgba(59, 130, 246, 0.2)"
+            title="Commenti"
+            description="Ricevi una notifica quando qualcuno lascia un commento sotto una tua recensione."
+            checked={prefs.comments}
+            onChange={() => togglePref("comments")}
+            disabled={!prefs.push_enabled}
+          />
+          <ModernToggleRow
+            icon={FiHeart}
+            iconBg="rgba(239, 68, 68, 0.2)"
+            title="Reazioni"
+            description="Notifica quando altri utenti aggiungono un like o reazione alle tue recensioni."
+            checked={prefs.reactions}
+            onChange={() => togglePref("reactions")}
+            disabled={!prefs.push_enabled}
+          />
+        </div>
+
+        {/* Group 3: Menzioni & Chat */}
+        <div className={styles.categoryCard}>
+          <h3 className={styles.categoryHeading}>
+            <span className={styles.categoryHeadingDot} style={{ background: '#a855f7' }} />
+            Menzioni & Conversazioni
+          </h3>
+          <ModernToggleRow
+            icon={FiAtSign}
+            iconBg="rgba(168, 85, 247, 0.2)"
+            title="Menzioni (@username)"
+            description="Ricevi un avviso quando vieni menzionato nei commenti o nella Chat Globale."
+            checked={prefs.mentions}
+            onChange={() => togglePref("mentions")}
+            disabled={!prefs.push_enabled}
+          />
+          <ModernToggleRow
+            icon={FiRepeat}
+            iconBg="rgba(6, 182, 212, 0.2)"
+            title="Risposte nei Thread"
+            description="Notifica quando altri utenti rispondono in una discussione in cui sei intervenuto."
+            checked={prefs.thread_replies}
+            onChange={() => togglePref("thread_replies")}
+            disabled={!prefs.push_enabled}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 

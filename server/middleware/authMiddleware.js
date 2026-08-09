@@ -30,4 +30,18 @@ const protect = (req, res, next) => {
     }
 };
 
-module.exports = { protect };
+const optionalProtect = (req, res, next) => {
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = decoded.user;
+        } catch (error) {
+            // Ignora errore per rotte con auth opzionale
+        }
+    }
+    next();
+};
+
+module.exports = { protect, optionalProtect };

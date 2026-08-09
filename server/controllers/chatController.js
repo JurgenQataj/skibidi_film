@@ -1,6 +1,7 @@
 const GlobalMessage = require("../models/GlobalMessage");
 const User = require("../models/User");
 const Notification = require("../models/Notification");
+const { sendPushNotification } = require("../services/pushService");
 
 // Estrae @username dal testo e restituisce gli ID utenti trovati
 async function extractMentions(text) {
@@ -60,6 +61,22 @@ exports.postMessage = async (req, res) => {
         type: "chat_mention",
       }));
       await Notification.insertMany(notifications);
+
+      const senderUser = await User.findById(req.user.id).select("username avatar_url");
+      const senderName = senderUser?.username || "Qualcuno";
+      const senderAvatar = senderUser?.avatar_url || "/pwa-192x192.png";
+      const chatSnippet = content.length > 90 ? `"${content.substring(0, 87)}..."` : `"${content}"`;
+
+      for (const recipientId of otherMentions) {
+        sendPushNotification(recipientId, {
+          title: `${senderName} ti ha menzionato nella Chat Globale 💬`,
+          body: chatSnippet,
+          icon: senderAvatar,
+          url: "/discover",
+          tag: `chat-mention-${newMessage._id}`,
+          notificationType: "chat_mention",
+        });
+      }
     }
 
     const populatedMessage = await GlobalMessage.findById(newMessage._id)

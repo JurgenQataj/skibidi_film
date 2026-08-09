@@ -3,11 +3,11 @@
 /* ── Page Shell ── */
 .pageWrapper {
   min-height: 100vh;
-  background: #0a0a0c;
-  color: #e8e8e8;
+  background: transparent;
+  color: var(--text-light, #f6ebf9);
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-ui, "Montserrat", -apple-system, sans-serif);
   padding-top: 80px; /* navbar height */
   box-sizing: border-box;
 }
@@ -91,8 +91,8 @@
 }
 
 .navBtn.active {
-  background: rgba(216, 27, 96, 0.12);
-  color: #e91e63;
+  background: rgba(161, 0, 28, 0.18);
+  color: #e50914;
   font-weight: 600;
 }
 
@@ -107,7 +107,7 @@
   transform: translateY(-50%);
   width: 3px;
   height: 60%;
-  background: #e91e63;
+  background: #e50914;
   border-radius: 0 4px 4px 0;
 }
 
@@ -151,9 +151,7 @@
 
 /* ── Section Header ── */
 .sectionHeader {
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 24px;
 }
 
 .sectionTitle {
@@ -226,8 +224,8 @@
 }
 
 .inputField:focus {
-  border-color: rgba(233, 30, 99, 0.5);
-  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+  border-color: rgba(229, 9, 20, 0.5);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
 }
 
 .selectField {
@@ -248,8 +246,8 @@
 }
 
 .selectField:focus {
-  border-color: rgba(233, 30, 99, 0.5);
-  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+  border-color: rgba(229, 9, 20, 0.5);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
 }
 
 .selectField option {
@@ -366,8 +364,8 @@
 }
 
 input:checked + .slider {
-  background: #e91e63;
-  border-color: #e91e63;
+  background: linear-gradient(135deg, #e50914, #a1001c);
+  border-color: #e50914;
 }
 
 input:checked + .slider::before {
@@ -380,7 +378,7 @@ input:checked + .slider::before {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #d81b60 0%, #ff4081 100%);
+  background: linear-gradient(135deg, #a1001c 0%, #e50914 100%);
   color: #fff;
   border: none;
   padding: 13px 26px;
@@ -394,7 +392,7 @@ input:checked + .slider::before {
 
 .primaryBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(216, 27, 96, 0.45);
+  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.45);
 }
 
 .primaryBtn:active {
@@ -806,4 +804,271 @@ input:checked + .slider::before {
   .sectionTitle {
     font-size: 1.15rem;
   }
+}
+
+/* ── Modern Notifications Tab Redesign ── */
+
+.notificationsTabContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.headerTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.headerIconBadge {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.2), rgba(161, 0, 28, 0.08));
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e50914;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(229, 9, 20, 0.15);
+}
+
+/* Hero Browser Status Card */
+.browserStatusCard {
+  background: linear-gradient(135deg, rgba(36, 16, 44, 0.7), rgba(24, 16, 25, 0.8));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 20px 24px;
+  backdrop-filter: blur(12px);
+}
+
+.statusHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.statusInfoGroup {
+  flex: 1;
+}
+
+.statusPulseDotGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.statusBadgeActive .pulseDot,
+.pulseDot.statusBadgeActive {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+}
+
+.statusBadgeActive {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.statusBadgeBlocked {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.statusBadgeWarn {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.statusTitle {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.statusDesc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.statusBadgePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Master Toggle Switch Card */
+.masterToggleCard {
+  background: linear-gradient(135deg, rgba(161, 0, 28, 0.12), rgba(24, 16, 25, 0.8));
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  border-radius: 18px;
+  padding: 16px 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.masterActive {
+  border-color: rgba(229, 9, 20, 0.5);
+  box-shadow: 0 8px 30px rgba(161, 0, 28, 0.22);
+}
+
+.masterInactive {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Categories & Grouped Cards */
+.categoriesWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  transition: opacity 0.3s ease;
+}
+
+.disabledSection {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.disabledOverlayBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: #1e1e24;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.categoryCard {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.categoryCard:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.categoryHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+}
+
+.categoryHeadingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Modern Toggle Row */
+.modernToggleRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 10px;
+  border-radius: 14px;
+  transition: background 0.2s ease;
+}
+
+.modernToggleRow:hover:not(.disabledRow) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.disabledRow {
+  opacity: 0.6;
+}
+
+.toggleIconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.toggleTitle {
+  margin: 0 0 3px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.toggleDesc {
+  margin: 0;
+  font-size: 0.83rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* Loading spinner */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #94a3b8;
+  gap: 16px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(229, 9, 20, 0.2);
+  border-top-color: #e50914;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

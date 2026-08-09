@@ -185,35 +185,23 @@ function ProfilePage() {
       window.scrollTo(0, 0);
       try {
         const token = localStorage.getItem("token");
-        const currentUserId = token ? jwtDecode(token).user.id : null;
+        let currentUserId = null;
+        if (token) {
+          try {
+            const decoded = jwtDecode(token);
+            currentUserId = decoded.user?.id || decoded.user?._id;
+          } catch (e) {}
+        }
         setLoggedInUserId(currentUserId);
 
-        const cacheBuster = `_t=${Date.now()}`;
-        const [profileRes, statsRes, reviewsRes] = await Promise.all([
-          axios.get(`${API_URL}/api/users/${userId}/profile?${cacheBuster}`),
-          axios.get(`${API_URL}/api/users/${userId}/stats`),
-          axios.get(`${API_URL}/api/users/${userId}/reviews`),
-        ]);
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const res = await axios.get(`${API_URL}/api/users/${userId}/full-profile`, config);
 
-        setProfile(profileRes.data);
-        setStats(statsRes.data);
-        setReviews(reviewsRes.data || []);
-
-        // Carica le liste pubbliche dell'utente
-        try {
-          const listsRes = await axios.get(`${API_URL}/api/users/${userId}/lists`);
-          setLists(listsRes.data || []);
-        } catch { setLists([]); }
-
-        if (currentUserId && currentUserId !== userId) {
-          const followStatusRes = await axios.get(
-            `${API_URL}/api/users/${userId}/follow-status`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          setIsFollowing(followStatusRes.data.isFollowing);
-        } else {
-          setIsFollowing(false);
-        }
+        setProfile(res.data.profile);
+        setStats(res.data.stats);
+        setReviews(res.data.reviews || []);
+        setLists(res.data.lists || []);
+        setIsFollowing(res.data.isFollowing || false);
       } catch (error) {
         console.error("Errore caricamento profilo:", error);
         setProfile(null);
@@ -348,28 +336,37 @@ function ProfilePage() {
         onClose={() => setIsHistoryModalOpen(false)}
         title={`Cronologia Film di ${profile.username}`}
       >
-        <ol className={styles.historyList}>
-          {movieReviews.map((review, index) => (
-            <li 
-              key={review._id} 
-              className={styles.historyItem}
-              onClick={() => navigate(`/movie/${review.movie.tmdb_id}`)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/movie/${review.movie.tmdb_id}`); }}
-              tabIndex={0}
-              role="button"
-            >
-              <span className={styles.historyNumber}>{index + 1}</span>
-              <img                 src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
-                alt={`Poster di ${review.movie.title}`}
-                className={styles.historyPoster}
-               loading="lazy" decoding="async" />
-              <div className={styles.historyInfo}>
-                <span className={styles.historyTitle}>{review.movie.title}</span>
-              </div>
-              <span className={styles.historyRating}>{review.rating}/10</span>
-            </li>
-          ))}
-        </ol>
+        {movieReviews.length === 0 ? (
+          <p style={{ color: "rgba(255,255,255,0.5)", textAlign: "center", padding: "20px 0" }}>
+            Nessun film recensito finora.
+          </p>
+        ) : (
+          <ol className={styles.historyList}>
+            {movieReviews.map((review, index) => {
+              const tmdbId = review.movie?.tmdb_id;
+              return (
+                <li 
+                  key={review._id} 
+                  className={styles.historyItem}
+                  onClick={() => tmdbId && navigate(`/movie/${tmdbId}`)}
+                  onKeyDown={(e) => { if (tmdbId && (e.key === 'Enter' || e.key === ' ')) navigate(`/movie/${tmdbId}`); }}
+                  tabIndex={0}
+                  role="button"
+                >
+                  <span className={styles.historyNumber}>{index + 1}</span>
+                  <img                     src={review.movie?.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
+                    alt={`Poster di ${review.movie?.title || 'Film'}`}
+                    className={styles.historyPoster}
+                    loading="lazy" decoding="async" />
+                  <div className={styles.historyInfo}>
+                    <span className={styles.historyTitle}>{review.movie?.title || "Titolo non disponibile"}</span>
+                  </div>
+                  <span className={styles.historyRating}>{review.rating}/10</span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </Modal>
 
       <Modal
@@ -377,28 +374,37 @@ function ProfilePage() {
         onClose={() => setIsTvHistoryModalOpen(false)}
         title={`Cronologia Serie TV di ${profile.username}`}
       >
-        <ol className={styles.historyList}>
-          {tvReviews.map((review, index) => (
-            <li 
-              key={review._id} 
-              className={styles.historyItem}
-              onClick={() => navigate(`/tv/${review.movie.tmdb_id}`)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/tv/${review.movie.tmdb_id}`); }}
-              tabIndex={0}
-              role="button"
-            >
-              <span className={styles.historyNumber}>{index + 1}</span>
-              <img                 src={review.movie.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
-                alt={`Poster di ${review.movie.title}`}
-                className={styles.historyPoster}
-               loading="lazy" decoding="async" />
-              <div className={styles.historyInfo}>
-                <span className={styles.historyTitle}>{review.movie.name || review.movie.title}</span>
-              </div>
-              <span className={styles.historyRating}>{review.rating}/10</span>
-            </li>
-          ))}
-        </ol>
+        {tvReviews.length === 0 ? (
+          <p style={{ color: "rgba(255,255,255,0.5)", textAlign: "center", padding: "20px 0" }}>
+            Nessuna serie TV recensita finora.
+          </p>
+        ) : (
+          <ol className={styles.historyList}>
+            {tvReviews.map((review, index) => {
+              const tmdbId = review.movie?.tmdb_id;
+              return (
+                <li 
+                  key={review._id} 
+                  className={styles.historyItem}
+                  onClick={() => tmdbId && navigate(`/tv/${tmdbId}`)}
+                  onKeyDown={(e) => { if (tmdbId && (e.key === 'Enter' || e.key === ' ')) navigate(`/tv/${tmdbId}`); }}
+                  tabIndex={0}
+                  role="button"
+                >
+                  <span className={styles.historyNumber}>{index + 1}</span>
+                  <img                     src={review.movie?.poster_path ? `https://image.tmdb.org/t/p/w185${review.movie.poster_path}` : "https://placehold.co/185x278?text=No+Img"}
+                    alt={`Poster di ${review.movie?.title || review.movie?.name || 'Serie TV'}`}
+                    className={styles.historyPoster}
+                    loading="lazy" decoding="async" />
+                  <div className={styles.historyInfo}>
+                    <span className={styles.historyTitle}>{review.movie?.title || review.movie?.name || "Titolo non disponibile"}</span>
+                  </div>
+                  <span className={styles.historyRating}>{review.rating}/10</span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </Modal>
 
       {/* Modal Liste */}

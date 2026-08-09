@@ -20,10 +20,11 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 const NOTIFICATION_TYPE_MAP = {
   "new_comment": "comments",
   "comment_mention": "mentions",
+  "review_mention": "mentions",
+  "chat_mention": "mentions",
   "thread_comment": "thread_replies",
   "new_reaction": "reactions",
   "new_follower": "followers",
-  "chat_mention": "mentions",
 };
 
 /**
@@ -55,17 +56,26 @@ async function sendPushNotification(userId, {
   title, body, url = "/", icon, image, tag, notificationType, actions = [] 
 }) {
   try {
-    // --- Check preferenze utente (se specificato il tipo) ---
-    if (notificationType) {
-      const prefField = NOTIFICATION_TYPE_MAP[notificationType];
-      if (prefField) {
-        const user = await User.findById(userId).select("notification_preferences").lean();
-        if (user?.notification_preferences) {
-          // Se push_enabled è esplicitamente false, blocca tutto
-          if (user.notification_preferences.push_enabled === false) return;
-          // Se il tipo specifico è disattivato, non inviare
-          if (user.notification_preferences[prefField] === false) return;
-        }
+    // --- Check preferenze utente ---
+    const user = await User.findById(userId).select("notification_preferences").lean();
+    if (user) {
+      const DEFAULT_PREFERENCES = {
+        push_enabled: true,
+        comments: true,
+        reactions: true,
+        followers: true,
+        mentions: true,
+        thread_replies: true,
+      };
+      const prefs = { ...DEFAULT_PREFERENCES, ...(user.notification_preferences || {}) };
+
+      // Se push_enabled è disattivato, non inviare alcuna push
+      if (prefs.push_enabled === false) return;
+
+      // Se il tipo specifico è disattivato, non inviare
+      if (notificationType) {
+        const prefField = NOTIFICATION_TYPE_MAP[notificationType];
+        if (prefField && prefs[prefField] === false) return;
       }
     }
 

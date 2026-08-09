@@ -46,12 +46,13 @@ const userSchema = new mongoose.Schema({
 
   // Preferenze Notifiche Push (granulari)
   notification_preferences: {
-    push_enabled:   { type: Boolean, default: true },  // Master switch
-    comments:       { type: Boolean, default: true },  // Commenti sulle tue recensioni
-    reactions:      { type: Boolean, default: true },  // Reazioni alle tue recensioni
-    followers:      { type: Boolean, default: true },  // Nuovi follower
-    mentions:       { type: Boolean, default: true },  // @menzioni in commenti e chat
-    thread_replies: { type: Boolean, default: true },  // Risposte in thread a cui partecipi
+    push_enabled:     { type: Boolean, default: true },  // Master switch
+    comments:         { type: Boolean, default: true },  // Commenti sulle tue recensioni
+    reactions:        { type: Boolean, default: true },  // Reazioni alle tue recensioni
+    followers:        { type: Boolean, default: true },  // Nuovi follower
+    mentions:         { type: Boolean, default: true },  // @menzioni in commenti e chat
+    thread_replies:   { type: Boolean, default: true },  // Risposte in thread a cui partecipi
+    followed_reviews: { type: Boolean, default: true },  // Recensioni di persone che segui
   },
 
   // Recupero Password

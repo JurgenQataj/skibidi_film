@@ -43,10 +43,10 @@ const CustomTrendingRow = () => {
 
     const fetchUnread = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/notifications`, {
+        const res = await axios.get(`${API_URL}/api/notifications/unread-count`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUnreadCount((res.data || []).filter((n) => !n.read).length);
+        setUnreadCount(res.data?.unreadCount || 0);
       } catch {}
     };
 

@@ -4,12 +4,13 @@ const notificationController = require('../controllers/notificationController');
 // MODIFICA QUI: Importiamo 'protect' con le parentesi graffe
 const { protect } = require('../middleware/authMiddleware');
 
-// Ottenere tutte le proprie notifiche
-// MODIFICA QUI: Usiamo 'protect'
+// Ottenere le proprie notifiche (paginate)
 router.get('/', protect, notificationController.getNotifications);
 
+// Endpoint leggero per il conteggio non lette (polling)
+router.get('/unread-count', protect, notificationController.getUnreadCount);
+
 // Marcare le proprie notifiche come lette
-// MODIFICA QUI: Usiamo 'protect'
 router.put('/read', protect, notificationController.markAsRead);
 
 module.exports = router;

@@ -267,6 +267,73 @@ exports.getUserStats = async (req, res) => {
   }
 };
 
+// --- GET FULL USER PROFILE IN A SINGLE FAST ROUNDTRIP ---
+exports.getUserFullProfile = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const currentUserId = req.user?.id || req.user?._id;
+
+    // Parallel DB Execution
+    const [user, reviews, lists] = await Promise.all([
+      User.findById(userId).select("-password").lean(),
+      Review.find({ user: String(userId) })
+        .populate("movie", "media_type title poster_path release_year vote_average tmdb_id")
+        .sort({ createdAt: -1 })
+        .lean(),
+      MovieList.find({ user: userId })
+        .select("name isPublic movies createdAt")
+        .lean(),
+    ]);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utente non trovato" });
+    }
+
+    // Stats calculation from reviews & user arrays
+    const validReviews = reviews.filter((r) => r.movie);
+    let moviesReviewed = 0;
+    let tvShowsReviewed = 0;
+
+    validReviews.forEach((r) => {
+      if (r.movie.media_type === "tv") {
+        tvShowsReviewed++;
+      } else {
+        moviesReviewed++;
+      }
+    });
+
+    const followersCount = user.followers ? user.followers.length : 0;
+    const followingCount = user.following ? user.following.length : 0;
+
+    const stats = {
+      username: user.username,
+      moviesReviewed,
+      tvShowsReviewed,
+      followersCount,
+      followingCount,
+    };
+
+    let isFollowing = false;
+    if (currentUserId && String(currentUserId) !== String(userId)) {
+      isFollowing = user.followers
+        ? user.followers.some((fId) => String(fId) === String(currentUserId))
+        : false;
+    }
+
+    res.json({
+      profile: user,
+      stats,
+      reviews: validReviews,
+      totalReviews: validReviews.length,
+      lists: lists || [],
+      isFollowing,
+    });
+  } catch (error) {
+    console.error("Errore getUserFullProfile:", error);
+    res.status(500).json({ message: "Errore durante il caricamento del profilo." });
+  }
+};
+
 // --- NUOVA FUNZIONE: STATISTICHE AVANZATE DINAMICHE (Con Anno) ---
 exports.getUserAdvancedStats = async (req, res) => {
   try {
@@ -1155,6 +1222,7 @@ exports.getNotificationPreferences = async (req, res) => {
       followers: true,
       mentions: true,
       thread_replies: true,
+      followed_reviews: true,
     };
 
     res.json(prefs);
@@ -1166,7 +1234,7 @@ exports.getNotificationPreferences = async (req, res) => {
 
 exports.updateNotificationPreferences = async (req, res) => {
   try {
-    const allowedFields = ["push_enabled", "comments", "reactions", "followers", "mentions", "thread_replies"];
+    const allowedFields = ["push_enabled", "comments", "reactions", "followers", "mentions", "thread_replies", "followed_reviews"];
     const updates = {};
 
     for (const field of allowedFields) {

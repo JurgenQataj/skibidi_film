@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, optionalProtect } = require("../middleware/authMiddleware");
 
 // --- Auth ---
 router.post("/register", userController.registerUser);
@@ -22,6 +22,7 @@ router.get("/search", userController.searchUsers); // Per @mention autocomplete
 router.get("/feed", protect, userController.getUserFeed); 
 
 // --- Profile ---
+router.get("/:userId/full-profile", optionalProtect, userController.getUserFullProfile);
 router.get("/:userId/profile", userController.getUserProfile);
 router.put("/profile", protect, userController.updateUserProfile);
 router.delete("/profile", protect, userController.deleteUserProfile);
