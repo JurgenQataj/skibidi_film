@@ -9,6 +9,10 @@ connectDB();
 
 const app = express();
 
+// Trust proxy for reverse proxies (Render, Vercel, etc.)
+// Prevents express-rate-limit ValidationError on X-Forwarded-For headers
+app.set("trust proxy", 1);
+
 // --- SICUREZZA BASE ---
 // Imposta header HTTP per la sicurezza
 app.use(helmet({
