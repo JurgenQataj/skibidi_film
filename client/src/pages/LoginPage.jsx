@@ -3,10 +3,12 @@ import axios from "axios";
 import useAuthStore from "../store/useAuthStore";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "../components/LoginPage.module.css";
+import { User, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuthStore();
@@ -18,7 +20,6 @@ function LoginPage() {
     setError("");
     try {
       const API_URL = import.meta.env.VITE_API_URL || "";
-      // Nota: Il backend ora supporta login sia con username che email
       const response = await axios.post(`${API_URL}/api/users/login`, {
         username,
         password,
@@ -34,43 +35,85 @@ function LoginPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      <form onSubmit={handleLogin} className={styles.loginContainer}>
-        <h2>Login</h2>
-        <div className={styles.inputGroup}>
-          <label>Username o Email:</label>
-          <input
-            className={styles.inputField}
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div className={styles.inputGroup}>
-          <label>Password:</label>
-          <input
-            className={styles.inputField}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p style={{ color: "#ff8a8a" }}>{error}</p>}
-        
-        <button type="submit" className={styles.submitButton} disabled={loading}>
-          {loading ? "Caricamento..." : "Accedi"}
-        </button>
+      <div className={styles.glowOrbTop} />
+      <div className={styles.glowOrbBottom} />
 
-        <Link to="/forgot-password" className={styles.forgotPasswordLink}>
-          Password dimenticata?
-        </Link>
+      <div className={styles.loginContainer}>
+        <div className={styles.brandHeader}>
+          <img src="/icona3.png" alt="Skibidi Film Logo" className={styles.brandLogo} />
+          <h2>Bentornato</h2>
+          <p className={styles.brandSubtitle}>Accedi al tuo account per continuare</p>
+        </div>
 
-        <p className={styles.authFooter}>
-          Non hai un account? <Link to="/register">Registrati</Link>
-        </p>
-      </form>
+        <form onSubmit={handleLogin} className={styles.loginForm}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="login-username">Username o Email</label>
+            <div className={styles.inputWrapper}>
+              <User size={18} className={styles.inputIcon} />
+              <input
+                id="login-username"
+                className={styles.inputField}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username o email..."
+                required
+                autoComplete="username"
+              />
+            </div>
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="login-password">Password</label>
+            <div className={styles.inputWrapper}>
+              <Lock size={18} className={styles.inputIcon} />
+              <input
+                id="login-password"
+                className={`${styles.inputField} ${styles.inputFieldWithToggle}`}
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Nascondi password" : "Mostra password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.linksRow}>
+            <Link to="/forgot-password" className={styles.forgotPasswordLink}>
+              Password dimenticata?
+            </Link>
+          </div>
+
+          {error && <div className={styles.errorMessage}>{error}</div>}
+
+          <button type="submit" className={styles.submitButton} disabled={loading}>
+            {loading ? (
+              <span className={styles.spinner} />
+            ) : (
+              <>
+                <span>Accedi</span>
+                <LogIn size={18} />
+              </>
+            )}
+          </button>
+
+          <p className={styles.authFooter}>
+            Non hai un account? <Link to="/register">Registrati</Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
+
 export default LoginPage;
