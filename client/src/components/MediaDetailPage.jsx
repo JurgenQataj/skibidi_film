@@ -134,6 +134,9 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
     setCommentText,
     editingReview,
     setEditingReview,
+    selectedSeason,
+    setSelectedSeason,
+    reviewedSeasons,
     fetchData,
     handleDeleteReview,
     isDeletingReview,
@@ -370,11 +373,13 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
           <p className={styles.overview}>{media.overview}</p>
         </div>
 
-        {loggedInUserId && !hasUserReviewed && (
+        {loggedInUserId && (!hasUserReviewed || mediaType === "tv") && (
           <div className={styles.reviewFormSection}>
             <AddReviewForm
               tmdbId={tmdbId}
               mediaType={mediaType}
+              seasons={media?.seasons || []}
+              selectedSeason={selectedSeason}
               onReviewAdded={fetchData}
             />
           </div>
@@ -584,29 +589,69 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
 
         {/* ── RECENSIONI ── */}
         <div className={styles.reviewsSection}>
-          {loggedInUserId && hasUserReviewed && (
+          {loggedInUserId && hasUserReviewed && mediaType === "movie" && (
             <div className={styles.alreadyReviewedMessage}>
               <h3>{labels.alreadyReviewedMsg}</h3>
             </div>
           )}
-          <h2 className={styles.reviewsTitle}>
-            Recensioni della Community
-            <span className={styles.reviewStats}>
-              {skibidiData.averageRating} ★ ({skibidiData.reviewCount} voti)
-            </span>
-          </h2>
+
+          <div className={styles.reviewsHeaderContainer}>
+            <h2 className={styles.reviewsTitle}>
+              Recensioni della Community
+              <span className={styles.reviewStats}>
+                Media Complessiva: {skibidiData.averageRating} ★ ({skibidiData.reviewCount} {skibidiData.reviewCount === 1 ? "voto" : "voti"})
+              </span>
+            </h2>
+
+            {mediaType === "tv" && media?.seasons?.length > 0 && (
+              <div className={styles.seasonTabsBar}>
+                <button
+                  type="button"
+                  className={`${styles.seasonTab} ${selectedSeason === "all" ? styles.seasonTabActive : ""}`}
+                  onClick={() => setSelectedSeason("all")}
+                >
+                  Tutte le stagioni
+                </button>
+                {media.seasons.map((s) => {
+                  const seasonNum = s.season_number;
+                  const stat = skibidiData.seasonStats ? skibidiData.seasonStats[seasonNum] : null;
+                  const isReviewed = reviewedSeasons.includes(seasonNum);
+                  return (
+                    <button
+                      key={s.id || seasonNum}
+                      type="button"
+                      className={`${styles.seasonTab} ${String(selectedSeason) === String(seasonNum) ? styles.seasonTabActive : ""}`}
+                      onClick={() => setSelectedSeason(String(seasonNum))}
+                    >
+                      {s.name || `Stagione ${seasonNum}`}
+                      {stat ? ` (${stat.averageRating} ★)` : ""}
+                      {isReviewed ? " ✓" : ""}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <div className={styles.reviewsList}>
             {skibidiData.reviews?.map((review) => (
               <div key={review.id} className={styles.reviewItem}>
                 <div className={styles.reviewHeader}>
-                  <Link
-                    to={`/profile/${review.user_id}`}
-                    className={styles.authorLink}
-                  >
-                    <strong className={styles.reviewAuthor}>
-                      {review.username}
-                    </strong>
-                  </Link>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <Link
+                      to={`/profile/${review.user_id}`}
+                      className={styles.authorLink}
+                    >
+                      <strong className={styles.reviewAuthor}>
+                        {review.username}
+                      </strong>
+                    </Link>
+                    {review.season_number !== null && review.season_number !== undefined && (
+                      <span className={styles.seasonBadge}>
+                        Stagione {review.season_number}
+                      </span>
+                    )}
+                  </div>
                   <div>
                     <span className={styles.reviewRating}>
                       {review.rating}/10

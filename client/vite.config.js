@@ -89,7 +89,7 @@ export default defineConfig(({ command }) => {
 
       proxy: {
         "/api": {
-          target: process.env.VITE_API_TARGET ?? "http://0.0.0.0:5000", // nosonar
+          target: process.env.VITE_API_TARGET ?? "http://127.0.0.1:5000", // nosonar
           changeOrigin: true,
           secure: false,
         },

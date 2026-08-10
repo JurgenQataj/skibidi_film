@@ -15,10 +15,13 @@ export function useMediaDetail(mediaType) {
 
   const [media, setMedia] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [selectedSeason, setSelectedSeason] = useState("all");
+  const [reviewedSeasons, setReviewedSeasons] = useState([]);
   const [skibidiData, setSkibidiData] = useState({
     reviews: [],
     averageRating: 0,
     reviewCount: 0,
+    seasonStats: {},
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,14 +54,15 @@ export function useMediaDetail(mediaType) {
       setLoggedInUserId(userId);
 
       const mediaPromise = axios.get(`${API_URL}/api/${apiBasePath}/${tmdbId}`);
+      const seasonParam = selectedSeason !== "all" ? `&seasonNumber=${selectedSeason}` : "";
       const reviewsPromise = axios.get(
-        `${API_URL}/api/reviews/movie/${tmdbId}?mediaType=${mediaType}`
+        `${API_URL}/api/reviews/movie/${tmdbId}?mediaType=${mediaType}${seasonParam}`
       );
       const promises = [mediaPromise, reviewsPromise];
 
       if (userId) {
         promises.push(
-          axios.get(`${API_URL}/api/reviews/status/${tmdbId}?mediaType=${mediaType}`, { headers })
+          axios.get(`${API_URL}/api/reviews/status/${tmdbId}?mediaType=${mediaType}${seasonParam}`, { headers })
             .catch(() => null)
         );
         promises.push(
@@ -86,6 +90,7 @@ export function useMediaDetail(mediaType) {
 
       if (userId && results.length > 2) {
         setHasUserReviewed(results[2]?.data?.hasReviewed || false);
+        setReviewedSeasons(results[2]?.data?.reviewedSeasons || []);
         setIsInWatchlist(results[3]?.data?.isInWatchlist || false);
         const fetchedLists = results[4]?.data || [];
         setUserLists(fetchedLists.filter(list => list._id !== "watchlist"));
@@ -96,7 +101,7 @@ export function useMediaDetail(mediaType) {
     } finally {
       setLoading(false);
     }
-  }, [tmdbId, API_URL, navigate, apiBasePath, mediaType]);
+  }, [tmdbId, API_URL, navigate, apiBasePath, mediaType, selectedSeason]);
 
   useEffect(() => {
     fetchData();
@@ -251,6 +256,9 @@ export function useMediaDetail(mediaType) {
     setCommentText,
     editingReview,
     setEditingReview,
+    selectedSeason,
+    setSelectedSeason,
+    reviewedSeasons,
     fetchData,
     handleDeleteReview,
     isDeletingReview,

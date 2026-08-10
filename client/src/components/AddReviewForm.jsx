@@ -3,9 +3,12 @@ import axios from "axios";
 import styles from "./AddReviewForm.module.css";
 import { FaStar } from "react-icons/fa";
 
-function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
+function AddReviewForm({ tmdbId, mediaType = "movie", seasons = [], selectedSeason = "all", onReviewAdded }) {
   const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
+  const [seasonNumber, setSeasonNumber] = useState(
+    selectedSeason && selectedSeason !== "all" ? String(selectedSeason) : ""
+  );
   const [error, setError] = useState("");
   const [mentionSearch, setMentionSearch] = useState("");
   const [mentionUsers, setMentionUsers] = useState([]);
@@ -13,6 +16,12 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
   const [mentionPosition, setMentionPosition] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedSeason && selectedSeason !== "all") {
+      setSeasonNumber(String(selectedSeason));
+    }
+  }, [selectedSeason]);
 
   useEffect(() => {
     if (!mentionSearch) {
@@ -86,6 +95,7 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
           mediaType: mediaType,
           rating: parseFloat(rating),
           comment_text: comment,
+          season_number: mediaType === "tv" && seasonNumber !== "" ? Number(seasonNumber) : null,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -113,22 +123,48 @@ function AddReviewForm({ tmdbId, mediaType = "movie", onReviewAdded }) {
           </div>
           
           <div className={styles.fieldsContainer} style={{ position: "relative" }}>
-            <div className={styles.ratingWrapper}>
-              <FaStar className={styles.starIcon} />
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
-                value={rating}
-                onChange={(e) => setRating(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                className={styles.ratingInput}
-                placeholder="Voto (0-10)"
-                required
-              />
+            <div style={{ display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
+              <div className={styles.ratingWrapper}>
+                <FaStar className={styles.starIcon} />
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  value={rating}
+                  onChange={(e) => setRating(e.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className={styles.ratingInput}
+                  placeholder="Voto (0-10)"
+                  required
+                />
+              </div>
+
+              {mediaType === "tv" && (
+                <div className={styles.seasonSelectWrapper}>
+                  <select
+                    value={seasonNumber}
+                    onChange={(e) => setSeasonNumber(e.target.value)}
+                    className={styles.seasonSelect}
+                    onFocus={() => setIsFocused(true)}
+                  >
+                    <option value="">Recensione Generale Serie</option>
+                    {seasons && seasons.map((s) => (
+                      <option key={s.season_number !== undefined ? s.season_number : s.id} value={s.season_number}>
+                        {s.name || `Stagione ${s.season_number}`} {s.episode_count ? `(${s.episode_count} ep.)` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
+
+            {mediaType === "tv" && seasonNumber === "" && (
+              <div className={styles.overallDisclaimer}>
+                ℹ️ Votare la serie complessivamente sovrascriverà le eventuali recensioni delle singole stagioni.
+              </div>
+            )}
 
             {showMentionDropdown && mentionUsers.length > 0 && (
               <div className={styles.mentionDropdown}>

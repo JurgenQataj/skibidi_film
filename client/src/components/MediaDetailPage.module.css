@@ -279,6 +279,79 @@
   background: transparent;
 }
 
+.reviewsHeaderContainer {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.overallStatsBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.95rem;
+}
+
+.overallStatsLabel {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.overallStatsValue {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.seasonTabsBar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.seasonTab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.seasonTab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.seasonTabActive {
+  background: linear-gradient(135deg, var(--dynamic-primary, #e50914), #5c2d7e);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.seasonBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
 .reviewsTitle {
   font-size: 1.5rem;
   display: flex;
@@ -290,7 +363,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 15px;
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .reviewStats {

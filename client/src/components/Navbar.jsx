@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import { Home, Search, Compass, Tv2, Gamepad2, UserRound, Bookmark } from "lucide-react";
@@ -6,6 +6,46 @@ import { jwtDecode } from "jwt-decode";
 
 function Navbar() {
   const location = useLocation();
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    const handleFocusIn = (e) => {
+      const target = e.target;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT")
+      ) {
+        const type = target.getAttribute("type");
+        if (type !== "checkbox" && type !== "radio" && type !== "submit") {
+          setIsTyping(true);
+        }
+      }
+    };
+
+    const handleFocusOut = () => {
+      setTimeout(() => {
+        const active = document.activeElement;
+        if (
+          !active ||
+          (active.tagName !== "INPUT" &&
+            active.tagName !== "TEXTAREA" &&
+            active.tagName !== "SELECT")
+        ) {
+          setIsTyping(false);
+        }
+      }, 50);
+    };
+
+    window.addEventListener("focusin", handleFocusIn);
+    window.addEventListener("focusout", handleFocusOut);
+
+    return () => {
+      window.removeEventListener("focusin", handleFocusIn);
+      window.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
 
   const isImmersivePage = 
     location.pathname.startsWith('/horizon') || 
@@ -43,7 +83,7 @@ function Navbar() {
         </Link>
       </div>
 
-      <nav className={styles.navbar}>
+      <nav className={`${styles.navbar} ${isTyping ? styles.hiddenOnMobile : ""}`}>
       <div className={styles.navContent}>
         <Link to="/" className={styles.logo}>
           <img src="/icona3.png" alt="logo" className={styles.logoImg}  loading="lazy" decoding="async" />

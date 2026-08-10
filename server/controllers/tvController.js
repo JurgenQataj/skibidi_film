@@ -164,6 +164,15 @@ exports.getTvDetails = async (req, res) => {
       genres: data.genres,
       number_of_seasons: data.number_of_seasons,
       number_of_episodes: data.number_of_episodes,
+      seasons: (data.seasons || []).map(s => ({
+        id: s.id,
+        season_number: s.season_number,
+        name: s.name,
+        episode_count: s.episode_count,
+        poster_path: s.poster_path,
+        air_date: s.air_date,
+        overview: s.overview
+      })),
       status: data.status,
       // Runtime format: un array di tempi, prendiamo il primo se c'è
       runtime: data.episode_run_time && data.episode_run_time.length > 0 ? data.episode_run_time[0] : null,

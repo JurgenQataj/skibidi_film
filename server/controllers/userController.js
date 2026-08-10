@@ -258,6 +258,66 @@ exports.deleteUserProfile = async (req, res) => {
   }
 };
 
+// Helper per raggruppare le recensioni per titolo unico e calcolare la media delle stagioni recensite dall'utente
+function getUniqueGroupedUserReviews(reviews) {
+  const validReviews = (reviews || []).filter((r) => r && r.movie);
+  const tvShowGroupMap = new Map();
+  const movieMap = new Map();
+
+  validReviews.forEach((r) => {
+    const key = String(r.movie._id || r.movie.tmdb_id);
+    if (r.movie.media_type === "tv") {
+      if (!tvShowGroupMap.has(key)) {
+        tvShowGroupMap.set(key, [r]);
+      } else {
+        tvShowGroupMap.get(key).push(r);
+      }
+    } else {
+      if (!movieMap.has(key)) {
+        movieMap.set(key, r);
+      } else {
+        const existing = movieMap.get(key);
+        const dateNew = new Date(r.updatedAt || r.createdAt);
+        const dateOld = new Date(existing.updatedAt || existing.createdAt);
+        if (dateNew > dateOld) {
+          movieMap.set(key, r);
+        }
+      }
+    }
+  });
+
+  const uniqueTvShows = [];
+  tvShowGroupMap.forEach((reviewList) => {
+    // Ordina dalla recensione più recente a quella meno recente
+    reviewList.sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
+
+    const latestReview = reviewList[0];
+    const totalRating = reviewList.reduce((sum, r) => sum + (r.rating || 0), 0);
+    const avgRating = Number((totalRating / reviewList.length).toFixed(1));
+
+    const groupedReview = {
+      ...latestReview,
+      rating: avgRating,
+      seasons_voted_count: reviewList.length,
+      all_season_reviews: reviewList,
+    };
+
+    uniqueTvShows.push(groupedReview);
+  });
+
+  const uniqueMovies = Array.from(movieMap.values());
+
+  const sortedUniqueReviews = [...uniqueMovies, ...uniqueTvShows].sort(
+    (a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+  );
+
+  return {
+    uniqueReviews: sortedUniqueReviews,
+    moviesReviewedCount: uniqueMovies.length,
+    tvShowsReviewedCount: uniqueTvShows.length,
+  };
+}
+
 exports.getUserStats = async (req, res) => {
   try {
     const currentUserId = req.user?.id || req.user?._id;
@@ -267,26 +327,15 @@ exports.getUserStats = async (req, res) => {
 
     const targetUserId = user._id;
     const reviews = await Review.find({ user: targetUserId }).populate("movie", "media_type").lean();
-    let moviesReviewed = 0;
-    let tvShowsReviewed = 0;
-
-    reviews.forEach(r => {
-      if (r.movie) {
-        if (r.movie.media_type === "tv") {
-          tvShowsReviewed++;
-        } else {
-          moviesReviewed++;
-        }
-      }
-    });
+    const { moviesReviewedCount, tvShowsReviewedCount } = getUniqueGroupedUserReviews(reviews);
 
     const followersCount = user.followers ? user.followers.length : 0;
     const followingCount = user.following ? user.following.length : 0;
 
     res.json({
       username: user.username,
-      moviesReviewed,
-      tvShowsReviewed,
+      moviesReviewed: moviesReviewedCount,
+      tvShowsReviewed: tvShowsReviewedCount,
       followersCount,
       followingCount,
     });
@@ -314,33 +363,22 @@ exports.getUserFullProfile = async (req, res) => {
     const [reviews, lists] = await Promise.all([
       Review.find({ user: targetUserId })
         .populate("movie", "media_type title poster_path release_year vote_average tmdb_id")
-        .sort({ createdAt: -1 })
+        .sort({ updatedAt: -1, createdAt: -1 })
         .lean(),
       MovieList.find({ user: targetUserId })
         .select("name isPublic movies createdAt")
         .lean(),
     ]);
 
-    // Stats calculation from reviews & user arrays
-    const validReviews = (reviews || []).filter((r) => r.movie);
-    let moviesReviewed = 0;
-    let tvShowsReviewed = 0;
-
-    validReviews.forEach((r) => {
-      if (r.movie.media_type === "tv") {
-        tvShowsReviewed++;
-      } else {
-        moviesReviewed++;
-      }
-    });
+    const { uniqueReviews, moviesReviewedCount, tvShowsReviewedCount } = getUniqueGroupedUserReviews(reviews);
 
     const followersCount = user.followers ? user.followers.length : 0;
     const followingCount = user.following ? user.following.length : 0;
 
     const stats = {
       username: user.username,
-      moviesReviewed,
-      tvShowsReviewed,
+      moviesReviewed: moviesReviewedCount,
+      tvShowsReviewed: tvShowsReviewedCount,
       followersCount,
       followingCount,
     };
@@ -355,8 +393,8 @@ exports.getUserFullProfile = async (req, res) => {
     res.json({
       profile: user,
       stats,
-      reviews: validReviews,
-      totalReviews: validReviews.length,
+      reviews: uniqueReviews,
+      totalReviews: uniqueReviews.length,
       lists: lists || [],
       isFollowing,
     });
@@ -856,9 +894,11 @@ exports.getUserReviews = async (req, res) => {
 
     const reviews = await Review.find({ user: user._id })
       .populate("movie", "tmdb_id title poster_path media_type release_year")
-      .sort({ createdAt: -1 });
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
 
-    res.json(reviews.filter((r) => r.movie));
+    const { uniqueReviews } = getUniqueGroupedUserReviews(reviews);
+    res.json(uniqueReviews);
   } catch (error) {
     res.status(500).json({ message: "Errore server" });
   }
@@ -1122,7 +1162,8 @@ exports.getUserFilteredReviews = async (req, res) => {
 
     const Review = require("../models/Review");
     const reviews = await Review.find({ user: user._id }).populate("movie").lean();
-    const validReviews = reviews.filter(r => r.movie);
+    const { uniqueReviews } = getUniqueGroupedUserReviews(reviews);
+    const validReviews = uniqueReviews;
 
     let filtered = [];
 

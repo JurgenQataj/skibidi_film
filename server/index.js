@@ -121,8 +121,10 @@ app.get("/api/tmdb-img/:size/:file", imgProxyLimiter, async (req, res) => {
     // Stream response directly to client
     response.data.pipe(res);
   } catch (error) {
-    console.error("Errore nel proxy immagine TMDB:", error.message);
-    res.status(500).json({ error: "Failed to fetch image" });
+    if (error.code !== "ENOTFOUND" && error.code !== "ETIMEDOUT") {
+      console.error("Errore nel proxy immagine TMDB:", error.message);
+    }
+    res.status(502).json({ error: "Failed to fetch image" });
   }
 });
 

@@ -201,8 +201,11 @@ async function syncMovieFromTMDB(movie, safeTmdbId, safeMediaType) {
 
 // Aggiungere una recensione
 exports.addReview = async (req, res) => {
-  const { tmdbId, rating, comment_text, is_spoiler, mediaType = "movie" } = req.body;
+  const { tmdbId, rating, comment_text, is_spoiler, mediaType = "movie", season_number, seasonNumber } = req.body;
   const userId = req.user.id;
+
+  const rawSeason = season_number !== undefined ? season_number : seasonNumber;
+  const seasonNum = (rawSeason !== undefined && rawSeason !== null && rawSeason !== "") ? Number(rawSeason) : null;
 
   if (!tmdbId || rating === undefined)
     return res.status(400).json({ message: "ID del contenuto e valutazione sono obbligatori." });
@@ -235,14 +238,36 @@ exports.addReview = async (req, res) => {
       );
     }
 
-    // 3. Check duplicate review
-    const existingReview = await Review.findOne({ user: userId, movie: movie._id });
-    if (existingReview)
-      return res.status(409).json({ message: "Hai già recensito questo film." });
+    // 3. Overall vs Season reviews overwrite logic
+    if (safeMediaType === "tv") {
+      if (seasonNum === null) {
+        // Recensione generale della serie: sovrascrive/cancella eventuali recensioni per singole stagioni
+        await Review.deleteMany({ user: userId, movie: movie._id, season_number: { $ne: null } });
+      } else {
+        // Recensione di una stagione specifica: rimuove eventuale recensione generale della serie
+        await Review.deleteMany({ user: userId, movie: movie._id, season_number: null });
+      }
+    }
 
-    // 4. Create review
-    const newReview = new Review({ user: userId, movie: movie._id, rating, comment_text, is_spoiler });
-    await newReview.save();
+    // 4. Create or update review (updating timestamp so it comes back to the top)
+    let newReview = await Review.findOne({ user: userId, movie: movie._id, season_number: seasonNum });
+    if (newReview) {
+      newReview.rating = rating;
+      newReview.comment_text = comment_text;
+      newReview.is_spoiler = is_spoiler;
+      newReview.updatedAt = new Date();
+      await newReview.save();
+    } else {
+      newReview = new Review({
+        user: userId,
+        movie: movie._id,
+        rating,
+        comment_text,
+        is_spoiler,
+        season_number: seasonNum,
+      });
+      await newReview.save();
+    }
 
     // Fire-and-forget: le menzioni non devono bloccare la response
     sendMentionNotifications(comment_text, newReview._id, userId).catch(err =>
@@ -258,7 +283,6 @@ exports.addReview = async (req, res) => {
     await User.findByIdAndUpdate(userId, { $pull: { watchlist: movie._id } });
 
     // Fire-and-forget: la sync delle collezioni non deve bloccare la response
-    // (può fare decine di chiamate TMDB e impiegare 5-15s)
     userController.syncUserCollections(userId).catch(err =>
       console.error("⚠️ Errore background sync collezioni:", err.message)
     );
@@ -270,10 +294,10 @@ exports.addReview = async (req, res) => {
   }
 };
 
-// Ottenere le recensioni per un film
+// Ottenere le recensioni per un film/serie TV
 exports.getReviewsForMovie = async (req, res) => {
   try {
-    const { mediaType = "movie" } = req.query;
+    const { mediaType = "movie", seasonNumber } = req.query;
     const safeTmdbId = Number(req.params.tmdbId);
     const safeMediaType = String(mediaType);
     const movieQuery = {
@@ -287,14 +311,21 @@ exports.getReviewsForMovie = async (req, res) => {
     if (!movie) {
       return res
         .status(200)
-        .json({ averageRating: "0.0", reviewCount: 0, reviews: [] });
+        .json({ averageRating: "0.0", reviewCount: 0, seasonStats: {}, reviews: [] });
     }
 
-    const reviews = await Review.find({ movie: movie._id })
+    // Costruiamo il filtro per le recensioni da restituire
+    const filter = { movie: movie._id };
+    if (seasonNumber !== undefined && seasonNumber !== null && seasonNumber !== "all" && seasonNumber !== "") {
+      filter.season_number = Number(seasonNumber);
+    }
+
+    const reviews = await Review.find(filter)
       .populate("user", "username avatar_url _id")
       .sort({ createdAt: -1 });
 
-    const stats = await Review.aggregate([
+    // Aggregazione per Media Complessiva della serie/film (tutte le recensioni)
+    const overallStats = await Review.aggregate([
       { $match: { movie: movie._id } },
       {
         $group: {
@@ -305,11 +336,32 @@ exports.getReviewsForMovie = async (req, res) => {
       },
     ]);
 
+    // Aggregazione per statistiche per singola stagione
+    const seasonStatsAgg = await Review.aggregate([
+      { $match: { movie: movie._id, season_number: { $ne: null } } },
+      {
+        $group: {
+          _id: "$season_number",
+          averageRating: { $avg: "$rating" },
+          reviewCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const seasonStats = {};
+    seasonStatsAgg.forEach((item) => {
+      seasonStats[item._id] = {
+        averageRating: item.averageRating ? item.averageRating.toFixed(1) : "0.0",
+        reviewCount: item.reviewCount,
+      };
+    });
+
     const formattedReviews = reviews.map((review) => ({
       id: review._id,
       rating: review.rating,
       comment_text: review.comment_text,
       is_spoiler: review.is_spoiler,
+      season_number: review.season_number,
       created_at: review.createdAt,
       user_id: review.user ? review.user._id : null,
       username: review.user ? review.user.username : "Utente eliminato",
@@ -324,8 +376,9 @@ exports.getReviewsForMovie = async (req, res) => {
 
     res.json({
       averageRating:
-        stats.length > 0 ? stats[0].averageRating.toFixed(1) : "0.0",
-      reviewCount: stats.length > 0 ? stats[0].reviewCount : 0,
+        overallStats.length > 0 ? overallStats[0].averageRating.toFixed(1) : "0.0",
+      reviewCount: overallStats.length > 0 ? overallStats[0].reviewCount : 0,
+      seasonStats,
       reviews: formattedReviews,
     });
   } catch (error) {
@@ -337,7 +390,7 @@ exports.getReviewsForMovie = async (req, res) => {
 // Controllare se l'utente ha già recensito
 exports.checkUserReviewStatus = async (req, res) => {
   try {
-    const { mediaType = "movie" } = req.query;
+    const { mediaType = "movie", seasonNumber } = req.query;
     const safeTmdbId = Number(req.params.tmdbId);
     const safeMediaType = String(mediaType);
     const movieQuery = {
@@ -348,13 +401,25 @@ exports.checkUserReviewStatus = async (req, res) => {
       ]
     };
     const movie = await Movie.findOne(movieQuery);
-    if (!movie) return res.json({ hasReviewed: false });
+    if (!movie) return res.json({ hasReviewed: false, reviewedSeasons: [] });
 
-    const review = await Review.findOne({
+    const userReviews = await Review.find({
       movie: movie._id,
       user: req.user.id,
     });
-    res.json({ hasReviewed: !!review });
+
+    const reviewedSeasons = userReviews
+      .map(r => r.season_number)
+      .filter(sn => sn !== null && sn !== undefined);
+
+    let hasReviewed = false;
+    if (seasonNumber !== undefined && seasonNumber !== null && seasonNumber !== "all" && seasonNumber !== "") {
+      hasReviewed = userReviews.some(r => r.season_number === Number(seasonNumber));
+    } else {
+      hasReviewed = userReviews.length > 0;
+    }
+
+    res.json({ hasReviewed, reviewedSeasons, totalUserReviews: userReviews.length });
   } catch (error) {
     res.status(500).json({ message: "Errore del server." });
   }

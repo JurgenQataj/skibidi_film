@@ -101,6 +101,49 @@
   margin: 0; 
 }
 
+.seasonSelectWrapper {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 0;
+  transition: all 0.3s ease;
+}
+
+.seasonSelectWrapper:focus-within {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.seasonSelect {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.88rem;
+  font-weight: 300;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.seasonSelect option {
+  background: #140f1e;
+  color: #fff;
+}
+
+.overallDisclaimer {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.25);
+  color: #ffc107;
+  font-size: 0.82rem;
+  font-weight: 400;
+  margin-top: 4px;
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
 .commentTextarea {
   width: 100%;
   background: transparent;

@@ -395,6 +395,10 @@
     box-shadow: none;
   }
 
+  .hiddenOnMobile {
+    display: none !important;
+  }
+
   .navContent {
     justify-content: center;
     width: 100%;

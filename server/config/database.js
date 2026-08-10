@@ -19,6 +19,20 @@ const connectDB = async (attempt = 1) => {
       maxPoolSize:              10,
     });
     console.log("✅ Connessione a MongoDB Atlas riuscita!");
+    try {
+      const Review = require("../models/Review");
+      await Review.collection.dropIndex("user_1_movie_1");
+      console.log("✅ Indice vecchio user_1_movie_1 rimosso con successo da reviews.");
+    } catch (e) {
+      // Ignora se l'indice è già stato rimosso o non esiste
+    }
+    try {
+      const Review = require("../models/Review");
+      await Review.syncIndexes();
+      console.log("✅ Indici di Review sincronizzati con successo.");
+    } catch (e) {
+      console.error("⚠️ Sync indici Review:", e.message);
+    }
   } catch (err) {
     console.error(`❌ Errore di connessione a MongoDB (tentativo ${attempt}/${MAX_RETRIES}):`, err.message);
 

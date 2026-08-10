@@ -61,6 +61,19 @@
   overflow: hidden; /* clip overflow so ellipsis works on children */
 }
 
+.seasonBadge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
 .movieTitleLink,
 .movieTitleLink:visited {
   font-weight: 700;

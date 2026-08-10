@@ -379,6 +379,11 @@ function ReviewCard({ review, onInteraction }) {
               {movie.release_year || movie.release_date.split("-")[0]}
             </span>
           )}
+          {review.season_number !== null && review.season_number !== undefined && (
+            <span className={styles.seasonBadge}>
+              Stagione {review.season_number}
+            </span>
+          )}
         </div>
         <Link to={`/profile/${user._id}`} className={styles.authorLink}>
           {user.username || "Utente"}

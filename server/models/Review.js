@@ -11,6 +11,7 @@ const ReviewSchema = new mongoose.Schema(
     rating: { type: Number, required: true, min: 0, max: 10 },
     comment_text: { type: String },
     is_spoiler: { type: Boolean, default: false },
+    season_number: { type: Number, default: null },
     reactions: [
       {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -29,9 +30,9 @@ const ReviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Indice composto per il check duplicati (addReview: findOne user+movie)
-ReviewSchema.index({ user: 1, movie: 1 }, { unique: true });
-// Indice per le query per film (getReviewsForMovie)
-ReviewSchema.index({ movie: 1 });
+// Indice composto per il check duplicati (user + movie + season_number)
+ReviewSchema.index({ user: 1, movie: 1, season_number: 1 }, { unique: true });
+// Indice per le query per film e stagione
+ReviewSchema.index({ movie: 1, season_number: 1 });
 
 module.exports = mongoose.model("Review", ReviewSchema);
