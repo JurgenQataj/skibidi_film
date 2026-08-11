@@ -207,26 +207,28 @@ function NotificationsPage() {
   };
 
   const getNotificationLink = (notification) => {
-    // CONTROLLO DI SICUREZZA
     if (!notification || !notification.sender) return "/";
 
     switch (notification.type) {
       case "new_follower":
-        return `/profile/${notification.sender._id}`;
+        return `/profile/${notification.sender._id || notification.sender}`;
       case "new_reaction":
       case "new_comment":
       case "review_mention":
       case "comment_mention":
       case "following_review":
-        // CONTROLLO DI SICUREZZA ANCORA PIÙ SPECIFICO
-        if (
-          notification.targetReview &&
-          notification.targetReview.movie &&
-          notification.targetReview.movie.tmdb_id
-        ) {
-          return `/${notification.targetReview.movie.media_type === "tv" ? "tv" : "movie"}/${notification.targetReview.movie.tmdb_id}`;
+      case "thread_comment":
+      case "comment_like":
+        if (notification.targetReview && notification.targetReview.movie) {
+          const movie = notification.targetReview.movie;
+          const tmdbId = movie.tmdb_id || movie._id;
+          const mediaType = movie.media_type === "tv" ? "tv" : "movie";
+          const reviewId = notification.targetReview._id || notification.targetReview;
+          if (tmdbId) {
+            return `/${mediaType}/${tmdbId}${reviewId ? `?reviewId=${reviewId}` : ""}`;
+          }
         }
-        return "/"; // Link di fallback se i dati sono corrotti
+        return "/";
       case "chat_mention":
         return "/discover";
       default:
@@ -235,63 +237,73 @@ function NotificationsPage() {
   };
 
   const getNotificationText = (notification) => {
-    // Gestione notifica senza mittente valido
     if (!notification || !notification.sender) return "Nuova notifica da un utente eliminato.";
+
+    const movieTitle = notification.targetReview?.movie?.title ? (
+      <> su <em>{notification.targetReview.movie.title}</em></>
+    ) : null;
 
     switch (notification.type) {
       case "following_review":
         return (
           <>
-            <strong>{notification.sender.username}</strong> ha pubblicato una nuova recensione
-            {notification.targetReview?.movie?.title ? (
-              <> su <em>{notification.targetReview.movie.title}</em></>
-            ) : "."}
+            <strong>{notification.sender.username}</strong> ha pubblicato una nuova recensione{movieTitle || "."}
           </>
         );
       case "new_follower":
         return (
           <>
-            <strong>{notification.sender.username}</strong> ha iniziato a
-            seguirti.
+            <strong>{notification.sender.username}</strong> ha iniziato a seguirti.
           </>
         );
       case "new_reaction":
         return (
           <>
-            <strong>{notification.sender.username}</strong> ha messo like alla
-            tua recensione.
+            <strong>{notification.sender.username}</strong> ha messo like alla tua recensione{movieTitle || "."}
           </>
         );
       case "new_comment":
         return (
           <>
-            <strong>{notification.sender.username}</strong> ha commentato la tua
-            recensione.
+            <strong>{notification.sender.username}</strong> ha commentato la tua recensione{movieTitle || "."}
+          </>
+        );
+      case "thread_comment":
+        return (
+          <>
+            <strong>{notification.sender.username}</strong> ha risposto al tuo commento{movieTitle || "."}
+          </>
+        );
+      case "comment_like":
+        return (
+          <>
+            <strong>{notification.sender.username}</strong> ha messo me piace al tuo commento{movieTitle || "."}
           </>
         );
       case "review_mention":
         return (
           <>
-            <strong>{notification.sender.username}</strong> ti ha menzionato in una
-            recensione.
+            <strong>{notification.sender.username}</strong> ti ha menzionato in una recensione{movieTitle || "."}
           </>
         );
       case "comment_mention":
         return (
           <>
-            <strong>{notification.sender.username}</strong> ti ha menzionato in un
-            commento.
+            <strong>{notification.sender.username}</strong> ti ha menzionato in un commento{movieTitle || "."}
           </>
         );
       case "chat_mention":
         return (
           <>
-            <strong>{notification.sender.username}</strong> ti ha menzionato nella
-            chat globale.
+            <strong>{notification.sender.username}</strong> ti ha menzionato nella chat globale.
           </>
         );
       default:
-        return "Nuova notifica.";
+        return (
+          <>
+            <strong>{notification.sender.username}</strong> ti ha inviato una notifica{movieTitle || "."}
+          </>
+        );
     }
   };
 

@@ -192,7 +192,7 @@ function useReviewInteractions({ review, onInteraction, token, API_URL, comments
   };
 }
 
-function ReviewCard({ review, onInteraction }) {
+function ReviewCard({ review, onInteraction, onEdit, onDelete }) {
   const [comments, setComments] = useState({ shown: false, list: [] });
   const [commentText, setCommentText] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -222,7 +222,7 @@ function ReviewCard({ review, onInteraction }) {
   
   const [localHasLoved, setLocalHasLoved] = useState(() => {
     const raw = review.user_reactions || (Array.isArray(review.reactions) ? review.reactions : []);
-    return raw.some((r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love");
+    return raw.some((r) => (typeof r.user === "object" && r.user !== null ? r.user._id : r.user)?.toString() === loggedInUserId && r.reaction_type === "love");
   });
 
   const [localCommentCount, setLocalCommentCount] = useState(() => {
@@ -237,7 +237,7 @@ function ReviewCard({ review, onInteraction }) {
       : (review.reactions?.love || 0)
     );
     const raw = review.user_reactions || (Array.isArray(review.reactions) ? review.reactions : []);
-    setLocalHasLoved(raw.some((r) => r.user?.toString() === loggedInUserId && r.reaction_type === "love"));
+    setLocalHasLoved(raw.some((r) => (typeof r.user === "object" && r.user !== null ? r.user._id : r.user)?.toString() === loggedInUserId && r.reaction_type === "love"));
     setLocalCommentCount(review.comments?.length || review.comment_count || 0);
   }, [review, loggedInUserId]);
 
@@ -302,18 +302,31 @@ function ReviewCard({ review, onInteraction }) {
     toast, confirm
   });
 
-  if (!review || !review.user) {
-    return null;
-  }
-  
-  if (!review.isPost && (!review.movie || !review.movie.tmdb_id)) {
+  if (!review) {
     return null;
   }
 
-  const { user, createdAt } = review;
-  const isPost = review.isPost;
-  
-  const movie = isPost ? null : review.movie;
+  const user = review.user || {
+    _id: review.user_id,
+    username: review.username || "Utente",
+    avatar_url: review.avatar_url,
+  };
+
+  const isPost = Boolean(review.isPost);
+  const createdAt = review.createdAt || review.created_at;
+
+  const rawMovie = typeof review.movie === "object" && review.movie !== null ? review.movie : {};
+  const movie = isPost
+    ? null
+    : {
+        tmdb_id: rawMovie.tmdb_id || review.tmdb_id || review.tmdbId,
+        media_type: rawMovie.media_type || review.media_type || "movie",
+        title: rawMovie.title || review.movie_title || review.title || "",
+        release_year: rawMovie.release_year,
+        release_date: rawMovie.release_date,
+        poster_path: rawMovie.poster_path || review.poster_path,
+      };
+
   const rating = isPost ? null : review.rating;
   const comment_text = isPost ? review.text : review.comment_text;
 
@@ -368,15 +381,17 @@ function ReviewCard({ review, onInteraction }) {
     <div className={styles.card}>
       <div className={styles.headerRow}>
         <div className={styles.movieTitleWrapper}>
-          <Link
-            to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}
-            className={styles.movieTitleLink}
-          >
-            {movie.title.split(":")[0].split(" - ")[0].trim()}
-          </Link>
-          {(movie.release_year || movie.release_date) && (
+          {movie?.title ? (
+            <Link
+              to={movie.tmdb_id ? `/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}` : "#"}
+              className={styles.movieTitleLink}
+            >
+              {movie.title.split(":")[0].split(" - ")[0].trim()}
+            </Link>
+          ) : null}
+          {(movie?.release_year || movie?.release_date) && (
             <span className={styles.releaseYear}>
-              {movie.release_year || movie.release_date.split("-")[0]}
+              {movie.release_year || String(movie.release_date).split("-")[0]}
             </span>
           )}
           {review.season_number !== null && review.season_number !== undefined && (
@@ -385,9 +400,33 @@ function ReviewCard({ review, onInteraction }) {
             </span>
           )}
         </div>
-        <Link to={`/profile/${user._id}`} className={styles.authorLink}>
-          {user.username || "Utente"}
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <Link to={`/profile/${user._id || user.id}`} className={styles.authorLink}>
+            {user.username || "Utente"}
+          </Link>
+          {loggedInUserId === (user._id || user.id || review.user_id) && (onEdit || onDelete) && (
+            <div style={{ display: "flex", gap: "8px" }}>
+              {onEdit && (
+                <button
+                  type="button"
+                  onClick={() => onEdit(review)}
+                  style={{ background: "none", border: "none", color: "var(--dynamic-primary, #e50914)", cursor: "pointer", fontSize: "0.8rem", padding: 0 }}
+                >
+                  Modifica
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  type="button"
+                  onClick={() => onDelete(review._id || review.id)}
+                  style={{ background: "none", border: "none", color: "#888", cursor: "pointer", fontSize: "0.8rem", padding: 0 }}
+                >
+                  Elimina
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={styles.ratingRow}>
@@ -397,9 +436,10 @@ function ReviewCard({ review, onInteraction }) {
       <div className={styles.cardBody}>
         <div className={styles.leftColumn}>
           <Link to={`/${movie.media_type === "tv" ? "tv" : "movie"}/${movie.tmdb_id}`}>
-            <img               src={
-                movie.poster_path
-                  ? `${posterBaseUrl}${movie.poster_path}`
+            <img
+              src={
+                movie?.poster_path
+                  ? (movie.poster_path.startsWith("http") ? movie.poster_path : `${posterBaseUrl}${movie.poster_path}`)
                   : placeholderPoster
               }
               alt={`Locandina di ${movie.title}`}

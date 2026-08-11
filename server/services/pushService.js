@@ -23,6 +23,7 @@ const NOTIFICATION_TYPE_MAP = {
   "review_mention": "mentions",
   "chat_mention": "mentions",
   "thread_comment": "thread_replies",
+  "comment_like": "reactions",
   "new_reaction": "reactions",
   "new_follower": "followers",
 };

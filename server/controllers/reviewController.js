@@ -322,6 +322,7 @@ exports.getReviewsForMovie = async (req, res) => {
 
     const reviews = await Review.find(filter)
       .populate("user", "username avatar_url _id")
+      .populate("movie", "tmdb_id title poster_path release_year media_type")
       .sort({ createdAt: -1 });
 
     // Aggregazione per Media Complessiva della serie/film (tutte le recensioni)
@@ -357,21 +358,26 @@ exports.getReviewsForMovie = async (req, res) => {
     });
 
     const formattedReviews = reviews.map((review) => ({
+      _id: review._id,
       id: review._id,
       rating: review.rating,
       comment_text: review.comment_text,
       is_spoiler: review.is_spoiler,
       season_number: review.season_number,
       created_at: review.createdAt,
+      createdAt: review.createdAt,
       user_id: review.user ? review.user._id : null,
       username: review.user ? review.user.username : "Utente eliminato",
       avatar_url: review.user ? review.user.avatar_url : null,
+      user: review.user || { _id: null, username: "Utente eliminato", avatar_url: null },
+      movie: (typeof review.movie === "object" && review.movie !== null && review.movie.poster_path) ? review.movie : movie,
       reactions: review.reactions ? review.reactions.reduce((acc, reaction) => {
         acc[reaction.reaction_type] = (acc[reaction.reaction_type] || 0) + 1;
         return acc;
       }, {}) : {},
       user_reactions: review.reactions || [],
       comment_count: review.comments ? review.comments.length : 0,
+      comments: review.comments || [],
     }));
 
     res.json({

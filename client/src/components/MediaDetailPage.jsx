@@ -1,5 +1,5 @@
-import React, { useRef, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import styles from "./MediaDetailPage.module.css";
 import AddReviewForm from "./AddReviewForm";
 import MovieCard from "./MovieCard";
@@ -7,22 +7,23 @@ import EditReviewModal from "./EditReviewModal";
 import { SkeletonWithLogo } from "./Skeleton";
 import { FaRegHeart, FaHeart, FaRegComment } from "react-icons/fa";
 import { useMediaDetail } from "../hooks/useMediaDetail";
+import ReviewCard from "./ReviewCard";
 
 // ─── Utility helpers (puri, nessuno stato) ─────────────────────────────────
 
 const POSTER_BASE = "https://image.tmdb.org/t/p/";
 
-export const formatCurrency = (num) =>
+const formatCurrency = (num) =>
   num > 0 ? `${num.toLocaleString("it-IT")} $` : "N/A";
 
-export const formatRuntime = (runtime) => {
+const formatRuntime = (runtime) => {
   if (!runtime || runtime === 0) return "N/A";
   const hours = Math.floor(runtime / 60);
   const minutes = runtime % 60;
   return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 };
 
-export const formatReleaseDate = (dateString) => {
+const formatReleaseDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
   return date.toLocaleDateString("it-IT", {
@@ -32,7 +33,7 @@ export const formatReleaseDate = (dateString) => {
   });
 };
 
-export const formatGenres = (genres) => {
+const formatGenres = (genres) => {
   if (!genres || genres.length === 0) return "N/A";
   return genres
     .slice(0, 3)
@@ -40,7 +41,7 @@ export const formatGenres = (genres) => {
     .join(", ");
 };
 
-export const formatRating = (rating) => {
+const formatRating = (rating) => {
   if (!rating || rating === 0) return "N/A";
   return rating.toFixed(1);
 };
@@ -54,7 +55,7 @@ const getCountryFlagEmoji = (countryCode) => {
   return String.fromCodePoint(...codePoints);
 };
 
-export const formatCompanies = (companies, mode) => {
+const formatCompanies = (companies, mode) => {
   if (!companies || companies.length === 0) return "N/A";
   return companies.slice(0, 2).map((c, index, arr) => (
     <span key={c.id}>
@@ -69,7 +70,7 @@ export const formatCompanies = (companies, mode) => {
   ));
 };
 
-export const formatCountriesWithFlags = (countries, mode) => {
+const formatCountriesWithFlags = (countries, mode) => {
   if (!countries || countries.length === 0) return "N/A";
   return countries.map((c, index, arr) => {
     const flag = getCountryFlagEmoji(c.iso_3166_1);
@@ -150,6 +151,25 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
 
   const [dynamicColors, setDynamicColors] = useState({ gradient: null, primary: null });
   const commentInputRef = useRef(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!skibidiData.reviews || skibidiData.reviews.length === 0) return;
+    const searchParams = new URLSearchParams(location.search);
+    const targetReviewId = searchParams.get("reviewId");
+    if (targetReviewId) {
+      const reviewIdStr = String(targetReviewId);
+      if (activeComments.reviewId !== reviewIdStr) {
+        toggleComments(reviewIdStr);
+      }
+      setTimeout(() => {
+        const el = document.getElementById(`review-${reviewIdStr}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 300);
+    }
+  }, [location.search, skibidiData.reviews]);
 
   const handleReplyClick = (username) => {
     const newText = `@${username} `;
@@ -634,138 +654,38 @@ function MediaDetailPage({ mediaType, labels, ExtraInfoComponent }) {
           </div>
 
           <div className={styles.reviewsList}>
-            {skibidiData.reviews?.map((review) => (
-              <div key={review.id} className={styles.reviewItem}>
-                <div className={styles.reviewHeader}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <Link
-                      to={`/profile/${review.user_id}`}
-                      className={styles.authorLink}
-                    >
-                      <strong className={styles.reviewAuthor}>
-                        {review.username}
-                      </strong>
-                    </Link>
-                    {review.season_number !== null && review.season_number !== undefined && (
-                      <span className={styles.seasonBadge}>
-                        Stagione {review.season_number}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <span className={styles.reviewRating}>
-                      {review.rating}/10
-                    </span>
-                    {loggedInUserId === review.user_id && (
-                      <div className={styles.manageButtons}>
-                        <button
-                          onClick={() => setEditingReview(review)}
-                          className={styles.editButton}
-                        >
-                          Modifica
-                        </button>
-                        <button
-                          onClick={() => handleDeleteReview(review.id)}
-                          className={styles.deleteButton}
-                          disabled={isDeletingReview}
-                        >
-                          {isDeletingReview ? "Eliminazione..." : "Elimina"}
-                        </button>
-                      </div>
-                    )}
-                  </div>
+            {skibidiData.reviews && skibidiData.reviews.length > 0 ? (
+              skibidiData.reviews.map((review) => (
+                <div
+                  key={review.id || review._id}
+                  id={`review-${review.id || review._id}`}
+                >
+                  <ReviewCard
+                    review={{
+                      ...review,
+                      movie: (typeof review.movie === "object" && review.movie !== null && review.movie.poster_path)
+                        ? review.movie
+                        : {
+                            tmdb_id: Number(tmdbId) || media?.id || media?.tmdb_id,
+                            media_type: mediaType,
+                            title: media?.title || media?.name || "",
+                            poster_path: media?.poster_path || "",
+                            release_year: media?.release_date
+                              ? Number(media.release_date.split("-")[0])
+                              : media?.first_air_date
+                              ? Number(media.first_air_date.split("-")[0])
+                              : null,
+                          },
+                    }}
+                    onInteraction={fetchData}
+                    onEdit={setEditingReview}
+                    onDelete={handleDeleteReview}
+                  />
                 </div>
-                <p className={styles.reviewComment}>{review.comment_text}</p>
-                <div className={styles.reviewActions}>
-                  <div className={styles.instBtnGroup}>
-                    {(() => {
-                      const rawReactions = review.user_reactions || [];
-                      const hasLoved = rawReactions.some(
-                        (r) =>
-                          r.user?.toString() === loggedInUserId &&
-                          r.reaction_type === "love"
-                      );
-                      const reactionCount = review.reactions?.love || 0;
-                      return (
-                        <button
-                          onClick={() => handleReaction(review.id, "love")}
-                          title="Love"
-                          className={`${styles.instBtn} ${hasLoved ? styles.instBtnLiked : ""}`}
-                        >
-                          {hasLoved ? (
-                            <FaHeart color="#e50914" />
-                          ) : (
-                            <FaRegHeart />
-                          )}
-                          <span style={hasLoved ? { color: "#e50914" } : {}}>
-                            {reactionCount}
-                          </span>
-                        </button>
-                      );
-                    })()}
-                    <button
-                      onClick={() => toggleComments(review.id)}
-                      className={styles.instBtn}
-                    >
-                      <FaRegComment />
-                      <span>{review.comment_count || 0}</span>
-                    </button>
-                  </div>
-                </div>
-                {activeComments.reviewId === review.id && (
-                  <div className={styles.commentsSection}>
-                    {activeComments.comments
-                      .filter((c) => c.user)
-                      .map((comment) => (
-                        <div key={comment._id} className={styles.commentItem}>
-                          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", flex: 1 }}>
-                            <Link
-                              to={`/profile/${comment.user._id}`}
-                              className={styles.authorLink}
-                              style={{ marginRight: "5px" }}
-                            >
-                              <strong>{comment.user.username}:</strong>
-                            </Link>
-                            <span> {comment.comment_text}</span>
-                          </div>
-                          
-                          <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginLeft: "auto", fontSize: "0.8rem", flexShrink: 0 }}>
-                            <button
-                              type="button"
-                              onClick={() => handleReplyClick(comment.user.username)}
-                              style={{ background: "none", border: "none", color: "var(--dynamic-primary, #aaa)", cursor: "pointer", padding: 0 }}
-                            >
-                              Rispondi
-                            </button>
-                            {loggedInUserId === comment.user._id && (
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteComment(comment._id)}
-                                className={styles.deleteCommentButton}
-                              >
-                                ×
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    <form
-                      className={styles.commentForm}
-                      onSubmit={(e) => handleAddComment(e, review.id)}
-                    >
-                      <input
-                        ref={commentInputRef}
-                        type="text"
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Rispondi... usa @ per taggare"
-                      />
-                      <button type="submit">Invia</button>
-                    </form>
-                  </div>
-                )}
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className={styles.noReviews}>Nessuna recensione ancora.</p>
+            )}
           </div>
         </div>
       </div>

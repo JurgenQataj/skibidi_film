@@ -162,22 +162,74 @@ export function useMediaDetail(mediaType) {
 
   const handleReaction = async (reviewId, reactionType) => {
     const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const targetIdStr = String(reviewId);
+
+    // Optimistic update
+    setSkibidiData((prev) => {
+      const updatedReviews = prev.reviews.map((r) => {
+        const rIdStr = String(r.id || r._id);
+        if (rIdStr !== targetIdStr) return r;
+
+        const rawReactions = r.user_reactions || (Array.isArray(r.reactions) ? r.reactions : []);
+        const hasLoved = rawReactions.some((rx) => {
+          const uId = (typeof rx.user === "object" && rx.user !== null ? rx.user._id : rx.user)?.toString();
+          return uId === loggedInUserId && rx.reaction_type === reactionType;
+        });
+
+        let newUserReactions;
+        if (hasLoved) {
+          newUserReactions = rawReactions.filter((rx) => {
+            const uId = (typeof rx.user === "object" && rx.user !== null ? rx.user._id : rx.user)?.toString();
+            return !(uId === loggedInUserId && rx.reaction_type === reactionType);
+          });
+        } else {
+          newUserReactions = [...rawReactions, { user: loggedInUserId, reaction_type: reactionType }];
+        }
+
+        const newFormattedReactions = newUserReactions.reduce((acc, rx) => {
+          acc[rx.reaction_type] = (acc[rx.reaction_type] || 0) + 1;
+          return acc;
+        }, {});
+
+        return {
+          ...r,
+          reactions: newFormattedReactions,
+          user_reactions: newUserReactions,
+        };
+      });
+
+      return { ...prev, reviews: updatedReviews };
+    });
+
     try {
       const resp = await axios.post(
         `${API_URL}/api/reactions/reviews/${reviewId}`,
         { reaction_type: reactionType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      const reactionsArr = resp.data?.reactions || [];
+      const formattedReactions = Array.isArray(reactionsArr)
+        ? reactionsArr.reduce((acc, rx) => {
+            acc[rx.reaction_type] = (acc[rx.reaction_type] || 0) + 1;
+            return acc;
+          }, {})
+        : {};
+
       setSkibidiData((prev) => ({
         ...prev,
-        reviews: prev.reviews.map((r) =>
-          r.id === reviewId
-            ? { ...r, reactions: resp.data.reactions, user_reactions: resp.data.reactions }
-            : r
-        ),
+        reviews: prev.reviews.map((r) => {
+          const rIdStr = String(r.id || r._id);
+          return rIdStr === targetIdStr
+            ? { ...r, reactions: formattedReactions, user_reactions: reactionsArr }
+            : r;
+        }),
       }));
     } catch (error) {
       toast("Errore durante l'invio della reazione.", "error");
+      fetchData();
     }
   };
 

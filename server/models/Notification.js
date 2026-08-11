@@ -13,7 +13,7 @@ const NotificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["new_follower", "new_reaction", "new_comment", "chat_mention", "comment_mention", "review_mention", "thread_comment", "following_review"],
+      enum: ["new_follower", "new_reaction", "new_comment", "chat_mention", "comment_mention", "review_mention", "thread_comment", "following_review", "comment_like"],
       required: true,
     },
     targetReview: { type: mongoose.Schema.Types.ObjectId, ref: "Review" },

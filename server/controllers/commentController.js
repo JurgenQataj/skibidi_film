@@ -61,7 +61,7 @@ exports.addComment = async (req, res) => {
     // Determina l'URL corretto per la notifica (film o serie TV)
     const movieTmdbId = review.movie?.tmdb_id || review.movie?._id;
     const mediaType = review.movie?.media_type === "tv" ? "tv" : "movie";
-    const notifUrl = movieTmdbId ? `/${mediaType}/${movieTmdbId}` : "/";
+    const notifUrl = movieTmdbId ? `/${mediaType}/${movieTmdbId}?reviewId=${review._id}` : "/";
 
     const trimmedComment = comment_text.trim();
     const commentSnippet = trimmedComment.length > 90
@@ -197,23 +197,54 @@ exports.toggleCommentLike = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const review = await Review.findById(reviewId);
+    const review = await Review.findById(reviewId).populate("movie", "title poster_path tmdb_id media_type");
     if (!review) return res.status(404).json({ message: "Recensione non trovata." });
 
     const comment = review.comments.id(commentId);
     if (!comment) return res.status(404).json({ message: "Commento non trovato." });
 
     const likeIndex = comment.likes.indexOf(userId);
-    if (likeIndex === -1) {
+    const isAddingLike = likeIndex === -1;
+
+    if (isAddingLike) {
       comment.likes.push(userId); // aggiungi like
     } else {
       comment.likes.splice(likeIndex, 1); // rimuovi like
     }
 
     await review.save();
-    
-    // Potremmo anche inviare una notifica a comment.user se e' un like nuovo e non self-like, 
-    // ma teniamolo semplice e restituiamo i like agionati.
+
+    // Se è un nuovo me piace e il commento è di un altro utente, invia notifica
+    if (isAddingLike && comment.user && comment.user.toString() !== userId) {
+      try {
+        await new Notification({
+          recipient: comment.user,
+          sender: userId,
+          type: "comment_like",
+          targetReview: review._id,
+        }).save();
+
+        const senderUser = await User.findById(userId).select("username avatar_url");
+        const senderName = senderUser ? senderUser.username : "Un utente";
+        const senderAvatar = senderUser?.avatar_url || "/pwa-192x192.png";
+        const movieTitle = review.movie?.title || "una recensione";
+        const movieTmdbId = review.movie?.tmdb_id || review.movie?._id;
+        const mediaType = review.movie?.media_type === "tv" ? "tv" : "movie";
+        const notifUrl = movieTmdbId ? `/${mediaType}/${movieTmdbId}?reviewId=${review._id}` : "/";
+
+        sendPushNotification(comment.user, {
+          title: `${senderName} ha messo like al tuo commento ❤️`,
+          body: `Su ${movieTitle}`,
+          icon: senderAvatar,
+          url: notifUrl,
+          tag: `comment-like-${comment._id}`,
+          notificationType: "comment_like",
+        });
+      } catch (notifErr) {
+        console.error("Errore notifica comment_like:", notifErr);
+      }
+    }
+
     res.json({ likes: comment.likes });
   } catch (err) {
     console.error("Errore toggleCommentLike:", err);
