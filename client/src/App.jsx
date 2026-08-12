@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import useAuthStore from "./store/useAuthStore";
 import { useState, lazy, Suspense } from "react";
+import { SkeletonWithLogo } from "./components/Skeleton";
 
 // Lazy import Pagine (code splitting: ogni pagina è un chunk separato)
 const DiscoverPage = lazy(() => import("./pages/DiscoverPage"));
@@ -115,7 +116,7 @@ function App() {
       <UpdatePrompt />
       <InstallPrompt />
       <EnableNotificationsPrompt />
-      <Suspense fallback={null}>
+      <Suspense fallback={<SkeletonWithLogo />}>
         <Routes>
           {/* Rotte Pubbliche (Auth) */}
           <Route

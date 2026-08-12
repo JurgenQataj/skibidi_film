@@ -18,7 +18,8 @@ export default defineConfig(({ command }) => {
           type: 'module'
         },
         injectManifest: {
-          injectionPoint: undefined
+          // Let Workbox inject the precache manifest into self.__WB_MANIFEST
+          // This is essential for NavigationRoute fallback to work (serves index.html for SPA routes)
         },
         manifest: {
           id: '/skibidi-film',
