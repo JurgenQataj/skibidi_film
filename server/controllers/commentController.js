@@ -43,7 +43,7 @@ exports.addComment = async (req, res) => {
     await review.save();
 
     await review.populate("comments.user", "username avatar_url");
-    await review.populate("movie", "title poster_path");
+    await review.populate("movie", "title poster_path tmdb_id media_type");
 
     const populatedComments = review.comments.filter((comment) => comment.user);
 

@@ -10,7 +10,7 @@ exports.addOrUpdateReaction = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const review = await Review.findById(reviewId).populate("movie", "title poster_path");
+    const review = await Review.findById(reviewId).populate("movie", "title poster_path tmdb_id media_type");
     if (!review)
       return res.status(404).json({ message: "Recensione non trovata." });
 
