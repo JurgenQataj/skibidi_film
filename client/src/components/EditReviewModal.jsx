@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
+import { FaEyeSlash } from "react-icons/fa";
 
 function EditReviewModal({ review, onClose, onUpdate }) {
   const [rating, setRating] = useState(review.rating);
   const [comment, setComment] = useState(review.comment_text || "");
+  const [isSpoiler, setIsSpoiler] = useState(review.is_spoiler || false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,8 +20,8 @@ function EditReviewModal({ review, onClose, onUpdate }) {
       const API_URL = import.meta.env.VITE_API_URL || "";
 
       await axios.put(
-        `${API_URL}/api/reviews/${review.id}`, // review object from formattedReviews has .id not ._id
-        { rating, comment_text: comment },
+        `${API_URL}/api/reviews/${review.id}`,
+        { rating, comment_text: comment, is_spoiler: isSpoiler },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -97,6 +99,36 @@ function EditReviewModal({ review, onClose, onUpdate }) {
                 e.target.style.boxShadow = "none";
               }}
             />
+          </div>
+
+          <div>
+            <label
+              style={{
+                display: "flex", alignItems: "center", gap: "10px",
+                cursor: "pointer", padding: "10px 14px", borderRadius: "12px",
+                background: isSpoiler ? "rgba(255, 170, 0, 0.1)" : "rgba(255, 255, 255, 0.04)",
+                border: `1px solid ${isSpoiler ? "rgba(255, 170, 0, 0.3)" : "rgba(255, 255, 255, 0.06)"}`,
+                transition: "all 0.25s ease", userSelect: "none"
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={isSpoiler}
+                onChange={(e) => setIsSpoiler(e.target.checked)}
+                style={{ display: "none" }}
+              />
+              <FaEyeSlash style={{
+                color: isSpoiler ? "#ffaa00" : "rgba(255,255,255,0.4)",
+                fontSize: "1rem", transition: "color 0.25s ease"
+              }} />
+              <span style={{
+                color: isSpoiler ? "#ffaa00" : "rgba(255,255,255,0.5)",
+                fontSize: "0.9rem", fontWeight: "500",
+                transition: "color 0.25s ease"
+              }}>
+                Contiene spoiler
+              </span>
+            </label>
           </div>
           
           {error && <p style={{color:"#ff8a8a", margin: "-10px 0 0"}}>{error}</p>}

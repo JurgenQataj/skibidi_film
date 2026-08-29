@@ -521,6 +521,84 @@
 
 }
 
+/* --- SPOILER STYLES --- */
+.spoilerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: rgba(255, 170, 0, 0.12);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  color: #ffaa00;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.3px;
+}
+
+.spoilerOverlay {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  margin: 2px 0 12px 0;
+}
+
+.spoilerBlurred {
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+  margin: 0 !important;
+}
+
+.revealSpoilerBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 170, 0, 0.15);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  color: #ffaa00;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  z-index: 2;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+}
+
+.revealSpoilerBtn:hover {
+  background: rgba(255, 170, 0, 0.25);
+  border-color: rgba(255, 170, 0, 0.5);
+  transform: translate(-50%, -50%) scale(1.04);
+  box-shadow: 0 4px 16px rgba(255, 170, 0, 0.15);
+}
+
+.spoilerRevealed {
+  animation: spoilerFadeIn 0.4s ease forwards;
+}
+
+@keyframes spoilerFadeIn {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
 /* --- ADMIN POST STYLES --- */
 .adminPostCard {
   background: rgba(18, 18, 28, 0.6);

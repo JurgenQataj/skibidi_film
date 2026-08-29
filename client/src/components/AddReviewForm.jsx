@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import styles from "./AddReviewForm.module.css";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaEyeSlash } from "react-icons/fa";
 
 function AddReviewForm({ tmdbId, mediaType = "movie", seasons = [], selectedSeason = "all", onReviewAdded }) {
   const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
+  const [isSpoiler, setIsSpoiler] = useState(false);
   const [seasonNumber, setSeasonNumber] = useState(
     selectedSeason && selectedSeason !== "all" ? String(selectedSeason) : ""
   );
@@ -95,6 +96,7 @@ function AddReviewForm({ tmdbId, mediaType = "movie", seasons = [], selectedSeas
           mediaType: mediaType,
           rating: parseFloat(rating),
           comment_text: comment,
+          is_spoiler: isSpoiler,
           season_number: mediaType === "tv" && seasonNumber !== "" ? Number(seasonNumber) : null,
         },
         {
@@ -104,6 +106,7 @@ function AddReviewForm({ tmdbId, mediaType = "movie", seasons = [], selectedSeas
 
       setRating("");
       setComment("");
+      setIsSpoiler(false);
       setIsFocused(false);
       onReviewAdded();
     } catch (err) {
@@ -201,6 +204,19 @@ function AddReviewForm({ tmdbId, mediaType = "movie", seasons = [], selectedSeas
               rows={isFocused || comment ? "3" : "1"}
               placeholder="Scrivi una recensione..."
             />
+
+            <div className={styles.spoilerRow}>
+              <label className={`${styles.spoilerToggle} ${isSpoiler ? styles.spoilerActive : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={isSpoiler}
+                  onChange={(e) => setIsSpoiler(e.target.checked)}
+                  className={styles.spoilerCheckbox}
+                />
+                <FaEyeSlash className={styles.spoilerIcon} />
+                <span>Contiene spoiler</span>
+              </label>
+            </div>
           </div>
         </div>
         

@@ -285,6 +285,65 @@
   opacity: 0.8;
 }
 
+/* Spoiler Toggle */
+.spoilerRow {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: all 0.3s ease;
+}
+
+.minimalForm.active .spoilerRow {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.spoilerToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  user-select: none;
+  letter-spacing: 0.2px;
+}
+
+.spoilerToggle:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.spoilerToggle.spoilerActive {
+  background: rgba(255, 170, 0, 0.12);
+  border-color: rgba(255, 170, 0, 0.35);
+  color: #ffaa00;
+}
+
+.spoilerCheckbox {
+  display: none;
+}
+
+.spoilerIcon {
+  font-size: 0.85rem;
+  transition: transform 0.3s ease;
+}
+
+.spoilerToggle.spoilerActive .spoilerIcon {
+  transform: scale(1.1);
+}
+
 @media (max-width: 768px) {
   .minimalForm {
     padding: 16px;

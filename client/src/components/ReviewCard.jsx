@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaRegHeart, FaHeart, FaRegComment, FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { FaRegHeart, FaHeart, FaRegComment, FaStar, FaStarHalfAlt, FaEyeSlash, FaEye } from "react-icons/fa";
 import axios from "axios";
 import styles from "./ReviewCard.module.css";
 import { formatDistanceToNow } from "date-fns";
@@ -197,6 +197,7 @@ function ReviewCard({ review, onInteraction, onEdit, onDelete }) {
   const [commentText, setCommentText] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isDeletingComment, setIsDeletingComment] = useState(null);
+  const [spoilerRevealed, setSpoilerRevealed] = useState(false);
 
   const [mentionSearch, setMentionSearch] = useState("");
   const [mentionUsers, setMentionUsers] = useState([]);
@@ -399,6 +400,11 @@ function ReviewCard({ review, onInteraction, onEdit, onDelete }) {
               Stagione {review.season_number}
             </span>
           )}
+          {review.is_spoiler && (
+            <span className={styles.spoilerBadge}>
+              <FaEyeSlash size={10} /> Spoiler
+            </span>
+          )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link to={`/profile/${user._id || user.id}`} className={styles.authorLink}>
@@ -448,7 +454,22 @@ function ReviewCard({ review, onInteraction, onEdit, onDelete }) {
           </Link>
         </div>
         <div className={styles.rightColumn}>
-          {comment_text && <p className={styles.comment}>{renderText(comment_text)}</p>}
+          {comment_text && (
+            review.is_spoiler && !spoilerRevealed ? (
+              <div className={styles.spoilerOverlay}>
+                <p className={`${styles.comment} ${styles.spoilerBlurred}`}>{comment_text}</p>
+                <button
+                  className={styles.revealSpoilerBtn}
+                  onClick={() => setSpoilerRevealed(true)}
+                >
+                  <FaEye size={12} />
+                  <span>Mostra spoiler</span>
+                </button>
+              </div>
+            ) : (
+              <p className={`${styles.comment} ${review.is_spoiler && spoilerRevealed ? styles.spoilerRevealed : ''}`}>{renderText(comment_text)}</p>
+            )
+          )}
         {/* Nuova riga combinata Footer */}
         <div className={styles.footerRow}>
           <div className={styles.timestamp}>{timeAgo(createdAt)}</div>
