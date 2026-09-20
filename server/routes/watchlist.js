@@ -11,6 +11,9 @@ router.post('/', protect, watchlistController.addToWatchlist);
 // Aggiungere più film in blocco alla watchlist (utente loggato)
 router.post('/batch', protect, watchlistController.addBatchToWatchlist);
 
+// Batch fetch watch providers (flatrate IT)
+router.post('/watch-providers', watchlistController.getWatchProvidersBatch);
+
 // Vedere la watchlist di un utente (pubblica)
 router.get('/user/:userId', watchlistController.getWatchlist);
 

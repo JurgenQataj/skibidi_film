@@ -161,3 +161,35 @@ exports.getWatchlistStatus = async (req, res) => {
     res.status(500).json({ message: "Errore server." });
   }
 };
+
+// --- Batch fetch watch providers (flatrate IT) per lista di TMDB IDs ---
+exports.getWatchProvidersBatch = async (req, res) => {
+  const { items } = req.body; // array di { tmdbId, mediaType }
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.json({});
+  }
+
+  const API_KEY = process.env.TMDB_API_KEY;
+  const result = {}; // chiave: "tmdbId" → array di provider IDs
+
+  // Limita a 50 per evitare troppi round-trip
+  const batch = items.slice(0, 50);
+
+  await Promise.all(
+    batch.map(async ({ tmdbId, mediaType }) => {
+      try {
+        const type = mediaType === "tv" ? "tv" : "movie";
+        const url = `https://api.themoviedb.org/3/${type}/${tmdbId}/watch/providers?api_key=${API_KEY}`;
+        const response = await axios.get(url, { timeout: 4000 });
+        const itData = response.data?.results?.IT;
+        const flatrate = itData?.flatrate || [];
+        result[String(tmdbId)] = flatrate.map(p => p.provider_id);
+      } catch (e) {
+        // Se fallisce, ignoriamo — nessun provider disponibile
+        result[String(tmdbId)] = [];
+      }
+    })
+  );
+
+  res.json(result);
+};

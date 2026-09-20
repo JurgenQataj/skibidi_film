@@ -70,6 +70,7 @@ function useSearchHandlers({
     if (filters.language)                    p.set('with_original_language', filters.language);
     if (filters.keywords.length > 0)         p.set('with_keywords', filters.keywords.map(k => k.id).join(','));
     if (filters.sortBy)                      p.set('sort_by', filters.sortBy);
+    if (filters.streamingProviders?.length > 0) p.set('with_watch_providers', filters.streamingProviders.join('|'));
     return p;
   };
 
@@ -176,6 +177,7 @@ function SearchPage() {
     language: "",
     keywords: [], // Changed to array for multiple keywords
     sortBy: "",
+    streamingProviders: [], // [NUOVO] Filtro provider di streaming (flatrate)
   }));
 
   // Salva in sessionStorage ad ogni modifica (incluso smart search)
@@ -231,6 +233,20 @@ function SearchPage() {
     { code: "ja", name: "Giapponese" },
     { code: "ko", name: "Coreano" },
     { code: "zh", name: "Cinese" },
+  ];
+
+  // Provider di streaming (solo abbonamento / flatrate) – ID TMDB Italia
+  const streamingProviders = [
+    { id: 119, name: "Amazon Prime Video" },
+    { id: 350, name: "Apple TV+" },
+    { id: 337, name: "Disney+" },
+    { id: 359, name: "Infinity" },
+    { id: 11,  name: "MUBI" },
+    { id: 8,   name: "Netflix" },
+    { id: 39,  name: "NOW" },
+    { id: 531, name: "Paramount+" },
+    { id: 222, name: "RaiPlay" },
+    { id: 29,  name: "Sky" },
   ];
 
   // *** OPZIONI ORDINAMENTO ***
@@ -308,6 +324,7 @@ function SearchPage() {
         language: "",
         keywords: [],
         sortBy: "",
+        streamingProviders: [],
       });
     } catch (error) {
       console.error("Errore durante la ricerca:", error);
@@ -411,6 +428,7 @@ function SearchPage() {
       language: "",
       keywords: [],
       sortBy: "",
+      streamingProviders: [],
     });
     setHasSearched(false);
     setResults([]);
@@ -720,6 +738,18 @@ function SearchPage() {
                     value={filters.language}
                     onChange={(val) => handleFilterChange("language", val)}
                     placeholder="Tutte"
+                />
+                </div>
+
+                {/* Streaming Providers */}
+                <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>Dove Guardare</label>
+                <CustomSelect
+                    options={streamingProviders}
+                    value={filters.streamingProviders}
+                    onChange={(val) => handleFilterChange("streamingProviders", val)}
+                    placeholder="Tutti"
+                    multiple={true}
                 />
                 </div>
 

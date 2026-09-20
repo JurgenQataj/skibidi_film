@@ -62,6 +62,14 @@ function WatchlistPage() {
     try { return sessionStorage.getItem(`watchlistSortBy_${userIdKey}`) || "recent"; } catch (e) { return "recent"; }
   });
 
+  const [selectedProviders, setSelectedProviders] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(`watchlistSelectedProviders_${userIdKey}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) { return []; }
+  });
+  const [providerMap, setProviderMap] = useState({}); // tmdbId -> [providerIds]
+
   const typeOptions = [
     { value: "all", name: "Tutti" },
     { value: "movie", name: "Film" },
@@ -85,6 +93,20 @@ function WatchlistPage() {
     { value: "meta_desc", name: "Metacritic" },
     { value: "year_desc", name: "Anno (Nuovi prima)" },
     { value: "year_asc", name: "Anno (Vecchi prima)" },
+  ];
+
+  // Provider di streaming (solo abbonamento / flatrate) – ID TMDB Italia
+  const streamingProviderOptions = [
+    { id: 119, name: "Amazon Prime Video" },
+    { id: 350, name: "Apple TV+" },
+    { id: 337, name: "Disney+" },
+    { id: 359, name: "Infinity" },
+    { id: 11,  name: "MUBI" },
+    { id: 8,   name: "Netflix" },
+    { id: 39,  name: "NOW" },
+    { id: 531, name: "Paramount+" },
+    { id: 222, name: "RaiPlay" },
+    { id: 29,  name: "Sky" },
   ];
 
   const availableGenres = useMemo(() => {
@@ -145,6 +167,12 @@ function WatchlistPage() {
         if (selectedRuntime === "long" && (rt <= 120 || rt > 180)) return false;
         if (selectedRuntime === "epic" && rt <= 180) return false;
       }
+      // Filtro provider di streaming
+      if (selectedProviders.length > 0) {
+        const movieProviders = providerMap[String(movie.tmdb_id)] || [];
+        const hasAnyProvider = selectedProviders.some(pid => movieProviders.includes(pid));
+        if (!hasAnyProvider) return false;
+      }
       return true;
     });
 
@@ -189,7 +217,7 @@ function WatchlistPage() {
     }
 
     return result;
-  }, [watchlist, selectedGenres, selectedKeyword, selectedType, sortBy, selectedRuntime]);
+  }, [watchlist, selectedGenres, selectedKeyword, selectedType, sortBy, selectedRuntime, selectedProviders, providerMap]);
 
   const fetchWatchlist = useCallback(async () => {
     try {
@@ -226,6 +254,27 @@ function WatchlistPage() {
     fetchWatchlist();
   }, [fetchWatchlist]);
 
+  // Fetch watch providers per tutti gli elementi della watchlist
+  useEffect(() => {
+    if (watchlist.length === 0) return;
+    const fetchProviders = async () => {
+      try {
+        const items = watchlist.map(m => ({ tmdbId: m.tmdb_id, mediaType: m.media_type || "movie" }));
+        // Processiamo a batch di 50
+        const allResults = {};
+        for (let i = 0; i < items.length; i += 50) {
+          const batch = items.slice(i, i + 50);
+          const res = await axios.post(`${API_URL}/api/watchlist/watch-providers`, { items: batch });
+          Object.assign(allResults, res.data);
+        }
+        setProviderMap(allResults);
+      } catch (err) {
+        console.error("Errore fetch watch providers:", err);
+      }
+    };
+    fetchProviders();
+  }, [watchlist, API_URL]);
+
   useEffect(() => {
     try {
       sessionStorage.setItem(`watchlistSelectedGenres_${userIdKey}`, JSON.stringify(selectedGenres));
@@ -249,6 +298,10 @@ function WatchlistPage() {
   useEffect(() => {
     try { sessionStorage.setItem(`watchlistSortBy_${userIdKey}`, sortBy); } catch (e) {}
   }, [sortBy, userIdKey]);
+
+  useEffect(() => {
+    try { sessionStorage.setItem(`watchlistSelectedProviders_${userIdKey}`, JSON.stringify(selectedProviders)); } catch (e) {}
+  }, [selectedProviders, userIdKey]);
 
   // Ripristina la posizione dello scroll PRIMA che il browser dipinga (nessun flash visivo)
   useLayoutEffect(() => {
@@ -381,6 +434,16 @@ function WatchlistPage() {
               )}
             </ul>
           )}
+        </div>
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Dove Guardare:</label>
+          <CustomSelect 
+            options={streamingProviderOptions}
+            value={selectedProviders} 
+            onChange={setSelectedProviders}
+            placeholder="Tutti"
+            multiple={true}
+          />
         </div>
       </div>
 

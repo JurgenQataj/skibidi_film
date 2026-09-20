@@ -34,7 +34,8 @@ function buildTvDiscoverParams(query, API_KEY) {
   const {
     genre, release_date_gte, release_date_lte, vote_average_gte,
     vote_count_gte, with_original_language, with_keywords,
-    with_companies, with_origin_country, sort_by, page = 1,
+    with_companies, with_origin_country, with_watch_providers,
+    sort_by, page = 1,
     category = "popular",
   } = query;
 
@@ -54,6 +55,11 @@ function buildTvDiscoverParams(query, API_KEY) {
   if (with_keywords)            params.with_keywords = with_keywords;
   if (with_companies)           params.with_companies = with_companies;
   if (with_origin_country)      params.with_origin_country = with_origin_country;
+  if (with_watch_providers) {
+    params.with_watch_providers = with_watch_providers;
+    params.watch_region = "IT";
+    params.with_watch_monetization_types = "flatrate";
+  }
   if (category === "top_rated" && !sort_by) params.sort_by = "vote_average.desc";
 
   return params;
@@ -62,10 +68,11 @@ function buildTvDiscoverParams(query, API_KEY) {
 function resolveTvDiscoverUrl(BASE_URL, defaultEndpoint, query) {
   const { genre, release_date_gte, release_date_lte, vote_average_gte,
     vote_count_gte, with_original_language, with_keywords,
-    with_companies, with_origin_country, sort_by } = query;
+    with_companies, with_origin_country, with_watch_providers, sort_by } = query;
   const needsDiscover = genre || release_date_gte || release_date_lte ||
     vote_average_gte || vote_count_gte || with_original_language ||
     with_keywords || with_companies || with_origin_country ||
+    with_watch_providers ||
     (sort_by && sort_by !== "popularity.desc");
   return needsDiscover ? `${BASE_URL}/discover/tv` : `${BASE_URL}${defaultEndpoint}`;
 }
